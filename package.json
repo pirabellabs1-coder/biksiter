@@ -10,10 +10,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "bd:migrer": "tsx --env-file-if-exists=.env.local scripts/migrer.ts",
-    "bd:semer": "tsx --env-file-if-exists=.env.local scripts/semer.ts"
+    "bd:semer": "tsx --env-file-if-exists=.env.local scripts/semer.ts",
+    "bd:courriels": "tsx --env-file-if-exists=.env.local scripts/envoyer-courriels.ts"
   },
   "dependencies": {
     "next": "^15.5.4",
+    "nodemailer": "^10.0.1",
     "pg": "^8.23.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",

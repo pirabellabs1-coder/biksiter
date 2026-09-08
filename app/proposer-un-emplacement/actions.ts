@@ -6,6 +6,7 @@ import { baseConfiguree } from '@/lib/bd/client';
 import { deposerUneCandidature } from '@/lib/depot/candidatures';
 import { creerUnEmplacement } from '@/lib/depot/emplacements';
 import { quartierParNom } from '@/lib/contenu/quartiers';
+import { geocoder } from '@/lib/geocodage/geocodeur';
 import {
   ERREUR_GENERALE,
   ressembleAUnEmail,
@@ -142,6 +143,28 @@ export async function proposerUnEmplacement(
     return { statut: 'erreur', erreurs };
   }
 
+  // Le géocodage sert à poser le point exact, que la vue arrondira ensuite.
+  // Une adresse hors de Bruxelles est refusée ici : c'est une règle de
+  // territoire, pas un champ mal rempli.
+  const situation = await geocoder(adresse);
+
+  if (!situation.trouve && situation.motif === 'hors_zone') {
+    return {
+      statut: 'erreur',
+      erreurs: {
+        adresse:
+          'Cette adresse est en Belgique mais hors de la région bruxelloise. Le réseau ne couvre pas encore votre commune.',
+      },
+    };
+  }
+
+  // Géocodeur muet ou adresse introuvable : on retombe sur le centre du
+  // quartier. La zone devient plus floue, jamais plus précise — c'est le seul
+  // sens dans lequel une approximation est acceptable ici.
+  const position = situation.trouve
+    ? situation.point
+    : { latitude: quartier.latitude, longitude: quartier.longitude };
+
   // Un membre connecté et vérifié publie directement ; tout autre cas dépose
   // une candidature, qui attend le passage d'une personne (règle 2).
   if (membre) {
@@ -163,8 +186,8 @@ export async function proposerUnEmplacement(
         type,
         quartier: quartier.nom,
         adresseExacte: adresse,
-        latitude: quartier.latitude,
-        longitude: quartier.longitude,
+        latitude: position.latitude,
+        longitude: position.longitude,
         rayonDeLaZone: RAYON_MINIMAL_DE_ZONE_METRES + 150,
         capacite,
         verrouillage,

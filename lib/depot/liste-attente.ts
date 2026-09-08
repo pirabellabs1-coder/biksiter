@@ -3,9 +3,12 @@ import 'server-only';
 import {
   VIOLATION_UNICITE,
   codeDErreurPostgres,
+  dansUneTransaction,
   interroger,
   uneLigne,
 } from '@/lib/bd/client';
+import { mettreEnFile } from '@/lib/courriel/file';
+import { inscriptionSurLaListe } from '@/lib/courriel/modeles';
 import type { Role } from '@/lib/formulaires/roles';
 
 export type DejaInscrit = { dejaInscrit: true };
@@ -22,12 +25,24 @@ export async function inscrireSurLaListe(inscription: {
   role: Role;
 }): Promise<DejaInscrit | Inscrit> {
   try {
-    await interroger(
-      `insert into inscription_liste_attente (email, quartier, role)
-       values ($1, $2, $3)`,
-      [inscription.email, inscription.quartier, inscription.role],
-    );
-    return { dejaInscrit: false };
+    return await dansUneTransaction(async (client) => {
+      await client.query(
+        `insert into inscription_liste_attente (email, quartier, role)
+         values ($1, $2, $3)`,
+        [inscription.email, inscription.quartier, inscription.role],
+      );
+
+      await mettreEnFile(
+        inscription.email,
+        inscriptionSurLaListe({
+          quartier: inscription.quartier,
+          peutAccueillir: inscription.role !== 'cycliste',
+        }),
+        { client, aPropos: 'liste d’attente' },
+      );
+
+      return { dejaInscrit: false };
+    });
   } catch (erreur) {
     if (codeDErreurPostgres(erreur) === VIOLATION_UNICITE) {
       return { dejaInscrit: true };

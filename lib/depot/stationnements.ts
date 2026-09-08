@@ -1,6 +1,14 @@
 import 'server-only';
 
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
+import { mettreEnFile } from '@/lib/courriel/file';
+import {
+  demandeAcceptee,
+  demandeRecue,
+  demandeRefusee,
+  desistement,
+} from '@/lib/courriel/modeles';
+import { creneauEnFrancais } from '@/lib/temps';
 import { laPlaceEstLibre, type Creneau } from '@/lib/regles/capacite';
 import { estUnDesistementTardif } from '@/lib/regles/annulation';
 import { ESSAIS_PAR_CODE, saisirLeCode, type Code } from '@/lib/regles/remise';
@@ -117,6 +125,38 @@ export async function demanderUnStationnement(demande: {
       ],
     );
 
+    // Le message part dans la même transaction que la demande : il ne peut
+    // donc pas annoncer un stationnement qui n'aurait pas été enregistré.
+    const gens = await client.query<{
+      emailDuBikeSitter: string;
+      prenomDuBikeSitter: string;
+      prenomDuCycliste: string;
+    }>(
+      `select bs.email  as "emailDuBikeSitter",
+              bs.prenom as "prenomDuBikeSitter",
+              cy.prenom as "prenomDuCycliste"
+         from emplacement e
+         join membre bs on bs.id = e.membre_id
+         join membre cy on cy.id = $2
+        where e.id = $1`,
+      [id, demande.cyclisteId],
+    );
+
+    const { emailDuBikeSitter, prenomDuBikeSitter, prenomDuCycliste } =
+      gens.rows[0];
+
+    await mettreEnFile(
+      emailDuBikeSitter,
+      demandeRecue({
+        prenomDuBikeSitter,
+        prenomDuCycliste,
+        creneau: creneauEnFrancais(demande.debut, demande.fin),
+        typeVelo: demande.typeVelo,
+        message: demande.message,
+      }),
+      { client, aPropos: `stationnement ${cree.rows[0].id}` },
+    );
+
     return cree.rows[0].id;
   });
 }
@@ -165,18 +205,63 @@ export async function repondreALaDemande(
   bikeSitterId: string,
   reponse: 'accepte' | 'refuse',
 ): Promise<boolean> {
-  const lignes = await interroger<{ id: string }>(
-    `update stationnement s
-        set etat = $3, repondu_le = now()
-       from emplacement e
-      where s.id = $1
-        and s.emplacement_id = e.id
-        and e.membre_id = $2
-        and s.etat = 'demande'
-      returning s.id`,
-    [stationnementId, bikeSitterId, reponse],
-  );
-  return lignes.length > 0;
+  return dansUneTransaction(async (client) => {
+    const modifie = await client.query<{
+      id: string;
+      debut: Date;
+      fin: Date;
+      emailDuCycliste: string;
+      prenomDuCycliste: string;
+      prenomDuBikeSitter: string;
+      adresseExacte: string;
+    }>(
+      `update stationnement s
+          set etat = $3, repondu_le = now()
+         from emplacement e, membre cy, membre bs
+        where s.id = $1
+          and s.emplacement_id = e.id
+          and e.membre_id = $2
+          and cy.id = s.cycliste_id
+          and bs.id = e.membre_id
+          and s.etat = 'demande'
+        returning s.id, s.debut, s.fin,
+                  cy.email  as "emailDuCycliste",
+                  cy.prenom as "prenomDuCycliste",
+                  bs.prenom as "prenomDuBikeSitter",
+                  e.adresse_exacte as "adresseExacte"`,
+      [stationnementId, bikeSitterId, reponse],
+    );
+
+    if (modifie.rowCount === 0) {
+      return false;
+    }
+
+    const ligne = modifie.rows[0];
+    const creneau = creneauEnFrancais(new Date(ligne.debut), new Date(ligne.fin));
+
+    // Règle 4 : l'adresse ne part qu'ici, dans le message d'acceptation, et
+    // nulle part ailleurs. Un refus n'en dit rien.
+    const message =
+      reponse === 'accepte'
+        ? demandeAcceptee({
+            prenomDuCycliste: ligne.prenomDuCycliste,
+            prenomDuBikeSitter: ligne.prenomDuBikeSitter,
+            creneau,
+            adresse: ligne.adresseExacte,
+          })
+        : demandeRefusee({
+            prenomDuCycliste: ligne.prenomDuCycliste,
+            prenomDuBikeSitter: ligne.prenomDuBikeSitter,
+            creneau,
+          });
+
+    await mettreEnFile(ligne.emailDuCycliste, message, {
+      client,
+      aPropos: `stationnement ${stationnementId}`,
+    });
+
+    return true;
+  });
 }
 
 export type Desistement = { annule: boolean; tardif: boolean };
@@ -186,10 +271,27 @@ export async function annulerLeStationnement(
   membreId: string,
 ): Promise<Desistement> {
   return dansUneTransaction(async (client) => {
-    const trouve = await client.query<{ debut: Date }>(
-      `select s.debut
+    const trouve = await client.query<{
+      debut: Date;
+      fin: Date;
+      cyclisteId: string;
+      bikeSitterId: string;
+      emailDuCycliste: string;
+      prenomDuCycliste: string;
+      emailDuBikeSitter: string;
+      prenomDuBikeSitter: string;
+    }>(
+      `select s.debut, s.fin,
+              cy.id     as "cyclisteId",
+              bs.id     as "bikeSitterId",
+              cy.email  as "emailDuCycliste",
+              cy.prenom as "prenomDuCycliste",
+              bs.email  as "emailDuBikeSitter",
+              bs.prenom as "prenomDuBikeSitter"
          from stationnement s
          join emplacement e on e.id = s.emplacement_id
+         join membre cy on cy.id = s.cycliste_id
+         join membre bs on bs.id = e.membre_id
         where s.id = $1
           and (s.cycliste_id = $2 or e.membre_id = $2)
           and s.etat in ('demande', 'accepte')
@@ -206,12 +308,31 @@ export async function annulerLeStationnement(
       [stationnementId],
     );
 
+    const ligne = trouve.rows[0];
+
     // Le caractère tardif ne déclenche aucune pénalité : il ne sert qu'à
     // choisir le message. La règle 3 interdit tout score entre membres.
-    return {
-      annule: true,
-      tardif: estUnDesistementTardif(new Date(trouve.rows[0].debut), new Date()),
-    };
+    const tardif = estUnDesistementTardif(new Date(ligne.debut), new Date());
+
+    // Le message va à l'autre : celui qui annule sait déjà qu'il a annulé.
+    const cestLeCycliste = membreId === ligne.cyclisteId;
+
+    await mettreEnFile(
+      cestLeCycliste ? ligne.emailDuBikeSitter : ligne.emailDuCycliste,
+      desistement({
+        prenomDuDestinataire: cestLeCycliste
+          ? ligne.prenomDuBikeSitter
+          : ligne.prenomDuCycliste,
+        prenomDeCeluiQuiSeDesiste: cestLeCycliste
+          ? ligne.prenomDuCycliste
+          : ligne.prenomDuBikeSitter,
+        creneau: creneauEnFrancais(new Date(ligne.debut), new Date(ligne.fin)),
+        tardif,
+      }),
+      { client, aPropos: `stationnement ${stationnementId}` },
+    );
+
+    return { annule: true, tardif };
   });
 }
 

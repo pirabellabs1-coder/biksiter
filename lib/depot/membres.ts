@@ -7,6 +7,8 @@ import {
   interroger,
   uneLigne,
 } from '@/lib/bd/client';
+import { mettreEnFile } from '@/lib/courriel/file';
+import { bienvenue } from '@/lib/courriel/modeles';
 import type { EtatDeVerification } from '@/lib/regles/publication';
 import { empreinteDuMotDePasse } from '@/lib/securite/mot-de-passe';
 
@@ -76,10 +78,15 @@ export async function creerLeMembre(inscription: Inscription): Promise<Membre> {
 
   try {
     return await dansUneTransaction(async (client) => {
-      const invitation = await client.query<{ code: string }>(
-        `select code from invitation
-          where code = $1 and utilisee_par is null
-          for update`,
+      const invitation = await client.query<{
+        code: string;
+        prenomDeLInvitant: string;
+      }>(
+        `select i.code, m.prenom as "prenomDeLInvitant"
+           from invitation i
+           join membre m on m.id = i.emise_par
+          where i.code = $1 and i.utilisee_par is null
+          for update of i`,
         [inscription.codeDInvitation.toUpperCase()],
       );
 
@@ -101,6 +108,15 @@ export async function creerLeMembre(inscription: Inscription): Promise<Membre> {
             set utilisee_par = $1, utilisee_le = now()
           where code = $2`,
         [membre.id, invitation.rows[0].code],
+      );
+
+      await mettreEnFile(
+        membre.email,
+        bienvenue({
+          prenom: membre.prenom,
+          invitePar: invitation.rows[0].prenomDeLInvitant,
+        }),
+        { client, aPropos: `membre ${membre.id}` },
       );
 
       return membre;

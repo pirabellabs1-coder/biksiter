@@ -1,6 +1,8 @@
 import 'server-only';
 
-import { interroger } from '@/lib/bd/client';
+import { dansUneTransaction, interroger } from '@/lib/bd/client';
+import { mettreEnFile } from '@/lib/courriel/file';
+import { candidatureRecue } from '@/lib/courriel/modeles';
 import type {
   Acces,
   Ancrage,
@@ -39,28 +41,36 @@ export type Candidature = {
 export async function deposerUneCandidature(
   candidature: Candidature,
 ): Promise<void> {
-  await interroger(
-    `insert into candidature_emplacement (
-        prenom, email, adresse_exacte, type, quartier, capacite,
-        verrouillage, intemperie, acces, ancrage, services,
-        velos_acceptes, precisions)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-    [
-      candidature.prenom,
+  await dansUneTransaction(async (client) => {
+    await client.query(
+      `insert into candidature_emplacement (
+          prenom, email, adresse_exacte, type, quartier, capacite,
+          verrouillage, intemperie, acces, ancrage, services,
+          velos_acceptes, precisions)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+      [
+        candidature.prenom,
+        candidature.email,
+        candidature.adresseExacte,
+        candidature.type,
+        candidature.quartier,
+        candidature.capacite,
+        candidature.verrouillage,
+        candidature.intemperie,
+        candidature.acces,
+        candidature.ancrage,
+        [...candidature.services],
+        [...candidature.velosAcceptes],
+        candidature.precisions,
+      ],
+    );
+
+    await mettreEnFile(
       candidature.email,
-      candidature.adresseExacte,
-      candidature.type,
-      candidature.quartier,
-      candidature.capacite,
-      candidature.verrouillage,
-      candidature.intemperie,
-      candidature.acces,
-      candidature.ancrage,
-      [...candidature.services],
-      [...candidature.velosAcceptes],
-      candidature.precisions,
-    ],
-  );
+      candidatureRecue({ prenom: candidature.prenom }),
+      { client, aPropos: 'candidature d’emplacement' },
+    );
+  });
 }
 
 export async function candidaturesATraiter(): Promise<number> {

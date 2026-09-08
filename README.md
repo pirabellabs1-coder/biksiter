@@ -52,8 +52,10 @@ Ne pas lancer `npm run build` pendant que `npm run dev` tourne : les deux
 | `lib/bd/` | La réserve de connexions et les utilitaires de requête. |
 | `lib/securite/` | Hachage des mots de passe (scrypt), jetons de session, codes de remise. |
 | `lib/contenu/` | Le texte éditorial et les listes de quartiers. |
+| `lib/geocodage/` | La transformation d’une adresse en coordonnées. |
+| `lib/courriel/` | Les modèles de messages et la file d’attente sortante. |
 | `migrations/` | Le schéma, en SQL, appliqué dans l’ordre des noms de fichiers. |
-| `scripts/` | `bd:migrer` et `bd:semer`. |
+| `scripts/` | `bd:migrer`, `bd:semer` et `bd:courriels`. |
 
 ## Les règles sont écrites deux fois, et c’est voulu
 
@@ -72,14 +74,42 @@ script, une reprise de données ou un second service écrit dans la table.
   puis régénération.
 - **Quota de deux emplacements** — un déclencheur.
 
+## Le géocodage
+
+L’adresse d’un emplacement est transformée en coordonnées par Nominatim
+(OpenStreetMap) au moment de la création. Une adresse hors de la région
+bruxelloise est refusée — c’est une règle, testée dans
+`lib/regles/territoire.ts`. Si le service ne répond pas ou ne trouve rien,
+l’emplacement est créé quand même avec le centre du quartier : la zone devient
+plus floue, jamais plus précise, et un géocodeur en panne ne bloque pas un bike
+sitter.
+
+**Vie privée.** Géocoder envoie l’adresse du domicile d’un membre à un tiers.
+C’est le seul moment où elle sort de nos serveurs. `GEOCODEUR_URL` permet de
+pointer vers une instance Nominatim auto-hébergée et de n’envoyer l’adresse à
+personne ; seule l’adresse est transmise, jamais le nom ni l’e-mail.
+
+## Les courriels
+
+Rien n’est envoyé depuis une requête web. Un message est écrit dans la table
+`courriel` **dans la même transaction** que le changement qu’il annonce : il ne
+peut donc ni parler d’un stationnement qui n’a pas été enregistré, ni se perdre
+parce que le serveur de messagerie redémarrait. Un script draine la file :
+
+```bash
+npm run bd:courriels
+```
+
+Sans `SMTP_URL`, le script affiche les messages en attente au lieu de les
+expédier, et ne les marque pas comme envoyés — on relit ce qu’on écrit sans
+déranger personne.
+
+Les messages sont en texte brut : pas de HTML, donc pas de pixel de suivi et
+rien qui casse chez un destinataire sur trois. Une association qui demande à
+des gens d’ouvrir leur porte n’a pas besoin de savoir qui a ouvert son courrier.
+
 ## Ce qui n’est pas encore branché
 
-- **Le géocodage.** L’adresse saisie n’est pas convertie en coordonnées : la
-  position d’un emplacement est celle du centre de son quartier
-  (`lib/contenu/quartiers.ts`). La dégradation va dans le bon sens — elle rend
-  la zone plus floue, jamais plus précise.
-- **L’envoi d’e-mails.** Rien n’est envoyé : ni confirmation d’inscription, ni
-  avis de demande reçue. Les états existent en base, les messages non.
 - **Le dépôt de la pièce d’identité.** Il demande un stockage chiffré et une
   file de relecture humaine. La page décrit le parcours, l’envoi n’est pas
   ouvert.
@@ -97,12 +127,21 @@ développement n’avait ni Docker ni PostgreSQL. `npm run bd:migrer` sur une ba
 fraîche est donc la première chose à faire, et le premier endroit où chercher
 si quelque chose ne passe pas.
 
+Le géocodage, lui, a été vérifié contre le vrai service. Ces vérifications
+appellent le réseau et ne tournent donc que sur demande, pour qu’une coupure
+chez OpenStreetMap ne fasse pas échouer la suite de quelqu’un qui travaille sur
+autre chose :
+
+```bash
+VERIFIER_LE_GEOCODAGE=1 npm test
+```
+
 ## Valeurs à remplacer avant toute mise en ligne
 
 - `lib/contenu/association.ts` — adresse de contact et numéro d’entreprise sont
   des exemples.
 - `lib/contenu/chiffres.ts` — les chiffres du réseau viennent de la maquette,
   ce ne sont pas des mesures.
-- `lib/contenu/quartiers.ts` — coordonnées indicatives, à remplacer par un
-  géocodage réel.
+- `lib/contenu/quartiers.ts` — coordonnées indicatives des centres de quartier.
+  Elles ne servent plus qu’au repli quand le géocodage échoue.
 - `app/conditions-generales/page.tsx` — texte à faire rédiger par un juriste.
