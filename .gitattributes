@@ -1,0 +1,10 @@
+# Le depot garde des fins de ligne LF, quel que soit le systeme de celui qui
+# travaille dessus : le site est deploye sur Linux, et un melange LF/CRLF rend
+# illisible le moindre diff.
+* text=auto eol=lf
+
+# Fichiers binaires : ne pas y toucher.
+*.ico binary
+*.png binary
+*.jpg binary
+*.woff2 binary

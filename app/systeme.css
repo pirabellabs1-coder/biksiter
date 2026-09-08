@@ -1,0 +1,1062 @@
+/* =============================================================================
+   Bike Sitters — le système de design, en un seul fichier.
+
+   Pourquoi un seul fichier : l'équipe est petite et le produit tient en une
+   quinzaine d'écrans. Une bibliothèque de composants coûterait plus cher à
+   maintenir que les quelques centaines de lignes qu'elle remplacerait.
+
+   Règle 6 du CLAUDE.md — une couleur, un sens :
+     bleu  = action        (ce sur quoi on clique)
+     vert  = vérifié       (une identité ou un lieu contrôlé par un humain)
+     ambre = vélo gardé    (un stationnement en cours — jamais sur le site public)
+     rouge = refus ou erreur
+   Toute autre information est neutre. Il n'existe pas de couleur décorative :
+   si un bloc ne porte pas l'un de ces quatre sens, il est gris.
+   ========================================================================== */
+
+:root {
+  /* Neutres — l'essentiel de l'interface vit ici. */
+  --encre: #19262b;
+  --ardoise: #5b6b76;
+  --papier: #f2f3f7;
+  --surface: #ffffff;
+  --craie: #e1e6ec;
+  --craie-forte: #c3ceda;
+
+  /* Bleu — action. */
+  --action: #0b57e0;
+  --action-appuyee: #0a3fa8;
+  --action-voile: #e6edfe;
+  --action-brume: #f2f6fe;
+
+  /* Vert — vérifié. */
+  --verifie: #007d38;
+  --verifie-encre: #00612b;
+  --verifie-voile: #e4f2ea;
+
+  /* Ambre — vélo actuellement gardé. Réservé à l'application, pas au site. */
+  --garde: #e8a33d;
+  --garde-encre: #7a4e0c;
+  --garde-voile: #fbf1de;
+
+  /* Rouge — refus ou erreur. */
+  --refus: #a8341f;
+  --refus-encre: #8a2a18;
+  --refus-voile: #f8e9e5;
+
+  /* Typographie — les deux familles sont injectées par next/font. */
+  --titres: var(--police-titres), ui-sans-serif, system-ui, sans-serif;
+  --texte: var(--police-texte), ui-sans-serif, system-ui, sans-serif;
+
+  /* Échelle d'espacement : multiples de 4, pour que rien ne dérive. */
+  --e1: 4px;
+  --e2: 8px;
+  --e3: 12px;
+  --e4: 16px;
+  --e5: 24px;
+  --e6: 32px;
+  --e7: 48px;
+  --e8: 64px;
+
+  --rayon: 10px;
+  --rayon-large: 14px;
+  --largeur-page: 1080px;
+  --largeur-lecture: 720px;
+}
+
+/* --- Réinitialisation minimale -------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--papier);
+  color: var(--encre);
+  font-family: var(--texte);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--titres);
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0 0 var(--e3);
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+/* Le focus visible n'est jamais retiré : c'est la seule façon de parcourir un
+   site dont toute la navigation est faite de liens. */
+:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- Utilitaires ----------------------------------------------------------- */
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Le lien d'évitement n'apparaît qu'au clavier, en premier élément du document. */
+.evitement {
+  position: absolute;
+  left: var(--e4);
+  top: -100px;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--encre);
+  border: 1px solid var(--craie-forte);
+  border-radius: var(--rayon);
+  padding: var(--e3) var(--e4);
+  transition: top 120ms ease;
+}
+
+.evitement:focus {
+  top: var(--e3);
+}
+
+/* --- Structure ------------------------------------------------------------- */
+
+.page {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--e7) var(--e6) var(--e8);
+}
+
+.page--lecture {
+  max-width: var(--largeur-lecture);
+}
+
+.bloc {
+  margin-bottom: var(--e8);
+}
+
+.bloc:last-child {
+  margin-bottom: 0;
+}
+
+/* --- En-tête --------------------------------------------------------------- */
+
+.entete {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--craie);
+}
+
+.entete__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--e3) var(--e6);
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+  flex-wrap: wrap;
+}
+
+.marque {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  font-family: var(--titres);
+  font-size: 19px;
+  color: var(--encre);
+  text-decoration: none;
+}
+
+.entete__navigation {
+  flex: 1;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+  flex-wrap: wrap;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navigation a {
+  font-size: 14px;
+  color: var(--ardoise);
+  text-decoration: none;
+}
+
+.navigation a:hover,
+.navigation a[aria-current="page"] {
+  color: var(--encre);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* --- Boutons et liens ------------------------------------------------------ */
+
+.bouton {
+  display: inline-block;
+  border: 1px solid transparent;
+  border-radius: var(--rayon);
+  padding: var(--e3) var(--e5);
+  font-family: var(--texte);
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bouton--principal {
+  background: var(--action);
+  color: var(--surface);
+}
+
+.bouton--principal:hover {
+  background: var(--action-appuyee);
+}
+
+.bouton--discret {
+  background: var(--surface);
+  border-color: var(--craie-forte);
+  color: var(--encre);
+}
+
+.bouton--discret:hover {
+  border-color: var(--ardoise);
+}
+
+.bouton--large {
+  display: block;
+  width: 100%;
+}
+
+.bouton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lien {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.boutons {
+  display: flex;
+  gap: var(--e3);
+  flex-wrap: wrap;
+}
+
+/* --- Textes courants ------------------------------------------------------- */
+
+.surtitre {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ardoise);
+  margin: 0 0 var(--e3);
+}
+
+.titre-page {
+  font-size: 40px;
+  line-height: 1.08;
+  margin-bottom: var(--e4);
+}
+
+.titre-section {
+  font-size: 26px;
+  margin-bottom: var(--e2);
+}
+
+.chapeau {
+  font-size: 16px;
+  color: var(--ardoise);
+  max-width: 62ch;
+  margin-bottom: var(--e5);
+}
+
+.discret {
+  color: var(--ardoise);
+  font-size: 14px;
+}
+
+/* --- Grilles et cartes ----------------------------------------------------- */
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--e4);
+}
+
+.grille--deux {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e4) var(--e5);
+}
+
+.carte--aeree {
+  padding: var(--e5) var(--e6);
+}
+
+.carte h3 {
+  font-size: 17px;
+  margin-bottom: var(--e1);
+}
+
+.carte p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Encarts --------------------------------------------------------------- */
+/* Neutre par défaut. Une variante colorée ne s'utilise que si le bloc porte
+   réellement le sens de sa couleur (règle 6). */
+
+.encart {
+  background: var(--papier);
+  border: 1px solid var(--craie);
+  border-left: 3px solid var(--craie-forte);
+  border-radius: var(--rayon);
+  padding: var(--e3) var(--e4);
+  font-size: 15px;
+  margin-bottom: var(--e5);
+}
+
+.encart p:last-child {
+  margin-bottom: 0;
+}
+
+.encart--verifie {
+  background: var(--verifie-voile);
+  border-color: var(--verifie-voile);
+  border-left-color: var(--verifie);
+  color: var(--verifie-encre);
+}
+
+.encart--garde {
+  background: var(--garde-voile);
+  border-color: var(--garde-voile);
+  border-left-color: var(--garde);
+  color: var(--garde-encre);
+}
+
+.encart--refus {
+  background: var(--refus-voile);
+  border-color: var(--refus-voile);
+  border-left-color: var(--refus);
+  color: var(--refus-encre);
+}
+
+/* --- Pastilles ------------------------------------------------------------- */
+
+.pastille {
+  display: inline-block;
+  font-size: 12.5px;
+  line-height: 1.4;
+  padding: var(--e1) var(--e3);
+  border-radius: 99px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.pastille--neutre {
+  background: var(--papier);
+  border-color: var(--craie-forte);
+  color: var(--ardoise);
+}
+
+.pastille--verifie {
+  background: var(--verifie-voile);
+  color: var(--verifie-encre);
+}
+
+.pastille--garde {
+  background: var(--garde-voile);
+  color: var(--garde-encre);
+}
+
+.pastille--refus {
+  background: var(--refus-voile);
+  color: var(--refus-encre);
+}
+
+/* --- Étapes numérotées ----------------------------------------------------- */
+
+.etapes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: etape;
+}
+
+.etape {
+  display: flex;
+  gap: var(--e4);
+  margin-bottom: var(--e5);
+}
+
+.etape__numero {
+  counter-increment: etape;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--action-voile);
+  color: var(--action-appuyee);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.etape__numero::before {
+  content: counter(etape);
+}
+
+/* Dans une carte, le numero est seul sur sa ligne : il lui faut sa marge. */
+.carte > .etape__numero {
+  margin-bottom: var(--e3);
+}
+
+.etape h2,
+.etape h3 {
+  font-size: 16px;
+  margin-bottom: var(--e1);
+}
+
+.etape p {
+  font-size: 15px;
+  color: var(--ardoise);
+  margin: 0;
+}
+
+/* --- Chiffres -------------------------------------------------------------- */
+
+.chiffres {
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e5) var(--e6);
+  display: flex;
+  gap: var(--e8);
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.chiffres > div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.chiffre__valeur {
+  font-family: var(--titres);
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.chiffre__libelle {
+  font-size: 14px;
+  color: var(--ardoise);
+  margin: var(--e1) 0 0;
+  max-width: 22ch;
+}
+
+/* --- Formulaires ----------------------------------------------------------- */
+
+.champ {
+  margin-bottom: var(--e4);
+}
+
+.champ label {
+  display: block;
+  font-size: 13.5px;
+  color: var(--encre);
+  margin-bottom: var(--e1);
+}
+
+.champ__aide {
+  display: block;
+  font-size: 13px;
+  color: var(--ardoise);
+  margin-bottom: var(--e2);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: var(--e3);
+  border: 1px solid var(--craie-forte);
+  border-radius: var(--rayon);
+  background: var(--surface);
+  color: var(--encre);
+  font-family: var(--texte);
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* Rouge = erreur : la bordure et le message portent le même sens. */
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--refus);
+}
+
+.champ__erreur {
+  display: block;
+  font-size: 13.5px;
+  color: var(--refus-encre);
+  margin-top: var(--e1);
+}
+
+/* Les champs sont alignes par le bas : une etiquette qui passe sur deux lignes
+   ne doit pas decaler le champ voisin. */
+.duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--e3);
+  align-items: end;
+}
+
+fieldset {
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon);
+  padding: var(--e4);
+  margin: 0 0 var(--e4);
+}
+
+legend {
+  font-size: 13.5px;
+  color: var(--encre);
+  padding: 0 var(--e2);
+}
+
+.cases {
+  display: grid;
+  gap: var(--e2);
+}
+
+.case {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e2);
+  font-size: 15px;
+}
+
+.case input {
+  width: auto;
+  margin: 4px 0 0;
+  flex: none;
+}
+
+/* --- Liste de questions ---------------------------------------------------- */
+
+.questions {
+  border-top: 1px solid var(--craie);
+  margin: 0;
+}
+
+.questions > div {
+  border-bottom: 1px solid var(--craie);
+  padding: var(--e4) 0;
+}
+
+.questions dt {
+  font-family: var(--titres);
+  font-size: 16.5px;
+  margin-bottom: var(--e1);
+}
+
+.questions dd {
+  margin: 0;
+  color: var(--ardoise);
+  font-size: 15px;
+}
+
+/* --- Zone approximative ---------------------------------------------------- */
+/* Règle 4 : on ne montre jamais un point d'adresse, seulement une zone. */
+
+.zone {
+  position: relative;
+  height: 320px;
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  background: var(--action-brume);
+  overflow: hidden;
+}
+
+.zone--haute {
+  height: 420px;
+}
+
+.zone__tache {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--action);
+  opacity: 0.14;
+}
+
+.zone__legende {
+  position: absolute;
+  right: var(--e3);
+  bottom: var(--e3);
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon);
+  padding: var(--e1) var(--e3);
+  font-size: 12.5px;
+  color: var(--ardoise);
+}
+
+/* --- Liste d'emplacements -------------------------------------------------- */
+
+.emplacements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.emplacement {
+  display: flex;
+  gap: var(--e4);
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e4);
+}
+
+.emplacement__initiale {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--action-voile);
+  color: var(--action-appuyee);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--titres);
+  font-size: 17px;
+}
+
+.emplacement__corps {
+  flex: 1;
+  min-width: 0;
+}
+
+.emplacement h3 {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.emplacement p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ardoise);
+}
+
+/* --- Couples libellé / valeur ---------------------------------------------- */
+
+.details {
+  margin: 0;
+}
+
+.details > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e4);
+  padding: var(--e2) 0;
+  border-bottom: 1px solid var(--craie);
+  font-size: 15px;
+}
+
+.details > div:last-child {
+  border-bottom: 0;
+}
+
+.details dt {
+  color: var(--ardoise);
+}
+
+.details dd {
+  margin: 0;
+  text-align: right;
+}
+
+/* --- Pied de page ---------------------------------------------------------- */
+
+.pied {
+  background: var(--surface);
+  border-top: 1px solid var(--craie);
+  padding: var(--e6) var(--e6) var(--e7);
+}
+
+.pied__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--e6);
+}
+
+.pied h2 {
+  font-family: var(--texte);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ardoise);
+  margin: 0 0 var(--e2);
+}
+
+.pied__marque {
+  margin-bottom: var(--e2);
+}
+
+.pied__phrase {
+  max-width: 34ch;
+}
+
+.pied ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pied li {
+  padding: 3px 0;
+}
+
+.pied a {
+  font-size: 14px;
+  color: var(--ardoise);
+  text-decoration: none;
+}
+
+.pied a:hover {
+  color: var(--encre);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- Accueil --------------------------------------------------------------- */
+
+.accroche {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--e7);
+  align-items: center;
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--e7) var(--e6);
+}
+
+.bandeau-chiffres {
+  background: var(--surface);
+  border-top: 1px solid var(--craie);
+  border-bottom: 1px solid var(--craie);
+  padding: var(--e6);
+}
+
+.bandeau-chiffres .chiffres {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+/* --- Recherche d'un quartier ----------------------------------------------- */
+
+.recherche {
+  display: flex;
+  gap: var(--e2);
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: var(--e3);
+}
+
+.recherche__champ {
+  flex: 1;
+  min-width: 220px;
+}
+
+.recherche__champ label {
+  display: block;
+  font-size: 13.5px;
+  color: var(--encre);
+  margin-bottom: var(--e1);
+}
+
+/* --- Temoignages ------------------------------------------------------------ */
+
+.temoignage {
+  margin: 0;
+}
+
+.temoignage blockquote {
+  margin: 0 0 var(--e4);
+  font-size: 16px;
+  color: var(--encre);
+}
+
+.temoignage blockquote::before {
+  content: "« ";
+}
+
+.temoignage blockquote::after {
+  content: " »";
+}
+
+.temoignage figcaption {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  font-size: 14px;
+}
+
+.temoignage figcaption .emplacement__initiale {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+/* --- Divers ---------------------------------------------------------------- */
+
+.titre-section--aere {
+  margin-top: var(--e7);
+  margin-bottom: var(--e3);
+}
+
+.resultats {
+  margin-top: var(--e6);
+}
+
+.liste-erreurs {
+  margin: var(--e2) 0 0;
+  padding-left: var(--e5);
+}
+
+.liste-erreurs a {
+  color: inherit;
+}
+
+/* --- Deux colonnes (page avec formulaire lateral) -------------------------- */
+
+.deux-colonnes {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: var(--e7);
+  align-items: start;
+}
+
+/* --- Etats de verification -------------------------------------------------- */
+
+.etapes-verification {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.etapes-verification .carte {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+}
+
+.etapes-verification h2 {
+  font-size: 16px;
+  margin-bottom: var(--e1);
+}
+
+.etapes-verification .carte > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.etapes-verification p {
+  margin: 0;
+}
+
+/* --- Dons -------------------------------------------------------------------- */
+
+.dons {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  text-align: center;
+}
+
+.dons p {
+  margin: 0;
+}
+
+.dons .discret {
+  margin-top: var(--e2);
+}
+
+/* --- Petits utilitaires de texte -------------------------------------------- */
+
+.centre {
+  text-align: center;
+}
+
+.questions__apres {
+  margin-top: var(--e5);
+}
+
+/* --- En-tete sur petit ecran ------------------------------------------------ */
+/* La marque et le bouton restent sur une ligne ; la navigation passe dessous et
+   defile horizontalement. Pas de menu deroulant : il faudrait du JavaScript et
+   un piege a focus pour quatre liens. */
+
+@media (max-width: 760px) {
+  .entete__interieur {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--e2) var(--e3);
+    padding: var(--e3) var(--e4);
+  }
+
+  /* Placement explicite : sans cela le bouton retombe sur une troisieme ligne. */
+  .entete .marque {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .entete .bouton {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    padding: var(--e2) var(--e4);
+    font-size: 14px;
+  }
+
+  .entete__navigation {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    margin: 0 calc(-1 * var(--e4));
+    padding: var(--e1) var(--e4);
+  }
+
+  .navigation {
+    flex-wrap: nowrap;
+    gap: var(--e4);
+  }
+
+  .navigation a {
+    white-space: nowrap;
+  }
+}
+
+/* --- Adaptations ----------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .grille,
+  .grille--deux {
+    grid-template-columns: 1fr;
+  }
+
+  .pied__interieur {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .accroche {
+    grid-template-columns: 1fr;
+    padding: var(--e6) var(--e5);
+  }
+
+  .deux-colonnes {
+    grid-template-columns: 1fr;
+    gap: var(--e6);
+  }
+
+  .titre-page {
+    font-size: 32px;
+  }
+
+  .page {
+    padding: var(--e6) var(--e5) var(--e7);
+  }
+
+  .entete__interieur {
+    padding: var(--e3) var(--e5);
+    gap: var(--e4);
+  }
+
+  .chiffres {
+    gap: var(--e5);
+  }
+}
+
+@media (max-width: 600px) {
+  .duo {
+    grid-template-columns: 1fr;
+  }
+
+  .pied__interieur {
+    grid-template-columns: 1fr;
+  }
+
+  .emplacement {
+    flex-wrap: wrap;
+  }
+}
