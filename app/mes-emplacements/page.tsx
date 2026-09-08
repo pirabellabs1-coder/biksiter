@@ -7,6 +7,8 @@ import { EMPLACEMENTS_PAR_MEMBRE } from '@/lib/regles/emplacements';
 import { decisionDePublication } from '@/lib/regles/publication';
 import { exigerUnMembre, membrePourLesRegles } from '@/lib/session';
 
+import { mettreEnPause, republier } from './actions';
+
 export const metadata: Metadata = { title: 'Mes emplacements' };
 export const dynamic = 'force-dynamic';
 
@@ -51,7 +53,7 @@ export default async function MesEmplacements() {
                     <span className="pastille pastille--verifie">Publié</span>
                   ) : (
                     <span className="pastille pastille--neutre">
-                      En attente de vérification
+                      En pause — invisible sur la carte
                     </span>
                   )}
                   {emplacement.demandesEnAttente > 0 ? (
@@ -66,12 +68,51 @@ export default async function MesEmplacements() {
                 </p>
               </div>
 
-              <Link
-                href={`/emplacements/${emplacement.reference}`}
-                className="bouton bouton--discret"
-              >
-                Voir la fiche publique
-              </Link>
+              <div className="stationnement__actions">
+                <Link
+                  href={`/mes-emplacements/${emplacement.reference}/modifier`}
+                  className="bouton bouton--discret"
+                >
+                  Modifier
+                </Link>
+
+                {emplacement.publie ? (
+                  <form action={mettreEnPause}>
+                    <input
+                      type="hidden"
+                      name="emplacement"
+                      value={emplacement.reference}
+                    />
+                    <button type="submit" className="bouton bouton--discret">
+                      Mettre en pause
+                    </button>
+                  </form>
+                ) : (
+                  <form action={republier}>
+                    <input
+                      type="hidden"
+                      name="emplacement"
+                      value={emplacement.reference}
+                    />
+                    <button
+                      type="submit"
+                      className="bouton bouton--discret"
+                      disabled={membre.verification !== 'verifiee'}
+                    >
+                      Republier
+                    </button>
+                  </form>
+                )}
+
+                {emplacement.publie ? (
+                  <Link
+                    href={`/emplacements/${emplacement.reference}`}
+                    className="bouton bouton--discret"
+                  >
+                    Voir la fiche publique
+                  </Link>
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

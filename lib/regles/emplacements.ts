@@ -46,3 +46,45 @@ export function estUnTypeEmplacementPrive(
 export function peutAjouterUnEmplacement(nombreDejaPublies: number): boolean {
   return nombreDejaPublies < EMPLACEMENTS_PAR_MEMBRE;
 }
+
+/**
+ * Les états d'un stationnement qui retiennent un emplacement.
+ *
+ * Un vélo gardé est physiquement là : retirer l'emplacement effacerait le
+ * stationnement alors que son propriétaire viendra sonner à la porte. Une
+ * demande en attente retient aussi, parce que quelqu'un attend une réponse —
+ * un bike sitter qui veut partir la refuse d'abord, il ne la fait pas
+ * disparaître.
+ */
+export const ETATS_QUI_RETIENNENT = ['demande', 'accepte', 'en_cours'] as const;
+
+export type MotifDeRefusDeRetrait = 'stationnements_en_cours';
+
+export type DecisionDeRetrait =
+  | { retirable: true }
+  | { retirable: false; motif: MotifDeRefusDeRetrait; combien: number };
+
+export function decisionDeRetrait(
+  stationnementsQuiRetiennent: number,
+): DecisionDeRetrait {
+  if (stationnementsQuiRetiennent > 0) {
+    return {
+      retirable: false,
+      motif: 'stationnements_en_cours',
+      combien: stationnementsQuiRetiennent,
+    };
+  }
+  return { retirable: true };
+}
+
+/**
+ * Mettre en pause plutôt que retirer.
+ *
+ * Un bike sitter qui part en vacances n'a aucune raison de tout effacer : un
+ * emplacement dépublié disparaît de la carte, ne reçoit plus de demande, et
+ * laisse vivre les stationnements déjà acceptés. C'est toujours possible,
+ * quelle que soit la situation.
+ */
+export function peutEtreMisEnPause(): boolean {
+  return true;
+}

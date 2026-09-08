@@ -1,6 +1,12 @@
 import 'server-only';
 
-import { interroger, uneLigne } from '@/lib/bd/client';
+import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
+import {
+  affluenceMaximale,
+  capaciteSuffisante,
+  type Creneau,
+} from '@/lib/regles/capacite';
+import { decisionDeRetrait } from '@/lib/regles/emplacements';
 import type {
   Acces,
   Ancrage,
@@ -174,6 +180,8 @@ export type EmplacementDuMembre = {
   capacite: number;
   publie: boolean;
   demandesEnAttente: number;
+  /** Ce qui empêche de retirer : demandes, acceptations et gardes en cours. */
+  stationnementsQuiRetiennent: number;
 };
 
 export async function emplacementsDuMembre(
@@ -186,7 +194,10 @@ export async function emplacementsDuMembre(
             e.capacite,
             e.publie,
             count(s.id) filter (where s.etat = 'demande')::int
-              as "demandesEnAttente"
+              as "demandesEnAttente",
+            count(s.id) filter (
+              where s.etat in ('demande', 'accepte', 'en_cours'))::int
+              as "stationnementsQuiRetiennent"
        from emplacement e
        left join stationnement s on s.emplacement_id = e.id
       where e.membre_id = $1
@@ -194,6 +205,214 @@ export async function emplacementsDuMembre(
       order by e.cree_le`,
     [membreId],
   );
+}
+
+// --- Modification et retrait -------------------------------------------------
+
+/**
+ * La fiche complète, telle que son propriétaire la voit pour la corriger.
+ *
+ * Elle contient l'adresse exacte, et c'est normal : la règle 4 protège
+ * l'adresse des autres membres, pas de celui qui l'a saisie. Cette fonction
+ * n'est appelée que par la page de modification, dont le `where` exige que le
+ * membre soit le propriétaire.
+ */
+export type EmplacementModifiable = {
+  reference: string;
+  type: TypeEmplacementPrive;
+  quartier: string;
+  adresseExacte: string;
+  capacite: number;
+  verrouillage: Verrouillage;
+  intemperie: Intemperie;
+  acces: Acces;
+  ancrage: Ancrage;
+  services: Service[];
+  velosAcceptes: TypeVelo[];
+  precisions: string | null;
+  publie: boolean;
+};
+
+export async function emplacementAModifier(
+  reference: string,
+  membreId: string,
+): Promise<EmplacementModifiable | null> {
+  return uneLigne<EmplacementModifiable>(
+    `select reference,
+            type,
+            quartier,
+            adresse_exacte as "adresseExacte",
+            capacite,
+            verrouillage,
+            intemperie,
+            acces,
+            ancrage,
+            services,
+            velos_acceptes as "velosAcceptes",
+            precisions,
+            publie
+       from emplacement
+      where reference = $1 and membre_id = $2`,
+    [reference, membreId],
+  );
+}
+
+export type Modification = Omit<NouvelEmplacement, 'membreId' | 'reference' | 'publie'>;
+
+export type ResultatDeModification =
+  | { modifie: true }
+  | { modifie: false; motif: 'introuvable' }
+  | { modifie: false; motif: 'capacite_trop_basse'; dejaPromis: number };
+
+/**
+ * La référence ne change jamais, même si le quartier change : elle vit dans
+ * des URL, dans des e-mails et dans des conversations avec le support.
+ *
+ * La capacité est vérifiée dans la transaction, contre les stationnements déjà
+ * acceptés : un bike sitter peut réduire ses places pour l'avenir, pas en
+ * dessous de ce qu'il a déjà promis.
+ */
+export async function modifierUnEmplacement(
+  reference: string,
+  membreId: string,
+  modification: Modification,
+): Promise<ResultatDeModification> {
+  return dansUneTransaction(async (client) => {
+    const trouve = await client.query<{ id: string }>(
+      'select id from emplacement where reference = $1 and membre_id = $2 for update',
+      [reference, membreId],
+    );
+
+    if (trouve.rowCount === 0) {
+      return { modifie: false, motif: 'introuvable' };
+    }
+
+    const { id } = trouve.rows[0];
+
+    const acceptes = await client.query<{ debut: Date; fin: Date }>(
+      `select debut, fin from stationnement
+        where emplacement_id = $1 and etat in ('accepte', 'en_cours')`,
+      [id],
+    );
+
+    const creneaux: Creneau[] = acceptes.rows.map((ligne) => ({
+      debut: new Date(ligne.debut),
+      fin: new Date(ligne.fin),
+    }));
+
+    if (!capaciteSuffisante(creneaux, modification.capacite)) {
+      return {
+        modifie: false,
+        motif: 'capacite_trop_basse',
+        dejaPromis: affluenceMaximale(creneaux),
+      };
+    }
+
+    await client.query(
+      `update emplacement
+          set type = $2,
+              quartier = $3,
+              adresse_exacte = $4,
+              position = st_setsrid(st_makepoint($6, $5), 4326)::geography,
+              rayon_de_la_zone = $7,
+              capacite = $8,
+              verrouillage = $9,
+              intemperie = $10,
+              acces = $11,
+              ancrage = $12,
+              services = $13,
+              velos_acceptes = $14,
+              precisions = $15,
+              modifie_le = now()
+        where id = $1`,
+      [
+        id,
+        modification.type,
+        modification.quartier,
+        modification.adresseExacte,
+        modification.latitude,
+        modification.longitude,
+        modification.rayonDeLaZone,
+        modification.capacite,
+        modification.verrouillage,
+        modification.intemperie,
+        modification.acces,
+        modification.ancrage,
+        [...modification.services],
+        [...modification.velosAcceptes],
+        modification.precisions,
+      ],
+    );
+
+    return { modifie: true };
+  });
+}
+
+/** Mettre en pause, ou remettre sur la carte. Toujours possible. */
+export async function changerLaPublication(
+  reference: string,
+  membreId: string,
+  publie: boolean,
+): Promise<boolean> {
+  const lignes = await interroger<{ reference: string }>(
+    `update emplacement
+        set publie = $3, modifie_le = now()
+      where reference = $1 and membre_id = $2
+      returning reference`,
+    [reference, membreId, publie],
+  );
+  return lignes.length > 0;
+}
+
+export type ResultatDeRetrait =
+  | { retire: true }
+  | { retire: false; motif: 'introuvable' }
+  | { retire: false; motif: 'stationnements_en_cours'; combien: number };
+
+/**
+ * Retirer efface aussi les stationnements passés de cet emplacement, par la
+ * cascade du schéma. C'est assumé et annoncé au membre : une association qui
+ * ne classe personne n'a pas besoin de garder l'historique d'un lieu que son
+ * propriétaire a décidé de reprendre.
+ *
+ * En revanche, un stationnement vivant retient : le vélo est là, ou quelqu'un
+ * attend une réponse.
+ */
+export async function retirerUnEmplacement(
+  reference: string,
+  membreId: string,
+): Promise<ResultatDeRetrait> {
+  return dansUneTransaction(async (client) => {
+    const trouve = await client.query<{ id: string }>(
+      'select id from emplacement where reference = $1 and membre_id = $2 for update',
+      [reference, membreId],
+    );
+
+    if (trouve.rowCount === 0) {
+      return { retire: false, motif: 'introuvable' };
+    }
+
+    const { id } = trouve.rows[0];
+
+    const retenus = await client.query<{ combien: number }>(
+      `select count(*)::int as combien from stationnement
+        where emplacement_id = $1
+          and etat in ('demande', 'accepte', 'en_cours')`,
+      [id],
+    );
+
+    const decision = decisionDeRetrait(retenus.rows[0].combien);
+    if (!decision.retirable) {
+      return {
+        retire: false,
+        motif: 'stationnements_en_cours',
+        combien: decision.combien,
+      };
+    }
+
+    await client.query('delete from emplacement where id = $1', [id]);
+    return { retire: true };
+  });
 }
 
 export async function nombreDEmplacements(membreId: string): Promise<number> {

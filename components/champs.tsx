@@ -141,12 +141,15 @@ export function GroupeDeCases({
   aide,
   erreur,
   options,
+  coches = [],
 }: {
   nom: string;
   legende: string;
   aide?: string;
   erreur?: string;
   options: readonly Option[];
+  /** Ce qui est déjà coché — pour corriger une fiche sans tout recocher. */
+  coches?: readonly string[];
 }) {
   return (
     // L'identifiant et `tabIndex` existent pour que le lien du résumé
@@ -164,6 +167,7 @@ export function GroupeDeCases({
                 id={identifiant}
                 name={nom}
                 value={option.valeur}
+                defaultChecked={coches.includes(option.valeur)}
               />
               <label htmlFor={identifiant}>{option.libelle}</label>
             </div>

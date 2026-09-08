@@ -48,3 +48,31 @@ export function laPlaceEstLibre(
 
   return simultanes < capacite;
 }
+
+/**
+ * Le plus grand nombre de vélos présents en même temps parmi les
+ * stationnements déjà acceptés.
+ *
+ * Sert à répondre à une question qui se pose quand un bike sitter corrige sa
+ * fiche : peut-il annoncer moins de places qu'il n'en a déjà promis ?
+ */
+export function affluenceMaximale(acceptes: readonly Creneau[]): number {
+  return acceptes.reduce((maximum, creneau) => {
+    const simultanes = acceptes.filter(
+      (autre) => autre === creneau || seChevauchent(autre, creneau),
+    ).length;
+    return Math.max(maximum, simultanes);
+  }, 0);
+}
+
+/**
+ * Réduire la capacité ne peut pas déloger un vélo déjà accepté : le bike
+ * sitter s'est engagé, et le cycliste s'est organisé. Il peut baisser sa
+ * capacité pour l'avenir, jamais en dessous de ce qu'il a déjà promis.
+ */
+export function capaciteSuffisante(
+  acceptes: readonly Creneau[],
+  nouvelleCapacite: number,
+): boolean {
+  return nouvelleCapacite >= affluenceMaximale(acceptes);
+}

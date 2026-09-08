@@ -162,13 +162,33 @@ tous ses scripts bloqués. Le choix était entre garder une dizaine de pages
 la requête et garder une politique stricte partout. Ces pages ne touchent pas
 la base et coûtent quelques millisecondes.
 
+## Corriger, mettre en pause, retirer
+
+Trois gestes distincts, et la distinction compte.
+
+**Corriger** ne touche pas aux stationnements déjà acceptés : le bike sitter
+s’est engagé, le cycliste s’est organisé. La seule chose qu’on refuse est de
+descendre la capacité sous ce qui a déjà été promis — la règle est dans
+`lib/regles/capacite.ts` et vérifiée dans la transaction, contre les créneaux
+acceptés.
+
+**Mettre en pause** dépublie : l’emplacement disparaît de la carte, ne reçoit
+plus de demande, et laisse vivre ce qui est déjà convenu. C’est ce qu’on
+propose à quelqu’un qui part en vacances, et c’est réversible.
+
+**Retirer** efface, y compris les stationnements passés de cet emplacement —
+c’est dit au membre, qui doit le confirmer. Le retrait est refusé tant qu’un
+stationnement est en cours, accepté, ou en attente de réponse : le vélo est
+physiquement là, ou quelqu’un attend qu’on lui réponde.
+
+L’adresse exacte apparaît dans le formulaire de correction, et c’est normal :
+la règle 4 protège l’adresse des autres membres, pas de celui qui l’a saisie.
+
 ## Ce qui n’est pas encore branché
 
 - **La vérification du téléphone.** L’écran l’annonce, aucun SMS ne part. Le
   coût par message en Belgique est la raison pour laquelle les SMS sont
   réservés à la vérification, et à rien d’autre.
-- **Modifier ou retirer un emplacement.** On peut en créer et les voir, pas
-  encore les corriger. En attendant, cela se fait en SQL.
 - **Les échanges après acceptation.** Le mot joint à une demande passe, mais il
   n’y a pas de fil de discussion. Le chat en temps réel a été écarté ; il reste
   à décider ce qui le remplace.

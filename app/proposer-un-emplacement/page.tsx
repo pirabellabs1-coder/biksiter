@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 
+import FormulaireDEmplacement from '@/components/formulaire-d-emplacement';
 import { membreConnecte } from '@/lib/session';
 
-import FormulaireDEmplacement from './formulaire';
+import { proposerUnEmplacement } from './actions';
 
 export const metadata: Metadata = {
   title: 'Proposer un emplacement',
@@ -100,7 +101,13 @@ export default async function ProposerUnEmplacement() {
               ? 'Votre identité est vérifiée : cet emplacement sera publié dès que vous l’aurez décrit. Vous pouvez en proposer deux au maximum.'
               : 'Rien n’est visible tant qu’une personne n’a pas vérifié votre identité. Vous décrivez le lieu, nous vous répondons.'}
           </p>
-          <FormulaireDEmplacement membreDejaConnu={membre !== null} />
+          <FormulaireDEmplacement
+            action={proposerUnEmplacement}
+            membreDejaConnu={membre !== null}
+            libelleDuBouton={
+              publiera ? 'Publier mon emplacement' : 'Envoyer ma candidature'
+            }
+          />
         </div>
       </div>
     </div>

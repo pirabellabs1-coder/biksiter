@@ -2,6 +2,8 @@ import { describe, expect, test } from 'vitest';
 
 import {
   MARGE_ENTRE_STATIONNEMENTS_MINUTES,
+  affluenceMaximale,
+  capaciteSuffisante,
   laPlaceEstLibre,
   seChevauchent,
   type Creneau,
@@ -66,5 +68,34 @@ describe('un emplacement accueille autant de vélos que sa capacité', () => {
 
   test('un emplacement sans stationnement accepté est libre', () => {
     expect(laPlaceEstLibre(matin, [], 1)).toBe(true);
+  });
+});
+
+describe('on ne réduit pas la capacité sous ce qu’on a déjà promis', () => {
+  const matinee = creneau('2026-09-08T09:00:00Z', '2026-09-08T12:00:00Z');
+  const memeMatinee = creneau('2026-09-08T10:00:00Z', '2026-09-08T11:00:00Z');
+  const lendemain = creneau('2026-09-09T09:00:00Z', '2026-09-09T12:00:00Z');
+
+  test('sans stationnement accepté, toute capacité convient', () => {
+    expect(affluenceMaximale([])).toBe(0);
+    expect(capaciteSuffisante([], 1)).toBe(true);
+  });
+
+  test('deux vélos au même moment demandent deux places', () => {
+    expect(affluenceMaximale([matinee, memeMatinee])).toBe(2);
+    expect(capaciteSuffisante([matinee, memeMatinee], 2)).toBe(true);
+    expect(capaciteSuffisante([matinee, memeMatinee], 1)).toBe(false);
+  });
+
+  test('deux vélos à deux jours d’écart ne demandent qu’une place', () => {
+    expect(affluenceMaximale([matinee, lendemain])).toBe(1);
+    expect(capaciteSuffisante([matinee, lendemain], 1)).toBe(true);
+  });
+
+  test('la marge de trente minutes compte dans l’affluence', () => {
+    // Quinze minutes après la reprise : les deux vélos ne sont pas là en même
+    // temps, mais le bike sitter n'a pas le temps de souffler entre les deux.
+    const juste = creneau('2026-09-08T12:15:00Z', '2026-09-08T14:00:00Z');
+    expect(affluenceMaximale([matinee, juste])).toBe(2);
   });
 });

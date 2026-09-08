@@ -5,36 +5,16 @@ import { revalidatePath } from 'next/cache';
 import { baseConfiguree } from '@/lib/bd/client';
 import { deposerUneCandidature } from '@/lib/depot/candidatures';
 import { creerUnEmplacement } from '@/lib/depot/emplacements';
-import { quartierParNom } from '@/lib/contenu/quartiers';
-import { geocoder } from '@/lib/geocodage/geocodeur';
+import { HORS_ZONE, situerLEmplacement } from '@/lib/geocodage/situer';
+import { lireLesChampsDEmplacement } from '@/lib/formulaires/emplacement';
 import {
   ERREUR_GENERALE,
-  ressembleAUnEmail,
-  texte,
   type EtatDuFormulaire,
 } from '@/lib/formulaires/etat';
 import { RAYON_MINIMAL_DE_ZONE_METRES } from '@/lib/regles/adresse';
-import {
-  estUnAcces,
-  estUnAncrage,
-  estUnService,
-  estUnVerrouillage,
-  estUneIntemperie,
-} from '@/lib/regles/caracteristiques';
-import {
-  EMPLACEMENTS_PAR_MEMBRE,
-  estUnTypeEmplacementPrive,
-} from '@/lib/regles/emplacements';
+import { EMPLACEMENTS_PAR_MEMBRE } from '@/lib/regles/emplacements';
 import { decisionDePublication } from '@/lib/regles/publication';
-import { estUnTypeVelo } from '@/lib/regles/velos';
 import { membreConnecte, membrePourLesRegles } from '@/lib/session';
-
-/** Au-delà, ce n'est plus un emplacement chez quelqu'un, c'est un parking. */
-const CAPACITE_MAXIMALE = 10;
-
-function estUneChaine(valeur: FormDataEntryValue): valeur is string {
-  return typeof valeur === 'string';
-}
 
 /**
  * Un seul formulaire pour deux situations, parce que c'est une seule action :
@@ -58,112 +38,19 @@ export async function proposerUnEmplacement(
     };
   }
 
-  const erreurs: Record<string, string> = {};
   const membre = await membreConnecte();
+  const lecture = lireLesChampsDEmplacement(donnees, membre);
 
-  const prenom = membre?.prenom ?? texte(donnees, 'prenom');
-  if (prenom === '') {
-    erreurs.prenom = 'Indiquez votre prénom.';
+  if (!lecture.valide) {
+    return { statut: 'erreur', erreurs: lecture.erreurs };
   }
 
-  const email = membre?.email ?? texte(donnees, 'email');
-  if (!ressembleAUnEmail(email)) {
-    erreurs.email = 'Indiquez une adresse e-mail valide.';
+  const champs = lecture.champs;
+  const situation = await situerLEmplacement(champs.adresse, champs.quartier);
+
+  if (!situation.situe) {
+    return { statut: 'erreur', erreurs: { adresse: HORS_ZONE } };
   }
-
-  const adresse = texte(donnees, 'adresse');
-  if (adresse === '') {
-    erreurs.adresse = 'Indiquez l’adresse du lieu. Elle ne sera jamais publiée.';
-  }
-
-  const nomDuQuartier = texte(donnees, 'quartier');
-  const quartier = quartierParNom(nomDuQuartier);
-  if (!quartier) {
-    erreurs.quartier = 'Choisissez le quartier le plus proche dans la liste.';
-  }
-
-  // Règle 1 : un type hors liste n'est pas un champ mal rempli, c'est un
-  // emplacement qui n'a pas sa place ici.
-  const type = texte(donnees, 'type');
-  if (!estUnTypeEmplacementPrive(type)) {
-    erreurs.type = 'Choisissez un type d’emplacement dans la liste.';
-  }
-
-  const capacite = Number.parseInt(texte(donnees, 'capacite'), 10);
-  if (!Number.isInteger(capacite) || capacite < 1 || capacite > CAPACITE_MAXIMALE) {
-    erreurs.capacite = `Indiquez un nombre de vélos entre 1 et ${CAPACITE_MAXIMALE}.`;
-  }
-
-  const verrouillage = texte(donnees, 'verrouillage');
-  if (!estUnVerrouillage(verrouillage)) {
-    erreurs.verrouillage = 'Indiquez comment l’emplacement se ferme.';
-  }
-
-  const intemperie = texte(donnees, 'intemperie');
-  if (!estUneIntemperie(intemperie)) {
-    erreurs.intemperie = 'Indiquez si le vélo est à l’abri.';
-  }
-
-  const acces = texte(donnees, 'acces');
-  if (!estUnAcces(acces)) {
-    erreurs.acces = 'Indiquez le chemin à faire avec le vélo à la main.';
-  }
-
-  const ancrage = texte(donnees, 'ancrage');
-  if (!estUnAncrage(ancrage)) {
-    erreurs.ancrage = 'Indiquez à quoi le vélo peut être attaché.';
-  }
-
-  const velos = donnees.getAll('velos').filter(estUneChaine);
-  if (velos.length === 0) {
-    erreurs.velos = 'Cochez au moins un type de vélo que vous pouvez accueillir.';
-  } else if (!velos.every(estUnTypeVelo)) {
-    erreurs.velos = 'Un des types de vélo cochés n’existe pas.';
-  }
-
-  const services = donnees.getAll('services').filter(estUneChaine);
-  if (!services.every(estUnService)) {
-    erreurs.services = 'Un des services cochés n’existe pas.';
-  }
-
-  const precisionsSaisies = texte(donnees, 'precisions');
-  const precisions = precisionsSaisies === '' ? null : precisionsSaisies;
-
-  if (
-    Object.keys(erreurs).length > 0 ||
-    !quartier ||
-    !estUnTypeEmplacementPrive(type) ||
-    !estUnVerrouillage(verrouillage) ||
-    !estUneIntemperie(intemperie) ||
-    !estUnAcces(acces) ||
-    !estUnAncrage(ancrage) ||
-    !velos.every(estUnTypeVelo) ||
-    !services.every(estUnService)
-  ) {
-    return { statut: 'erreur', erreurs };
-  }
-
-  // Le géocodage sert à poser le point exact, que la vue arrondira ensuite.
-  // Une adresse hors de Bruxelles est refusée ici : c'est une règle de
-  // territoire, pas un champ mal rempli.
-  const situation = await geocoder(adresse);
-
-  if (!situation.trouve && situation.motif === 'hors_zone') {
-    return {
-      statut: 'erreur',
-      erreurs: {
-        adresse:
-          'Cette adresse est en Belgique mais hors de la région bruxelloise. Le réseau ne couvre pas encore votre commune.',
-      },
-    };
-  }
-
-  // Géocodeur muet ou adresse introuvable : on retombe sur le centre du
-  // quartier. La zone devient plus floue, jamais plus précise — c'est le seul
-  // sens dans lequel une approximation est acceptable ici.
-  const position = situation.trouve
-    ? situation.point
-    : { latitude: quartier.latitude, longitude: quartier.longitude };
 
   // Un membre connecté et vérifié publie directement ; tout autre cas dépose
   // une candidature, qui attend le passage d'une personne (règle 2).
@@ -182,21 +69,21 @@ export async function proposerUnEmplacement(
     if (decision.autorise) {
       await creerUnEmplacement({
         membreId: membre.id,
-        reference: referenceLisible(quartier.nom, membre.prenom),
-        type,
-        quartier: quartier.nom,
-        adresseExacte: adresse,
-        latitude: position.latitude,
-        longitude: position.longitude,
+        reference: referenceLisible(champs.quartier.nom, membre.prenom),
+        type: champs.type,
+        quartier: champs.quartier.nom,
+        adresseExacte: champs.adresse,
+        latitude: situation.point.latitude,
+        longitude: situation.point.longitude,
         rayonDeLaZone: RAYON_MINIMAL_DE_ZONE_METRES + 150,
-        capacite,
-        verrouillage,
-        intemperie,
-        acces,
-        ancrage,
-        services,
-        velosAcceptes: velos,
-        precisions,
+        capacite: champs.capacite,
+        verrouillage: champs.verrouillage,
+        intemperie: champs.intemperie,
+        acces: champs.acces,
+        ancrage: champs.ancrage,
+        services: champs.services,
+        velosAcceptes: champs.velosAcceptes,
+        precisions: champs.precisions,
         publie: true,
       });
 
@@ -212,19 +99,19 @@ export async function proposerUnEmplacement(
   }
 
   await deposerUneCandidature({
-    prenom,
-    email,
-    adresseExacte: adresse,
-    type,
-    quartier: quartier.nom,
-    capacite,
-    verrouillage,
-    intemperie,
-    acces,
-    ancrage,
-    services,
-    velosAcceptes: velos,
-    precisions,
+    prenom: champs.prenom,
+    email: champs.email,
+    adresseExacte: champs.adresse,
+    type: champs.type,
+    quartier: champs.quartier.nom,
+    capacite: champs.capacite,
+    verrouillage: champs.verrouillage,
+    intemperie: champs.intemperie,
+    acces: champs.acces,
+    ancrage: champs.ancrage,
+    services: champs.services,
+    velosAcceptes: champs.velosAcceptes,
+    precisions: champs.precisions,
   });
 
   return {
@@ -236,11 +123,12 @@ export async function proposerUnEmplacement(
 
 /**
  * Une référence lisible plutôt qu'un identifiant : elle se retrouve dans une
- * URL, dans un message de support, dans un e-mail.
+ * URL, dans un message de support, dans un e-mail. Elle ne change plus ensuite,
+ * même si le quartier change.
  */
 function referenceLisible(quartier: string, prenom: string): string {
-  const sansAccent = (texte: string) =>
-    texte
+  const sansAccent = (valeur: string) =>
+    valeur
       .normalize('NFD')
       // Les signes diacritiques combinants, retirés après décomposition.
       .replace(/[̀-ͯ]/g, '')
