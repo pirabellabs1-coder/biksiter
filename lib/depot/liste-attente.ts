@@ -7,7 +7,7 @@ import {
   interroger,
   uneLigne,
 } from '@/lib/bd/client';
-import { mettreEnFile } from '@/lib/courriel/file';
+import { mettreEnFile } from '@/lib/envois/file';
 import { inscriptionSurLaListe } from '@/lib/courriel/modeles';
 import type { Role } from '@/lib/formulaires/roles';
 

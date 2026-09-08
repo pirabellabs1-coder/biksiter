@@ -4,14 +4,18 @@ import { notFound } from 'next/navigation';
 
 import BarreDuMembre from '@/components/barre-du-membre';
 import { adresseDuStationnement } from '@/lib/depot/emplacements';
+import { messagesDuStationnement } from '@/lib/depot/echanges';
 import {
   codeVivant,
   stationnementParId,
 } from '@/lib/depot/stationnements';
+import { onPeutEcrire } from '@/lib/regles/echanges';
 import { VALIDITE_CODE_HEURES } from '@/lib/regles/remise';
 import { exigerUnMembre } from '@/lib/session';
-import { creneauEnFrancais } from '@/lib/temps';
+import { creneauEnFrancais, enFrancais } from '@/lib/temps';
 
+import { ecrireAuSujetDuStationnement } from './actions';
+import Echange from './echange';
 import FormulaireDuCode from './formulaire-code';
 
 export const metadata: Metadata = { title: 'Un stationnement' };
@@ -51,6 +55,8 @@ export default async function LeStationnement({
     stationnement.etat === 'accepte' || stationnement.etat === 'en_cours';
 
   const code = remisePossible && jeRemets ? await codeVivant(id, sens) : null;
+  const messages = await messagesDuStationnement(id, membre.id);
+  const filOuvert = onPeutEcrire(stationnement.etat);
 
   return (
     <div className="page page--lecture">
@@ -137,6 +143,49 @@ export default async function LeStationnement({
           )}
         </>
       ) : null}
+
+      <h2 className="titre-section titre-section--aere">
+        {messages.length === 0 ? 'Écrire' : 'Vos échanges'}
+      </h2>
+
+      {messages.length === 0 ? (
+        <p className="discret">
+          Rien n’a encore été écrit ici.
+        </p>
+      ) : (
+        <ol className="fil">
+          {messages.map((message) => (
+            <li
+              key={message.id}
+              className={
+                message.auteurId === membre.id
+                  ? 'fil__message fil__message--mien'
+                  : 'fil__message'
+              }
+            >
+              <p className="fil__auteur">
+                {message.prenomDeLAuteur}
+                <span className="discret">
+                  {' '}
+                  · {enFrancais(new Date(message.ecritLe))}
+                </span>
+              </p>
+              <p>{message.corps}</p>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {filOuvert ? (
+        <Echange
+          action={ecrireAuSujetDuStationnement.bind(null, id)}
+          prenomDeLAutre={lAutre}
+        />
+      ) : (
+        <p className="discret">
+          Ce stationnement est clos : le fil est fermé.
+        </p>
+      )}
     </div>
   );
 }

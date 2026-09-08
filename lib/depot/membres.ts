@@ -7,7 +7,7 @@ import {
   interroger,
   uneLigne,
 } from '@/lib/bd/client';
-import { mettreEnFile } from '@/lib/courriel/file';
+import { mettreEnFile } from '@/lib/envois/file';
 import { bienvenue } from '@/lib/courriel/modeles';
 import type { EtatDeVerification } from '@/lib/regles/publication';
 import { empreinteDuMotDePasse } from '@/lib/securite/mot-de-passe';

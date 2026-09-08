@@ -2,10 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { ecrireUnMessage } from '@/lib/depot/echanges';
 import {
   saisirLeCodeDeRemise,
   stationnementParId,
 } from '@/lib/depot/stationnements';
+import { LONGUEUR_MAXIMALE_DU_MESSAGE } from '@/lib/regles/echanges';
 import {
   ERREUR_GENERALE,
   texte,
@@ -105,5 +107,45 @@ export async function saisirLeCode(
           ? 'Code incorrect. Les essais sont épuisés : un nouveau code a été généré.'
           : `Code incorrect. Il vous reste ${resultat.essaisRestants} essai${resultat.essaisRestants > 1 ? 's' : ''}.`,
     },
+  };
+}
+
+/**
+ * Écrire à l'autre.
+ *
+ * Ce qui remplace le chat en temps réel : un message, un courriel, et rien
+ * d'autre. Pas d'accusé de lecture — personne ne doit pouvoir reprocher à un
+ * bénévole d'avoir répondu le lendemain.
+ */
+export async function ecrireAuSujetDuStationnement(
+  stationnementId: string,
+  _precedent: EtatDuFormulaire,
+  donnees: FormData,
+): Promise<EtatDuFormulaire> {
+  const membre = await exigerUnMembre();
+  const corps = texte(donnees, 'corps');
+
+  const resultat = await ecrireUnMessage(stationnementId, membre.id, corps);
+
+  if (!resultat.ecrit) {
+    const motifs: Record<string, string> = {
+      vide: 'Écrivez quelque chose avant d’envoyer.',
+      trop_long: `Ce message dépasse ${LONGUEUR_MAXIMALE_DU_MESSAGE} caractères.`,
+      etat_ferme:
+        'Ce stationnement est refusé ou annulé : le fil est fermé.',
+      pas_concerne: 'Ce stationnement ne vous concerne pas.',
+    };
+    return {
+      statut: 'erreur',
+      erreurs: { corps: motifs[resultat.motif] },
+    };
+  }
+
+  revalidatePath(`/stationnements/${stationnementId}`);
+
+  return {
+    statut: 'valide',
+    message:
+      'Message envoyé. L’autre le reçoit par courriel — rien ne dit quand il le lira, et c’est très bien ainsi.',
   };
 }

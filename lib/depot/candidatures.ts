@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { dansUneTransaction, interroger } from '@/lib/bd/client';
-import { mettreEnFile } from '@/lib/courriel/file';
+import { mettreEnFile } from '@/lib/envois/file';
 import { candidatureRecue } from '@/lib/courriel/modeles';
 import type {
   Acces,

@@ -4,10 +4,17 @@ import { revalidatePath } from 'next/cache';
 
 import { baseConfiguree } from '@/lib/bd/client';
 import { deposerLaPiece } from '@/lib/depot/pieces';
+import { confirmerLeNumero, envoyerUnCode } from '@/lib/depot/telephone';
 import {
   ERREUR_GENERALE,
+  texte,
   type EtatDuFormulaire,
 } from '@/lib/formulaires/etat';
+import {
+  CHIFFRES_DU_CODE,
+  VALIDITE_DU_CODE_MINUTES,
+  lireLeNumero,
+} from '@/lib/regles/telephone';
 import {
   TAILLE_MAXIMALE_OCTETS,
   estUnTypeAccepte,
@@ -83,5 +90,78 @@ export async function deposerLaPieceDidentite(
     statut: 'valide',
     message:
       'Votre pièce est enregistrée, chiffrée. Une personne la relit sous 24 heures, puis elle est supprimée — au plus tard après sept jours, même si personne ne l’a regardée.',
+  };
+}
+
+/**
+ * Le SMS est le seul usage du téléphone : vérifier qu'on joint bien la
+ * personne. Les rappels passent par courriel — le coût par message en Belgique
+ * rend un SMS de rappel déraisonnable pour une association.
+ */
+export async function demanderUnCodeSms(
+  _precedent: EtatDuFormulaire,
+  donnees: FormData,
+): Promise<EtatDuFormulaire> {
+  const membre = await exigerUnMembre();
+
+  const lecture = lireLeNumero(texte(donnees, 'telephone'));
+
+  if (!lecture.valide) {
+    return {
+      statut: 'erreur',
+      erreurs: {
+        telephone:
+          lecture.motif === 'pas_un_mobile'
+            ? 'Indiquez un numéro de mobile : un SMS n’arrive pas sur une ligne fixe.'
+            : 'Ce numéro n’est pas lisible. Exemple : 0470 12 34 56.',
+      },
+    };
+  }
+
+  await envoyerUnCode(membre.id, lecture.numero);
+  revalidatePath('/inscription/verification');
+
+  return {
+    statut: 'valide',
+    message: `Un code à ${CHIFFRES_DU_CODE} chiffres part vers le ${lecture.numero}. Il vaut ${VALIDITE_DU_CODE_MINUTES} minutes.`,
+  };
+}
+
+export async function confirmerLeCodeSms(
+  _precedent: EtatDuFormulaire,
+  donnees: FormData,
+): Promise<EtatDuFormulaire> {
+  const membre = await exigerUnMembre();
+  const saisie = texte(donnees, 'code');
+
+  const confirmation = await confirmerLeNumero(membre.id, saisie);
+
+  if (confirmation.confirme) {
+    revalidatePath('/inscription/verification');
+    revalidatePath('/mon-compte');
+    return { statut: 'valide', message: 'Votre numéro est vérifié.' };
+  }
+
+  if (confirmation.resultat === null) {
+    return {
+      statut: 'erreur',
+      erreurs: { code: 'Aucun code en attente. Demandez-en un.' },
+    };
+  }
+
+  const resultat = confirmation.resultat;
+  const messages: Record<string, string> = {
+    expire: 'Ce code a plus de dix minutes. Demandez-en un nouveau.',
+    epuise: 'Les trois essais sont épuisés. Demandez un nouveau code.',
+  };
+
+  return {
+    statut: 'erreur',
+    erreurs: {
+      code:
+        resultat.motif === 'incorrect'
+          ? `Code incorrect. Il vous reste ${resultat.essaisRestants} essai${resultat.essaisRestants > 1 ? 's' : ''}.`
+          : messages[resultat.motif],
+    },
   };
 }

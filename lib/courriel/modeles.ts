@@ -185,6 +185,52 @@ export function demandeRefusee(details: {
   ]);
 }
 
+export function messageRecu(details: {
+  prenomDuDestinataire: string;
+  prenomDeLAuteur: string;
+  quartier: string;
+  corps: string;
+}): Message {
+  return rediger(`${details.prenomDeLAuteur} vous a écrit`, [
+    `Bonjour ${details.prenomDuDestinataire},`,
+    '',
+    `À propos du stationnement à ${details.quartier} :`,
+    '',
+    details.corps,
+    '',
+    'Répondez depuis la page du stationnement. Rien ne presse : personne ici',
+    'ne compte le temps que vous mettez à répondre, et personne ne sait si',
+    'vous avez lu ce message.',
+  ]);
+}
+
+export function donAnnonce(details: {
+  prenom: string | null;
+  montant: number | null;
+  communication: string;
+}): Message {
+  return rediger('Les coordonnées pour votre don', [
+    details.prenom ? `Bonjour ${details.prenom},` : 'Bonjour,',
+    '',
+    'Merci. Voici de quoi faire le virement :',
+    '',
+    `  Bénéficiaire   : ${ASSOCIATION.nom}`,
+    `  IBAN           : ${ASSOCIATION.iban}`,
+    ...(details.montant ? [`  Montant        : ${details.montant} €`] : []),
+    `  Communication  : ${details.communication}`,
+    '',
+    'La communication structurée est ce qui nous permet de reconnaître votre',
+    'virement : recopiez-la telle quelle, votre banque saura la lire.',
+    '',
+    'Nous ne passons pas par un prestataire de paiement : sa commission prend',
+    'deux à trois pour cent de chaque don, et un virement n’en prend rien.',
+    'Sur de petits montants, c’est un mois de fonctionnement par an.',
+    '',
+    'Un don ne donne aucun avantage sur le service. Un membre qui donne et un',
+    'membre qui ne donne pas sont traités exactement pareil.',
+  ]);
+}
+
 export function desistement(details: {
   prenomDuDestinataire: string;
   prenomDeCeluiQuiSeDesiste: string;

@@ -1386,3 +1386,47 @@ legend {
   border-radius: var(--rayon-large);
   margin-bottom: var(--e5);
 }
+
+/* Deux formulaires qui se suivent dans une même étape : le second n'apparaît
+   qu'une fois le premier envoyé, et doit s'en détacher visiblement. */
+.formulaire--suite {
+  margin-top: var(--e5);
+  padding-top: var(--e5);
+  border-top: 1px solid var(--craie);
+}
+
+/* --- Fil d'échanges ---------------------------------------------------------- */
+/* Ni bulle de messagerie instantanée, ni accusé de lecture : des messages
+   posés les uns après les autres. Ce qui distingue les siens de ceux de
+   l'autre est un décalage, pas une couleur — le bleu voudrait dire « action ». */
+
+.fil {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.fil__message {
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e4);
+  max-width: 46rem;
+}
+
+.fil__message--mien {
+  margin-left: var(--e6);
+  background: var(--papier);
+}
+
+.fil__auteur {
+  font-size: var(--t-menu);
+  margin-bottom: var(--e2);
+}
+
+.fil__message p:last-child {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+}

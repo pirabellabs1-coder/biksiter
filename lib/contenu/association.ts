@@ -15,4 +15,7 @@ export const ASSOCIATION = {
   contact: 'bonjour@bikesitters.be',
   /** Numéro d'entreprise belge — à remplacer. */
   numeroDEntreprise: '0000.000.000',
+  /** Compte de l'association — à remplacer par le vrai avant toute mise en
+   *  ligne : un IBAN faux fait partir un don chez quelqu'un d'autre. */
+  iban: 'BE00 0000 0000 0000',
 } as const;

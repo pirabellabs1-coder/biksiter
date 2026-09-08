@@ -12,7 +12,10 @@ import {
 import { chiffrementDisponible } from '@/lib/securite/chiffrement';
 import { exigerUnMembre } from '@/lib/session';
 
+import { etatDuTelephone } from '@/lib/depot/telephone';
+
 import FormulaireDePiece from './formulaire';
+import VerificationDuTelephone from './telephone';
 
 export const metadata: Metadata = {
   title: 'Vérifier mon identité',
@@ -34,7 +37,10 @@ export default async function Verification() {
     );
   }
 
-  const piece = await pieceDuMembre(membre.id);
+  const [piece, telephone] = await Promise.all([
+    pieceDuMembre(membre.id),
+    etatDuTelephone(membre.id),
+  ]);
   const dejaVerifie = membre.verification === 'verifiee';
   const refuse = membre.verification === 'refusee';
 
@@ -63,11 +69,20 @@ export default async function Verification() {
           <div>
             <h2>Téléphone</h2>
             <p className="discret">
-              Un code arrive par SMS. C’est le seul usage que nous faisons des
-              SMS : ils coûtent trop cher pour servir aux rappels.
+              {telephone.verifieLe
+                ? telephone.telephone
+                : 'Un code arrive par SMS. C’est le seul usage que nous faisons des SMS : ils coûtent trop cher pour servir aux rappels.'}
             </p>
           </div>
-          <span className="pastille pastille--neutre">À faire</span>
+          <span
+            className={
+              telephone.verifieLe
+                ? 'pastille pastille--verifie'
+                : 'pastille pastille--neutre'
+            }
+          >
+            {telephone.verifieLe ? 'Vérifié' : 'À faire'}
+          </span>
         </li>
 
         <li className="carte">
@@ -100,6 +115,22 @@ export default async function Verification() {
           </span>
         </li>
       </ul>
+
+      {telephone.verifieLe ? null : (
+        <>
+          <h2 className="titre-section titre-section--aere">
+            Vérifier votre téléphone
+          </h2>
+          <VerificationDuTelephone
+            numeroConnu={telephone.telephone}
+            codeEnAttente={telephone.codeEnvoyeLe !== null}
+          />
+        </>
+      )}
+
+      <h2 className="titre-section titre-section--aere">
+        Vérifier votre identité
+      </h2>
 
       {dejaVerifie ? (
         <>

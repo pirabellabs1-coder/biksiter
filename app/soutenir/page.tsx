@@ -1,18 +1,17 @@
 import type { Metadata } from 'next';
 
+import BaseNonBranchee from '@/components/base-non-branchee';
+import { baseConfiguree } from '@/lib/bd/client';
 import { ASSOCIATION } from '@/lib/contenu/association';
+import { CE_QUE_COUVRE_UN_DON } from '@/lib/regles/dons';
+
+import FormulaireDeDon from './formulaire';
 
 export const metadata: Metadata = {
   title: 'Nous soutenir',
   description:
     'Le service est gratuit, pas sans coût. Hébergement, cartographie, envois d’e-mails et vérification des candidatures : ce que couvre un don.',
 };
-
-const CE_QUE_COUVRE_UN_DON = [
-  { montant: '5 €', usage: 'un mois de carte pour un quartier' },
-  { montant: '20 €', usage: 'la vérification de vingt candidatures' },
-  { montant: '50 €', usage: 'un mois de fonctionnement complet' },
-];
 
 export default function Soutenir() {
   return (
@@ -28,22 +27,36 @@ export default function Soutenir() {
       <ul className="grille dons">
         {CE_QUE_COUVRE_UN_DON.map(({ montant, usage }) => (
           <li className="carte" key={montant}>
-            <p className="chiffre__valeur">{montant}</p>
+            <p className="chiffre__valeur">{montant} €</p>
             <p className="discret">{usage}</p>
           </li>
         ))}
       </ul>
 
+      <h2 className="titre-section titre-section--aere">
+        Par virement, pas par carte
+      </h2>
+      <p className="discret">
+        Un prestataire de paiement prend deux à trois pour cent de chaque don.
+        Sur les petits montants qui nous font vivre, cela représente un mois de
+        fonctionnement par an. Un virement, lui, ne coûte rien — ni à vous, ni à
+        nous.
+      </p>
+      <p className="discret">
+        Le formulaire ci-dessous ne fait qu’une chose : produire une
+        communication structurée, ce numéro que votre banque sait recopier et
+        qui nous permet de reconnaître votre virement. Aucune donnée bancaire ne
+        passe par ce site, et il n’y en aura jamais.
+      </p>
+
+      {baseConfiguree() ? <FormulaireDeDon /> : <BaseNonBranchee />}
+
       <div className="encart">
         <p>
-          <strong>Le don en ligne n’est pas encore ouvert.</strong> Nous
-          préférons le dire plutôt qu’afficher un formulaire qui ne mène nulle
-          part. En attendant, écrivez-nous à{' '}
-          <a href={`mailto:${ASSOCIATION.contact}`} className="lien">
-            {ASSOCIATION.contact}
-          </a>{' '}
-          : nous vous répondons avec les coordonnées bancaires de
-          l’association.
+          Vous pouvez aussi virer directement à {ASSOCIATION.nom}, IBAN{' '}
+          <strong>{ASSOCIATION.iban}</strong>, en mentionnant simplement
+          « don ». La communication structurée nous aide seulement à vous
+          remercier nommément.
         </p>
       </div>
 

@@ -59,9 +59,10 @@ Ne pas lancer `npm run build` pendant que `npm run dev` tourne : les deux
 | `lib/securite/` | Hachage des mots de passe (scrypt), jetons de session, codes de remise. |
 | `lib/contenu/` | Le texte éditorial et les listes de quartiers. |
 | `lib/geocodage/` | La transformation d’une adresse en coordonnées. |
-| `lib/courriel/` | Les modèles de messages et la file d’attente sortante. |
+| `lib/courriel/` | Les modèles de messages. |
+| `lib/envois/` | La file d’attente sortante, courriels et SMS. |
 | `migrations/` | Le schéma, en SQL, appliqué dans l’ordre des noms de fichiers. |
-| `scripts/` | `bd:migrer`, `bd:semer`, `bd:courriels` et `bd:purger`. |
+| `scripts/` | `bd:migrer`, `bd:semer`, `bd:messages` et `bd:purger`. |
 
 ## Les règles sont écrites deux fois, et c’est voulu
 
@@ -103,10 +104,11 @@ peut donc ni parler d’un stationnement qui n’a pas été enregistré, ni se 
 parce que le serveur de messagerie redémarrait. Un script draine la file :
 
 ```bash
-npm run bd:courriels
+npm run bd:messages
 ```
 
-Sans `SMTP_URL`, le script affiche les messages en attente au lieu de les
+La même file porte les SMS. Sans `SMTP_URL` (ou sans `SMS_URL`), le script
+affiche les messages en attente sur ce canal au lieu de les
 expédier, et ne les marque pas comme envoyés — on relit ce qu’on écrit sans
 déranger personne.
 
@@ -184,16 +186,52 @@ physiquement là, ou quelqu’un attend qu’on lui réponde.
 L’adresse exacte apparaît dans le formulaire de correction, et c’est normal :
 la règle 4 protège l’adresse des autres membres, pas de celui qui l’a saisie.
 
+## Le téléphone
+
+Un code à six chiffres par SMS, valable dix minutes, trois essais. On garde
+l’empreinte du code et non le code : dix minutes suffisent pour qu’une fuite
+serve à quelqu’un, et on n’a jamais besoin de le relire.
+
+Seuls les mobiles belges sont acceptés — un code envoyé sur une ligne fixe
+n’arrive nulle part, et mieux vaut le dire à la saisie que laisser quelqu’un
+attendre. Les six façons d’écrire un numéro belge sont toutes reconnues.
+
+C’est le seul usage du SMS dans ce produit. Les rappels passent par courriel :
+le coût par message en Belgique rend le reste déraisonnable.
+
+## Les échanges
+
+Ce qui remplace le chat en temps réel, écarté parce qu’il crée une attente de
+réponse que des bénévoles ne tiennent pas. Un message s’écrit sur la page du
+stationnement et part par courriel.
+
+Pas d’accusé de lecture, pas de compteur de messages non lus, pas d’heure de
+dernière connexion, pas d’indicateur de saisie. Rien qui permette de reprocher
+à quelqu’un d’avoir répondu le lendemain.
+
+On peut écrire dès la demande — un bike sitter a souvent une question avant
+d’accepter — et jusqu’après la reprise. Un refus ou une annulation referment le
+fil : laisser un fil ouvert sur un refus, c’est inviter à le contester.
+
+## Les dons
+
+Par virement, pas par carte. Un prestataire de paiement prend deux à trois pour
+cent de chaque don ; sur les petits montants qui font vivre une association,
+c’est un mois de fonctionnement par an. Un virement ne prend rien.
+
+Le formulaire ne fait qu’une chose : produire une communication structurée au
+format belge — dix chiffres et deux de contrôle, modulo 97 — que la banque du
+donateur sait recopier et qui permet de rapprocher le versement. Tout y est
+facultatif, y compris le montant : un don anonyme reste un don, et demander une
+identité pour en accepter un serait une façon de classer les gens.
+
+**Aucune donnée bancaire ne passe par ce site, et il ne faut pas en ajouter.**
+
 ## Ce qui n’est pas encore branché
 
-- **La vérification du téléphone.** L’écran l’annonce, aucun SMS ne part. Le
-  coût par message en Belgique est la raison pour laquelle les SMS sont
-  réservés à la vérification, et à rien d’autre.
-- **Les échanges après acceptation.** Le mot joint à une demande passe, mais il
-  n’y a pas de fil de discussion. Le chat en temps réel a été écarté ; il reste
-  à décider ce qui le remplace.
-- **Le don en ligne.** La page `/soutenir` le dit plutôt que d’afficher un
-  formulaire qui ne mène nulle part.
+- **L’envoi réel des SMS.** La file existe et le code y est déposé ; il manque
+  un contrat chez un opérateur et l’adresse de sa passerelle (`SMS_URL`). Sans
+  elle, `npm run bd:messages` affiche le SMS au lieu de l’expédier.
 
 ## Vérifications qui restent à faire
 
@@ -219,4 +257,6 @@ VERIFIER_LE_GEOCODAGE=1 npm test
   ce ne sont pas des mesures.
 - `lib/contenu/quartiers.ts` — coordonnées indicatives des centres de quartier.
   Elles ne servent plus qu’au repli quand le géocodage échoue.
+- `lib/contenu/association.ts` — l’IBAN aussi : un IBAN faux fait partir un don
+  chez quelqu’un d’autre.
 - `app/conditions-generales/page.tsx` — texte à faire rédiger par un juriste.

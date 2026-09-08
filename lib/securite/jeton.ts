@@ -19,17 +19,25 @@ export function empreinteDuJeton(jeton: string): string {
   return createHash('sha256').update(jeton).digest('hex');
 }
 
-/** Un code de remise à quatre chiffres (règle 5), tiré sans biais. */
-export function nouveauCodeDeRemise(): string {
-  // On rejette les tirages qui déborderaient : prendre un octet modulo 10
-  // favoriserait les chiffres 0 à 5.
+/**
+ * Un code numérique tiré sans biais.
+ *
+ * On rejette les octets au-delà de 249 : prendre un octet modulo 10
+ * favoriserait les chiffres 0 à 5, et un code prévisible n'est pas un code.
+ */
+export function nouveauCodeNumerique(longueur: number): string {
   const chiffres: string[] = [];
-  while (chiffres.length < 4) {
-    for (const octet of randomBytes(8)) {
-      if (octet < 250 && chiffres.length < 4) {
+  while (chiffres.length < longueur) {
+    for (const octet of randomBytes(longueur * 2)) {
+      if (octet < 250 && chiffres.length < longueur) {
         chiffres.push(String(octet % 10));
       }
     }
   }
   return chiffres.join('');
+}
+
+/** Le code de remise, à quatre chiffres (règle 5). */
+export function nouveauCodeDeRemise(): string {
+  return nouveauCodeNumerique(4);
 }

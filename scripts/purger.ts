@@ -41,7 +41,7 @@ async function purger(): Promise<void> {
     // Les messages partis restent trois mois : de quoi répondre à « je n'ai
     // rien reçu », pas de quoi constituer une archive de correspondance.
     const courriels = await reserve.query(
-      `delete from courriel
+      `delete from message_sortant
         where envoye_le is not null
           and envoye_le <= now() - interval '90 days'
         returning id`,
@@ -49,7 +49,7 @@ async function purger(): Promise<void> {
 
     console.log(`Pièces d’identité supprimées : ${pieces.rowCount}`);
     console.log(`Sessions expirées supprimées : ${sessions.rowCount}`);
-    console.log(`Courriels envoyés archivés puis supprimés : ${courriels.rowCount}`);
+    console.log(`Messages envoyés supprimés après 90 jours : ${courriels.rowCount}`);
   } finally {
     await reserve.end();
   }
