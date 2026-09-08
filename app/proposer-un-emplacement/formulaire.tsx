@@ -19,12 +19,18 @@ import {
   SERVICES,
   VERROUILLAGES,
 } from '@/lib/regles/caracteristiques';
+import { NOMS_DE_QUARTIER } from '@/lib/contenu/quartiers';
 import { TYPES_EMPLACEMENT_PRIVE } from '@/lib/regles/emplacements';
 import { TYPES_VELO } from '@/lib/regles/velos';
 
 import { proposerUnEmplacement } from './actions';
 
-export default function FormulaireDEmplacement() {
+export default function FormulaireDEmplacement({
+  membreDejaConnu,
+}: {
+  /** Un membre connecté n'a pas à ressaisir son prénom ni son e-mail. */
+  membreDejaConnu: boolean;
+}) {
   const [etat, envoyer, enCours] = useActionState(
     proposerUnEmplacement,
     FORMULAIRE_VIERGE,
@@ -36,21 +42,23 @@ export default function FormulaireDEmplacement() {
     <form action={envoyer} noValidate>
       <MessageDeFormulaire etat={etat} />
 
-      <div className="duo">
-        <ChampTexte
-          id="prenom"
-          label="Votre prénom"
-          autoComplete="given-name"
-          erreur={erreurs.prenom}
-        />
-        <ChampTexte
-          id="email"
-          label="Votre e-mail"
-          type="email"
-          autoComplete="email"
-          erreur={erreurs.email}
-        />
-      </div>
+      {membreDejaConnu ? null : (
+        <div className="duo">
+          <ChampTexte
+            id="prenom"
+            label="Votre prénom"
+            autoComplete="given-name"
+            erreur={erreurs.prenom}
+          />
+          <ChampTexte
+            id="email"
+            label="Votre e-mail"
+            type="email"
+            autoComplete="email"
+            erreur={erreurs.email}
+          />
+        </div>
+      )}
 
       <ChampTexte
         id="adresse"
@@ -58,6 +66,14 @@ export default function FormulaireDEmplacement() {
         aide="Elle n’est jamais publiée. La carte n’affiche qu’une zone, et vous seul communiquez l’adresse, à la personne dont vous avez accepté la demande."
         autoComplete="street-address"
         erreur={erreurs.adresse}
+      />
+
+      <ChampListe
+        id="quartier"
+        label="Le quartier le plus proche"
+        aide="Il situe votre emplacement sur la carte, en zone approximative. Votre adresse, elle, n’y figure jamais."
+        options={optionsDepuis(NOMS_DE_QUARTIER)}
+        erreur={erreurs.quartier}
       />
 
       <ChampListe

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { membreConnecte } from '@/lib/session';
+
 import FormulaireDEmplacement from './formulaire';
 
 export const metadata: Metadata = {
@@ -8,7 +10,12 @@ export const metadata: Metadata = {
     'Un garage, une cave, une cour fermée suffisent. Accueillir un vélo ne coûte rien, n’engage à rien, et votre adresse reste masquée tant que vous n’avez pas accepté une demande.',
 };
 
-export default function ProposerUnEmplacement() {
+export const dynamic = 'force-dynamic';
+
+export default async function ProposerUnEmplacement() {
+  const membre = await membreConnecte();
+  const publiera = membre?.verification === 'verifiee';
+
   return (
     <div className="page">
       <div className="deux-colonnes">
@@ -89,10 +96,11 @@ export default function ProposerUnEmplacement() {
         <div className="carte carte--aeree">
           <h2 className="titre-section">Décrire mon emplacement</h2>
           <p className="discret">
-            Vous pouvez publier jusqu’à deux emplacements. Rien n’est visible
-            tant qu’une personne n’a pas vérifié votre identité.
+            {publiera
+              ? 'Votre identité est vérifiée : cet emplacement sera publié dès que vous l’aurez décrit. Vous pouvez en proposer deux au maximum.'
+              : 'Rien n’est visible tant qu’une personne n’a pas vérifié votre identité. Vous décrivez le lieu, nous vous répondons.'}
           </p>
-          <FormulaireDEmplacement />
+          <FormulaireDEmplacement membreDejaConnu={membre !== null} />
         </div>
       </div>
     </div>

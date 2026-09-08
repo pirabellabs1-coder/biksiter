@@ -2,35 +2,35 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import BaseNonBranchee from '@/components/base-non-branchee';
 import ZoneApproximative from '@/components/zone-approximative';
-import {
-  EMPLACEMENTS_DE_DEMONSTRATION,
-  emplacementParReference,
-} from '@/lib/donnees/emplacements-de-demonstration';
-import { ficheVisible } from '@/lib/regles/adresse';
+import { baseConfiguree } from '@/lib/bd/client';
+import { ficheParReference } from '@/lib/depot/emplacements';
 import { INTEMPERIES, VERROUILLAGES } from '@/lib/regles/caracteristiques';
 import { peutDemanderUnStationnement } from '@/lib/regles/publication';
-import { membreCourant } from '@/lib/session';
+import { membrePourLesRegles } from '@/lib/session';
 
-export function generateStaticParams() {
-  return EMPLACEMENTS_DE_DEMONSTRATION.map(({ reference }) => ({ reference }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ reference: string }>;
 }): Promise<Metadata> {
-  const { reference } = await params;
-  const emplacement = emplacementParReference(reference);
+  if (!baseConfiguree()) {
+    return { title: 'Emplacement' };
+  }
 
-  if (!emplacement) {
+  const { reference } = await params;
+  const fiche = await ficheParReference(reference);
+
+  if (!fiche) {
     return { title: 'Emplacement introuvable' };
   }
 
   return {
-    title: `Un emplacement près de ${emplacement.quartier}`,
-    description: `${emplacement.type} chez ${emplacement.prenomDuBikeSitter}, à quelques centaines de mètres de ${emplacement.quartier}.`,
+    title: `Un emplacement près de ${fiche.quartier}`,
+    description: `${fiche.type} chez ${fiche.prenomDuBikeSitter}, à quelques centaines de mètres de ${fiche.quartier}.`,
   };
 }
 
@@ -39,17 +39,25 @@ export default async function FicheEmplacement({
 }: {
   params: Promise<{ reference: string }>;
 }) {
-  const { reference } = await params;
-  const complet = emplacementParReference(reference);
+  if (!baseConfiguree()) {
+    return (
+      <div className="page page--lecture">
+        <h1 className="titre-page">Emplacement</h1>
+        <BaseNonBranchee />
+      </div>
+    );
+  }
 
-  if (!complet) {
+  const { reference } = await params;
+
+  // La fiche vient de la vue `emplacement_visible` : ni adresse exacte, ni
+  // position exacte n'existent dans cet objet (règle 4).
+  const fiche = await ficheParReference(reference);
+  if (!fiche) {
     notFound();
   }
 
-  // Règle 4 : l'adresse exacte ne franchit pas cette ligne. `ficheVisible`
-  // retire le champ du type lui-même, donc l'oublier ne compilerait pas.
-  const fiche = ficheVisible(complet);
-  const peutDemander = peutDemanderUnStationnement(membreCourant());
+  const peutDemander = peutDemanderUnStationnement(await membrePourLesRegles());
 
   return (
     <div className="page page--lecture">
@@ -59,54 +67,52 @@ export default async function FicheEmplacement({
         </Link>
       </p>
 
-      <h1 className="titre-page">
-        Un emplacement près de {fiche.quartier}
-      </h1>
+      <h1 className="titre-page">Un emplacement près de {fiche.quartier}</h1>
       <p className="chapeau">
-        {complet.type}, chez {fiche.prenomDuBikeSitter}. La carte montre une
-        zone d’environ {fiche.rayonDeLaZone} mètres : l’adresse exacte vous sera
+        {fiche.type}, chez {fiche.prenomDuBikeSitter}. La carte montre une zone
+        d’environ {fiche.rayonDeLaZone} mètres : l’adresse exacte vous sera
         donnée par {fiche.prenomDuBikeSitter} si votre demande est acceptée.
       </p>
 
-      <ZoneApproximative taches={[{ x: 50, y: 45 }]} />
+      <ZoneApproximative
+        taches={[{ latitude: fiche.latitude, longitude: fiche.longitude }]}
+      />
 
-      <h2 className="titre-section titre-section--aere">
-        Ce qu’il faut savoir
-      </h2>
+      <h2 className="titre-section titre-section--aere">Ce qu’il faut savoir</h2>
       <dl className="details">
         <div>
           <dt>Type d’emplacement</dt>
-          <dd>{complet.type}</dd>
+          <dd>{fiche.type}</dd>
         </div>
         <div>
           <dt>Vélos accueillis en même temps</dt>
-          <dd>{complet.capacite}</dd>
+          <dd>{fiche.capacite}</dd>
         </div>
         <div>
           <dt>Fermeture</dt>
-          <dd>{VERROUILLAGES[complet.verrouillage]}</dd>
+          <dd>{VERROUILLAGES[fiche.verrouillage]}</dd>
         </div>
         <div>
           <dt>Intempéries</dt>
-          <dd>{INTEMPERIES[complet.intemperie]}</dd>
+          <dd>{INTEMPERIES[fiche.intemperie]}</dd>
         </div>
         <div>
           <dt>Accès avec le vélo</dt>
-          <dd>{complet.acces}</dd>
+          <dd>{fiche.acces}</dd>
         </div>
         <div>
           <dt>Ancrage sur place</dt>
-          <dd>{complet.ancrage}</dd>
+          <dd>{fiche.ancrage}</dd>
         </div>
         <div>
           <dt>Vélos acceptés</dt>
-          <dd>{complet.velosAcceptes.join(', ')}</dd>
+          <dd>{fiche.velosAcceptes.join(', ')}</dd>
         </div>
         <div>
           <dt>En plus</dt>
           <dd>
-            {complet.services.length > 0
-              ? complet.services.join(', ')
+            {fiche.services.length > 0
+              ? fiche.services.join(', ')
               : 'Rien de particulier'}
           </dd>
         </div>
@@ -115,6 +121,15 @@ export default async function FicheEmplacement({
           <dd>après acceptation de votre demande</dd>
         </div>
       </dl>
+
+      {fiche.precisions ? (
+        <>
+          <h2 className="titre-section titre-section--aere">
+            Ce que {fiche.prenomDuBikeSitter} précise
+          </h2>
+          <p className="discret">{fiche.precisions}</p>
+        </>
+      ) : null}
 
       {peutDemander ? (
         <Link

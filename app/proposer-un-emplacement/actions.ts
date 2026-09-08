@@ -1,11 +1,18 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
+import { baseConfiguree } from '@/lib/bd/client';
+import { deposerUneCandidature } from '@/lib/depot/candidatures';
+import { creerUnEmplacement } from '@/lib/depot/emplacements';
+import { quartierParNom } from '@/lib/contenu/quartiers';
 import {
-  RIEN_N_EST_ENCORE_ENVOYE,
+  ERREUR_GENERALE,
   ressembleAUnEmail,
   texte,
   type EtatDuFormulaire,
 } from '@/lib/formulaires/etat';
+import { RAYON_MINIMAL_DE_ZONE_METRES } from '@/lib/regles/adresse';
 import {
   estUnAcces,
   estUnAncrage,
@@ -13,25 +20,52 @@ import {
   estUnVerrouillage,
   estUneIntemperie,
 } from '@/lib/regles/caracteristiques';
-import { estUnTypeEmplacementPrive } from '@/lib/regles/emplacements';
+import {
+  EMPLACEMENTS_PAR_MEMBRE,
+  estUnTypeEmplacementPrive,
+} from '@/lib/regles/emplacements';
+import { decisionDePublication } from '@/lib/regles/publication';
 import { estUnTypeVelo } from '@/lib/regles/velos';
+import { membreConnecte, membrePourLesRegles } from '@/lib/session';
 
-/** Le nombre de vélos qu'un particulier peut raisonnablement caser chez lui.
- *  Au-delà, ce n'est plus un emplacement, c'est un parking. */
+/** Au-delà, ce n'est plus un emplacement chez quelqu'un, c'est un parking. */
 const CAPACITE_MAXIMALE = 10;
 
+function estUneChaine(valeur: FormDataEntryValue): valeur is string {
+  return typeof valeur === 'string';
+}
+
+/**
+ * Un seul formulaire pour deux situations, parce que c'est une seule action :
+ * proposer un emplacement n'est pas un statut qu'on demande.
+ *
+ * - Un membre vérifié crée directement son emplacement, qui est publié.
+ * - Tout le monde d'autre dépose une candidature, qui attend qu'une personne
+ *   vérifie son identité (règle 2). Rien n'est publié dans ce cas.
+ */
 export async function proposerUnEmplacement(
   _precedent: EtatDuFormulaire,
   donnees: FormData,
 ): Promise<EtatDuFormulaire> {
-  const erreurs: Record<string, string> = {};
+  if (!baseConfiguree()) {
+    return {
+      statut: 'erreur',
+      erreurs: {
+        [ERREUR_GENERALE]:
+          'La base de données n’est pas branchée : rien ne peut être enregistré.',
+      },
+    };
+  }
 
-  const prenom = texte(donnees, 'prenom');
+  const erreurs: Record<string, string> = {};
+  const membre = await membreConnecte();
+
+  const prenom = membre?.prenom ?? texte(donnees, 'prenom');
   if (prenom === '') {
     erreurs.prenom = 'Indiquez votre prénom.';
   }
 
-  const email = texte(donnees, 'email');
+  const email = membre?.email ?? texte(donnees, 'email');
   if (!ressembleAUnEmail(email)) {
     erreurs.email = 'Indiquez une adresse e-mail valide.';
   }
@@ -41,19 +75,21 @@ export async function proposerUnEmplacement(
     erreurs.adresse = 'Indiquez l’adresse du lieu. Elle ne sera jamais publiée.';
   }
 
-  // Règle 1 : la liste des types est la règle. Un type hors liste n'est pas
-  // un champ mal rempli, c'est un emplacement qui n'a pas sa place ici.
+  const nomDuQuartier = texte(donnees, 'quartier');
+  const quartier = quartierParNom(nomDuQuartier);
+  if (!quartier) {
+    erreurs.quartier = 'Choisissez le quartier le plus proche dans la liste.';
+  }
+
+  // Règle 1 : un type hors liste n'est pas un champ mal rempli, c'est un
+  // emplacement qui n'a pas sa place ici.
   const type = texte(donnees, 'type');
   if (!estUnTypeEmplacementPrive(type)) {
     erreurs.type = 'Choisissez un type d’emplacement dans la liste.';
   }
 
   const capacite = Number.parseInt(texte(donnees, 'capacite'), 10);
-  if (
-    !Number.isInteger(capacite) ||
-    capacite < 1 ||
-    capacite > CAPACITE_MAXIMALE
-  ) {
+  if (!Number.isInteger(capacite) || capacite < 1 || capacite > CAPACITE_MAXIMALE) {
     erreurs.capacite = `Indiquez un nombre de vélos entre 1 et ${CAPACITE_MAXIMALE}.`;
   }
 
@@ -89,16 +125,106 @@ export async function proposerUnEmplacement(
     erreurs.services = 'Un des services cochés n’existe pas.';
   }
 
-  if (Object.keys(erreurs).length > 0) {
+  const precisionsSaisies = texte(donnees, 'precisions');
+  const precisions = precisionsSaisies === '' ? null : precisionsSaisies;
+
+  if (
+    Object.keys(erreurs).length > 0 ||
+    !quartier ||
+    !estUnTypeEmplacementPrive(type) ||
+    !estUnVerrouillage(verrouillage) ||
+    !estUneIntemperie(intemperie) ||
+    !estUnAcces(acces) ||
+    !estUnAncrage(ancrage) ||
+    !velos.every(estUnTypeVelo) ||
+    !services.every(estUnService)
+  ) {
     return { statut: 'erreur', erreurs };
   }
 
-  // TODO(persistance) : enregistrer la candidature, puis la mettre dans la
-  // file de vérification humaine. Règle 2 — rien n'est publié avant ce
-  // passage par une personne.
-  return { statut: 'valide', message: RIEN_N_EST_ENCORE_ENVOYE };
+  // Un membre connecté et vérifié publie directement ; tout autre cas dépose
+  // une candidature, qui attend le passage d'une personne (règle 2).
+  if (membre) {
+    const decision = decisionDePublication(await membrePourLesRegles());
+
+    if (!decision.autorise && decision.motif === 'quota_atteint') {
+      return {
+        statut: 'erreur',
+        erreurs: {
+          [ERREUR_GENERALE]: `Vous proposez déjà ${EMPLACEMENTS_PAR_MEMBRE} emplacements, c’est le maximum. Retirez-en un pour en ajouter un autre.`,
+        },
+      };
+    }
+
+    if (decision.autorise) {
+      await creerUnEmplacement({
+        membreId: membre.id,
+        reference: referenceLisible(quartier.nom, membre.prenom),
+        type,
+        quartier: quartier.nom,
+        adresseExacte: adresse,
+        latitude: quartier.latitude,
+        longitude: quartier.longitude,
+        rayonDeLaZone: RAYON_MINIMAL_DE_ZONE_METRES + 150,
+        capacite,
+        verrouillage,
+        intemperie,
+        acces,
+        ancrage,
+        services,
+        velosAcceptes: velos,
+        precisions,
+        publie: true,
+      });
+
+      revalidatePath('/emplacements');
+      revalidatePath('/mes-emplacements');
+
+      return {
+        statut: 'valide',
+        message:
+          'Votre emplacement est publié. Il apparaît en zone approximative : votre adresse reste chez vous jusqu’à ce que vous acceptiez une demande.',
+      };
+    }
+  }
+
+  await deposerUneCandidature({
+    prenom,
+    email,
+    adresseExacte: adresse,
+    type,
+    quartier: quartier.nom,
+    capacite,
+    verrouillage,
+    intemperie,
+    acces,
+    ancrage,
+    services,
+    velosAcceptes: velos,
+    precisions,
+  });
+
+  return {
+    statut: 'valide',
+    message:
+      'Votre candidature est enregistrée. Une personne la relit et vérifie votre identité avant toute publication : personne n’apparaît sur la carte sans être passé par là.',
+  };
 }
 
-function estUneChaine(valeur: FormDataEntryValue): valeur is string {
-  return typeof valeur === 'string';
+/**
+ * Une référence lisible plutôt qu'un identifiant : elle se retrouve dans une
+ * URL, dans un message de support, dans un e-mail.
+ */
+function referenceLisible(quartier: string, prenom: string): string {
+  const sansAccent = (texte: string) =>
+    texte
+      .normalize('NFD')
+      // Les signes diacritiques combinants, retirés après décomposition.
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+  const suffixe = Math.random().toString(36).slice(2, 6);
+  return `${sansAccent(quartier)}-${sansAccent(prenom)}-${suffixe}`;
 }

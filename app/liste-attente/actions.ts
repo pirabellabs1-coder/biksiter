@@ -1,7 +1,9 @@
 'use server';
 
+import { baseConfiguree } from '@/lib/bd/client';
+import { inscrireSurLaListe } from '@/lib/depot/liste-attente';
 import {
-  RIEN_N_EST_ENCORE_ENVOYE,
+  ERREUR_GENERALE,
   ressembleAUnEmail,
   texte,
   type EtatDuFormulaire,
@@ -12,6 +14,16 @@ export async function rejoindreLaListe(
   _precedent: EtatDuFormulaire,
   donnees: FormData,
 ): Promise<EtatDuFormulaire> {
+  if (!baseConfiguree()) {
+    return {
+      statut: 'erreur',
+      erreurs: {
+        [ERREUR_GENERALE]:
+          'La base de données n’est pas branchée : votre inscription ne peut pas être enregistrée.',
+      },
+    };
+  }
+
   const erreurs: Record<string, string> = {};
 
   const email = texte(donnees, 'email');
@@ -30,11 +42,25 @@ export async function rejoindreLaListe(
     erreurs.role = 'Dites-nous ce que vous seriez plutôt.';
   }
 
-  if (Object.keys(erreurs).length > 0) {
+  if (Object.keys(erreurs).length > 0 || !estUnRole(role)) {
     return { statut: 'erreur', erreurs };
   }
 
-  // TODO(persistance) : enregistrer l'inscription et compter les bike sitters
-  // par quartier — c'est ce compteur qui déclenche l'ouverture d'un quartier.
-  return { statut: 'valide', message: RIEN_N_EST_ENCORE_ENVOYE };
+  const resultat = await inscrireSurLaListe({ email, quartier, role });
+
+  if (resultat.dejaInscrit) {
+    return {
+      statut: 'valide',
+      message:
+        'Vous étiez déjà sur la liste avec cette adresse — c’est noté, il n’y a rien à faire de plus.',
+    };
+  }
+
+  return {
+    statut: 'valide',
+    message:
+      role === 'cycliste'
+        ? 'Vous êtes sur la liste. Nous ouvrirons votre quartier quand il comptera assez de bike sitters pour qu’une place s’y trouve à chaque fois.'
+        : 'Vous êtes sur la liste, et c’est votre inscription qui compte le plus : ce sont les bike sitters qui font ouvrir un quartier.',
+  };
 }

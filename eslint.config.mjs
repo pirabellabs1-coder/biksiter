@@ -26,6 +26,12 @@ const configuration = [
       ],
     },
   },
+  {
+    // Les scripts en ligne de commande parlent par la console : c'est leur
+    // seule interface. La règle vise le code livré au navigateur.
+    files: ['scripts/**/*.ts'],
+    rules: { 'no-console': 'off' },
+  },
 ];
 
 export default configuration;

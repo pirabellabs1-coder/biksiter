@@ -192,7 +192,7 @@ svg {
   padding: var(--e3) var(--e6);
   display: flex;
   align-items: center;
-  gap: var(--e5);
+  gap: var(--e4);
   flex-wrap: wrap;
 }
 
@@ -213,12 +213,17 @@ svg {
 .navigation {
   display: flex;
   align-items: center;
-  gap: var(--e5);
+  gap: var(--e4);
   flex-wrap: wrap;
   flex: 1;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.navigation a,
+.entete__connexion {
+  white-space: nowrap;
 }
 
 .navigation a {
@@ -1059,4 +1064,139 @@ legend {
   .emplacement {
     flex-wrap: wrap;
   }
+}
+
+/* --- Espace du membre -------------------------------------------------------- */
+
+.entete__connexion {
+  font-size: 14px;
+  color: var(--ardoise);
+  text-decoration: none;
+}
+
+.entete__connexion:hover {
+  color: var(--encre);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.barre-membre {
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e3) var(--e4);
+  margin-bottom: var(--e6);
+}
+
+.barre-membre__identite {
+  display: flex;
+  align-items: center;
+  gap: var(--e3);
+}
+
+.barre-membre__liens {
+  display: flex;
+  gap: var(--e4);
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.barre-membre__liens a {
+  font-size: 14px;
+  color: var(--ardoise);
+  text-decoration: none;
+}
+
+.barre-membre__liens a:hover,
+.barre-membre__liens a[aria-current="page"] {
+  color: var(--encre);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* --- Stationnements ---------------------------------------------------------- */
+
+.stationnements {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.stationnement {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+  flex-wrap: wrap;
+}
+
+.stationnement__corps {
+  flex: 1;
+  min-width: 220px;
+}
+
+.stationnement__corps h3 {
+  margin-bottom: var(--e1);
+}
+
+.stationnement__corps p {
+  margin: 0 0 var(--e2);
+}
+
+.stationnement__actions {
+  display: flex;
+  gap: var(--e2);
+  flex-wrap: wrap;
+}
+
+.emplacement h2 {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+/* --- Codes ------------------------------------------------------------------- */
+
+.codes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--e2);
+  flex-wrap: wrap;
+}
+
+.codes code {
+  display: inline-block;
+  background: var(--papier);
+  border: 1px solid var(--craie-forte);
+  border-radius: var(--rayon);
+  padding: var(--e2) var(--e3);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+/* Le code de remise se lit à voix haute, souvent dans une cave mal eclairee :
+   il est aussi grand que la page le permet. */
+.code-de-remise {
+  font-family: var(--titres);
+  font-size: 56px;
+  letter-spacing: 0.22em;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e5) var(--e4);
+  margin: var(--e4) 0;
+}
+
+.saisie-code {
+  font-family: var(--titres);
+  font-size: 32px;
+  letter-spacing: 0.3em;
+  text-align: center;
 }

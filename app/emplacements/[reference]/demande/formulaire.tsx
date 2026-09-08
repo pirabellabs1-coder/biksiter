@@ -9,8 +9,10 @@ import { TYPES_VELO } from '@/lib/regles/velos';
 import { demanderUnStationnement } from './actions';
 
 export default function FormulaireDeDemande({
+  reference,
   prenomDuBikeSitter,
 }: {
+  reference: string;
   prenomDuBikeSitter: string;
 }) {
   const [etat, envoyer, enCours] = useActionState(
@@ -23,6 +25,8 @@ export default function FormulaireDeDemande({
   return (
     <form action={envoyer} noValidate>
       <MessageDeFormulaire etat={etat} />
+
+      <input type="hidden" name="reference" value={reference} />
 
       <div className="duo">
         <div className="champ">

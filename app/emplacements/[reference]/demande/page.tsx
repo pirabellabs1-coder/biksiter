@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { emplacementParReference } from '@/lib/donnees/emplacements-de-demonstration';
-import { ficheVisible } from '@/lib/regles/adresse';
+import BaseNonBranchee from '@/components/base-non-branchee';
+import { baseConfiguree } from '@/lib/bd/client';
+import { ficheParReference } from '@/lib/depot/emplacements';
 import { peutDemanderUnStationnement } from '@/lib/regles/publication';
-import { membreCourant } from '@/lib/session';
+import { membreConnecte, membrePourLesRegles } from '@/lib/session';
 
 import FormulaireDeDemande from './formulaire';
 
@@ -13,26 +14,40 @@ export const metadata: Metadata = {
   title: 'Demander un stationnement',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function DemandeDeStationnement({
   params,
 }: {
   params: Promise<{ reference: string }>;
 }) {
-  const { reference } = await params;
-  const complet = emplacementParReference(reference);
+  if (!baseConfiguree()) {
+    return (
+      <div className="page page--lecture">
+        <h1 className="titre-page">Demander un stationnement</h1>
+        <BaseNonBranchee />
+      </div>
+    );
+  }
 
-  if (!complet) {
+  const { reference } = await params;
+  const fiche = await ficheParReference(reference);
+
+  if (!fiche) {
     notFound();
   }
 
-  const fiche = ficheVisible(complet);
-  const membre = membreCourant();
+  const membre = await membreConnecte();
+  const autorise =
+    membre !== null && peutDemanderUnStationnement(await membrePourLesRegles());
 
-  if (!peutDemanderUnStationnement(membre)) {
+  if (!autorise) {
     return (
       <div className="page page--lecture">
         <p className="surtitre">Demande de stationnement</p>
-        <h1 className="titre-page">Avant d’écrire à {fiche.prenomDuBikeSitter}</h1>
+        <h1 className="titre-page">
+          Avant d’écrire à {fiche.prenomDuBikeSitter}
+        </h1>
         <p className="chapeau">
           Un compte unique, vérifié. Vous serez cycliste quand vous cherchez une
           place, bike sitter si vous décidez d’en proposer une — c’est la même
@@ -42,21 +57,33 @@ export default async function DemandeDeStationnement({
         <div className="encart">
           <p>
             <strong>
-              Votre identité doit être vérifiée avant d’envoyer une demande.
+              {membre
+                ? 'Votre identité est en cours de vérification.'
+                : 'Votre identité doit être vérifiée avant d’envoyer une demande.'}
             </strong>{' '}
             Ouvrir sa porte à quelqu’un suppose de savoir qui c’est ; c’est ce
-            que nous demandons aussi de votre côté. On entre aujourd’hui sur
-            invitation d’un membre.
+            que nous demandons aussi de votre côté.
           </p>
         </div>
 
         <div className="boutons">
-          <Link href="/invitation" className="bouton bouton--principal">
-            J’ai une invitation
-          </Link>
-          <Link href="/liste-attente" className="bouton bouton--discret">
-            Rejoindre la liste d’attente
-          </Link>
+          {membre ? (
+            <Link
+              href="/inscription/validation"
+              className="bouton bouton--principal"
+            >
+              Où en est ma vérification
+            </Link>
+          ) : (
+            <>
+              <Link href="/connexion" className="bouton bouton--principal">
+                Me connecter
+              </Link>
+              <Link href="/invitation" className="bouton bouton--discret">
+                J’ai une invitation
+              </Link>
+            </>
+          )}
           <Link
             href={`/emplacements/${fiche.reference}`}
             className="bouton bouton--discret"
@@ -71,9 +98,7 @@ export default async function DemandeDeStationnement({
   return (
     <div className="page page--lecture">
       <p className="surtitre">Demande de stationnement</p>
-      <h1 className="titre-page">
-        Votre demande à {fiche.prenomDuBikeSitter}
-      </h1>
+      <h1 className="titre-page">Votre demande à {fiche.prenomDuBikeSitter}</h1>
 
       <div className="encart encart--verifie">
         <p>
@@ -90,11 +115,15 @@ export default async function DemandeDeStationnement({
         </div>
         <div>
           <dt>Emplacement</dt>
-          <dd>{complet.type}</dd>
+          <dd>{fiche.type}</dd>
         </div>
         <div>
           <dt>Quartier</dt>
           <dd>{fiche.quartier}</dd>
+        </div>
+        <div>
+          <dt>Vélos acceptés</dt>
+          <dd>{fiche.velosAcceptes.join(', ')}</dd>
         </div>
         <div>
           <dt>Adresse exacte</dt>
@@ -103,7 +132,10 @@ export default async function DemandeDeStationnement({
       </dl>
 
       <h2 className="titre-section titre-section--aere">Votre demande</h2>
-      <FormulaireDeDemande prenomDuBikeSitter={fiche.prenomDuBikeSitter} />
+      <FormulaireDeDemande
+        reference={fiche.reference}
+        prenomDuBikeSitter={fiche.prenomDuBikeSitter}
+      />
     </div>
   );
 }

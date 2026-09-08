@@ -8,20 +8,29 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "bd:migrer": "tsx --env-file-if-exists=.env.local scripts/migrer.ts",
+    "bd:semer": "tsx --env-file-if-exists=.env.local scripts/semer.ts"
   },
   "dependencies": {
     "next": "^15.5.4",
+    "pg": "^8.23.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^15.5.4",
+    "tsx": "^4.23.13",
     "typescript": "^5",
     "vitest": "^3"
+  },
+  "overrides": {
+    "postcss": "^8.5.23"
   }
 }

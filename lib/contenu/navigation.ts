@@ -11,11 +11,16 @@ export type Lien = {
   libelle: string;
 };
 
+/**
+ * Les libellés de l'en-tête sont plus courts que ceux du pied de page : la
+ * barre doit tenir sur une ligne à côté de la marque et des deux boutons.
+ * Le pied de page, lui, a la place d'être explicite.
+ */
 export const NAVIGATION: readonly Lien[] = [
-  { chemin: '/emplacements', libelle: 'Trouver un emplacement' },
-  { chemin: '/proposer-un-emplacement', libelle: 'Proposer un emplacement' },
+  { chemin: '/emplacements', libelle: 'Emplacements' },
+  { chemin: '/proposer-un-emplacement', libelle: 'Accueillir un vélo' },
   { chemin: '/fonctionnement', libelle: 'Comment ça marche' },
-  { chemin: '/questions-frequentes', libelle: 'Questions fréquentes' },
+  { chemin: '/questions-frequentes', libelle: 'Questions' },
 ];
 
 export const COLONNES_DU_PIED: readonly {
