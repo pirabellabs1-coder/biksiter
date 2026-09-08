@@ -18,10 +18,12 @@ import { empreinteDuMotDePasse } from '../lib/securite/mot-de-passe';
 const MOT_DE_PASSE_DE_DEMONSTRATION = 'un velo a l abri';
 
 const MEMBRES = [
-  { prenom: 'Thomas', nom: 'Lemaire', email: 'thomas@exemple.be' },
-  { prenom: 'Manoelle', nom: 'Dubois', email: 'manoelle@exemple.be' },
-  { prenom: 'Yanis', nom: 'Benali', email: 'yanis@exemple.be' },
-  { prenom: 'Aïcha', nom: 'Traoré', email: 'aicha@exemple.be' },
+  // Thomas modère : sans au moins une personne qui relit les pièces, la
+  // règle 2 bloque tout le monde et le jeu de démonstration est inutilisable.
+  { prenom: 'Thomas', nom: 'Lemaire', email: 'thomas@exemple.be', modere: true },
+  { prenom: 'Manoelle', nom: 'Dubois', email: 'manoelle@exemple.be', modere: false },
+  { prenom: 'Yanis', nom: 'Benali', email: 'yanis@exemple.be', modere: false },
+  { prenom: 'Aïcha', nom: 'Traoré', email: 'aicha@exemple.be', modere: false },
 ];
 
 const EMPLACEMENTS = [
@@ -116,10 +118,11 @@ async function semer(): Promise<void> {
 
     for (const membre of MEMBRES) {
       const cree = await reserve.query<{ id: string }>(
-        `insert into membre (prenom, nom, email, empreinte, verification, verifie_le)
-         values ($1, $2, $3, $4, 'verifiee', now())
+        `insert into membre
+           (prenom, nom, email, empreinte, verification, verifie_le, moderateur)
+         values ($1, $2, $3, $4, 'verifiee', now(), $5)
          returning id`,
-        [membre.prenom, membre.nom, membre.email, empreinte],
+        [membre.prenom, membre.nom, membre.email, empreinte, membre.modere],
       );
       identifiants.set(membre.email, cree.rows[0].id);
     }
@@ -176,6 +179,7 @@ async function semer(): Promise<void> {
     console.log(`${MEMBRES.length} membres vérifiés, ${EMPLACEMENTS.length} emplacements publiés.`);
     console.log(`Mot de passe commun : « ${MOT_DE_PASSE_DE_DEMONSTRATION} »`);
     console.log(`Codes d’invitation : ${codes.rows.map((l) => l.code).join(', ')}`);
+    console.log('Thomas modère : connectez-vous avec lui pour voir /moderation.');
   } finally {
     await reserve.end();
   }

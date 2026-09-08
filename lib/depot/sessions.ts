@@ -17,6 +17,7 @@ export type MembreConnecte = {
   nom: string;
   email: string;
   verification: EtatDeVerification;
+  moderateur: boolean;
 };
 
 export async function ouvrirUneSession(membreId: string): Promise<string> {
@@ -35,7 +36,7 @@ export async function membreDeLaSession(
   jeton: string,
 ): Promise<MembreConnecte | null> {
   return uneLigne<MembreConnecte>(
-    `select m.id, m.prenom, m.nom, m.email, m.verification
+    `select m.id, m.prenom, m.nom, m.email, m.verification, m.moderateur
        from session s
        join membre m on m.id = s.membre_id
       where s.empreinte_du_jeton = $1

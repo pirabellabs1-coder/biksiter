@@ -12,6 +12,9 @@ Ce fichier-ci ne dit que comment faire tourner le projet.
 ```bash
 npm install
 cp .env.example .env.local
+# Produire la clé de chiffrement des pièces d’identité et la coller
+# dans .env.local sous CLE_DES_PIECES :
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 docker compose up -d
 npm run bd:migrer
 npm run bd:semer
@@ -30,6 +33,9 @@ de fausses données.
 Aïcha), leurs quatre emplacements publiés et deux invitations chacun. Le script
 affiche le mot de passe commun et les codes d’invitation, et refuse de tourner
 si la table `membre` n’est pas vide.
+
+**Thomas modère.** Connectez-vous avec lui pour voir `/moderation` : sans au
+moins une personne qui relit les pièces, la règle 2 bloque tout le monde.
 
 ## Vérifier avant de livrer
 
@@ -55,7 +61,7 @@ Ne pas lancer `npm run build` pendant que `npm run dev` tourne : les deux
 | `lib/geocodage/` | La transformation d’une adresse en coordonnées. |
 | `lib/courriel/` | Les modèles de messages et la file d’attente sortante. |
 | `migrations/` | Le schéma, en SQL, appliqué dans l’ordre des noms de fichiers. |
-| `scripts/` | `bd:migrer`, `bd:semer` et `bd:courriels`. |
+| `scripts/` | `bd:migrer`, `bd:semer`, `bd:courriels` et `bd:purger`. |
 
 ## Les règles sont écrites deux fois, et c’est voulu
 
@@ -108,17 +114,66 @@ Les messages sont en texte brut : pas de HTML, donc pas de pixel de suivi et
 rien qui casse chez un destinataire sur trois. Une association qui demande à
 des gens d’ouvrir leur porte n’a pas besoin de savoir qui a ouvert son courrier.
 
+## La pièce d’identité
+
+Le document est chiffré (AES-256-GCM) avant de toucher la base : la clé vit
+dans l’environnement, donc qui repart avec une sauvegarde repart avec des
+octets illisibles. Sans `CLE_DES_PIECES`, le dépôt est **fermé** — on ne stocke
+pas une pièce en clair en attendant que quelqu’un configure la clé.
+
+Le site promet que le document est supprimé dès la vérification, et au plus
+tard après sept jours même si personne ne l’a regardé. Une promesse écrite sur
+un site doit avoir un exécutant : c’est `lib/regles/pieces.ts` pour la règle,
+la transaction de modération pour la suppression immédiate, et `npm run
+bd:purger` pour le filet de sécurité — à lancer une fois par jour.
+
+Le document n’est servi qu’à un modérateur, par une route qui répond 404 à tout
+le monde d’autre (un « accès refusé » confirmerait que ce membre a déposé une
+pièce), sans cache et sous une CSP qui n’autorise rien à s’exécuter.
+
+## La modération
+
+`/moderation` liste les pièces à relire, les candidatures d’emplacement et le
+journal des décisions. Un membre non modérateur est renvoyé sur son compte.
+
+Un refus se motive — la contrainte est dans la base, pas seulement dans le
+formulaire. Le motif part au membre, qui peut redéposer une pièce sans limite
+de tentatives.
+
+Le journal survit au document : on garde ce qui a été décidé et pourquoi,
+jamais la pièce qui l’a fondé. C’est ce que promettent les conditions
+générales.
+
+Un modérateur se pose à la main, jamais depuis l’application :
+
+```sql
+update membre set moderateur = true where email = 'quelqu-un@exemple.be';
+```
+
+## La Content-Security-Policy
+
+Elle vit dans `middleware.ts` et autorise les scripts par un nonce qui change à
+chaque requête — pas d’`unsafe-inline` en production.
+
+**Conséquence assumée : tout le site est rendu à la requête.** Une page
+prérendue à la compilation ne peut pas porter un nonce ; elle partirait avec
+tous ses scripts bloqués. Le choix était entre garder une dizaine de pages
+éditoriales statiques et affaiblir la politique pour tout le monde, ou rendre à
+la requête et garder une politique stricte partout. Ces pages ne touchent pas
+la base et coûtent quelques millisecondes.
+
 ## Ce qui n’est pas encore branché
 
-- **Le dépôt de la pièce d’identité.** Il demande un stockage chiffré et une
-  file de relecture humaine. La page décrit le parcours, l’envoi n’est pas
-  ouvert.
-- **L’outil de modération.** `enregistrerLaVerification()` existe dans
-  `lib/depot/membres.ts` ; l’écran qui l’appelle n’existe pas. En attendant,
-  vérifier un membre se fait en SQL.
-- **La Content-Security-Policy.** Les autres en-têtes de sécurité sont posés
-  dans `next.config.ts` ; la CSP demande un middleware à nonce et n’a pas été
-  bâclée.
+- **La vérification du téléphone.** L’écran l’annonce, aucun SMS ne part. Le
+  coût par message en Belgique est la raison pour laquelle les SMS sont
+  réservés à la vérification, et à rien d’autre.
+- **Modifier ou retirer un emplacement.** On peut en créer et les voir, pas
+  encore les corriger. En attendant, cela se fait en SQL.
+- **Les échanges après acceptation.** Le mot joint à une demande passe, mais il
+  n’y a pas de fil de discussion. Le chat en temps réel a été écarté ; il reste
+  à décider ce qui le remplace.
+- **Le don en ligne.** La page `/soutenir` le dit plutôt que d’afficher un
+  formulaire qui ne mène nulle part.
 
 ## Vérifications qui restent à faire
 

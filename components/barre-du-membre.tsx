@@ -56,6 +56,7 @@ export default function BarreDuMembre({
         >
           Mes stationnements
         </Link>
+        {membre.moderateur ? <Link href="/moderation">Modération</Link> : null}
       </nav>
 
       <BoutonDeDeconnexion />

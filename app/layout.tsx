@@ -18,6 +18,23 @@ const policeDuTexte = Instrument_Sans({
   display: 'swap',
 });
 
+/**
+ * Tout le site est rendu à la requête, et c'est la Content-Security-Policy qui
+ * l'exige.
+ *
+ * La CSP autorise les scripts par un nonce, qui change à chaque requête. Une
+ * page prérendue à la compilation ne peut pas en porter : elle partirait avec
+ * tous ses scripts bloqués. On a donc le choix entre garder une dizaine de
+ * pages éditoriales statiques et affaiblir la politique pour tout le monde, ou
+ * rendre à la requête et garder une politique stricte partout.
+ *
+ * On rend à la requête. Ces pages ne touchent pas la base et coûtent quelques
+ * millisecondes ; une CSP qui vaut sur certaines pages et pas sur d'autres
+ * coûte bien plus cher à raisonner — surtout sur un site qui manipule des
+ * pièces d'identité.
+ */
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: {
     default: 'Bike Sitters — votre vélo à l’abri, chez un voisin',

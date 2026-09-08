@@ -1369,3 +1369,20 @@ legend {
     text-align: left;
   }
 }
+
+/* --- Examen d'une pièce d'identité ------------------------------------------ */
+/* Le document est affiché aussi grand que la page le permet : un modérateur
+   doit pouvoir lire un nom sans zoomer. Fond sombre neutre pour que les bords
+   d'une photo se distinguent du cadre. */
+
+.piece-examinee {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  background: var(--carte-fond);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  margin-bottom: var(--e5);
+}

@@ -1,15 +1,47 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import BarreDuMembre from '@/components/barre-du-membre';
+import BaseNonBranchee from '@/components/base-non-branchee';
+import { baseConfiguree } from '@/lib/bd/client';
+import { pieceDuMembre } from '@/lib/depot/pieces';
+import {
+  CONSERVATION_MAXIMALE_JOURS,
+  joursAvantSuppression,
+} from '@/lib/regles/pieces';
+import { chiffrementDisponible } from '@/lib/securite/chiffrement';
+import { exigerUnMembre } from '@/lib/session';
+
+import FormulaireDePiece from './formulaire';
+
 export const metadata: Metadata = {
   title: 'Vérifier mon identité',
   description:
     'Trois vérifications, une seule fois : e-mail, téléphone et pièce d’identité. Le document est supprimé après contrôle.',
 };
 
-export default function Verification() {
+export const dynamic = 'force-dynamic';
+
+export default async function Verification() {
+  const membre = await exigerUnMembre();
+
+  if (!baseConfiguree()) {
+    return (
+      <div className="page page--lecture">
+        <h1 className="titre-page">Confirmer qui vous êtes</h1>
+        <BaseNonBranchee />
+      </div>
+    );
+  }
+
+  const piece = await pieceDuMembre(membre.id);
+  const dejaVerifie = membre.verification === 'verifiee';
+  const refuse = membre.verification === 'refusee';
+
   return (
     <div className="page page--lecture">
+      <BarreDuMembre membre={membre} page="compte" />
+
       <p className="surtitre">Vérification</p>
       <h1 className="titre-page">Confirmer qui vous êtes</h1>
       <p className="chapeau">
@@ -22,11 +54,9 @@ export default function Verification() {
         <li className="carte">
           <div>
             <h2>E-mail</h2>
-            <p className="discret">
-              Un message vous est envoyé, vous cliquez sur le lien.
-            </p>
+            <p className="discret">{membre.email}</p>
           </div>
-          <span className="pastille pastille--neutre">À faire</span>
+          <span className="pastille pastille--neutre">Confirmé</span>
         </li>
 
         <li className="carte">
@@ -44,41 +74,97 @@ export default function Verification() {
           <div>
             <h2>Pièce d’identité</h2>
             <p className="discret">
-              Une personne la regarde, sous 24 heures. C’est la vérification qui
-              rend acceptable d’ouvrir sa porte à un inconnu.
+              {dejaVerifie
+                ? 'Relue par une personne, puis supprimée.'
+                : piece
+                  ? `Déposée, en attente de relecture. Supprimée dans ${joursAvantSuppression(new Date(piece.deposeeLe), new Date())} jour(s) au plus tard, même si personne ne l’a regardée.`
+                  : 'Une personne la regarde, sous 24 heures.'}
             </p>
           </div>
-          <span className="pastille pastille--neutre">À faire</span>
+          <span
+            className={
+              dejaVerifie
+                ? 'pastille pastille--verifie'
+                : refuse
+                  ? 'pastille pastille--refus'
+                  : 'pastille pastille--neutre'
+            }
+          >
+            {dejaVerifie
+              ? 'Vérifiée'
+              : refuse
+                ? 'Refusée'
+                : piece
+                  ? 'En cours'
+                  : 'À faire'}
+          </span>
         </li>
       </ul>
 
-      <div className="encart">
-        <p>
-          <strong>Votre document n’est pas conservé.</strong> Il est supprimé dès
-          la vérification, et au plus tard après sept jours. Ni l’image ni le
-          numéro ne sont gardés — seul le résultat l’est.
-        </p>
-      </div>
+      {dejaVerifie ? (
+        <>
+          <div className="encart encart--verifie">
+            <p>
+              <strong>Votre identité est vérifiée.</strong> Votre pièce a été
+              supprimée : nous ne gardons ni l’image, ni le numéro, seulement le
+              fait que la vérification a eu lieu.
+            </p>
+          </div>
+          <div className="boutons">
+            <Link href="/emplacements" className="bouton bouton--principal">
+              Trouver un emplacement
+            </Link>
+            <Link
+              href="/proposer-un-emplacement"
+              className="bouton bouton--discret"
+            >
+              Proposer le mien
+            </Link>
+          </div>
+        </>
+      ) : (
+        <>
+          {refuse ? (
+            <div className="encart encart--refus">
+              <p>
+                <strong>Votre pièce n’a pas pu être validée.</strong> Le motif
+                vous a été envoyé par e-mail. Vous pouvez en déposer une autre
+                ci-dessous — il n’y a pas de limite au nombre d’essais.
+              </p>
+            </div>
+          ) : null}
 
-      <div className="encart">
-        <p>
-          <strong>L’envoi n’est pas encore ouvert.</strong> Le dépôt de la pièce
-          d’identité demande un stockage chiffré et une file de vérification
-          humaine, qui n’existent pas encore. Nous préférons afficher cette page
-          telle qu’elle sera plutôt qu’un formulaire qui perdrait votre
-          document.
-        </p>
-      </div>
+          <div className="encart">
+            <p>
+              <strong>Votre document n’est pas conservé.</strong> Il est chiffré
+              dès son arrivée, supprimé dès la vérification, et au plus tard
+              après {CONSERVATION_MAXIMALE_JOURS} jours même si personne ne l’a
+              regardé. Ni l’image ni le numéro ne sont gardés — seul le résultat
+              l’est.
+            </p>
+          </div>
 
+          {chiffrementDisponible() ? (
+            <FormulaireDePiece />
+          ) : (
+            <div className="encart">
+              <p>
+                <strong>Le dépôt est momentanément fermé.</strong> La clé de
+                chiffrement des pièces n’est pas configurée sur ce serveur, et
+                nous préférons fermer la porte plutôt que de stocker une pièce
+                d’identité en clair en attendant.
+              </p>
+            </div>
+          )}
+        </>
+      )}
+
+      <h2 className="titre-section titre-section--aere">
+        En attendant, vous pouvez déjà
+      </h2>
       <div className="boutons">
-        <Link
-          href="/inscription/validation"
-          className="bouton bouton--principal"
-        >
-          Suivre l’état de ma vérification
-        </Link>
         <Link href="/emplacements" className="bouton bouton--discret">
-          Voir les emplacements en attendant
+          Voir les emplacements
         </Link>
         <Link href="/fonctionnement" className="bouton bouton--discret">
           Comment ça marche

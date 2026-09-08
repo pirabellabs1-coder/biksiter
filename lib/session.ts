@@ -51,6 +51,23 @@ export async function exigerUnMembre(): Promise<MembreConnecte> {
   return membre;
 }
 
+/**
+ * Pour les pages de modération.
+ *
+ * Un membre connecté mais non modérateur est renvoyé sur son compte, pas sur
+ * une page d'erreur : il n'a rien fait de mal, cette porte n'est simplement
+ * pas la sienne. Et surtout, une page qui répondrait « accès refusé » plutôt
+ * que « cette page n'existe pas pour vous » confirmerait à qui cherche que
+ * l'adresse existe.
+ */
+export async function exigerUnModerateur(): Promise<MembreConnecte> {
+  const membre = await exigerUnMembre();
+  if (!membre.moderateur) {
+    redirect('/mon-compte');
+  }
+  return membre;
+}
+
 export async function poserLeCookieDeSession(jeton: string): Promise<void> {
   (await cookies()).set(NOM_DU_COOKIE, jeton, OPTIONS_DU_COOKIE);
 }

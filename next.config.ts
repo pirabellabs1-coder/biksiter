@@ -3,10 +3,9 @@ import type { NextConfig } from 'next';
 /**
  * En-têtes de sécurité.
  *
- * Il n'y a pas encore de Content-Security-Policy : une CSP utile avec Next
- * suppose un nonce généré par un middleware et propagé aux scripts en ligne du
- * framework. Une CSP posée à la va-vite casse le rendu ou ne protège de rien —
- * on la fera correctement, avec le middleware, plutôt que de cocher la case.
+ * La Content-Security-Policy n'est pas ici : elle a besoin d'un nonce qui
+ * change à chaque requête, donc elle vit dans `middleware.ts`. Ce qui suit est
+ * ce qui peut être posé une fois pour toutes.
  */
 const enTetesDeSecurite = [
   // Empêche le navigateur de deviner un type MIME et d'exécuter un fichier
@@ -28,6 +27,13 @@ const enTetesDeSecurite = [
 const configuration: NextConfig = {
   // L'en-tête « X-Powered-By » n'apporte rien et annonce la pile technique.
   poweredByHeader: false,
+
+  experimental: {
+    // Une pièce d'identité photographiée dépasse la limite d'un mégaoctet des
+    // actions serveur. La borne haute reste celle de lib/regles/pieces.ts,
+    // qui refuse proprement au-delà de huit mégaoctets.
+    serverActions: { bodySizeLimit: '9mb' },
+  },
 
   async headers() {
     return [{ source: '/:chemin*', headers: enTetesDeSecurite }];

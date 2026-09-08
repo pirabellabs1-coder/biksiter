@@ -87,6 +87,37 @@ export function bienvenue(details: {
   ]);
 }
 
+export function identiteVerifiee(details: { prenom: string }): Message {
+  return rediger('Votre identité est vérifiée', [
+    `Bonjour ${details.prenom},`,
+    '',
+    'Une personne a relu votre pièce d’identité : votre compte est actif.',
+    'Le document a été supprimé dans la foulée, comme annoncé — nous ne',
+    'gardons ni l’image, ni le numéro, seulement le fait que la vérification a',
+    'eu lieu.',
+    '',
+    'Vous pouvez maintenant demander un stationnement, et proposer un',
+    'emplacement si vous en avez un.',
+  ]);
+}
+
+export function identiteRefusee(details: {
+  prenom: string;
+  motif: string;
+}): Message {
+  return rediger('Nous n’avons pas pu vérifier votre identité', [
+    `Bonjour ${details.prenom},`,
+    '',
+    'Nous n’avons pas pu valider la pièce que vous avez envoyée.',
+    '',
+    `La raison : ${details.motif}`,
+    '',
+    'Votre document a été supprimé. Vous pouvez en déposer un autre quand vous',
+    'voulez — il n’y a pas de limite au nombre d’essais, et un refus n’est pas',
+    'un jugement sur vous.',
+  ]);
+}
+
 export function demandeRecue(details: {
   prenomDuBikeSitter: string;
   prenomDuCycliste: string;
