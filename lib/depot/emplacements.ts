@@ -484,3 +484,22 @@ export async function creneauxAcceptesDuJour(
     fin: new Date(ligne.fin),
   }));
 }
+
+/**
+ * Les centres de zone du réseau, un par quartier ouvert.
+ *
+ * Sert à la figure de la page d'accueil. Elle passe par la même vue que le
+ * reste : ce qui en sort est déjà arrondi à la maille de 500 mètres, et un
+ * quartier ne rend qu'un point, si bien qu'on ne peut pas déduire de la figure
+ * combien d'emplacements s'y trouvent — encore moins où.
+ */
+export async function zonesOuvertes(): Promise<
+  { latitude: number; longitude: number }[]
+> {
+  return interroger<{ latitude: number; longitude: number }>(
+    `select avg(latitude_de_zone)::double precision  as latitude,
+            avg(longitude_de_zone)::double precision as longitude
+       from emplacement_visible
+      group by quartier`,
+  );
+}

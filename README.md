@@ -227,18 +227,37 @@ identité pour en accepter un serait une façon de classer les gens.
 
 **Aucune donnée bancaire ne passe par ce site, et il ne faut pas en ajouter.**
 
+## Les chiffres affichés
+
+Aucun chiffre du site n’est saisi à la main. `lib/depot/chiffres.ts` les compte
+dans la base, `lib/regles/chiffres.ts` décide de ce qui s’affiche, et la règle
+tient en deux points : **un chiffre à zéro ne s’affiche pas**, et rien n’est
+arrondi ni précédé d’un « plus de ». Un réseau qui n’a encore rien fait ne
+montre donc pas de bandeau du tout, plutôt que trois zéros alignés.
+
+Ce qui a été écarté : « aucun vélo volé pendant une garde », qui figurait sur la
+maquette. Rien dans le produit n’enregistre d’incident, donc personne ici ne
+peut l’affirmer. La phrase pourra revenir le jour où une déclaration d’incident
+existera — avec le compteur derrière.
+
+Même logique pour les témoignages de la page d’accueil : ce sont les deux
+derniers avis réellement écrits, les plus récents et non les meilleurs (règle
+3). Tant qu’il n’y en a aucun, la page le dit.
+
 ## Ce qui n’est pas encore branché
 
 - **L’envoi réel des SMS.** La file existe et le code y est déposé ; il manque
   un contrat chez un opérateur et l’adresse de sa passerelle (`SMS_URL`). Sans
   elle, `npm run bd:messages` affiche le SMS au lieu de l’expédier.
 
-## Vérifications qui restent à faire
+## Ce qui a été vérifié, et comment
 
-Le schéma n’a **pas** été exécuté contre un vrai serveur : la machine de
-développement n’avait ni Docker ni PostgreSQL. `npm run bd:migrer` sur une base
-fraîche est donc la première chose à faire, et le premier endroit où chercher
-si quelque chose ne passe pas.
+Le schéma a été appliqué sur un vrai PostgreSQL 16 avec PostGIS 3.4, et les
+contraintes ont été mises à l’épreuve une par une : un emplacement publié par
+un membre non vérifié est refusé par le déclencheur de la règle 2, un troisième
+emplacement par le même membre est refusé par le quota, et la vue
+`emplacement_visible` ne rend jamais autre chose qu’un point posé sur la maille
+de cinq cents mètres.
 
 Le géocodage, lui, a été vérifié contre le vrai service. Ces vérifications
 appellent le réseau et ne tournent donc que sur demande, pour qu’une coupure
@@ -253,8 +272,6 @@ VERIFIER_LE_GEOCODAGE=1 npm test
 
 - `lib/contenu/association.ts` — adresse de contact et numéro d’entreprise sont
   des exemples.
-- `lib/contenu/chiffres.ts` — les chiffres du réseau viennent de la maquette,
-  ce ne sont pas des mesures.
 - `lib/contenu/quartiers.ts` — coordonnées indicatives des centres de quartier.
   Elles ne servent plus qu’au repli quand le géocodage échoue.
 - `lib/contenu/association.ts` — l’IBAN aussi : un IBAN faux fait partir un don

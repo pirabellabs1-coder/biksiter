@@ -2,8 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import Chiffres from '@/components/chiffres';
+import { baseConfiguree } from '@/lib/bd/client';
 import { ASSOCIATION } from '@/lib/contenu/association';
-import { CHIFFRES_DU_RESEAU } from '@/lib/contenu/chiffres';
+import { mesuresDuReseau } from '@/lib/depot/chiffres';
+import { chiffresAAfficher } from '@/lib/regles/chiffres';
 
 export const metadata: Metadata = {
   title: 'Qui sommes-nous',
@@ -11,7 +13,11 @@ export const metadata: Metadata = {
     'Bike Sitters relie des cyclistes qui cherchent un abri et des habitants qui en ont un. Association sans but lucratif, à Bruxelles.',
 };
 
-export default function APropos() {
+export default async function APropos() {
+  const chiffres = baseConfiguree()
+    ? chiffresAAfficher(await mesuresDuReseau())
+    : [];
+
   return (
     <div className="page page--lecture">
       <p className="surtitre">À propos</p>
@@ -32,7 +38,15 @@ export default function APropos() {
       <p>Bike Sitters relie les deux. Rien de plus, rien de moins.</p>
 
       <h2 className="titre-section titre-section--aere">Où nous en sommes</h2>
-      <Chiffres chiffres={CHIFFRES_DU_RESEAU} />
+      {chiffres.length === 0 ? (
+        <p className="discret">
+          Rien à compter pour l’instant : le premier emplacement n’est pas
+          encore publié. Ce paragraphe affichera les chiffres du réseau, tels
+          qu’ils sortent de la base — pas des chiffres d’annonce.
+        </p>
+      ) : (
+        <Chiffres chiffres={chiffres} />
+      )}
 
       <h2 className="titre-section titre-section--aere">
         Ce que nous refusons de faire

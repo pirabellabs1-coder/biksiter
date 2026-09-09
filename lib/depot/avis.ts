@@ -103,3 +103,36 @@ export async function avisDejaEcrit(
   );
   return lignes[0]?.existe ?? false;
 }
+
+export type AvisDuReseau = AvisAffiche & {
+  quartier: string;
+};
+
+/**
+ * Les derniers avis écrits, tous emplacements confondus.
+ *
+ * Les plus récents, pas les meilleurs (règle 3) : il n'existe aucun critère
+ * qui permettrait de choisir, et en inventer un reviendrait à classer les
+ * emplacements par la petite porte. La page d'accueil affiche donc ce qui
+ * vient d'être écrit, ou rien.
+ */
+export async function derniersAvisDuReseau(
+  combien = 2,
+): Promise<AvisDuReseau[]> {
+  return interroger<AvisDuReseau>(
+    `select a.id,
+            a.corps,
+            a.ecrit_le  as "ecritLe",
+            m.prenom    as "prenomDeLAuteur",
+            s.type_velo as "typeVelo",
+            e.quartier
+       from avis a
+       join emplacement e on e.id = a.emplacement_id
+       join membre m on m.id = a.auteur_id
+       join stationnement s on s.id = a.stationnement_id
+      where e.publie
+      order by a.ecrit_le desc
+      limit $1`,
+    [combien],
+  );
+}

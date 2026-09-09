@@ -5,6 +5,7 @@ import BarreDuMembre from '@/components/barre-du-membre';
 import { comptesDuMembre, registre, soldeDuMembre } from '@/lib/depot/maillons';
 import { etatDuTelephone } from '@/lib/depot/telephone';
 import { joursEntames, leSoldeSAffiche } from '@/lib/regles/maillons';
+import { typeVeloDansUnePhrase } from '@/lib/regles/velos';
 import { exigerUnMembre } from '@/lib/session';
 import { enJour } from '@/lib/temps';
 
@@ -111,7 +112,7 @@ export default async function Profil() {
                       {/* La date qui compte est celle de la garde, pas celle
                           de l'écriture au registre. */}
                       {enJour(new Date(ligne.fin ?? ligne.creeLe))}
-                      {ligne.typeVelo ? ` · ${ligne.typeVelo.toLowerCase()}` : ''}
+                      {ligne.typeVelo ? ` · ${typeVeloDansUnePhrase(ligne.typeVelo)}` : ''}
                       {ligne.debut && ligne.fin
                         ? ` · ${joursEntames(new Date(ligne.debut), new Date(ligne.fin))} jour(s)`
                         : ''}

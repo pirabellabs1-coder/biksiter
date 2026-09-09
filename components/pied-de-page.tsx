@@ -1,7 +1,9 @@
 import Link from 'next/link';
 
 import Logo from '@/components/logo';
+import { ASSOCIATION } from '@/lib/contenu/association';
 import { COLONNES_DU_PIED } from '@/lib/contenu/navigation';
+import { NOMS_DE_QUARTIER } from '@/lib/contenu/quartiers';
 
 export default function PiedDePage() {
   return (
@@ -31,6 +33,31 @@ export default function PiedDePage() {
           </nav>
         ))}
       </div>
+
+      {/* Ces liens mènent à la recherche filtrée, pas à une page par quartier :
+          il n'y a rien à dire sur un quartier qu'on ne dise mieux en montrant
+          ce qui y est ouvert — et une page vide par quartier serait quatorze
+          impasses. */}
+      <nav className="pied__quartiers" aria-labelledby="pied-quartiers">
+        <h2 id="pied-quartiers">Chercher par quartier</h2>
+        <ul>
+          {NOMS_DE_QUARTIER.map((quartier) => (
+            <li key={quartier}>
+              <Link
+                href={`/emplacements?quartier=${encodeURIComponent(quartier)}`}
+              >
+                {quartier}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <p className="pied__mentions">
+        {ASSOCIATION.nom}, {ASSOCIATION.forme} établie à {ASSOCIATION.ville}.
+        Numéro d’entreprise {ASSOCIATION.numeroDEntreprise}.{' '}
+        <a href={`mailto:${ASSOCIATION.contact}`}>{ASSOCIATION.contact}</a>
+      </p>
     </footer>
   );
 }

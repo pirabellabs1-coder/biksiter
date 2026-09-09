@@ -1,4 +1,4 @@
-import type { Chiffre } from '@/lib/contenu/chiffres';
+import type { Chiffre } from '@/lib/regles/chiffres';
 
 /**
  * Le terme vient avant sa description dans le document — c’est ce qu’attend

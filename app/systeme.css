@@ -286,6 +286,9 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: var(--e2);
+  /* Le nom de l'association ne se coupe pas : sur un écran étroit, « Bike »
+     seul sur une ligne et « Sitters » en dessous, ce n'est plus une marque. */
+  white-space: nowrap;
   font-family: var(--titres);
   font-size: 1.1875rem;
   letter-spacing: -0.01em;
@@ -425,6 +428,13 @@ svg {
 .titre-section--aere {
   margin-top: var(--e7);
   margin-bottom: var(--e3);
+}
+
+/* Un titre de rang inférieur garde la famille mais pas la taille : sans cela
+   un h3 pèse autant qu'un h2 et la hiérarchie ne s'entend plus. */
+.titre-sous-section {
+  font-size: var(--t-moyen);
+  margin: var(--e7) 0 var(--e3);
 }
 
 .chapeau {
@@ -1784,5 +1794,159 @@ legend {
 
   .photos img:first-child {
     grid-row: auto;
+  }
+}
+
+/* --- Accueil : accroche, alternance, jetons ---------------------------------- */
+
+/* Le titre de l'accueil est une phrase, point final compris. Une phrase se lit
+   d'un trait : ligne courte, coupures réparties, interlignage resserré. */
+.titre-page--phrase {
+  max-width: 20ch;
+  text-wrap: balance;
+  line-height: 1.08;
+}
+
+/* La recherche est l'action de l'écran ; les deux chemins qui la suivent sont
+   des liens et non des boutons, pour ne pas lui disputer le regard. */
+.accroche .recherche {
+  margin-bottom: var(--e4);
+}
+
+.accroche__chemins {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--e2) var(--e5);
+  font-size: var(--t-petit);
+  margin: 0 0 var(--e5);
+}
+
+.accroche__figure {
+  margin: 0;
+}
+
+.accroche__figure figcaption {
+  margin-top: var(--e3);
+  max-width: 48ch;
+}
+
+/* La figure ne peut rien montrer tant qu'aucun emplacement n'est publié : un
+   rectangle gris vide dirait « c'est cassé » plutôt que « ça commence ». */
+.accroche__figure--vide {
+  border: 1px dashed var(--craie-forte);
+  border-radius: var(--rayon-large);
+  padding: var(--e6);
+  background: var(--surface);
+}
+
+/* --- Rangs alternés --------------------------------------------------------- */
+
+.alternance__rang {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--e7);
+  align-items: center;
+}
+
+.alternance__rang + .alternance__rang {
+  margin-top: var(--e8);
+}
+
+/* Le second rang inverse les colonnes à l'écran, jamais dans le document : le
+   texte reste lu en premier au clavier et au lecteur d'écran. */
+.alternance__rang:nth-child(even) > :first-child {
+  order: 2;
+}
+
+/* --- Listes de jetons et de points ------------------------------------------ */
+
+.jetons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2);
+}
+
+.marques {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+  font-size: var(--t-petit);
+  color: var(--ardoise);
+}
+
+.marques li {
+  position: relative;
+  padding-left: var(--e5);
+}
+
+/* Un tiret, pas une coche verte : ces lignes énumèrent, elles ne certifient
+   rien (règle 6). */
+.marques li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 12px;
+  height: 2px;
+  background: var(--craie-forte);
+}
+
+.bloc__apres {
+  margin: var(--e5) 0 0;
+  font-size: var(--t-petit);
+}
+
+/* --- Pied de page : quartiers et mentions ----------------------------------- */
+
+.pied__quartiers,
+.pied__mentions {
+  max-width: var(--largeur-page);
+  margin: var(--e6) auto 0;
+  padding-top: var(--e5);
+  border-top: 1px solid var(--craie);
+}
+
+.pied__quartiers ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2) var(--e4);
+}
+
+.pied__quartiers li {
+  padding: 0;
+}
+
+.pied__mentions {
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+  margin-bottom: 0;
+}
+
+/* Seule adresse cliquable du pied : elle se souligne, sinon rien ne la
+   distingue du numéro d'entreprise qui la précède. */
+.pied__mentions a {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .alternance__rang {
+    grid-template-columns: 1fr;
+    gap: var(--e5);
+  }
+
+  /* En une colonne, l'inversion n'a plus de sens : elle ferait passer
+     l'illustration avant le texte qu'elle illustre. */
+  .alternance__rang:nth-child(even) > :first-child {
+    order: 0;
+  }
+
+  .titre-page--phrase {
+    max-width: none;
   }
 }

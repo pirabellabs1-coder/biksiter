@@ -19,6 +19,7 @@ import { photosDeLEmplacement } from '@/lib/depot/photos';
 import { INTEMPERIES, VERROUILLAGES } from '@/lib/regles/caracteristiques';
 import { SUJETS_DES_PHOTOS } from '@/lib/regles/photos';
 import { peutDemanderUnStationnement } from '@/lib/regles/publication';
+import { typeVeloDansUnePhrase } from '@/lib/regles/velos';
 import { membrePourLesRegles } from '@/lib/session';
 import { enJour } from '@/lib/temps';
 
@@ -189,7 +190,7 @@ export default async function FicheEmplacement({
                   <li key={un.id}>
                     <p>{un.corps}</p>
                     <p className="discret">
-                      {un.prenomDeLAuteur} · {un.typeVelo.toLowerCase()} ·{' '}
+                      {un.prenomDeLAuteur} · {typeVeloDansUnePhrase(un.typeVelo)} ·{' '}
                       {enJour(new Date(un.ecritLe))}
                     </p>
                   </li>
