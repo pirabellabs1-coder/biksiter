@@ -7,6 +7,14 @@ import {
   modifierUnEmplacement,
   retirerUnEmplacement,
 } from '@/lib/depot/emplacements';
+import {
+  ajouterUnePhoto,
+  identifiantDeLEmplacement,
+} from '@/lib/depot/photos';
+import {
+  PHOTOS_PAR_EMPLACEMENT,
+  refusDeLaPhoto,
+} from '@/lib/regles/photos';
 import { lireLesChampsDEmplacement } from '@/lib/formulaires/emplacement';
 import {
   ERREUR_GENERALE,
@@ -122,4 +130,76 @@ export async function retirerLEmplacement(
   revalidatePath('/mes-emplacements');
 
   redirect('/mes-emplacements');
+}
+
+const REFUS_DE_PHOTO: Record<string, string> = {
+  vide: 'Ce fichier est vide.',
+  type_refuse: 'Envoyez une photo (JPEG, PNG, WebP ou HEIC).',
+  trop_lourde: 'Cette photo dépasse 8 Mo. Une photo de téléphone suffit.',
+  rang_hors_limites: 'Cet emplacement de photo n’existe pas.',
+};
+
+/**
+ * Les photos d'un emplacement.
+ *
+ * Le dépôt ré-encode chaque image, ce qui supprime les métadonnées EXIF — et
+ * donc les coordonnées GPS du lieu. C'est la règle 4 : sans ce passage, publier
+ * une photo reviendrait à publier l'adresse.
+ */
+export async function envoyerLesPhotos(
+  reference: string,
+  _precedent: EtatDuFormulaire,
+  donnees: FormData,
+): Promise<EtatDuFormulaire> {
+  const membre = await exigerUnMembre();
+
+  const emplacementId = await identifiantDeLEmplacement(reference, membre.id);
+  if (!emplacementId) {
+    return {
+      statut: 'erreur',
+      erreurs: { [ERREUR_GENERALE]: 'Cet emplacement n’est pas le vôtre.' },
+    };
+  }
+
+  let envoyees = 0;
+
+  for (let rang = 0; rang < PHOTOS_PAR_EMPLACEMENT; rang += 1) {
+    const fichier = donnees.get(`photo-${rang}`);
+
+    if (!(fichier instanceof File) || fichier.size === 0) {
+      continue;
+    }
+
+    const refus = refusDeLaPhoto({
+      type: fichier.type,
+      taille: fichier.size,
+      rang,
+    });
+
+    if (refus) {
+      return { statut: 'erreur', erreurs: { photo: REFUS_DE_PHOTO[refus] } };
+    }
+
+    await ajouterUnePhoto(
+      emplacementId,
+      rang,
+      Buffer.from(await fichier.arrayBuffer()),
+    );
+    envoyees += 1;
+  }
+
+  if (envoyees === 0) {
+    return {
+      statut: 'erreur',
+      erreurs: { photo: 'Choisissez au moins une photo à envoyer.' },
+    };
+  }
+
+  revalidatePath(`/emplacements/${reference}`);
+  revalidatePath(`/mes-emplacements/${reference}/modifier`);
+
+  return {
+    statut: 'valide',
+    message: `${envoyees} photo${envoyees > 1 ? 's' : ''} enregistrée${envoyees > 1 ? 's' : ''}. Les métadonnées, coordonnées GPS comprises, ont été retirées.`,
+  };
 }

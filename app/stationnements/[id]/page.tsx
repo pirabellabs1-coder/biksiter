@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import BarreDuMembre from '@/components/barre-du-membre';
 import { adresseDuStationnement } from '@/lib/depot/emplacements';
+import { avisDejaEcrit } from '@/lib/depot/avis';
 import { messagesDuStationnement } from '@/lib/depot/echanges';
 import {
   codeVivant,
@@ -14,7 +15,11 @@ import { VALIDITE_CODE_HEURES } from '@/lib/regles/remise';
 import { exigerUnMembre } from '@/lib/session';
 import { creneauEnFrancais, enFrancais } from '@/lib/temps';
 
-import { ecrireAuSujetDuStationnement } from './actions';
+import {
+  ecrireAuSujetDuStationnement,
+  ecrireUnAvisSurLaGarde,
+} from './actions';
+import FormulaireDAvis from './avis';
 import Echange from './echange';
 import FormulaireDuCode from './formulaire-code';
 
@@ -57,6 +62,12 @@ export default async function LeStationnement({
   const code = remisePossible && jeRemets ? await codeVivant(id, sens) : null;
   const messages = await messagesDuStationnement(id, membre.id);
   const filOuvert = onPeutEcrire(stationnement.etat);
+
+  // L'avis se propose au cycliste, une fois le vélo repris, et une seule fois.
+  const avisPossible =
+    stationnement.etat === 'termine' &&
+    jeSuisLeCycliste &&
+    !(await avisDejaEcrit(id));
 
   return (
     <div className="page page--lecture">
@@ -141,6 +152,18 @@ export default async function LeStationnement({
           ) : (
             <FormulaireDuCode stationnement={id} quiRemet={lAutre} />
           )}
+        </>
+      ) : null}
+
+      {avisPossible ? (
+        <>
+          <h2 className="titre-section titre-section--aere">
+            Laisser un avis
+          </h2>
+          <FormulaireDAvis
+            action={ecrireUnAvisSurLaGarde.bind(null, id)}
+            prenomDuBikeSitter={stationnement.prenomDuBikeSitter}
+          />
         </>
       ) : null}
 

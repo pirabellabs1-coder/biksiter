@@ -3,12 +3,24 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import BaseNonBranchee from '@/components/base-non-branchee';
+import FriseDeDisponibilite from '@/components/frise-de-disponibilite';
+import IconeCaracteristique, {
+  type Pictogramme,
+} from '@/components/icone-caracteristique';
 import ZoneApproximative from '@/components/zone-approximative';
 import { baseConfiguree } from '@/lib/bd/client';
-import { ficheParReference } from '@/lib/depot/emplacements';
+import { avisDeLEmplacement } from '@/lib/depot/avis';
+import {
+  creneauxAcceptesDuJour,
+  ficheParReference,
+  signauxDeLEmplacement,
+} from '@/lib/depot/emplacements';
+import { photosDeLEmplacement } from '@/lib/depot/photos';
 import { INTEMPERIES, VERROUILLAGES } from '@/lib/regles/caracteristiques';
+import { SUJETS_DES_PHOTOS } from '@/lib/regles/photos';
 import { peutDemanderUnStationnement } from '@/lib/regles/publication';
 import { membrePourLesRegles } from '@/lib/session';
+import { enJour } from '@/lib/temps';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,8 +41,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: `Un emplacement près de ${fiche.quartier}`,
-    description: `${fiche.type} chez ${fiche.prenomDuBikeSitter}, à quelques centaines de mètres de ${fiche.quartier}.`,
+    title: `${fiche.type} à ${fiche.quartier}`,
+    description: `${fiche.type} chez ${fiche.prenomDuBikeSitter}, à quelques centaines de mètres de ${fiche.quartier}. Gratuit, entre membres vérifiés.`,
   };
 }
 
@@ -57,105 +69,181 @@ export default async function FicheEmplacement({
     notFound();
   }
 
-  const peutDemander = peutDemanderUnStationnement(await membrePourLesRegles());
+  const aujourdhui = new Date();
+
+  const [signaux, photos, avis, creneaux, membre] = await Promise.all([
+    signauxDeLEmplacement(reference),
+    photosDeLEmplacement(reference),
+    avisDeLEmplacement(reference),
+    creneauxAcceptesDuJour(reference, aujourdhui),
+    membrePourLesRegles(),
+  ]);
+
+  const peutDemander = peutDemanderUnStationnement(membre);
+
+  const caracteristiques: { pictogramme: Pictogramme; texte: string }[] = [
+    { pictogramme: 'fermeture', texte: VERROUILLAGES[fiche.verrouillage] },
+    { pictogramme: 'abri', texte: INTEMPERIES[fiche.intemperie] },
+    { pictogramme: 'ancrage', texte: fiche.ancrage },
+    { pictogramme: 'acces', texte: fiche.acces },
+    {
+      pictogramme: 'capacite',
+      texte: `${fiche.capacite} vélo${fiche.capacite > 1 ? 's' : ''} · ${fiche.velosAcceptes.join(', ').toLowerCase()}`,
+    },
+    {
+      pictogramme: 'prive',
+      texte: 'Emplacement privé, non partagé avec d’autres résidents',
+    },
+  ];
 
   return (
-    <div className="page page--lecture">
-      <p className="surtitre">
-        <Link href="/emplacements" className="lien">
-          Tous les emplacements
-        </Link>
-      </p>
+    <div className="page">
+      <nav aria-label="Fil d’Ariane" className="fil-ariane">
+        <Link href="/emplacements">Emplacements</Link>
+        <span aria-hidden="true"> › </span>
+        <span>{fiche.quartier}</span>
+        <span aria-hidden="true"> › </span>
+        <span>{fiche.type}</span>
+      </nav>
 
-      <h1 className="titre-page">Un emplacement près de {fiche.quartier}</h1>
-      <p className="chapeau">
-        {fiche.type}, chez {fiche.prenomDuBikeSitter}. La carte montre une zone
-        d’environ {fiche.rayonDeLaZone} mètres : l’adresse exacte vous sera
-        donnée par {fiche.prenomDuBikeSitter} si votre demande est acceptée.
-      </p>
-
-      <ZoneApproximative
-        taches={[{ latitude: fiche.latitude, longitude: fiche.longitude }]}
-      />
-
-      <h2 className="titre-section titre-section--aere">Ce qu’il faut savoir</h2>
-      <dl className="details">
-        <div>
-          <dt>Type d’emplacement</dt>
-          <dd>{fiche.type}</dd>
+      {photos.length > 0 ? (
+        <div className="photos">
+          {photos.map((photo) => (
+            /* eslint-disable-next-line @next/next/no-img-element --
+               La photo est servie déjà redimensionnée et ré-encodée par le
+               dépôt, précisément pour n'avoir plus aucune métadonnée. La
+               repasser dans l'optimiseur d'images n'apporterait rien. */
+            <img
+              key={photo.rang}
+              src={`/emplacements/${reference}/photo/${photo.rang}`}
+              alt={SUJETS_DES_PHOTOS[photo.rang] ?? 'Photo de l’emplacement'}
+              width={photo.largeur}
+              height={photo.hauteur}
+            />
+          ))}
         </div>
-        <div>
-          <dt>Vélos accueillis en même temps</dt>
-          <dd>{fiche.capacite}</dd>
-        </div>
-        <div>
-          <dt>Fermeture</dt>
-          <dd>{VERROUILLAGES[fiche.verrouillage]}</dd>
-        </div>
-        <div>
-          <dt>Intempéries</dt>
-          <dd>{INTEMPERIES[fiche.intemperie]}</dd>
-        </div>
-        <div>
-          <dt>Accès avec le vélo</dt>
-          <dd>{fiche.acces}</dd>
-        </div>
-        <div>
-          <dt>Ancrage sur place</dt>
-          <dd>{fiche.ancrage}</dd>
-        </div>
-        <div>
-          <dt>Vélos acceptés</dt>
-          <dd>{fiche.velosAcceptes.join(', ')}</dd>
-        </div>
-        <div>
-          <dt>En plus</dt>
-          <dd>
-            {fiche.services.length > 0
-              ? fiche.services.join(', ')
-              : 'Rien de particulier'}
-          </dd>
-        </div>
-        <div>
-          <dt>Adresse exacte</dt>
-          <dd>après acceptation de votre demande</dd>
-        </div>
-      </dl>
-
-      {fiche.precisions ? (
-        <>
-          <h2 className="titre-section titre-section--aere">
-            Ce que {fiche.prenomDuBikeSitter} précise
-          </h2>
-          <p className="discret">{fiche.precisions}</p>
-        </>
       ) : null}
 
-      {peutDemander ? (
-        <Link
-          href={`/emplacements/${fiche.reference}/demande`}
-          className="bouton bouton--principal bouton--large"
-        >
-          Demander un stationnement
-        </Link>
-      ) : (
-        <div className="encart">
-          <p>
-            <strong>Demander suppose un compte vérifié.</strong> C’est la
-            contrepartie de ce qu’on demande à {fiche.prenomDuBikeSitter} :
-            ouvrir sa porte à quelqu’un suppose de savoir qui c’est. On entre
-            aujourd’hui sur invitation d’un membre.
+      <div className="fiche">
+        <div>
+          <h1 className="titre-page">
+            {fiche.type} à {fiche.quartier}
+          </h1>
+
+          {/* Les signaux tiennent sur une ligne de texte gris. Ce sont des
+              compteurs : rien dans le produit ne trie les emplacements par
+              ces nombres (règle 3). */}
+          {signaux ? (
+            <p className="signaux">
+              {signaux.identiteVerifiee ? 'Identité vérifiée' : 'En vérification'}
+              {signaux.gardesAccueillies > 0
+                ? ` · ${signaux.gardesAccueillies} garde${signaux.gardesAccueillies > 1 ? 's' : ''}`
+                : ''}
+              {signaux.nombreDAvis > 0
+                ? ` · ${signaux.nombreDAvis} avis`
+                : ''}
+              {` · membre depuis ${signaux.membreDepuis}`}
+            </p>
+          ) : null}
+
+          {fiche.precisions ? (
+            <blockquote className="mot">{fiche.precisions}</blockquote>
+          ) : null}
+
+          <FriseDeDisponibilite
+            jour={aujourdhui}
+            acceptes={creneaux}
+            capacite={fiche.capacite}
+          />
+
+          <ul className="caracteristiques">
+            {caracteristiques.map((caracteristique) => (
+              <li key={caracteristique.pictogramme}>
+                <IconeCaracteristique
+                  pictogramme={caracteristique.pictogramme}
+                />
+                {caracteristique.texte}
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="titre-section titre-section--aere">
+            Où se trouve l’emplacement
+          </h2>
+          <p className="discret">
+            La carte montre une zone d’environ {fiche.rayonDeLaZone} mètres.
+            L’adresse exacte vous sera donnée par {fiche.prenomDuBikeSitter} si
+            votre demande est acceptée.
           </p>
-          <div className="boutons">
-            <Link href="/invitation" className="bouton bouton--principal">
-              J’ai une invitation
-            </Link>
-            <Link href="/liste-attente" className="bouton bouton--discret">
-              Je n’en ai pas
-            </Link>
-          </div>
+          <ZoneApproximative
+            taches={[{ latitude: fiche.latitude, longitude: fiche.longitude }]}
+          />
+
+          {avis.length > 0 ? (
+            <>
+              <h2 className="titre-section titre-section--aere">
+                Ce qu’en disent les membres
+              </h2>
+              <ul className="avis">
+                {avis.map((un) => (
+                  <li key={un.id}>
+                    <p>{un.corps}</p>
+                    <p className="discret">
+                      {un.prenomDeLAuteur} · {un.typeVelo.toLowerCase()} ·{' '}
+                      {enJour(new Date(un.ecritLe))}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </div>
-      )}
+
+        <aside className="carte fiche__aside">
+          <p className="fiche__prix">Gratuit</p>
+          <p className="discret">
+            Aucun paiement, ni sur le site ni en direct. C’est une association.
+          </p>
+
+          {peutDemander ? (
+            <Link
+              href={`/emplacements/${fiche.reference}/demande`}
+              className="bouton bouton--principal bouton--large"
+            >
+              Demander un stationnement
+            </Link>
+          ) : (
+            <>
+              <p className="discret">
+                Demander suppose un compte dont l’identité a été vérifiée :
+                c’est la contrepartie de ce qu’on demande à{' '}
+                {fiche.prenomDuBikeSitter}.
+              </p>
+              <Link
+                href="/invitation"
+                className="bouton bouton--principal bouton--large"
+              >
+                J’ai une invitation
+              </Link>
+              <Link
+                href="/liste-attente"
+                className="bouton bouton--discret bouton--large fiche__second"
+              >
+                Je n’en ai pas
+              </Link>
+            </>
+          )}
+
+          <hr className="fiche__separateur" />
+
+          <p className="discret">
+            <strong>{fiche.quartier}</strong>
+            <br />
+            L’adresse exacte vous est communiquée une fois votre demande
+            acceptée — et elle n’apparaît nulle part avant.
+          </p>
+        </aside>
+      </div>
     </div>
   );
 }

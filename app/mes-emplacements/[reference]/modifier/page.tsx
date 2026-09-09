@@ -10,7 +10,14 @@ import {
 } from '@/lib/depot/emplacements';
 import { exigerUnMembre } from '@/lib/session';
 
-import { modifierLEmplacement, retirerLEmplacement } from './actions';
+import { photosDeLEmplacement } from '@/lib/depot/photos';
+
+import {
+  envoyerLesPhotos,
+  modifierLEmplacement,
+  retirerLEmplacement,
+} from './actions';
+import Photos from './photos';
 import Retrait from './retrait';
 
 export const metadata: Metadata = { title: 'Modifier un emplacement' };
@@ -30,7 +37,10 @@ export default async function ModifierUnEmplacement({
 
   // Le compte des stationnements qui retiennent vient de la même liste que la
   // page précédente : une seule requête sait le calculer, et elle est déjà là.
-  const miens = await emplacementsDuMembre(membre.id);
+  const [miens, photos] = await Promise.all([
+    emplacementsDuMembre(membre.id),
+    photosDeLEmplacement(reference),
+  ]);
   const retenu =
     miens.find((autre) => autre.reference === reference)
       ?.stationnementsQuiRetiennent ?? 0;
@@ -75,6 +85,17 @@ export default async function ModifierUnEmplacement({
           velosAcceptes: emplacement.velosAcceptes,
           precisions: emplacement.precisions,
         }}
+      />
+
+      <h2 className="titre-section titre-section--aere">Les photos</h2>
+      <p className="discret">
+        Trois photos au plus. Elles aident un cycliste à reconnaître le lieu et
+        à savoir où son vélo va dormir.
+      </p>
+      <Photos
+        action={envoyerLesPhotos.bind(null, reference)}
+        reference={reference}
+        presentes={photos.map((photo) => photo.rang)}
       />
 
       <h2 className="titre-section titre-section--aere">

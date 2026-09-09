@@ -422,3 +422,65 @@ export async function nombreDEmplacements(membreId: string): Promise<number> {
   );
   return ligne?.combien ?? 0;
 }
+
+// --- Ce que la fiche publique affiche en plus --------------------------------
+
+/**
+ * Les signaux de confiance, en une ligne.
+ *
+ * Ce sont des compteurs, pas des rangs : aucune requête du produit ne trie ni
+ * ne filtre des emplacements par ces nombres (règle 3). Ils disent « cette
+ * personne a déjà fait ça », pas « elle le fait mieux qu'une autre ».
+ */
+export type SignauxDeConfiance = {
+  identiteVerifiee: boolean;
+  gardesAccueillies: number;
+  nombreDAvis: number;
+  membreDepuis: number;
+};
+
+export async function signauxDeLEmplacement(
+  reference: string,
+): Promise<SignauxDeConfiance | null> {
+  return uneLigne<SignauxDeConfiance>(
+    `select (m.verification = 'verifiee')          as "identiteVerifiee",
+            (select count(*) from stationnement s2
+               join emplacement e2 on e2.id = s2.emplacement_id
+              where e2.membre_id = m.id and s2.etat = 'termine')::int
+                                                  as "gardesAccueillies",
+            (select count(*) from avis a where a.emplacement_id = e.id)::int
+                                                  as "nombreDAvis",
+            extract(year from m.cree_le)::int     as "membreDepuis"
+       from emplacement e
+       join membre m on m.id = e.membre_id
+      where e.reference = $1`,
+    [reference],
+  );
+}
+
+/**
+ * Les créneaux déjà pris ce jour-là, pour dessiner la frise.
+ *
+ * On ne rend ni qui occupe, ni pour quel vélo : seulement des bornes. Un
+ * passant n'a pas à savoir quand le bike sitter reçoit du monde chez lui.
+ */
+export async function creneauxAcceptesDuJour(
+  reference: string,
+  jour: Date,
+): Promise<Creneau[]> {
+  const lignes = await interroger<{ debut: Date; fin: Date }>(
+    `select s.debut, s.fin
+       from stationnement s
+       join emplacement e on e.id = s.emplacement_id
+      where e.reference = $1
+        and s.etat in ('accepte', 'en_cours')
+        and s.fin   >= $2::timestamptz - interval '1 hour'
+        and s.debut <= $2::timestamptz + interval '1 day'`,
+    [reference, jour],
+  );
+
+  return lignes.map((ligne) => ({
+    debut: new Date(ligne.debut),
+    fin: new Date(ligne.fin),
+  }));
+}

@@ -2,11 +2,13 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { ecrireUnAvis } from '@/lib/depot/avis';
 import { ecrireUnMessage } from '@/lib/depot/echanges';
 import {
   saisirLeCodeDeRemise,
   stationnementParId,
 } from '@/lib/depot/stationnements';
+import { LONGUEUR_MAXIMALE_DE_LAVIS } from '@/lib/regles/avis';
 import { LONGUEUR_MAXIMALE_DU_MESSAGE } from '@/lib/regles/echanges';
 import {
   ERREUR_GENERALE,
@@ -147,5 +149,44 @@ export async function ecrireAuSujetDuStationnement(
     statut: 'valide',
     message:
       'Message envoyé. L’autre le reçoit par courriel — rien ne dit quand il le lira, et c’est très bien ainsi.',
+  };
+}
+
+/**
+ * Écrire un avis, après la reprise du vélo.
+ *
+ * Du texte, jamais une note : « la note appartient à la personne », et un
+ * emplacement noté deviendrait un emplacement classé (règle 3).
+ */
+export async function ecrireUnAvisSurLaGarde(
+  stationnementId: string,
+  _precedent: EtatDuFormulaire,
+  donnees: FormData,
+): Promise<EtatDuFormulaire> {
+  const membre = await exigerUnMembre();
+  const corps = texte(donnees, 'avis');
+
+  const resultat = await ecrireUnAvis(stationnementId, membre.id, corps);
+
+  if (!resultat.ecrit) {
+    const motifs: Record<string, string> = {
+      vide: 'Écrivez quelque chose avant d’envoyer.',
+      trop_long: `Cet avis dépasse ${LONGUEUR_MAXIMALE_DE_LAVIS} caractères.`,
+      garde_non_terminee:
+        'Un avis s’écrit après la reprise du vélo, pas pendant la garde.',
+      pas_le_cycliste:
+        'Seule la personne qui a déposé le vélo écrit l’avis.',
+      deja_ecrit: 'Vous avez déjà écrit un avis pour cette garde.',
+      introuvable: 'Ce stationnement n’existe plus.',
+    };
+    return { statut: 'erreur', erreurs: { avis: motifs[resultat.motif] } };
+  }
+
+  revalidatePath(`/stationnements/${stationnementId}`);
+
+  return {
+    statut: 'valide',
+    message:
+      'Merci. Votre avis apparaît sur la fiche de l’emplacement, sans note ni étoile — juste ce que vous avez écrit.',
   };
 }
