@@ -51,3 +51,18 @@ export const CE_QUE_COUVRE_UN_DON = [
   { montant: 20, usage: 'la vérification de vingt candidatures' },
   { montant: 50, usage: 'un mois de fonctionnement complet' },
 ] as const;
+
+/**
+ * Les dons ne s'ouvrent qu'avec un compte pour les recevoir.
+ *
+ * Tant que l'association n'a pas d'IBAN, un formulaire de don produirait une
+ * communication structurée pour un compte qui n'existe pas — et enverrait
+ * quelqu'un faire un virement dans le vide. La règle est vérifiée deux fois :
+ * la page ne montre pas le formulaire, et l'action serveur refuse quand même,
+ * parce qu'un formulaire caché reste soumettable.
+ */
+export function lesDonsSontOuverts<T extends { iban: string | null }>(
+  association: T,
+): association is T & { iban: string } {
+  return association.iban !== null;
+}

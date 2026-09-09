@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'vitest';
 
-import { communicationStructuree, communicationValide } from './dons';
+import {
+  communicationStructuree,
+  communicationValide,
+  lesDonsSontOuverts,
+} from './dons';
 
 describe('la communication structurée permet de rapprocher un virement', () => {
   test('elle prend la forme belge que toutes les banques savent lire', () => {
@@ -35,5 +39,15 @@ describe('la communication structurée permet de rapprocher un virement', () => 
   test('un numéro qui ne tient pas sur dix chiffres est refusé', () => {
     expect(() => communicationStructuree(10_000_000_000)).toThrow();
     expect(() => communicationStructuree(-1)).toThrow();
+  });
+});
+
+describe('un don suppose un compte pour le recevoir', () => {
+  test('les dons restent fermés tant que l’association n’a pas d’IBAN', () => {
+    expect(lesDonsSontOuverts({ iban: null })).toBe(false);
+  });
+
+  test('un compte renseigné rouvre les dons', () => {
+    expect(lesDonsSontOuverts({ iban: 'BE68 5390 0754 7034' })).toBe(true);
   });
 });

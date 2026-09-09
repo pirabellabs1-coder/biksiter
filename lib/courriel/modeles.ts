@@ -23,7 +23,11 @@ const SIGNATURE = [
   '',
   '—',
   `${ASSOCIATION.nom}, ${ASSOCIATION.forme} à ${ASSOCIATION.ville}.`,
-  `Une question ? Répondez à ce message ou écrivez à ${ASSOCIATION.contact}.`,
+  // Sans adresse de contact publique, le message invite simplement à répondre :
+  // une ligne « écrivez à null » vaudrait moins que pas de ligne du tout.
+  ASSOCIATION.contact === null
+    ? 'Une question ? Répondez simplement à ce message.'
+    : `Une question ? Répondez à ce message ou écrivez à ${ASSOCIATION.contact}.`,
 ].join('\n');
 
 function rediger(sujet: string, lignes: readonly string[]): Message {
@@ -204,10 +208,16 @@ export function messageRecu(details: {
   ]);
 }
 
+/**
+ * L'IBAN est passé en paramètre plutôt que lu ici : ce message ne s'écrit
+ * qu'après `lesDonsSontOuverts`, et le type oblige l'appelant à l'avoir
+ * vérifié. Aucun chemin ne peut donc écrire « IBAN : null » à quelqu'un.
+ */
 export function donAnnonce(details: {
   prenom: string | null;
   montant: number | null;
   communication: string;
+  iban: string;
 }): Message {
   return rediger('Les coordonnées pour votre don', [
     details.prenom ? `Bonjour ${details.prenom},` : 'Bonjour,',
@@ -215,7 +225,7 @@ export function donAnnonce(details: {
     'Merci. Voici de quoi faire le virement :',
     '',
     `  Bénéficiaire   : ${ASSOCIATION.nom}`,
-    `  IBAN           : ${ASSOCIATION.iban}`,
+    `  IBAN           : ${details.iban}`,
     ...(details.montant ? [`  Montant        : ${details.montant} €`] : []),
     `  Communication  : ${details.communication}`,
     '',

@@ -60,8 +60,10 @@
   --zone-bord: rgb(90 107 118 / 8%);
 
   /* --- Ombres : discrètes, elles ne servent qu'à décoller une carte. --- */
-  --ombre-posee: 0 1px 2px rgb(22 35 42 / 5%);
-  --ombre-levee: 0 6px 20px -8px rgb(22 35 42 / 18%);
+  --ombre-posee:
+    0 1px 2px rgb(22 35 42 / 6%),
+    0 10px 24px -20px rgb(22 35 42 / 22%);
+  --ombre-levee: 0 8px 26px -10px rgb(22 35 42 / 20%);
 
   /* --- Typographie. Les deux familles viennent de next/font. --- */
   --titres: var(--police-titres), ui-sans-serif, system-ui, sans-serif;
@@ -129,8 +131,10 @@
     --zone-coeur: rgb(157 175 186 / 22%);
     --zone-bord: rgb(157 175 186 / 6%);
 
-    --ombre-posee: 0 1px 2px rgb(0 0 0 / 40%);
-    --ombre-levee: 0 6px 20px -8px rgb(0 0 0 / 60%);
+    --ombre-posee:
+      0 1px 2px rgb(0 0 0 / 44%),
+      0 10px 24px -20px rgb(0 0 0 / 55%);
+    --ombre-levee: 0 8px 26px -10px rgb(0 0 0 / 62%);
   }
 }
 
@@ -1822,24 +1826,6 @@ legend {
   margin: 0 0 var(--e5);
 }
 
-.accroche__figure {
-  margin: 0;
-}
-
-.accroche__figure figcaption {
-  margin-top: var(--e3);
-  max-width: 48ch;
-}
-
-/* La figure ne peut rien montrer tant qu'aucun emplacement n'est publié : un
-   rectangle gris vide dirait « c'est cassé » plutôt que « ça commence ». */
-.accroche__figure--vide {
-  border: 1px dashed var(--craie-forte);
-  border-radius: var(--rayon-large);
-  padding: var(--e6);
-  background: var(--surface);
-}
-
 /* --- Rangs alternés --------------------------------------------------------- */
 
 .alternance__rang {
@@ -1949,4 +1935,116 @@ legend {
   .titre-page--phrase {
     max-width: none;
   }
+}
+
+/* --- Illustrations ---------------------------------------------------------- */
+/* Le même trait que les pictogrammes, en plus grand. Grises pour la même
+   raison que la figure cartographique (règle 6) : une illustration n'est ni
+   une action, ni une vérification, ni un vélo gardé. Les seules variations
+   sont des valeurs. */
+
+.illustration {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--ardoise);
+}
+
+/* Ce qui est en retrait dans le dessin : le creux d'un garage, l'embrasure
+   d'une porte. Une valeur plus sombre que le papier, jamais une teinte. */
+.illustration__creux {
+  fill: var(--carte-fond);
+  stroke: none;
+}
+
+/* La pluie, les rayons de l'ampoule, les joints de la voûte : présents, mais
+   ils ne doivent pas peser autant que l'architecture. */
+.illustration__leger {
+  opacity: 0.45;
+  stroke-width: 1.5;
+}
+
+/* Le cadre d'une illustration : du papier posé sur la surface, pas une carte
+   de plus. Il n'a pas d'ombre — rien ne s'y clique. */
+.figure-illustree {
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e6) var(--e6) var(--e5);
+}
+
+/* Dans un cadre, la figure cartographique n'a pas besoin de toute sa hauteur :
+   à côté d'une liste de quatre quartiers, elle laisserait une colonne vide. */
+.figure-illustree .zone {
+  height: clamp(200px, 22vw, 270px);
+}
+
+.figure-illustree figcaption {
+  margin-top: var(--e4);
+  padding-top: var(--e4);
+  border-top: 1px solid var(--craie);
+  max-width: 46ch;
+}
+
+/* --- Carte illustrée --------------------------------------------------------- */
+/* L'illustration occupe sa propre bande, sur le papier, séparée du texte par
+   le même trait que la bordure de la carte. Sans cette séparation, un dessin
+   au trait posé sur du blanc flotte : il faut un fond pour qu'il se tienne. */
+
+.carte--illustree {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.carte__illustration {
+  background: var(--papier);
+  border-bottom: 1px solid var(--craie);
+  padding: var(--e5) var(--e6) var(--e4);
+}
+
+.carte__corps {
+  padding: var(--e5) var(--e6) var(--e6);
+  flex: 1;
+}
+
+/* --- Liste des quartiers ouverts -------------------------------------------- */
+
+.quartiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--craie);
+}
+
+.quartiers li {
+  border-bottom: 1px solid var(--craie);
+}
+
+.quartiers a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e4);
+  padding: var(--e3) var(--e2);
+  color: var(--encre);
+  text-decoration: none;
+  font-size: var(--t-petit);
+  border-radius: var(--rayon);
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+
+.quartiers a:hover {
+  background: var(--action-voile);
+  color: var(--action-appuyee);
+}
+
+/* Le nombre reste gris au survol : c'est le quartier qui mène quelque part,
+   pas son compteur. */
+.quartiers a:hover .discret {
+  color: var(--ardoise);
 }

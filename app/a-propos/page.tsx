@@ -76,19 +76,33 @@ export default async function APropos() {
         <Link href="/soutenir" className="bouton bouton--principal">
           Nous soutenir
         </Link>
-        <a href={`mailto:${ASSOCIATION.contact}`} className="bouton bouton--discret">
-          Nous écrire
-        </a>
+        {ASSOCIATION.contact === null ? null : (
+          <a
+            href={`mailto:${ASSOCIATION.contact}`}
+            className="bouton bouton--discret"
+          >
+            Nous écrire
+          </a>
+        )}
       </div>
 
       <div className="encart">
         <p>
-          {ASSOCIATION.nom}, {ASSOCIATION.forme} établie à {ASSOCIATION.ville}.
-          Numéro d’entreprise {ASSOCIATION.numeroDEntreprise}. Écrivez-nous à{' '}
-          <a href={`mailto:${ASSOCIATION.contact}`} className="lien">
-            {ASSOCIATION.contact}
-          </a>
-          .
+          {ASSOCIATION.nom}, {ASSOCIATION.forme} en cours de constitution à{' '}
+          {ASSOCIATION.ville}.{' '}
+          {ASSOCIATION.numeroDEntreprise === null
+            ? 'Le numéro d’entreprise sera publié ici dès l’enregistrement : tant qu’il n’existe pas, nous préférons ne rien afficher plutôt qu’un numéro de façade.'
+            : `Numéro d’entreprise ${ASSOCIATION.numeroDEntreprise}.`}
+          {ASSOCIATION.contact === null ? null : (
+            <>
+              {' '}
+              Écrivez-nous à{' '}
+              <a href={`mailto:${ASSOCIATION.contact}`} className="lien">
+                {ASSOCIATION.contact}
+              </a>
+              .
+            </>
+          )}
         </p>
       </div>
     </div>

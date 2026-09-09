@@ -21,6 +21,8 @@ export async function annoncerUnDon(don: {
   prenom: string | null;
   email: string | null;
   montant: number | null;
+  /** Le compte où le virement doit arriver. L'appelant a vérifié qu'il existe. */
+  iban: string;
 }): Promise<DonAnnonce> {
   return dansUneTransaction(async (client) => {
     // La séquence garantit que deux dons annoncés à la même seconde ne
@@ -47,6 +49,7 @@ export async function annoncerUnDon(don: {
           prenom: don.prenom,
           montant: don.montant,
           communication,
+          iban: don.iban,
         }),
         { client, aPropos: 'don' },
       );

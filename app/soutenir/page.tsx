@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import BaseNonBranchee from '@/components/base-non-branchee';
 import { baseConfiguree } from '@/lib/bd/client';
 import { ASSOCIATION } from '@/lib/contenu/association';
-import { CE_QUE_COUVRE_UN_DON } from '@/lib/regles/dons';
+import { CE_QUE_COUVRE_UN_DON, lesDonsSontOuverts } from '@/lib/regles/dons';
 
 import FormulaireDeDon from './formulaire';
 
@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 export default function Soutenir() {
+  const ouverts = lesDonsSontOuverts(ASSOCIATION);
+
   return (
     <div className="page page--lecture">
       <p className="surtitre">Nous soutenir</p>
@@ -33,6 +35,23 @@ export default function Soutenir() {
         ))}
       </ul>
 
+      {ouverts ? null : (
+        <div className="encart">
+          <p>
+            <strong>Les dons ne sont pas encore ouverts.</strong> L’association
+            est en cours de constitution&nbsp;: tant qu’elle n’a pas de compte,
+            il n’y a nulle part où faire un virement. Nous préférons vous le
+            dire que publier un numéro de compte de façade — c’est le genre de
+            détail sur lequel se joue la confiance qu’on nous demande par
+            ailleurs.
+          </p>
+          <p>
+            Cette page reste en ligne pour dire à quoi sert l’argent. Le
+            formulaire reviendra ici le jour où le compte existera.
+          </p>
+        </div>
+      )}
+
       <h2 className="titre-section titre-section--aere">
         Par virement, pas par carte
       </h2>
@@ -49,16 +68,20 @@ export default function Soutenir() {
         passe par ce site, et il n’y en aura jamais.
       </p>
 
-      {baseConfiguree() ? <FormulaireDeDon /> : <BaseNonBranchee />}
+      {ouverts ? (
+        <>
+          {baseConfiguree() ? <FormulaireDeDon /> : <BaseNonBranchee />}
 
-      <div className="encart">
-        <p>
-          Vous pouvez aussi virer directement à {ASSOCIATION.nom}, IBAN{' '}
-          <strong>{ASSOCIATION.iban}</strong>, en mentionnant simplement
-          « don ». La communication structurée nous aide seulement à vous
-          remercier nommément.
-        </p>
-      </div>
+          <div className="encart">
+            <p>
+              Vous pouvez aussi virer directement à {ASSOCIATION.nom}, IBAN{' '}
+              <strong>{ASSOCIATION.iban}</strong>, en mentionnant simplement
+              « don ». La communication structurée nous aide seulement à vous
+              remercier nommément.
+            </p>
+          </div>
+        </>
+      ) : null}
 
       <h2 className="titre-section titre-section--aere">
         Ce qu’un don ne donne pas

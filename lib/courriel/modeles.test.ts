@@ -7,6 +7,7 @@ import {
   demandeRecue,
   demandeRefusee,
   desistement,
+  donAnnonce,
   inscriptionSurLaListe,
 } from './modeles';
 
@@ -78,6 +79,12 @@ describe('règle 3 — aucun message ne parle de note ni de classement', () => {
       creneau: CRENEAU,
       tardif: true,
     }),
+    donAnnonce({
+      prenom: 'Lucas',
+      montant: 20,
+      communication: '+++090/9337/55493+++',
+      iban: 'BE68 5390 0754 7034',
+    }),
   ];
 
   test('aucun message ne demande d’évaluer, de noter ou de donner un avis', () => {
@@ -98,6 +105,22 @@ describe('règle 3 — aucun message ne parle de note ni de classement', () => {
       expect(message.sujet.trim().length).toBeGreaterThan(0);
       expect(message.corps.trim().length).toBeGreaterThan(0);
       expect(message.corps).toContain('Bike Sitters');
+    }
+  });
+
+  test('aucun message n’écrit une valeur qui n’existe pas encore', () => {
+    // Les mentions de l'association sont facultatives tant que l'ASBL n'est
+    // pas constituée : contact, numéro d'entreprise et IBAN valent `null`. Un
+    // gabarit qui les interpolerait sans vérifier écrirait « écrivez à null »
+    // ou « IBAN : null » à quelqu'un, et personne ne s'en apercevrait avant le
+    // destinataire.
+    //
+    // Le mot est cherché entier : « elle n'est publiée nulle part » est une
+    // phrase qu'on veut lire, et « nulle » n'est pas « null ».
+    for (const message of tous) {
+      expect(message.corps).not.toMatch(/\bnull\b/);
+      expect(message.corps).not.toMatch(/\bundefined\b/);
+      expect(message.corps).not.toContain('0000');
     }
   });
 

@@ -9,6 +9,7 @@ import {
   texte,
   type EtatDuFormulaire,
 } from '@/lib/formulaires/etat';
+import { lesDonsSontOuverts } from '@/lib/regles/dons';
 
 /**
  * Il n'y a pas de paiement en ligne, et ce n'est pas un manque.
@@ -24,6 +25,20 @@ export async function annoncerMonDon(
   _precedent: EtatDuFormulaire,
   donnees: FormData,
 ): Promise<EtatDuFormulaire> {
+  // Deuxième vérification de la même règle : la page n'affiche pas le
+  // formulaire sans IBAN, mais un formulaire caché reste soumettable, et
+  // produire une communication structurée pour un compte inexistant enverrait
+  // quelqu'un faire un virement dans le vide.
+  if (!lesDonsSontOuverts(ASSOCIATION)) {
+    return {
+      statut: 'erreur',
+      erreurs: {
+        [ERREUR_GENERALE]:
+          'Les dons ne sont pas encore ouverts : l’association n’a pas de compte tant qu’elle n’est pas constituée.',
+      },
+    };
+  }
+
   if (!baseConfiguree()) {
     return {
       statut: 'erreur',
@@ -57,10 +72,13 @@ export async function annoncerMonDon(
 
   const prenom = texte(donnees, 'prenom');
 
+  // Le garde-fou du haut est un prédicat de type : ici, `ASSOCIATION.iban`
+  // n'est plus `string | null` mais `string`, sans conversion forcée.
   const { communication } = await annoncerUnDon({
     prenom: prenom === '' ? null : prenom,
     email: email === '' ? null : email,
     montant,
+    iban: ASSOCIATION.iban,
   });
 
   return {

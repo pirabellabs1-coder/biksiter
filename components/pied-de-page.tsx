@@ -53,10 +53,22 @@ export default function PiedDePage() {
         </ul>
       </nav>
 
+      {/* Rien de ce qui n'existe pas encore n'apparaît ici. Un numéro
+          d'entreprise de zéros au bas de chaque page ferait perdre à
+          l'association précisément ce qu'elle demande : qu'on lui fasse
+          confiance assez pour lui ouvrir sa porte. */}
       <p className="pied__mentions">
-        {ASSOCIATION.nom}, {ASSOCIATION.forme} établie à {ASSOCIATION.ville}.
-        Numéro d’entreprise {ASSOCIATION.numeroDEntreprise}.{' '}
-        <a href={`mailto:${ASSOCIATION.contact}`}>{ASSOCIATION.contact}</a>
+        {ASSOCIATION.nom}, {ASSOCIATION.forme} en cours de constitution à{' '}
+        {ASSOCIATION.ville}.
+        {ASSOCIATION.numeroDEntreprise === null
+          ? ''
+          : ` Numéro d’entreprise ${ASSOCIATION.numeroDEntreprise}.`}
+        {ASSOCIATION.contact === null ? null : (
+          <>
+            {' '}
+            <a href={`mailto:${ASSOCIATION.contact}`}>{ASSOCIATION.contact}</a>
+          </>
+        )}
       </p>
     </footer>
   );

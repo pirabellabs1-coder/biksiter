@@ -485,21 +485,30 @@ export async function creneauxAcceptesDuJour(
   }));
 }
 
+export type QuartierOuvert = {
+  quartier: string;
+  combien: number;
+  latitude: number;
+  longitude: number;
+};
+
 /**
- * Les centres de zone du réseau, un par quartier ouvert.
+ * Les quartiers ouverts, avec un point pour situer chacun.
  *
- * Sert à la figure de la page d'accueil. Elle passe par la même vue que le
- * reste : ce qui en sort est déjà arrondi à la maille de 500 mètres, et un
- * quartier ne rend qu'un point, si bien qu'on ne peut pas déduire de la figure
- * combien d'emplacements s'y trouvent — encore moins où.
+ * Le point passe par la même vue que tout le reste : ce qui en sort est déjà
+ * arrondi à la maille de 500 mètres, et un quartier n'en rend qu'un seul. La
+ * figure ne dit donc pas où sont les emplacements, seulement où le réseau
+ * existe — et le nombre est écrit à côté, en toutes lettres, plutôt que deviné
+ * en comptant des taches.
  */
-export async function zonesOuvertes(): Promise<
-  { latitude: number; longitude: number }[]
-> {
-  return interroger<{ latitude: number; longitude: number }>(
-    `select avg(latitude_de_zone)::double precision  as latitude,
+export async function quartiersOuverts(): Promise<QuartierOuvert[]> {
+  return interroger<QuartierOuvert>(
+    `select quartier,
+            count(*)::int                            as combien,
+            avg(latitude_de_zone)::double precision  as latitude,
             avg(longitude_de_zone)::double precision as longitude
        from emplacement_visible
-      group by quartier`,
+      group by quartier
+      order by quartier`,
   );
 }

@@ -268,12 +268,41 @@ autre chose :
 VERIFIER_LE_GEOCODAGE=1 npm test
 ```
 
+## Ce qui n’existe pas encore ne s’affiche pas
+
+L’ASBL n’est pas constituée. Plutôt que d’afficher un numéro d’entreprise de
+zéros et un IBAN de démonstration, `lib/contenu/association.ts` porte `null`
+pour les trois valeurs qui n’existent pas — contact, numéro d’entreprise,
+IBAN — et le site s’adapte :
+
+| Ce qui est `null` | Ce que le site fait |
+|---|---|
+| `contact` | Pas de bouton « Nous écrire », pas d’adresse au pied de page ; les courriels invitent à répondre au message. |
+| `numeroDEntreprise` | Le pied de page et la page « Qui sommes-nous » disent « en cours de constitution ». |
+| `iban` | Les dons sont fermés : la page l’explique, et l’action serveur refuse aussi (`lesDonsSontOuverts`). |
+
+C’est une décision, pas un provisoire mal fini : un numéro d’entreprise de
+façade au bas de chaque page ferait perdre à l’association exactement ce
+qu’elle demande par ailleurs, et un IBAN faux ferait partir un don chez
+quelqu’un d’autre.
+
+**Pour rouvrir tout cela, il suffit de remplacer les trois `null`** par les
+vraies valeurs dans `lib/contenu/association.ts`. Rien d’autre à modifier.
+
+Un test garantit qu’aucun message ne peut partir avec l’un de ces trous
+dedans : `lib/courriel/modeles.test.ts` refuse « null », « undefined » et
+« 0000 » dans le corps de tous les messages.
+
+## Les images du site
+
+Il n’y a pas de photographies, et `components/illustration.tsx` explique
+pourquoi : une photo de banque d’images montrerait le garage de quelqu’un qui
+n’est pas membre. Les dessins prolongent le trait des pictogrammes, sont gris
+pour la même raison que la figure cartographique (règle 6), et disparaîtront le
+jour où des membres nous confieront leurs propres photos.
+
 ## Valeurs à remplacer avant toute mise en ligne
 
-- `lib/contenu/association.ts` — adresse de contact et numéro d’entreprise sont
-  des exemples.
 - `lib/contenu/quartiers.ts` — coordonnées indicatives des centres de quartier.
   Elles ne servent plus qu’au repli quand le géocodage échoue.
-- `lib/contenu/association.ts` — l’IBAN aussi : un IBAN faux fait partir un don
-  chez quelqu’un d’autre.
 - `app/conditions-generales/page.tsx` — texte à faire rédiger par un juriste.

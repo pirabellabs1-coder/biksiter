@@ -2,12 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import Chiffres from '@/components/chiffres';
+import Illustration from '@/components/illustration';
 import ZoneApproximative from '@/components/zone-approximative';
 import { baseConfiguree } from '@/lib/bd/client';
 import { ASSOCIATION } from '@/lib/contenu/association';
 import { derniersAvisDuReseau, type AvisDuReseau } from '@/lib/depot/avis';
 import { mesuresDuReseau } from '@/lib/depot/chiffres';
-import { zonesOuvertes } from '@/lib/depot/emplacements';
+import {
+  quartiersOuverts,
+  type QuartierOuvert,
+} from '@/lib/depot/emplacements';
 import { chiffresAAfficher, type MesuresDuReseau } from '@/lib/regles/chiffres';
 import { TYPES_VELO, typeVeloDansUnePhrase } from '@/lib/regles/velos';
 
@@ -27,13 +31,13 @@ export default async function Accueil() {
   // La page d'accueil doit s'afficher même sans base : c'est souvent le premier
   // écran qu'on ouvre après un déploiement, et une erreur de connexion ne
   // dirait rien d'utile à qui découvre le service.
-  const [mesures, avis, zones] = baseConfiguree()
+  const [mesures, avis, quartiers] = baseConfiguree()
     ? await Promise.all([
         mesuresDuReseau(),
         derniersAvisDuReseau(),
-        zonesOuvertes(),
+        quartiersOuverts(),
       ])
-    : [RIEN_ENCORE, [] as AvisDuReseau[], []];
+    : [RIEN_ENCORE, [] as AvisDuReseau[], [] as QuartierOuvert[]];
 
   const chiffres = chiffresAAfficher(mesures);
 
@@ -91,31 +95,13 @@ export default async function Accueil() {
           </div>
         </div>
 
-        {zones.length === 0 ? (
-          <div className="accroche__figure--vide">
-            <h2 className="titre-section">Le réseau se construit maintenant</h2>
-            <p className="discret">
-              Aucun emplacement n’est encore publié. Un quartier ouvre quand il
-              compte assez de bike sitters pour qu’un cycliste y trouve une
-              place à chaque fois — c’est pour cela qu’on commence par en
-              réunir, avant d’ouvrir la recherche à tout le monde.
-            </p>
-            <p className="discret">
-              <Link href="/proposer-un-emplacement" className="lien">
-                Proposer le premier de votre rue
-              </Link>
-            </p>
-          </div>
-        ) : (
-          <figure className="accroche__figure">
-            <ZoneApproximative taches={zones} />
-            <figcaption className="discret">
-              Les quartiers ouverts, en zones approximatives. C’est aussi tout
-              ce qu’un emplacement montre de lui&nbsp;: son adresse exacte
-              n’apparaît qu’une fois votre demande acceptée.
-            </figcaption>
-          </figure>
-        )}
+        <figure className="figure-illustree">
+          <Illustration scene="velo-a-labri" />
+          <figcaption className="discret">
+            Un garage, une cave, une cour fermée. Le vélo passe la journée
+            derrière une porte qui se ferme, chez quelqu’un qui habite là.
+          </figcaption>
+        </figure>
       </div>
 
       {chiffres.length === 0 ? null : (
@@ -126,6 +112,91 @@ export default async function Accueil() {
       )}
 
       <div className="page">
+        <section className="bloc">
+          <p className="surtitre">Où c’est ouvert</p>
+
+          {quartiers.length === 0 ? (
+            <>
+              <h2 className="titre-section">
+                Le réseau se construit en ce moment
+              </h2>
+              <p className="chapeau">
+                Aucun emplacement n’est encore publié. Un quartier ouvre quand
+                il compte assez de bike sitters pour qu’un cycliste y trouve
+                une place à chaque fois — ouvrir plus tôt reviendrait à
+                promettre une place qui n’existe pas.
+              </p>
+              <div className="boutons">
+                <Link
+                  href="/proposer-un-emplacement"
+                  className="bouton bouton--principal"
+                >
+                  Proposer le premier de votre rue
+                </Link>
+                <Link href="/liste-attente" className="bouton bouton--discret">
+                  Me prévenir quand mon quartier ouvre
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="titre-section">
+                {quartiers.length === 1
+                  ? 'Un quartier, pour commencer'
+                  : `${quartiers.length} quartiers, aujourd’hui`}
+              </h2>
+              <p className="chapeau">
+                Cliquez sur un quartier pour voir ce qui s’y trouve. Les autres
+                ouvriront quand ils compteront assez de bike sitters pour qu’une
+                place s’y trouve à chaque fois.
+              </p>
+
+              <div className="deux-colonnes">
+                <figure className="figure-illustree">
+                  <ZoneApproximative
+                    taches={quartiers.map(({ latitude, longitude }) => ({
+                      latitude,
+                      longitude,
+                    }))}
+                  />
+                  <figcaption className="discret">
+                    Une figure, pas une carte&nbsp;: chaque tache situe un
+                    quartier, jamais une maison. L’adresse exacte d’un
+                    emplacement n’apparaît qu’une fois votre demande acceptée.
+                  </figcaption>
+                </figure>
+
+                <div>
+                  <ul className="quartiers">
+                    {quartiers.map((ouvert) => (
+                      <li key={ouvert.quartier}>
+                        <Link
+                          href={`/emplacements?quartier=${encodeURIComponent(ouvert.quartier)}`}
+                        >
+                          <span>{ouvert.quartier}</span>
+                          <span className="discret">
+                            {ouvert.combien === 1
+                              ? '1 emplacement'
+                              : `${ouvert.combien} emplacements`}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="bloc__apres">
+                    Votre quartier n’y est pas&nbsp;?{' '}
+                    <Link href="/liste-attente" className="lien">
+                      Dites-le nous
+                    </Link>{' '}
+                    — c’est ce qui nous dit où ouvrir ensuite.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+        </section>
+
         <section className="bloc">
           <p className="surtitre">Pourquoi ça existe</p>
           <h2 className="titre-section">
@@ -187,26 +258,31 @@ export default async function Accueil() {
               </p>
             </div>
 
-            <div className="carte carte--aeree">
-              <p className="surtitre">Un stationnement typique</p>
-              <dl className="details">
-                <div>
-                  <dt>Créneau</dt>
-                  <dd>Aujourd’hui, 9h → 18h</dd>
-                </div>
-                <div>
-                  <dt>Emplacement</dt>
-                  <dd>Cave privative, fermée à clé</dd>
-                </div>
-                <div>
-                  <dt>Ce que vous voyez avant</dt>
-                  <dd>Une zone d’environ 500 mètres</dd>
-                </div>
-                <div>
-                  <dt>Coût</dt>
-                  <dd>Gratuit</dd>
-                </div>
-              </dl>
+            <div className="carte carte--illustree">
+              <div className="carte__illustration">
+                <Illustration scene="la-cave" />
+              </div>
+              <div className="carte__corps">
+                <p className="surtitre">Un stationnement typique</p>
+                <dl className="details">
+                  <div>
+                    <dt>Créneau</dt>
+                    <dd>Aujourd’hui, 9h → 18h</dd>
+                  </div>
+                  <div>
+                    <dt>Emplacement</dt>
+                    <dd>Cave privative, fermée à clé</dd>
+                  </div>
+                  <div>
+                    <dt>Ce que vous voyez avant</dt>
+                    <dd>Une zone d’environ 500 mètres</dd>
+                  </div>
+                  <div>
+                    <dt>Coût</dt>
+                    <dd>Gratuit</dd>
+                  </div>
+                </dl>
+              </div>
             </div>
           </div>
 
@@ -228,16 +304,21 @@ export default async function Accueil() {
               </p>
             </div>
 
-            <div className="carte carte--aeree">
-              <p className="surtitre">Ce que ça change</p>
-              <ul className="marques">
-                <li>Le vélo ne dort pas dehors pendant huit heures.</li>
-                <li>Vous n’avez personne à convaincre dans votre immeuble.</li>
-                <li>
-                  Vous connaissez quelqu’un à deux rues de votre bureau, ce qui
-                  n’est pas le moins intéressant.
-                </li>
-              </ul>
+            <div className="carte carte--illustree">
+              <div className="carte__illustration">
+                <Illustration scene="la-rue" />
+              </div>
+              <div className="carte__corps">
+                <p className="surtitre">Ce que ça change</p>
+                <ul className="marques">
+                  <li>Le vélo ne dort pas dehors pendant huit heures.</li>
+                  <li>Vous n’avez personne à convaincre dans votre immeuble.</li>
+                  <li>
+                    Vous connaissez quelqu’un à deux rues de votre bureau, ce
+                    qui n’est pas le moins intéressant.
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
