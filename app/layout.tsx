@@ -1,16 +1,24 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, Instrument_Sans } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 
 import './systeme.css';
 
-const policeDesTitres = Bricolage_Grotesque({
+/**
+ * Deux familles, comme dans la maquette : une géométrie douce et ouverte pour
+ * les titres, une neutralité irréprochable pour le texte courant. Les
+ * graisses sont limitées à celles qu'on utilise vraiment — chaque graisse
+ * chargée est un fichier de plus à télécharger.
+ */
+const policeDesTitres = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  weight: ['600', '700'],
   variable: '--police-titres',
   display: 'swap',
 });
 
-const policeDuTexte = Instrument_Sans({
+const policeDuTexte = Inter({
   subsets: ['latin'],
+  weight: ['400', '500', '600'],
   variable: '--police-texte',
   display: 'swap',
 });

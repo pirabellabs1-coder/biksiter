@@ -410,15 +410,23 @@ dedans : `lib/courriel/modeles.test.ts` refuse « null », « undefined » et
 
 | Couleur | Sens | Où |
 |---|---|---|
-| Vert | Action — ce qu'on clique, et la marque | boutons, liens, numéros d'étape |
-| Bleu | Vérifié — une identité contrôlée par une personne | pastilles « Identité vérifiée » |
-| Ambre | Vélo actuellement gardé | états d'un stationnement en cours |
-| Rouge | Refus ou erreur | messages d'erreur, refus |
+| Vert sapin **plein** | Action — ce qu'on clique, et la marque | boutons, liens |
+| Vert clair **teinté** | Confirmé | identité vérifiée, demande acceptée, vélo gardé, emplacement libre |
+| Ambre | En attente d'une réponse | demande sans réponse, maillon retenu |
+| Rosé | Refusé, annulé, erreur | refus, désistement, messages d'erreur |
 
-Le vert et le bleu ont échangé leurs rôles par rapport à la première version.
-Le principe de la règle 6 n'a pas bougé — une couleur ne veut dire qu'une
-chose — mais la marque est verte, et une marque dont on ne clique jamais la
-couleur ne sert à rien.
+La teinte dit le sens, le remplissage dit s'il y a quelque chose à cliquer :
+un rectangle vert foncé plein est un bouton, une pilule vert clair est un état.
+C'est ce qui permet à l'action et au « confirmé » de partager une famille sans
+se confondre.
+
+**Une pastille d'état porte toujours une puce colorée en plus de sa teinte.**
+Entre l'ambre et le vert clair, la teinte seule ne suffit pas à tout le monde ;
+avec la puce, le mot et la position, la couleur devient facultative.
+
+La palette, les deux familles typographiques (Plus Jakarta Sans / Inter), les
+rayons et les ombres viennent d'un maquettage fait avec Google Stitch, dont
+l'export est resté hors du dépôt (`stich/`, ignoré par git).
 
 **Les illustrations font exception, et c'est tenu.** Elles ont leurs propres
 jetons `--dessin-*`, qui ne servent que dans `.illustration`. Un dessin ne

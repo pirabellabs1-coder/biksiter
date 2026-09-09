@@ -113,7 +113,7 @@ export default async function LeStationnement({
       </dl>
 
       {enCours ? (
-        <div className="encart encart--garde">
+        <div className="encart encart--verifie">
           <p>
             <strong>Le vélo est gardé en ce moment.</strong> Il reste chez{' '}
             {stationnement.prenomDuBikeSitter} jusqu’à la reprise.
@@ -137,19 +137,43 @@ export default async function LeStationnement({
           </h2>
 
           {jeRemets ? (
-            <>
-              <p className="discret">
-                Vous remettez le vélo : dictez ce code à {lAutre}, qui le
-                saisira de son côté. Il vaut {VALIDITE_CODE_HEURES} heures.
+            <div className="remise">
+              <div className="remise__entete">
+                <h3 className="remise__titre">Code de remise</h3>
+                <span className="remise__validite">
+                  Valable {VALIDITE_CODE_HEURES} h
+                </span>
+              </div>
+
+              {/* Un chiffre par tuile pour qu'il se relise sans se perdre, mais
+                  un seul élément lu à voix haute par un lecteur d'écran : sans
+                  ce `aria-label`, il épellerait quatre nombres séparés. */}
+              <ul
+                className="remise__chiffres"
+                aria-label={`Code : ${(code ?? '').split('').join(' ')}`}
+              >
+                {(code ?? '').split('').map((chiffre, rang) => (
+                  <li
+                    // Deux chiffres identiques se suivent souvent dans un code :
+                    // c'est la position qui l'identifie, pas la valeur.
+                    key={`${rang}-${chiffre}`}
+                    className="remise__chiffre"
+                    aria-hidden="true"
+                  >
+                    {chiffre}
+                  </li>
+                ))}
+              </ul>
+
+              <p>
+                Dictez-le à {lAutre}, qui le saisira de son côté. Il a trois
+                essais.
               </p>
-              <p className="code-de-remise" aria-label={`Code : ${code?.split('').join(' ')}`}>
-                {code}
-              </p>
-              <p className="discret">
+              <p>
                 Ne l’envoyez pas à l’avance : il n’a de sens qu’au moment où
                 vous êtes tous les deux devant le vélo.
               </p>
-            </>
+            </div>
           ) : (
             <FormulaireDuCode stationnement={id} quiRemet={lAutre} />
           )}

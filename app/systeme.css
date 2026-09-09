@@ -33,51 +33,53 @@
   color-scheme: light;
 
   /* --- Neutres — l'essentiel de l'interface vit ici. ---
-     Ils sont légèrement tirés vers le vert plutôt que vers le bleu : un gris
-     froid sur toute une page donne un site d'administration, et ce n'en est
-     pas un. La différence est de quelques points, elle ne se nomme pas, mais
-     elle se sent. */
-  --encre: #14201a;
-  --ardoise: #58685e;
-  --papier: #f3f7f3;
+     Ardoise plutôt que noir : le contraste reste largement suffisant sans la
+     dureté d'un noir pur, et le fond est un écru papier, pas un blanc d'écran. */
+  --encre: #1e293b;
+  --ardoise: #64748b;
+  --papier: #f8f9fa;
   --surface: #ffffff;
-  --craie: #e0eae2;
-  --craie-forte: #c1d0c5;
+  --craie: #e2e8f0;
+  --craie-forte: #cbd5e1;
 
-  /* --- Vert : action. ---
-     C'est la couleur de la marque, et c'est elle qu'on clique. Elle est plus
-     sombre que le vert du logo pour tenir le contraste du texte blanc posé
-     dessus (5,5 : 1, au-delà du minimum). */
-  --action: #0a7a41;
-  --action-appuyee: #06592f;
-  --action-voile: #e7f4ec;
+  /* --- Vert sapin plein : action. ---
+     C'est ce qu'on clique, et c'est la marque. Le texte blanc posé dessus
+     tient un contraste de 11,3 : 1, très au-delà du minimum. */
+  --action: #1b4332;
+  --action-appuyee: #245842;
+  --action-voile: #edf7f2;
   --texte-sur-action: #ffffff;
 
-  /* --- Bleu : vérifié. ---
-     Le bleu a pris la place du vert le jour où le vert est devenu l'action.
-     La règle 6 est intacte : une couleur, un sens — c'est l'attribution qui a
-     changé, pas le principe. Un badge de vérification bleu se lit d'ailleurs
-     sans qu'on ait à l'expliquer. */
-  --verifie: #0b57e0;
-  --verifie-encre: #0a3fa8;
-  --verifie-voile: #e6edfe;
+  /* --- Vert clair teinté : ce qui est confirmé. ---
+     Identité vérifiée, demande acceptée, vélo actuellement gardé, emplacement
+     disponible. Même famille que l'action, mais teinté et jamais plein : dans
+     ce système, la teinte dit le domaine et le remplissage dit s'il y a
+     quelque chose à cliquer. */
+  --verifie: #047857;
+  --verifie-encre: #047857;
+  --verifie-voile: #d1fae5;
 
-  /* --- Ambre : vélo actuellement gardé. --- */
-  --garde: #b57414;
-  --garde-encre: #7a4e0c;
-  --garde-voile: #fbf1de;
+  /* --- Ambre : ce qui attend une réponse. --- */
+  --attente: #b45309;
+  --attente-encre: #b45309;
+  --attente-voile: #fef3c7;
 
-  /* --- Rouge : refus ou erreur. --- */
-  --refus: #b3311c;
-  --refus-encre: #8a2a18;
-  --refus-voile: #fae9e5;
+  /* --- Rosé : refus, annulation, erreur. ---
+     Un rosé plutôt qu'un rouge d'alerte : un bike sitter qui refuse n'a rien
+     fait de mal, et l'écran n'a pas à le lui reprocher. */
+  --refus: #be123c;
+  --refus-encre: #9f1239;
+  --refus-voile: #ffe4e6;
 
   /* --- La figure cartographique, volontairement neutre. --- */
-  --carte-fond: #eef2ee;
-  --carte-rue: #e2e9e3;
-  --carte-avenue: #d5e0d8;
-  --zone-coeur: rgb(88 104 94 / 26%);
-  --zone-bord: rgb(88 104 94 / 8%);
+  --carte-fond: #f1f5f9;
+  --carte-rue: #e6ecf2;
+  --carte-avenue: #dbe3ec;
+  /* La zone reste grise. La maquette la dessine en vert, mais une zone
+     d'accueil n'est ni une action ni un état confirmé — la teindre du vert du
+     produit lui ferait dire quelque chose qu'elle ne dit pas. */
+  --zone-coeur: rgb(100 116 139 / 24%);
+  --zone-bord: rgb(100 116 139 / 7%);
 
   /* --- La palette des dessins. ---
      Elle est à part, et elle doit le rester. Ces jetons ne servent que dans
@@ -98,11 +100,12 @@
   --dessin-bois: #8c6a4f;
   --dessin-lumiere: #f4d98c;
 
-  /* --- Ombres : discrètes, elles ne servent qu'à décoller une carte. --- */
-  --ombre-posee:
-    0 1px 2px rgb(20 32 26 / 6%),
-    0 10px 24px -20px rgb(20 32 26 / 22%);
-  --ombre-levee: 0 8px 26px -10px rgb(20 32 26 / 20%);
+  /* --- Ombres : des cartes de papier posées sur un plan de travail. ---
+     Teintées d'ardoise chaude plutôt que de noir : une ombre noire sur un fond
+     écru grise le papier au lieu de le décoller. */
+  --ombre-posee: 0 2px 8px -1px rgb(30 41 59 / 5%);
+  --ombre-levee: 0 6px 16px -2px rgb(30 41 59 / 8%);
+  --ombre-flottante: 0 12px 32px -4px rgb(30 41 59 / 14%);
 
   /* --- Typographie. Les deux familles viennent de next/font. --- */
   --titres: var(--police-titres), ui-sans-serif, system-ui, sans-serif;
@@ -110,12 +113,13 @@
 
   /* Échelle fluide : le titre respire sur un grand écran sans déborder sur un
      téléphone, et personne n'a à écrire de point de rupture pour du texte. */
-  --t-mega: clamp(2rem, 1.35rem + 2.9vw, 3.25rem);
-  --t-grand: clamp(1.5rem, 1.2rem + 1.3vw, 2rem);
-  --t-moyen: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-  --t-normal: 1rem;
+  --t-mega: clamp(1.75rem, 1.2rem + 2.6vw, 3rem);
+  --t-grand: clamp(1.375rem, 1.1rem + 1.3vw, 1.75rem);
+  --t-moyen: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --t-normal: 0.9375rem;
   --t-petit: 0.9375rem;
   --t-menu: 0.875rem;
+  --t-etiquette: 0.75rem;
 
   /* --- Espacement : multiples de 4, pour que rien ne dérive. --- */
   --e1: 4px;
@@ -127,9 +131,14 @@
   --e7: 48px;
   --e8: 72px;
 
-  --rayon: 10px;
+  /* --- Formes : arrondies et rassurantes. ---
+     Huit pixels pour ce qui se clique ou se saisit, seize pour une carte,
+     vingt-quatre pour ce qui se pose par-dessus le reste. La pastille est une
+     pilule entière, pour qu'un état ne se confonde jamais avec un bouton. */
+  --rayon: 8px;
   --rayon-large: 16px;
-  --largeur-page: 1120px;
+  --rayon-flottant: 24px;
+  --largeur-page: 1200px;
   --largeur-lecture: 720px;
 
   --transition: 160ms cubic-bezier(0.2, 0, 0.2, 1);
@@ -141,41 +150,38 @@
  * quelqu'un dont le système est réglé en sombre. Ces valeurs restent écrites
  * et à jour parce que les rebrancher ne coûte rien — il suffit de poser
  * `data-theme="sombre"` sur `<html>`, ou de rendre ce bloc à la requête média
- * d'origine. Elles gardent exactement les quatre sens de la règle 6 ; seules
- * les valeurs changent. */
+ * d'origine. */
 :root[data-theme='sombre'] {
-  --encre: #e8f0ea;
-  --ardoise: #9db0a3;
-  --papier: #0d1310;
-  --surface: #161e19;
-  --craie: #263129;
-  --craie-forte: #3a4840;
+  --encre: #e8eef2;
+  --ardoise: #94a3b8;
+  --papier: #0e1512;
+  --surface: #17211c;
+  --craie: #26312b;
+  --craie-forte: #3a4842;
 
-  --action: #4cbd7d;
-  --action-appuyee: #7ad4a0;
-  --action-voile: #10291c;
+  --action: #6fc79b;
+  --action-appuyee: #97dcb7;
+  --action-voile: #10291d;
   --texte-sur-action: #06180e;
 
-  --verifie: #74a6ff;
-  --verifie-encre: #a8c8ff;
-  --verifie-voile: #16243a;
+  --verifie: #34d399;
+  --verifie-encre: #6ee7b7;
+  --verifie-voile: #0d2a20;
 
-  --garde: #e8a33d;
-  --garde-encre: #f2c78a;
-  --garde-voile: #2a2013;
+  --attente: #f0b464;
+  --attente-encre: #f7cf94;
+  --attente-voile: #2b2012;
 
-  --refus: #ff9077;
-  --refus-encre: #ffb8a7;
-  --refus-voile: #2d1a15;
+  --refus: #fb7185;
+  --refus-encre: #fda4af;
+  --refus-voile: #2d1319;
 
-  --carte-fond: #131b16;
-  --carte-rue: #1a241d;
-  --carte-avenue: #222e26;
-  --zone-coeur: rgb(157 176 163 / 22%);
-  --zone-bord: rgb(157 176 163 / 6%);
+  --carte-fond: #131b17;
+  --carte-rue: #1a2420;
+  --carte-avenue: #222e29;
+  --zone-coeur: rgb(52 211 153 / 20%);
+  --zone-bord: rgb(52 211 153 / 6%);
 
-  /* Les dessins gardent leurs teintes mais rabattues : un feuillage clair
-     sur un fond sombre brille comme une enseigne. */
   --dessin-trait: #cfded4;
   --dessin-ciel: #16232a;
   --dessin-sol: #1c2620;
@@ -189,12 +195,10 @@
   --dessin-bois: #4f3d2e;
   --dessin-lumiere: #6b5a2c;
 
-  --ombre-posee:
-    0 1px 2px rgb(0 0 0 / 44%),
-    0 10px 24px -20px rgb(0 0 0 / 55%);
-  --ombre-levee: 0 8px 26px -10px rgb(0 0 0 / 62%);
+  --ombre-posee: 0 2px 8px -1px rgb(0 0 0 / 45%);
+  --ombre-levee: 0 6px 16px -2px rgb(0 0 0 / 55%);
+  --ombre-flottante: 0 12px 32px -4px rgb(0 0 0 / 62%);
 }
-
 
 /* --- Réinitialisation minimale --------------------------------------------- */
 
@@ -223,11 +227,19 @@ h2,
 h3,
 h4 {
   font-family: var(--titres);
-  font-weight: 500;
+  font-weight: 600;
   margin: 0;
-  letter-spacing: -0.018em;
-  line-height: 1.15;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
   text-wrap: balance;
+}
+
+/* Le grand titre d'une page monte d'un cran : c'est la seule graisse lourde
+   du système, et elle ne sert qu'une fois par écran. */
+.titre-page,
+.entete-de-page__titre {
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 p {
@@ -601,11 +613,11 @@ svg {
   color: var(--verifie-encre);
 }
 
-.encart--garde {
-  background: var(--garde-voile);
+.encart--attente {
+  background: var(--attente-voile);
   border-color: transparent;
-  border-left-color: var(--garde);
-  color: var(--garde-encre);
+  border-left-color: var(--attente);
+  color: var(--attente-encre);
 }
 
 .encart--refus {
@@ -625,16 +637,6 @@ svg {
 
 /* --- Pastilles -------------------------------------------------------------- */
 
-.pastille {
-  display: inline-block;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  padding: 2px var(--e3);
-  border-radius: 99px;
-  border: 1px solid transparent;
-  white-space: nowrap;
-}
-
 .pastille--neutre {
   background: var(--papier);
   border-color: var(--craie-forte);
@@ -646,9 +648,9 @@ svg {
   color: var(--verifie-encre);
 }
 
-.pastille--garde {
-  background: var(--garde-voile);
-  color: var(--garde-encre);
+.pastille--attente {
+  background: var(--attente-voile);
+  color: var(--attente-encre);
 }
 
 .pastille--refus {
@@ -1171,21 +1173,6 @@ legend {
 /* Le code de remise se lit à voix haute, souvent dans une cave mal éclairée :
    il est aussi grand que la page le permet, et les chiffres ont tous la même
    largeur pour qu'il ne danse pas quand on le relit. */
-.code-de-remise {
-  font-family: var(--titres);
-  font-size: clamp(2.75rem, 2rem + 3.5vw, 4rem);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.2em;
-  text-indent: 0.2em;
-  text-align: center;
-  background: var(--surface);
-  border: 1px solid var(--craie);
-  border-radius: var(--rayon-large);
-  padding: var(--e5) var(--e4);
-  margin: var(--e4) 0;
-  box-shadow: var(--ombre-posee);
-}
-
 .saisie-code {
   font-family: var(--titres);
   font-size: 2rem;
@@ -1402,42 +1389,6 @@ legend {
   margin-top: var(--e5);
   padding-top: var(--e5);
   border-top: 1px solid var(--craie);
-}
-
-/* --- Fil d'échanges ---------------------------------------------------------- */
-/* Ni bulle de messagerie instantanée, ni accusé de lecture : des messages
-   posés les uns après les autres. Ce qui distingue les siens de ceux de
-   l'autre est un décalage, pas une couleur — le bleu voudrait dire « action ». */
-
-.fil {
-  list-style: none;
-  margin: 0 0 var(--e5);
-  padding: 0;
-  display: grid;
-  gap: var(--e3);
-}
-
-.fil__message {
-  background: var(--surface);
-  border: 1px solid var(--craie);
-  border-radius: var(--rayon-large);
-  padding: var(--e4);
-  max-width: 46rem;
-}
-
-.fil__message--mien {
-  margin-left: var(--e6);
-  background: var(--papier);
-}
-
-.fil__auteur {
-  font-size: var(--t-menu);
-  margin-bottom: var(--e2);
-}
-
-.fil__message p:last-child {
-  margin-bottom: 0;
-  white-space: pre-wrap;
 }
 
 /* --- Catalogue ---------------------------------------------------------------- */
@@ -2834,14 +2785,14 @@ legend {
   border-left: 3px solid var(--craie-forte);
 }
 
-/* Celle-ci, en revanche, a droit à l'ambre : elle compte des vélos
-   actuellement gardés, ce qui est exactement ce que l'ambre veut dire. */
-.tuile--garde {
-  border-left: 3px solid var(--garde);
+/* Celle-ci compte des vélos actuellement gardés : un état confirmé, en cours,
+   et non une attente. Elle prend donc le vert et non l'ambre. */
+.tuile--verifie {
+  border-left: 3px solid var(--verifie);
 }
 
-.tuile--garde .tuile__valeur {
-  color: var(--garde-encre);
+.tuile--verifie .tuile__valeur {
+  color: var(--verifie-encre);
 }
 
 /* --- Les panneaux ------------------------------------------------------------ */
@@ -3016,8 +2967,8 @@ a.ligne:hover {
 }
 
 /* Un vélo actuellement gardé : c'est le sens exact de l'ambre. */
-.a-faire__entree--garde {
-  border-left-color: var(--garde);
+.a-faire__entree--actif {
+  border-left-color: var(--attente);
 }
 
 .a-faire__corps {
@@ -3050,114 +3001,98 @@ a.ligne:hover {
   }
 }
 
-/* En dessous, la colonne passe au-dessus du contenu et devient une barre
-   horizontale qui défile. Pas de menu déroulant : il faudrait du JavaScript et
-   un piège à focus pour six liens. */
-@media (max-width: 860px) {
-  .espace {
-    grid-template-columns: minmax(0, 1fr);
-  }
+/* La colonne reste une colonne, à toutes les largeurs.
+   Elle se resserre à un rail d'icônes plutôt que de basculer en barre
+   horizontale : une navigation qui change de côté selon la fenêtre oblige à
+   la retrouver, et on ne retrouve bien que ce qui ne bouge pas. Les libellés
+   ne disparaissent pas du document, ils cessent seulement d'être visibles —
+   un lecteur d'écran lit toujours « Mes stationnements ». */
 
-  .rail {
-    border-right: 0;
-    border-bottom: 1px solid var(--craie);
-    position: sticky;
-    top: 0;
-    z-index: 20;
+@media (max-width: 1080px) {
+  .espace {
+    grid-template-columns: 76px minmax(0, 1fr);
   }
 
   .rail__interieur {
-    position: static;
-    height: auto;
-    display: grid;
-    /* `minmax(0, …)` et non `1fr` : sans cela, la barre de navigation qui
-       défile impose sa largeur intrinsèque à la grille, et c'est toute la page
-       qui déborde de côté. */
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: var(--e4) var(--e2);
+    gap: var(--e4);
     align-items: center;
-    gap: var(--e3);
-    padding: var(--e3) var(--e5);
-    overflow: visible;
   }
 
-  .rail__marque {
-    grid-column: 1;
+  .rail__marque,
+  .rail__lien,
+  .rail__pied .bouton-lien {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
   }
 
-  /* En barre compacte, l'identité se réduit au jeton d'initiale : le prénom
-     est déjà dans le « Bonjour … » du titre, et la pastille de vérification a
-     sa place sur le profil, pas dans une barre de 375 pixels. */
-  .rail__identite {
-    grid-column: 2;
-    justify-self: end;
-    border: 0;
-    background: none;
-    padding: 0;
-  }
-
+  .rail__libelle,
+  .rail__marque-nom,
   .rail__qui {
-    display: none;
-  }
-
-  .rail__pied {
-    grid-column: 3;
-    grid-auto-flow: column;
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  /* Le lien « Retour au site » n'a plus la place de son libellé ; son
-     pictogramme suffit, et le libellé reste lisible au lecteur d'écran. */
-  .rail__pied .rail__libelle {
     position: absolute;
     width: 1px;
     height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
   }
 
-  /* Pas de marge négative pour faire déborder la barre jusqu'au bord de
-     l'écran : elle rendait la boîte plus large que la page, et c'est la page
-     entière qui se mettait à défiler de côté. La barre reste dans les marges,
-     et seul son contenu défile. */
-  .rail__navigation {
-    grid-column: 1 / -1;
-    min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
+  .rail__identite {
+    border: 0;
+    background: none;
+    padding: 0;
+    justify-content: center;
   }
 
-  .rail__navigation::-webkit-scrollbar {
-    display: none;
-  }
-
-  .rail__liste {
-    grid-auto-flow: column;
-    justify-content: start;
-    gap: var(--e2);
-  }
-
+  /* Le trait de la page courante passe sous l'icône : à 76 pixels, un filet
+     à gauche colle au bord de l'écran et ne se voit plus. */
   .rail__lien {
     border-left: 0;
-    border-bottom: 3px solid transparent;
-    border-radius: var(--rayon) var(--rayon) 0 0;
-    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--rayon);
   }
 
   .rail__lien[aria-current='page'] {
-    border-left-color: transparent;
     border-bottom-color: var(--action);
+  }
+
+  /* Le compteur se pose sur l'icône, faute de place à côté. */
+  .rail__lien {
+    position: relative;
+  }
+
+  .rail__compteur {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 4px;
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .espace {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .rail__interieur {
+    padding: var(--e3) 6px;
+  }
+
+  .rail__lien,
+  .rail__pied .bouton-lien {
+    padding-block: var(--e2);
   }
 }
 
 @media (max-width: 560px) {
   .espace__contenu {
     padding: var(--e5) var(--e4) var(--e7);
-  }
-
-  .rail__interieur {
-    padding-inline: var(--e4);
   }
 
   .entete-de-page {
@@ -3172,21 +3107,6 @@ a.ligne:hover {
   .a-faire__entree .bouton {
     width: 100%;
   }
-}
-
-/* Un bouton qui doit se comporter comme un lien : même poids visuel, mais
-   c'est bien un bouton, parce qu'il change l'état du serveur. */
-.bouton-lien {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  border: 0;
-  background: none;
-  font-family: var(--texte);
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--transition), color var(--transition);
 }
 
 .bouton-lien svg {
@@ -3277,4 +3197,199 @@ a.ligne:hover {
    formulaire. Elle garde la colonne étroite d'un texte, dans la coque. */
 .page-de-lespace {
   max-width: var(--largeur-lecture);
+}
+
+/* =============================================================================
+   Ce que la maquette apporte.
+
+   Trois composants repris du travail de maquettage, parce qu'ils font mieux que
+   ce qu'il y avait : la pastille à puce, le code de remise en tuiles, et le fil
+   d'échanges en bulles.
+   ========================================================================== */
+
+/* --- La pastille porte une puce ---------------------------------------------
+   Une couleur seule ne suffit pas : entre l'ambre et le vert clair, quelqu'un
+   qui distingue mal les teintes lit deux fois la même pastille. La puce n'aide
+   pas non plus à elle seule — mais avec la position, le mot et la teinte, elle
+   fait la quatrième redondance, et c'est la teinte qui devient facultative. */
+
+.pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--titres);
+  font-weight: 600;
+  font-size: var(--t-etiquette);
+  line-height: 1.5;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.pastille::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+/* Certaines pastilles ne disent pas un état mais portent un nombre ou un mot :
+   la puce y serait du bruit. */
+.pastille--sans-puce::before {
+  display: none;
+}
+
+/* --- Le code de remise, un chiffre par tuile --------------------------------
+   Il se lit à voix haute, souvent dans une cave mal éclairée, et souvent en
+   deux fois. Quatre tuiles séparées se relisent sans se perdre — un nombre à
+   quatre chiffres d'un seul tenant, non. Le bloc est sombre pour la même
+   raison qu'un panneau de gare l'est : c'est ce qu'on cherche des yeux. */
+
+.remise {
+  background: var(--action);
+  color: var(--texte-sur-action);
+  border-radius: var(--rayon-large);
+  padding: var(--e5);
+  margin: var(--e4) 0 var(--e5);
+}
+
+.remise__entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e3);
+  margin-bottom: var(--e4);
+}
+
+.remise__titre {
+  font-family: var(--titres);
+  font-weight: 600;
+  font-size: var(--t-menu);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.remise__validite {
+  font-size: var(--t-etiquette);
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: rgb(255 255 255 / 14%);
+}
+
+.remise__chiffres {
+  display: flex;
+  gap: var(--e3);
+  justify-content: center;
+  margin: 0 0 var(--e4);
+  padding: 0;
+  list-style: none;
+}
+
+.remise__chiffre {
+  flex: 1;
+  max-width: 84px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rayon);
+  background: rgb(255 255 255 / 10%);
+  font-family: var(--titres);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 1.2rem + 3vw, 2.75rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.remise p {
+  margin: 0;
+  font-size: var(--t-menu);
+  color: rgb(255 255 255 / 78%);
+  text-align: center;
+}
+
+.remise p + p {
+  margin-top: var(--e3);
+  padding-top: var(--e3);
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+/* --- Le fil d'échanges en bulles ---------------------------------------------
+   Le message qu'on a écrit soi-même est plein et à droite, celui de l'autre est
+   posé à gauche. Ce n'est pas de la messagerie instantanée pour autant : pas
+   d'accusé de lecture, pas d'indicateur de frappe, pas de « en ligne ». Le
+   message part par courriel, et chacun répond quand il peut. */
+
+.fil {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.fil__message {
+  background: var(--papier);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  border-bottom-left-radius: var(--rayon);
+  padding: var(--e3) var(--e4);
+  max-width: 34rem;
+  justify-self: start;
+}
+
+.fil__message--mien {
+  background: var(--action);
+  border-color: var(--action);
+  color: var(--texte-sur-action);
+  border-radius: var(--rayon-large);
+  border-bottom-right-radius: var(--rayon);
+  justify-self: end;
+}
+
+.fil__auteur {
+  font-size: var(--t-etiquette);
+  margin-bottom: var(--e1);
+  opacity: 0.75;
+}
+
+.fil__message p:last-child {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+}
+
+/* --- Les jetons de caractéristique ------------------------------------------
+   Ce que la maquette pose sous le titre d'un emplacement : « Fermé à clé »,
+   « Totalement au sec », « Capacité : 2 vélos ». Ils se lisent d'un coup d'œil
+   là où une liste de définitions demanderait une lecture. */
+
+.caracteres {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2);
+}
+
+.caractere {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--rayon);
+  background: var(--papier);
+  border: 1px solid var(--craie);
+  font-size: var(--t-menu);
+  color: var(--encre);
+}
+
+.caractere svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ardoise);
 }

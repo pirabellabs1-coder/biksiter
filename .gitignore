@@ -42,3 +42,7 @@ next-env.d.ts
 
 # Le gabarit, lui, se versionne : il documente les variables attendues.
 !.env.example
+
+# L'export du maquettage (Stitch). C'est une référence, pas du code : trois
+# mégaoctets d'images régénérables, qui n'ont pas à vivre dans l'historique.
+/stich/

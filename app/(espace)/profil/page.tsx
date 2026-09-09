@@ -159,7 +159,7 @@ export default async function Profil() {
                       <span
                         className={
                           ligne.etat === 'en_attente'
-                            ? 'pastille pastille--garde'
+                            ? 'pastille pastille--attente'
                             : 'pastille pastille--neutre'
                         }
                       >

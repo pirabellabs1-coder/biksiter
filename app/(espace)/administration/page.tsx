@@ -115,7 +115,7 @@ export default async function Administration() {
       ? [
           {
             cle: 'contestations',
-            variante: 'garde' as const,
+            variante: 'actif' as const,
             titre:
               suspens.gardesContestees === 1
                 ? 'Une garde est contestée'
@@ -206,7 +206,7 @@ export default async function Administration() {
           </span>
         </li>
         <li
-          className={reseau.gardesEnCours > 0 ? 'tuile tuile--garde' : 'tuile'}
+          className={reseau.gardesEnCours > 0 ? 'tuile tuile--verifie' : 'tuile'}
         >
           <span className="tuile__valeur">
             {ecrireUnNombre(reseau.gardesEnCours)}

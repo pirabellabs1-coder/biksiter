@@ -26,11 +26,20 @@ const LIBELLES: Record<Stationnement['etat'], string> = {
   termine: 'Terminé',
 };
 
-/** Règle 6 : l'ambre ne dit qu'une chose, « le vélo est actuellement gardé ». */
+/**
+ * La couleur d'un état, et rien d'autre.
+ *
+ * Vert : ce qui est confirmé — accepté, ou vélo actuellement gardé.
+ * Ambre : ce qui attend une réponse.
+ * Rosé : ce qui n'a pas eu lieu — refusé, annulé.
+ * Gris : ce qui est fini et n'attend plus rien.
+ */
 function pastille(etat: Stationnement['etat']): string {
-  if (etat === 'en_cours') return 'pastille pastille--garde';
-  if (etat === 'accepte') return 'pastille pastille--verifie';
-  if (etat === 'refuse') return 'pastille pastille--refus';
+  if (etat === 'accepte' || etat === 'en_cours') {
+    return 'pastille pastille--verifie';
+  }
+  if (etat === 'demande') return 'pastille pastille--attente';
+  if (etat === 'refuse' || etat === 'annule') return 'pastille pastille--refus';
   return 'pastille pastille--neutre';
 }
 

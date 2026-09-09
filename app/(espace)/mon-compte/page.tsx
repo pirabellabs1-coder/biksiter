@@ -177,7 +177,7 @@ export default async function TableauDeBord() {
             {aRepondre.length > 1 ? 'demandes à répondre' : 'demande à répondre'}
           </span>
         </li>
-        <li className={enCours.length > 0 ? 'tuile tuile--garde' : 'tuile'}>
+        <li className={enCours.length > 0 ? 'tuile tuile--verifie' : 'tuile'}>
           <span className="tuile__valeur">{enCours.length}</span>
           <span className="tuile__libelle">
             {enCours.length > 1
@@ -256,7 +256,7 @@ export default async function TableauDeBord() {
                       <span
                         className={
                           stationnement.etat === 'en_cours'
-                            ? 'pastille pastille--garde'
+                            ? 'pastille pastille--verifie'
                             : 'pastille pastille--verifie'
                         }
                       >

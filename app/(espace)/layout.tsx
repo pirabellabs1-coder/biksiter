@@ -59,9 +59,13 @@ export default async function MiseEnPageDeLEspace({
 
       <aside className="rail">
         <div className="rail__interieur">
+          {/* Le nom est dans son propre élément pour pouvoir disparaître à
+              l'œil quand la colonne se resserre, sans quitter le document :
+              le lien continue de s'appeler « Bike Sitters » pour un lecteur
+              d'écran. */}
           <Link href="/" className="marque rail__marque">
             <Logo taille={24} />
-            Bike Sitters
+            <span className="rail__marque-nom">Bike Sitters</span>
           </Link>
 
           <div className="rail__identite">
