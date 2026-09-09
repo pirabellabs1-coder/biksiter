@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import BarreDuMembre from '@/components/barre-du-membre';
+import EnteteDePage from '@/components/espace/entete-de-page';
 import { adresseDuStationnement } from '@/lib/depot/emplacements';
 import { avisDejaEcrit } from '@/lib/depot/avis';
 import { messagesDuStationnement } from '@/lib/depot/echanges';
@@ -70,20 +70,21 @@ export default async function LeStationnement({
     !(await avisDejaEcrit(id));
 
   return (
-    <div className="page page--lecture">
-      <BarreDuMembre membre={membre} page="stationnements" />
-
-      <p className="surtitre">
-        <Link href="/mes-stationnements" className="lien">
-          Tous mes stationnements
-        </Link>
-      </p>
-
-      <h1 className="titre-page">
-        {jeSuisLeCycliste
-          ? `Votre vélo chez ${stationnement.prenomDuBikeSitter}`
-          : `Le vélo de ${stationnement.prenomDuCycliste}`}
-      </h1>
+    <div className="page-de-lespace">
+      <EnteteDePage
+        surtitre="Un stationnement"
+        titre={
+          jeSuisLeCycliste
+            ? `Votre vélo chez ${stationnement.prenomDuBikeSitter}`
+            : `Le vélo de ${stationnement.prenomDuCycliste}`
+        }
+        phrase={`${stationnement.quartier} · ${creneauEnFrancais(new Date(stationnement.debut), new Date(stationnement.fin))}`}
+        actions={
+          <Link href="/mes-stationnements" className="bouton bouton--discret">
+            Tous mes stationnements
+          </Link>
+        }
+      />
 
       <dl className="details carte">
         <div>

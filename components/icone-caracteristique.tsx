@@ -18,7 +18,11 @@ export type Pictogramme =
   | 'message'
   | 'code'
   | 'identite'
-  | 'journal';
+  | 'journal'
+  | 'tableau'
+  | 'calendrier'
+  | 'etiquette'
+  | 'sortie';
 
 const TRACES: Record<Pictogramme, React.ReactNode> = {
   fermeture: (
@@ -99,6 +103,32 @@ const TRACES: Record<Pictogramme, React.ReactNode> = {
     <>
       <rect x="4" y="3" width="12" height="14" rx="2" />
       <path d="M7 7.2h6M7 10.2h6M7 13.2h3.2" />
+    </>
+  ),
+  tableau: (
+    <>
+      <rect x="3" y="3" width="6.2" height="6.2" rx="1.6" />
+      <rect x="10.8" y="3" width="6.2" height="6.2" rx="1.6" />
+      <rect x="3" y="10.8" width="6.2" height="6.2" rx="1.6" />
+      <rect x="10.8" y="10.8" width="6.2" height="6.2" rx="1.6" />
+    </>
+  ),
+  calendrier: (
+    <>
+      <rect x="3" y="4.5" width="14" height="12.5" rx="2" />
+      <path d="M3 8.4h14M6.8 2.8v3.2M13.2 2.8v3.2" />
+    </>
+  ),
+  etiquette: (
+    <>
+      <path d="M10.4 3H16a1 1 0 0 1 1 1v5.6a2 2 0 0 1-.6 1.4l-5.4 5.4a2 2 0 0 1-2.8 0l-4.6-4.6a2 2 0 0 1 0-2.8L9 3.6a2 2 0 0 1 1.4-.6Z" />
+      <circle cx="13.4" cy="6.6" r="1.2" />
+    </>
+  ),
+  sortie: (
+    <>
+      <path d="M12 4.5H15a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
+      <path d="M8.6 13.4 4.2 10l4.4-3.4M4.6 10h7.6" />
     </>
   ),
 };

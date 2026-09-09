@@ -227,6 +227,43 @@ identité pour en accepter un serait une façon de classer les gens.
 
 **Aucune donnée bancaire ne passe par ce site, et il ne faut pas en ajouter.**
 
+## Deux enveloppes, deux groupes de routes
+
+`app/` est coupé en deux, et les parenthèses ne changent rien aux adresses :
+
+- **`app/(site)/`** — le site public. En-tête de marque, grand pied de page,
+  pages qui se lisent. C'est là que vivent l'accueil, la recherche, la FAQ,
+  l'inscription et le catalogue.
+- **`app/(espace)/`** — l'espace du membre. Une colonne de navigation qui reste
+  à l'écran, pas de pied de page, un contenu qui défile seul. Tableau de bord,
+  stationnements, emplacements, profil, modération.
+
+`app/layout.tsx` ne pose plus que le document : chaque groupe a son enveloppe.
+`app/not-found.tsx` reste à la racine — c'est elle que Next rend pour une
+adresse qui ne correspond à rien — et porte donc l'enveloppe publique
+elle-même.
+
+### Les primitives de l'espace
+
+| Classe | Ce qu'elle fait |
+|---|---|
+| `.espace` / `.rail` | La coque et sa colonne de navigation. |
+| `.entete-de-page` | Surtitre, titre, phrase, actions. La même sur chaque écran. |
+| `.tuiles` / `.tuile` | Les chiffres en tête d'écran. |
+| `.panneau` | Un bloc à en-tête, corps et pied. |
+| `.lignes` / `.ligne` | Une liste d'objets, avec état et actions à droite. |
+| `.a-faire` | Ce qui attend une réponse, en tête du tableau de bord. |
+| `.vide` | Un panneau vide qui dit pourquoi il l'est. |
+
+**Ce qui n'est pas dans la navigation** : aucun compteur de gardes réussies,
+aucun classement, aucun palmarès. Les compteurs du rail disent ce qui attend
+quelqu'un, jamais ce que quelqu'un a accompli (règle 3).
+
+**L'ambre est réservé à une seule chose** : un vélo actuellement gardé. Une
+demande sans réponse n'est pas un vélo gardé — son compteur est donc neutre et
+contrasté, pas ambre. Et une identité en cours de vérification n'est ni un
+refus ni une erreur : elle n'est pas rouge.
+
 ## Le système de design
 
 Il tient toujours dans `app/systeme.css`. Les primitives écrites pour la page

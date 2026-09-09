@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import BarreDuMembre from '@/components/barre-du-membre';
+import EnteteDePage from '@/components/espace/entete-de-page';
 import FormulaireDEmplacement from '@/components/formulaire-d-emplacement';
 import {
   emplacementAModifier,
@@ -46,19 +46,19 @@ export default async function ModifierUnEmplacement({
       ?.stationnementsQuiRetiennent ?? 0;
 
   return (
-    <div className="page page--lecture">
-      <BarreDuMembre membre={membre} page="emplacements" />
-
-      <p className="surtitre">
-        <Link href="/mes-emplacements" className="lien">
-          Mes emplacements
-        </Link>
-      </p>
-      <h1 className="titre-page">Corriger cet emplacement</h1>
-      <p className="chapeau">
-        {emplacement.type} · {emplacement.quartier}
-        {emplacement.publie ? '' : ' · en pause, invisible sur la carte'}
-      </p>
+    <div className="page-de-lespace">
+      <EnteteDePage
+        surtitre="Mes emplacements"
+        titre="Corriger cet emplacement"
+        phrase={`${emplacement.type} · ${emplacement.quartier}${
+          emplacement.publie ? '' : ' · en pause, invisible sur la carte'
+        }`}
+        actions={
+          <Link href="/mes-emplacements" className="bouton bouton--discret">
+            Retour à la liste
+          </Link>
+        }
+      />
 
       <div className="encart">
         <p>

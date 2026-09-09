@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import BarreDuMembre from '@/components/barre-du-membre';
 import BaseNonBranchee from '@/components/base-non-branchee';
 import { baseConfiguree } from '@/lib/bd/client';
 import { mesBons, offresDuCatalogue } from '@/lib/depot/catalogue';
@@ -63,7 +62,13 @@ export default async function Catalogue() {
 
   return (
     <div className="page page--lecture">
-      {membre ? <BarreDuMembre membre={membre} page="catalogue" /> : null}
+      {membre ? (
+        <p className="surtitre">
+          <Link href="/mon-compte" className="lien">
+            Retour à mon tableau de bord
+          </Link>
+        </p>
+      ) : null}
 
       {entete}
 

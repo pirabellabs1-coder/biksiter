@@ -1081,50 +1081,6 @@ legend {
   text-align: right;
 }
 
-/* --- Espace du membre ------------------------------------------------------- */
-
-.barre-membre {
-  display: flex;
-  align-items: center;
-  gap: var(--e5);
-  flex-wrap: wrap;
-  background: var(--surface);
-  border: 1px solid var(--craie);
-  border-radius: var(--rayon-large);
-  padding: var(--e3) var(--e4);
-  margin-bottom: var(--e6);
-  box-shadow: var(--ombre-posee);
-}
-
-.barre-membre__identite {
-  display: flex;
-  align-items: center;
-  gap: var(--e3);
-}
-
-.barre-membre__liens {
-  display: flex;
-  gap: var(--e4);
-  flex-wrap: wrap;
-  flex: 1;
-}
-
-.barre-membre__liens a {
-  font-size: var(--t-menu);
-  color: var(--ardoise);
-  text-decoration: none;
-  transition: color var(--transition);
-}
-
-.barre-membre__liens a:hover,
-.barre-membre__liens a[aria-current='page'] {
-  color: var(--encre);
-}
-
-.barre-membre__liens a[aria-current='page'] {
-  box-shadow: inset 0 -2px 0 0 var(--action);
-}
-
 /* --- Stationnements --------------------------------------------------------- */
 
 .stationnements {
@@ -1482,65 +1438,6 @@ legend {
 .fil__message p:last-child {
   margin-bottom: 0;
   white-space: pre-wrap;
-}
-
-/* --- Profil : compteurs et registre ------------------------------------------ */
-/* Les compteurs sont neutres, pas verts. Le vert dit « vérifié » (règle 6) et
-   un nombre de gardes n'est pas une vérification. Aucun de ces blocs ne se
-   compare à celui de quelqu'un d'autre : ce sont des compteurs, pas des rangs. */
-
-.row-identite {
-  display: flex;
-  align-items: center;
-  gap: var(--e3);
-  margin-bottom: var(--e3);
-}
-
-.row-identite p {
-  margin: 0;
-}
-
-.pastilles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--e2);
-}
-
-.compteur {
-  margin-bottom: var(--e3);
-}
-
-.compteur__valeur {
-  font-family: var(--titres);
-  font-size: var(--t-grand);
-  line-height: 1.2;
-  margin: 0 0 var(--e1);
-  font-variant-numeric: tabular-nums;
-}
-
-.registre {
-  list-style: none;
-  margin: var(--e4) 0 0;
-  padding: var(--e3) 0 0;
-  border-top: 1px solid var(--craie);
-}
-
-.registre li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--e4);
-  padding: var(--e1) 0;
-  font-size: var(--t-menu);
-  color: var(--ardoise);
-}
-
-.registre li strong {
-  color: var(--encre);
-  font-variant-numeric: tabular-nums;
-}
-
-.registre__attente {
-  margin: var(--e3) 0 0;
 }
 
 /* --- Catalogue ---------------------------------------------------------------- */
@@ -2660,4 +2557,724 @@ legend {
   .garantie {
     padding: var(--e4);
   }
+}
+
+/* =============================================================================
+   L'espace du membre.
+
+   Une application, pas une suite de pages : la navigation reste à l'écran, le
+   contenu défile seul, et on ne « quitte » jamais un écran pour aller au
+   suivant. Les jetons et les composants sont ceux du site — mêmes couleurs,
+   mêmes cartes, même typographie — parce qu'un membre passe de l'un à l'autre
+   sans transition et ne doit pas avoir l'impression de changer de service.
+   ========================================================================== */
+
+.espace {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--papier);
+}
+
+/* --- La colonne de navigation ----------------------------------------------- */
+
+.rail {
+  background: var(--surface);
+  border-right: 1px solid var(--craie);
+}
+
+.rail__interieur {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e5);
+  padding: var(--e5) var(--e4);
+  overflow-y: auto;
+}
+
+.rail__marque {
+  padding-inline: var(--e2);
+}
+
+.rail__identite {
+  display: flex;
+  align-items: center;
+  gap: var(--e3);
+  padding: var(--e3);
+  background: var(--papier);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon);
+}
+
+.rail__qui {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  font-size: var(--t-menu);
+}
+
+.rail__qui strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail__qui .pastille {
+  justify-self: start;
+  font-size: 0.75rem;
+}
+
+/* La navigation prend la place qui reste, le pied est poussé en bas. */
+.rail__navigation {
+  flex: 1;
+}
+
+.rail__liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.rail__lien {
+  display: flex;
+  align-items: center;
+  gap: var(--e3);
+  padding: var(--e2) var(--e3);
+  border-radius: var(--rayon);
+  color: var(--ardoise);
+  text-decoration: none;
+  font-size: var(--t-petit);
+  border-left: 3px solid transparent;
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+
+.rail__lien svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.rail__libelle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail__lien:hover {
+  background: var(--papier);
+  color: var(--encre);
+}
+
+/* La page courante ne se signale pas que par la couleur : elle change de fond
+   et porte un trait à gauche. Qui ne distingue pas le vert du gris voit quand
+   même où il se trouve. */
+.rail__lien[aria-current='page'] {
+  background: var(--action-voile);
+  border-left-color: var(--action);
+  color: var(--action-appuyee);
+  font-weight: 500;
+}
+
+/* Un compteur dit ce qui attend une réponse — jamais un score.
+   Il est neutre et contrasté, pas ambre : l'ambre ne veut dire qu'une chose
+   dans ce produit, « un vélo est actuellement gardé », et une demande sans
+   réponse n'est pas un vélo gardé. Le contraste suffit à le faire voir. */
+.rail__compteur {
+  flex: none;
+  min-width: 22px;
+  height: 22px;
+  padding-inline: 6px;
+  border-radius: 99px;
+  background: var(--encre);
+  color: var(--surface);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rail__pied {
+  display: grid;
+  gap: 2px;
+  padding-top: var(--e4);
+  border-top: 1px solid var(--craie);
+}
+
+.rail__pied .bouton-lien {
+  justify-content: flex-start;
+  gap: var(--e3);
+  padding: var(--e2) var(--e3);
+  border-radius: var(--rayon);
+  font-size: var(--t-petit);
+  color: var(--ardoise);
+}
+
+.rail__pied .bouton-lien:hover {
+  background: var(--papier);
+  color: var(--encre);
+}
+
+/* --- Le contenu -------------------------------------------------------------- */
+
+.espace__contenu {
+  min-width: 0;
+  padding: var(--e6) var(--e7) var(--e8);
+}
+
+.espace__contenu > * {
+  max-width: 1080px;
+}
+
+/* --- L'en-tête d'une page ---------------------------------------------------- */
+
+.entete-de-page {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e5);
+  flex-wrap: wrap;
+  padding-bottom: var(--e5);
+  margin-bottom: var(--e6);
+  border-bottom: 1px solid var(--craie);
+}
+
+.entete-de-page__propos {
+  min-width: 0;
+}
+
+.entete-de-page__titre {
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  margin: 0 0 var(--e2);
+}
+
+.entete-de-page__propos p {
+  margin: 0;
+  max-width: 68ch;
+}
+
+.entete-de-page__actions {
+  display: flex;
+  gap: var(--e3);
+  flex-wrap: wrap;
+}
+
+/* --- Le jeton d'initiale ----------------------------------------------------- */
+/* Il remplace `.emplacement__initiale` dans l'espace : même rôle, mais il ne
+   dépend plus d'une liste d'emplacements pour exister. */
+
+.jeton-initiale {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--action-voile);
+  color: var(--action-appuyee);
+  font-family: var(--titres);
+  font-size: var(--t-moyen);
+}
+
+.jeton-initiale--petit {
+  width: 32px;
+  height: 32px;
+  font-size: var(--t-menu);
+}
+
+/* --- Les tuiles de chiffres -------------------------------------------------- */
+
+.tuiles {
+  list-style: none;
+  margin: 0 0 var(--e6);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--e4);
+}
+
+.tuile {
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e4) var(--e5);
+  box-shadow: var(--ombre-posee);
+  display: grid;
+  gap: var(--e1);
+  align-content: start;
+}
+
+.tuile__valeur {
+  font-family: var(--titres);
+  font-size: 1.75rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.tuile__libelle {
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+}
+
+/* Une tuile qui appelle une action se signale par un filet, pas par un fond
+   coloré : le contenu reste lisible et rien ne clignote. Le filet est gris —
+   « quelque chose attend » n'est aucun des quatre sens de la règle 6. */
+.tuile--attente {
+  border-left: 3px solid var(--craie-forte);
+}
+
+/* Celle-ci, en revanche, a droit à l'ambre : elle compte des vélos
+   actuellement gardés, ce qui est exactement ce que l'ambre veut dire. */
+.tuile--garde {
+  border-left: 3px solid var(--garde);
+}
+
+.tuile--garde .tuile__valeur {
+  color: var(--garde-encre);
+}
+
+/* --- Les panneaux ------------------------------------------------------------ */
+/* Le bloc de contenu de l'espace. Il porte un en-tête, un corps, et parfois un
+   pied — c'est ce qui remplace les cartes disparates de l'ancienne version. */
+
+.panneaux {
+  display: grid;
+  gap: var(--e5);
+}
+
+.panneaux--deux {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.panneau {
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  box-shadow: var(--ombre-posee);
+  overflow: hidden;
+}
+
+.panneau__entete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e4);
+  padding: var(--e4) var(--e5);
+  border-bottom: 1px solid var(--craie);
+}
+
+.panneau__entete h2,
+.panneau__entete h3 {
+  font-size: var(--t-moyen);
+  margin: 0;
+}
+
+.panneau__entete a {
+  font-size: var(--t-menu);
+  color: var(--action);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.panneau__entete a:hover {
+  text-decoration: underline;
+}
+
+.panneau__corps {
+  padding: var(--e5);
+}
+
+.panneau__corps > :last-child {
+  margin-bottom: 0;
+}
+
+/* --- Les lignes d'une liste -------------------------------------------------- */
+
+.lignes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lignes > li {
+  border-bottom: 1px solid var(--craie);
+}
+
+.lignes > li:last-child {
+  border-bottom: 0;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+  padding: var(--e4) var(--e5);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--transition);
+}
+
+a.ligne:hover {
+  background: var(--papier);
+}
+
+.ligne__corps {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Ces deux-là sont souvent des `span` — une ligne cliquable est un lien, et un
+   lien ne peut pas contenir de paragraphe. Il leur faut donc leur propre
+   passage à la ligne. */
+.ligne__titre {
+  display: block;
+  font-size: var(--t-petit);
+  margin: 0 0 2px;
+}
+
+.ligne__detail {
+  display: block;
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+  margin: 0;
+}
+
+.ligne__fin {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--e3);
+}
+
+/* --- Un vide utile ----------------------------------------------------------- */
+/* Un panneau vide dit pourquoi il l'est et ce qu'on peut y faire. Un espace
+   blanc sans phrase se lit comme une panne. */
+
+.vide {
+  padding: var(--e6) var(--e5);
+  text-align: center;
+}
+
+.vide svg {
+  width: 34px;
+  height: 34px;
+  color: var(--craie-forte);
+  margin-bottom: var(--e3);
+}
+
+.vide p {
+  margin: 0 auto;
+  max-width: 46ch;
+  font-size: var(--t-petit);
+  color: var(--ardoise);
+}
+
+.vide .boutons {
+  justify-content: center;
+  margin-top: var(--e4);
+}
+
+/* --- Ce qui demande une réponse ---------------------------------------------- */
+
+.a-faire {
+  display: grid;
+  gap: var(--e3);
+  margin-bottom: var(--e6);
+}
+
+.a-faire__entree {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+  padding: var(--e4) var(--e5);
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-left: 3px solid var(--craie-forte);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre-posee);
+}
+
+/* Ce qui bloque se distingue de ce qui attend seulement une réponse — par un
+   filet plus sombre, pas par du rouge. Une identité en cours de vérification
+   n'est ni un refus ni une erreur, et alarmer quelqu'un qui n'a rien fait de
+   mal serait un mauvais usage de la seule couleur qui dit « ça n'a pas
+   marché ». */
+.a-faire__entree--bloquant {
+  border-left-color: var(--encre);
+}
+
+/* Un vélo actuellement gardé : c'est le sens exact de l'ambre. */
+.a-faire__entree--garde {
+  border-left-color: var(--garde);
+}
+
+.a-faire__corps {
+  flex: 1;
+  min-width: 0;
+}
+
+.a-faire__corps p {
+  margin: 0;
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+}
+
+.a-faire__corps strong {
+  display: block;
+  font-size: var(--t-petit);
+  color: var(--encre);
+  margin-bottom: 2px;
+}
+
+/* --- Adaptations ------------------------------------------------------------- */
+
+@media (max-width: 1080px) {
+  .panneaux--deux {
+    grid-template-columns: 1fr;
+  }
+
+  .espace__contenu {
+    padding: var(--e6) var(--e5) var(--e7);
+  }
+}
+
+/* En dessous, la colonne passe au-dessus du contenu et devient une barre
+   horizontale qui défile. Pas de menu déroulant : il faudrait du JavaScript et
+   un piège à focus pour six liens. */
+@media (max-width: 860px) {
+  .espace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--craie);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .rail__interieur {
+    position: static;
+    height: auto;
+    display: grid;
+    /* `minmax(0, …)` et non `1fr` : sans cela, la barre de navigation qui
+       défile impose sa largeur intrinsèque à la grille, et c'est toute la page
+       qui déborde de côté. */
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--e3);
+    padding: var(--e3) var(--e5);
+    overflow: visible;
+  }
+
+  .rail__marque {
+    grid-column: 1;
+  }
+
+  /* En barre compacte, l'identité se réduit au jeton d'initiale : le prénom
+     est déjà dans le « Bonjour … » du titre, et la pastille de vérification a
+     sa place sur le profil, pas dans une barre de 375 pixels. */
+  .rail__identite {
+    grid-column: 2;
+    justify-self: end;
+    border: 0;
+    background: none;
+    padding: 0;
+  }
+
+  .rail__qui {
+    display: none;
+  }
+
+  .rail__pied {
+    grid-column: 3;
+    grid-auto-flow: column;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  /* Le lien « Retour au site » n'a plus la place de son libellé ; son
+     pictogramme suffit, et le libellé reste lisible au lecteur d'écran. */
+  .rail__pied .rail__libelle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Pas de marge négative pour faire déborder la barre jusqu'au bord de
+     l'écran : elle rendait la boîte plus large que la page, et c'est la page
+     entière qui se mettait à défiler de côté. La barre reste dans les marges,
+     et seul son contenu défile. */
+  .rail__navigation {
+    grid-column: 1 / -1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .rail__navigation::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail__liste {
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: var(--e2);
+  }
+
+  .rail__lien {
+    border-left: 0;
+    border-bottom: 3px solid transparent;
+    border-radius: var(--rayon) var(--rayon) 0 0;
+    white-space: nowrap;
+  }
+
+  .rail__lien[aria-current='page'] {
+    border-left-color: transparent;
+    border-bottom-color: var(--action);
+  }
+}
+
+@media (max-width: 560px) {
+  .espace__contenu {
+    padding: var(--e5) var(--e4) var(--e7);
+  }
+
+  .rail__interieur {
+    padding-inline: var(--e4);
+  }
+
+  .entete-de-page {
+    align-items: flex-start;
+  }
+
+  /* Une action et son texte ne tiennent pas côte à côte : la carte se plie. */
+  .a-faire__entree {
+    flex-wrap: wrap;
+  }
+
+  .a-faire__entree .bouton {
+    width: 100%;
+  }
+}
+
+/* Un bouton qui doit se comporter comme un lien : même poids visuel, mais
+   c'est bien un bouton, parce qu'il change l'état du serveur. */
+.bouton-lien {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 0;
+  background: none;
+  font-family: var(--texte);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition), color var(--transition);
+}
+
+.bouton-lien svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* --- Ce qui est clos, replié ------------------------------------------------- */
+/* `<details>` plutôt qu'un composant client : le navigateur sait déjà ouvrir et
+   fermer, annoncer l'état au lecteur d'écran, et il le fait sans JavaScript. */
+
+.repli {
+  border-top: 1px solid var(--craie);
+}
+
+.repli > summary {
+  padding: var(--e3) var(--e5);
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.repli > summary:hover {
+  color: var(--encre);
+  background: var(--papier);
+}
+
+.repli[open] > summary {
+  border-bottom: 1px solid var(--craie);
+}
+
+/* Le message d'une demande, cité dans la ligne. */
+.ligne__citation {
+  display: block;
+  margin-top: var(--e2);
+  padding-left: var(--e3);
+  border-left: 2px solid var(--craie);
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+}
+
+/* Une ligne peut porter plusieurs actions : elles s'empilent si la place
+   manque plutôt que d'écraser le texte. */
+.ligne__fin {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.ligne__fin .bouton {
+  min-height: 38px;
+  padding-inline: var(--e4);
+  font-size: var(--t-menu);
+}
+
+@media (max-width: 700px) {
+  .ligne {
+    flex-wrap: wrap;
+  }
+
+  .ligne__fin {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* --- La liste des vérifications ---------------------------------------------- */
+
+.verifications {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  border-top: 1px solid var(--craie);
+}
+
+.verifications li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e4);
+  padding: var(--e3) 0;
+  border-bottom: 1px solid var(--craie);
+  font-size: var(--t-petit);
+}
+
+/* Une page de l'espace qui se lit plutôt qu'elle ne se pilote : une fiche, un
+   formulaire. Elle garde la colonne étroite d'un texte, dans la coque. */
+.page-de-lespace {
+  max-width: var(--largeur-lecture);
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import BarreDuMembre from '@/components/barre-du-membre';
 import BaseNonBranchee from '@/components/base-non-branchee';
 import { baseConfiguree } from '@/lib/bd/client';
 import { pieceDuMembre } from '@/lib/depot/pieces';
@@ -46,7 +45,11 @@ export default async function Verification() {
 
   return (
     <div className="page page--lecture">
-      <BarreDuMembre membre={membre} page="compte" />
+      <p className="surtitre">
+        <Link href="/mon-compte" className="lien">
+          Retour à mon tableau de bord
+        </Link>
+      </p>
 
       <p className="surtitre">Vérification</p>
       <h1 className="titre-page">Confirmer qui vous êtes</h1>

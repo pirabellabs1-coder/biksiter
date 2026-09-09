@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import { Bricolage_Grotesque, Instrument_Sans } from 'next/font/google';
 
-import EnTete from '@/components/en-tete';
-import PiedDePage from '@/components/pied-de-page';
-
 import './systeme.css';
 
 const policeDesTitres = Bricolage_Grotesque({
@@ -44,6 +41,15 @@ export const metadata: Metadata = {
     'Un réseau d’entraide entre cyclistes à Bruxelles : des habitants accueillent gratuitement votre vélo chez eux, dans un emplacement privé, le temps qu’il faut.',
 };
 
+/**
+ * La racine ne pose que le document.
+ *
+ * Le site public et l'espace du membre n'ont pas la même enveloppe — l'un a un
+ * en-tête de marque et un grand pied de page, l'autre une colonne de
+ * navigation et aucun pied. Chacun a donc sa propre mise en page, dans
+ * `app/(site)` et `app/(espace)`. Les parenthèses ne changent rien aux
+ * adresses : `/mon-compte` reste `/mon-compte`.
+ */
 export default function RacineDuSite({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -52,14 +58,7 @@ export default function RacineDuSite({
       lang="fr"
       className={`${policeDesTitres.variable} ${policeDuTexte.variable}`}
     >
-      <body>
-        <a className="evitement" href="#contenu">
-          Aller au contenu
-        </a>
-        <EnTete />
-        <main id="contenu">{children}</main>
-        <PiedDePage />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
