@@ -333,6 +333,31 @@ Un test garantit qu’aucun message ne peut partir avec l’un de ces trous
 dedans : `lib/courriel/modeles.test.ts` refuse « null », « undefined » et
 « 0000 » dans le corps de tous les messages.
 
+## Les couleurs
+
+| Couleur | Sens | Où |
+|---|---|---|
+| Vert | Action — ce qu'on clique, et la marque | boutons, liens, numéros d'étape |
+| Bleu | Vérifié — une identité contrôlée par une personne | pastilles « Identité vérifiée » |
+| Ambre | Vélo actuellement gardé | états d'un stationnement en cours |
+| Rouge | Refus ou erreur | messages d'erreur, refus |
+
+Le vert et le bleu ont échangé leurs rôles par rapport à la première version.
+Le principe de la règle 6 n'a pas bougé — une couleur ne veut dire qu'une
+chose — mais la marque est verte, et une marque dont on ne clique jamais la
+couleur ne sert à rien.
+
+**Les illustrations font exception, et c'est tenu.** Elles ont leurs propres
+jetons `--dessin-*`, qui ne servent que dans `.illustration`. Un dessin ne
+porte aucune information : sa couleur ne peut donc pas se tromper de sens. Si
+l'un de ces jetons apparaît un jour sur un bouton ou une pastille, c'est une
+erreur.
+
+**Le site est clair, chez tout le monde.** `color-scheme: light`, et le mode
+sombre ne suit plus `prefers-color-scheme`. Ses valeurs restent écrites et à
+jour sous `:root[data-theme='sombre']` : pour le rendre, il suffit de poser cet
+attribut sur `<html>` ou de remettre le bloc derrière sa requête média.
+
 ## Les images du site
 
 Il n’y a pas de photographies, et `components/illustration.tsx` explique

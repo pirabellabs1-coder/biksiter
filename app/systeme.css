@@ -6,41 +6,61 @@
    maintenir que les quelques centaines de lignes qu'elle remplacerait.
 
    Règle 6 du CLAUDE.md — une couleur, un sens :
-     bleu  = action        (ce sur quoi on clique)
-     vert  = vérifié       (une identité contrôlée par un humain)
+     vert  = action        (ce sur quoi on clique ; c'est aussi la marque)
+     bleu  = vérifié       (une identité contrôlée par un humain)
      ambre = vélo gardé    (un stationnement en cours)
      rouge = refus ou erreur
-   Toute autre information est neutre. Il n'existe pas de couleur décorative :
-   si un bloc ne porte pas l'un de ces quatre sens, il est gris. C'est aussi
-   pour cela que la figure cartographique est grise — une zone d'accueil n'est
-   pas une action, elle n'a aucune raison d'être bleue.
 
-   Ce que ce fichier cherche : de la tenue par la typographie, l'espacement et
-   la retenue, jamais par la couleur. C'est ce qui convient à une association
-   qui demande à des gens d'ouvrir leur porte.
+   Le vert et le bleu ont échangé leurs rôles. Le principe n'a pas bougé —
+   une couleur ne veut dire qu'une chose — mais la marque est verte, et une
+   marque dont on ne clique jamais la couleur ne sert à rien. Le bleu a hérité
+   de la vérification, où il se lit d'ailleurs tout seul.
+
+   Toute autre information de l'interface est neutre : si un bloc ne porte pas
+   l'un de ces quatre sens, il est gris. C'est pour cela que la figure
+   cartographique reste grise — une zone d'accueil n'est pas une action.
+
+   Une exception, et une seule : les dessins ont leur propre palette, sous des
+   jetons `--dessin-*` qui ne servent que dans `.illustration`. Une
+   illustration n'est pas une information : elle ne peut donc pas se tromper de
+   sens, et elle a le droit d'avoir des couleurs. Voir plus bas.
    ========================================================================== */
 
 :root {
-  color-scheme: light dark;
+  /* Clair, et seulement clair. `light dark` laissait le système décider, et le
+     site basculait en sombre chez qui a réglé son ordinateur ainsi. Ce n'est
+     pas ce qu'on veut ici : le parti pris est clair, chez tout le monde. */
+  color-scheme: light;
 
-  /* --- Neutres — l'essentiel de l'interface vit ici. --- */
-  --encre: #16232a;
-  --ardoise: #5a6b76;
-  --papier: #f4f5f8;
+  /* --- Neutres — l'essentiel de l'interface vit ici. ---
+     Ils sont légèrement tirés vers le vert plutôt que vers le bleu : un gris
+     froid sur toute une page donne un site d'administration, et ce n'en est
+     pas un. La différence est de quelques points, elle ne se nomme pas, mais
+     elle se sent. */
+  --encre: #14201a;
+  --ardoise: #58685e;
+  --papier: #f3f7f3;
   --surface: #ffffff;
-  --craie: #e3e8ee;
-  --craie-forte: #c4cfda;
+  --craie: #e0eae2;
+  --craie-forte: #c1d0c5;
 
-  /* --- Bleu : action. --- */
-  --action: #0b57e0;
-  --action-appuyee: #0a3fa8;
-  --action-voile: #e6edfe;
+  /* --- Vert : action. ---
+     C'est la couleur de la marque, et c'est elle qu'on clique. Elle est plus
+     sombre que le vert du logo pour tenir le contraste du texte blanc posé
+     dessus (5,5 : 1, au-delà du minimum). */
+  --action: #0a7a41;
+  --action-appuyee: #06592f;
+  --action-voile: #e7f4ec;
   --texte-sur-action: #ffffff;
 
-  /* --- Vert : vérifié. --- */
-  --verifie: #007d38;
-  --verifie-encre: #00612b;
-  --verifie-voile: #e4f2ea;
+  /* --- Bleu : vérifié. ---
+     Le bleu a pris la place du vert le jour où le vert est devenu l'action.
+     La règle 6 est intacte : une couleur, un sens — c'est l'attribution qui a
+     changé, pas le principe. Un badge de vérification bleu se lit d'ailleurs
+     sans qu'on ait à l'expliquer. */
+  --verifie: #0b57e0;
+  --verifie-encre: #0a3fa8;
+  --verifie-voile: #e6edfe;
 
   /* --- Ambre : vélo actuellement gardé. --- */
   --garde: #b57414;
@@ -48,22 +68,41 @@
   --garde-voile: #fbf1de;
 
   /* --- Rouge : refus ou erreur. --- */
-  --refus: #a8341f;
+  --refus: #b3311c;
   --refus-encre: #8a2a18;
-  --refus-voile: #f8e9e5;
+  --refus-voile: #fae9e5;
 
   /* --- La figure cartographique, volontairement neutre. --- */
-  --carte-fond: #eef1f4;
-  --carte-rue: #e2e7ec;
-  --carte-avenue: #d6dee5;
-  --zone-coeur: rgb(90 107 118 / 26%);
-  --zone-bord: rgb(90 107 118 / 8%);
+  --carte-fond: #eef2ee;
+  --carte-rue: #e2e9e3;
+  --carte-avenue: #d5e0d8;
+  --zone-coeur: rgb(88 104 94 / 26%);
+  --zone-bord: rgb(88 104 94 / 8%);
+
+  /* --- La palette des dessins. ---
+     Elle est à part, et elle doit le rester. Ces jetons ne servent que dans
+     `.illustration` : aucun bouton, aucune pastille, aucun encart ne les
+     utilise. C'est ce qui permet aux dessins d'être colorés sans que la
+     couleur se mette à vouloir dire quelque chose ailleurs dans l'interface.
+     Si l'un d'eux apparaît un jour hors d'un dessin, c'est une erreur. */
+  --dessin-trait: #24352b;
+  --dessin-ciel: #e8f2f6;
+  --dessin-sol: #dde8dc;
+  --dessin-feuillage: #bcdcc3;
+  --dessin-feuillage-fonce: #93c5a2;
+  --dessin-facade: #f7efe2;
+  --dessin-bandeau: #ecdfcb;
+  --dessin-creux: #dde6de;
+  --dessin-menuiserie: #4b8790;
+  --dessin-terre: #d3946a;
+  --dessin-bois: #8c6a4f;
+  --dessin-lumiere: #f4d98c;
 
   /* --- Ombres : discrètes, elles ne servent qu'à décoller une carte. --- */
   --ombre-posee:
-    0 1px 2px rgb(22 35 42 / 6%),
-    0 10px 24px -20px rgb(22 35 42 / 22%);
-  --ombre-levee: 0 8px 26px -10px rgb(22 35 42 / 20%);
+    0 1px 2px rgb(20 32 26 / 6%),
+    0 10px 24px -20px rgb(20 32 26 / 22%);
+  --ombre-levee: 0 8px 26px -10px rgb(20 32 26 / 20%);
 
   /* --- Typographie. Les deux familles viennent de next/font. --- */
   --titres: var(--police-titres), ui-sans-serif, system-ui, sans-serif;
@@ -96,47 +135,66 @@
   --transition: 160ms cubic-bezier(0.2, 0, 0.2, 1);
 }
 
-/* Le mode sombre garde exactement les quatre sens de la règle 6 ; seules les
-   valeurs changent, pour rester lisibles sur un fond foncé. Aucun jeton
-   nouveau : si une couleur manquait ici, c'est qu'elle n'aurait pas de sens. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --encre: #e8eef2;
-    --ardoise: #9dafba;
-    --papier: #0d1316;
-    --surface: #161e23;
-    --craie: #26313a;
-    --craie-forte: #3a4852;
+/* Le mode sombre, gardé mais débranché.
+ *
+ * Il ne suit plus `prefers-color-scheme` : le site est clair, y compris chez
+ * quelqu'un dont le système est réglé en sombre. Ces valeurs restent écrites
+ * et à jour parce que les rebrancher ne coûte rien — il suffit de poser
+ * `data-theme="sombre"` sur `<html>`, ou de rendre ce bloc à la requête média
+ * d'origine. Elles gardent exactement les quatre sens de la règle 6 ; seules
+ * les valeurs changent. */
+:root[data-theme='sombre'] {
+  --encre: #e8f0ea;
+  --ardoise: #9db0a3;
+  --papier: #0d1310;
+  --surface: #161e19;
+  --craie: #263129;
+  --craie-forte: #3a4840;
 
-    --action: #74a6ff;
-    --action-appuyee: #9cc0ff;
-    --action-voile: #16243a;
-    --texte-sur-action: #0b1620;
+  --action: #4cbd7d;
+  --action-appuyee: #7ad4a0;
+  --action-voile: #10291c;
+  --texte-sur-action: #06180e;
 
-    --verifie: #4ecb8c;
-    --verifie-encre: #9ae4bd;
-    --verifie-voile: #11281e;
+  --verifie: #74a6ff;
+  --verifie-encre: #a8c8ff;
+  --verifie-voile: #16243a;
 
-    --garde: #e8a33d;
-    --garde-encre: #f2c78a;
-    --garde-voile: #2a2013;
+  --garde: #e8a33d;
+  --garde-encre: #f2c78a;
+  --garde-voile: #2a2013;
 
-    --refus: #ff9077;
-    --refus-encre: #ffb8a7;
-    --refus-voile: #2d1a15;
+  --refus: #ff9077;
+  --refus-encre: #ffb8a7;
+  --refus-voile: #2d1a15;
 
-    --carte-fond: #131b20;
-    --carte-rue: #1a242a;
-    --carte-avenue: #222e36;
-    --zone-coeur: rgb(157 175 186 / 22%);
-    --zone-bord: rgb(157 175 186 / 6%);
+  --carte-fond: #131b16;
+  --carte-rue: #1a241d;
+  --carte-avenue: #222e26;
+  --zone-coeur: rgb(157 176 163 / 22%);
+  --zone-bord: rgb(157 176 163 / 6%);
 
-    --ombre-posee:
-      0 1px 2px rgb(0 0 0 / 44%),
-      0 10px 24px -20px rgb(0 0 0 / 55%);
-    --ombre-levee: 0 8px 26px -10px rgb(0 0 0 / 62%);
-  }
+  /* Les dessins gardent leurs teintes mais rabattues : un feuillage clair
+     sur un fond sombre brille comme une enseigne. */
+  --dessin-trait: #cfded4;
+  --dessin-ciel: #16232a;
+  --dessin-sol: #1c2620;
+  --dessin-feuillage: #2b5138;
+  --dessin-feuillage-fonce: #3a6a49;
+  --dessin-facade: #24211b;
+  --dessin-bandeau: #33291d;
+  --dessin-creux: #101713;
+  --dessin-menuiserie: #2e5a61;
+  --dessin-terre: #7a5133;
+  --dessin-bois: #4f3d2e;
+  --dessin-lumiere: #6b5a2c;
+
+  --ombre-posee:
+    0 1px 2px rgb(0 0 0 / 44%),
+    0 10px 24px -20px rgb(0 0 0 / 55%);
+  --ombre-levee: 0 8px 26px -10px rgb(0 0 0 / 62%);
 }
+
 
 /* --- Réinitialisation minimale --------------------------------------------- */
 
@@ -1858,29 +1916,76 @@ legend {
 }
 
 /* --- Illustrations ---------------------------------------------------------- */
-/* Le même trait que les pictogrammes, en plus grand. Grises pour la même
-   raison que la figure cartographique (règle 6) : une illustration n'est ni
-   une action, ni une vérification, ni un vélo gardé. Les seules variations
-   sont des valeurs. */
+/* Le trait des pictogrammes, en plus grand et en couleur. La palette est
+   séparée du reste (jetons `--dessin-*`) : une illustration ne porte aucune
+   information, donc sa couleur ne peut pas se tromper de sens. Aucun de ces
+   jetons ne doit sortir d'ici. */
 
 .illustration {
   display: block;
   width: 100%;
   height: auto;
-  color: var(--ardoise);
+  stroke: var(--dessin-trait);
 }
 
-/* Ce qui est en retrait dans le dessin : le creux d'un garage, l'embrasure
-   d'une porte. Une valeur plus sombre que le papier, jamais une teinte. */
-.illustration__creux {
-  fill: var(--carte-fond);
+.dessin-sol {
+  fill: var(--dessin-sol);
   stroke: none;
 }
 
-/* La pluie, les rayons de l'ampoule, les joints de la voûte : présents, mais
-   ils ne doivent pas peser autant que l'architecture. */
+.dessin-facade {
+  fill: var(--dessin-facade);
+}
+
+.dessin-bandeau {
+  fill: var(--dessin-bandeau);
+}
+
+.dessin-vitre {
+  fill: var(--dessin-ciel);
+}
+
+.dessin-menuiserie {
+  fill: var(--dessin-menuiserie);
+}
+
+.dessin-creux {
+  fill: var(--dessin-creux);
+}
+
+.dessin-terre {
+  fill: var(--dessin-terre);
+}
+
+.dessin-bois {
+  fill: var(--dessin-bois);
+}
+
+.dessin-lumiere {
+  fill: var(--dessin-lumiere);
+}
+
+.dessin-feuillage {
+  fill: var(--dessin-feuillage);
+}
+
+/* La deuxième valeur d'un feuillage : elle lui donne du volume sans trait, et
+   n'est donc jamais bordée. */
+.dessin-feuillage-clair {
+  fill: var(--dessin-feuillage-fonce);
+  stroke: none;
+}
+
+/* La pluie garde le trait du dessin mais s'efface : c'est le décor, pas le
+   sujet. */
+.dessin-trait-pluie {
+  stroke: var(--dessin-menuiserie);
+}
+
+/* Ce qui est en retrait dans le dessin : le creux d'un garage, l'embrasure
+   d'une porte. */
 .illustration__leger {
-  opacity: 0.45;
+  opacity: 0.5;
   stroke-width: 1.5;
 }
 
@@ -1892,6 +1997,7 @@ legend {
   border: 1px solid var(--craie);
   border-radius: var(--rayon-large);
   padding: var(--e6) var(--e6) var(--e5);
+  overflow: hidden;
 }
 
 /* Dans un cadre, la figure cartographique n'a pas besoin de toute sa hauteur :
@@ -1993,6 +2099,16 @@ legend {
   border-bottom: 1px solid var(--craie);
 }
 
+/* Une bande à la couleur de la marque, très dessaturée. C'est la seule
+   entorse au « pas de couleur décorative » côté interface, et elle est tenue :
+   un fond n'est pas un contrôle, rien ne s'y clique, et aucun bouton n'y prend
+   cette teinte. */
+.section--marque {
+  background: linear-gradient(var(--action-voile), var(--surface));
+  border-top: 1px solid var(--craie);
+  border-bottom: 1px solid var(--craie);
+}
+
 /* Deux sections claires qui se suivent ne doivent pas doubler le trait. */
 .section--claire + .section--claire {
   border-top: 0;
@@ -2047,11 +2163,12 @@ legend {
 
 .accroche {
   padding: var(--e8) var(--e6) calc(var(--e8) + var(--e7));
-  /* Un dégradé de gris, pas de couleur : il pose une profondeur derrière le
-     titre sans rien signifier. */
+  /* Le haut de page porte la couleur de la marque, posée très bas et
+     dégradée vers le papier. C'est un fond, pas un signal : il n'y a rien à y
+     cliquer, et le bouton vert qui s'y trouve reste le seul vert saturé. */
   background:
-    radial-gradient(120% 90% at 78% 8%, var(--surface) 0%, transparent 62%),
-    linear-gradient(var(--surface), var(--papier));
+    radial-gradient(110% 80% at 82% 6%, var(--surface) 0%, transparent 58%),
+    linear-gradient(160deg, var(--action-voile) 0%, var(--papier) 62%);
 }
 
 .accroche__interieur {
@@ -2380,9 +2497,7 @@ legend {
 .appel {
   padding: var(--e8) var(--e6);
   text-align: center;
-  background:
-    radial-gradient(90% 120% at 50% 100%, var(--surface) 0%, transparent 68%),
-    linear-gradient(var(--papier), var(--surface));
+  background: linear-gradient(var(--surface), var(--action-voile));
   border-top: 1px solid var(--craie);
 }
 

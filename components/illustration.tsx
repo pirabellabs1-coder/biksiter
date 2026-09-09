@@ -5,18 +5,17 @@
  * Une photo de banque d'images montrerait le garage de quelqu'un qui n'est pas
  * membre, dans une ville qui n'est pas la nôtre, et une association qui
  * demande à des gens d'ouvrir leur porte ne peut pas commencer par une image
- * empruntée. Le jour où des membres nous confieront leurs photos, elles
+ * empruntée. Le jour où des membres nous confieront les leurs, elles
  * remplaceront ces dessins.
  *
- * Elles prolongent le trait des pictogrammes (`icone-caracteristique.tsx`) :
- * même absence de remplissage, mêmes extrémités arrondies, et la couleur du
- * texte qui les entoure. Elles sont grises pour la même raison que la figure
- * cartographique l'est (règle 6) — une illustration n'est ni une action, ni
- * une vérification, ni un vélo gardé. Les seules variations sont des valeurs,
- * jamais des teintes.
+ * Elles ont leur propre palette, sous des jetons `--dessin-*` qui ne servent
+ * nulle part ailleurs. C'est ce qui leur permet d'être colorées sans casser la
+ * règle 6 : une illustration ne porte aucune information, elle ne peut donc
+ * pas se tromper de sens. Si l'un de ces jetons apparaît un jour sur un bouton
+ * ou une pastille, c'est une erreur — la couleur y voudrait dire quelque chose.
  *
  * On n'y dessine personne. Ce n'est pas de la pudeur : un personnage au trait
- * a forcément un âge, une carrure, une silhouette, et le réseau s'adresse à
+ * a forcément un âge, une carrure, une carnation, et le réseau s'adresse à
  * tout le monde. Les lieux et les vélos disent la même chose sans que
  * quiconque ait à se reconnaître ou non dedans.
  *
@@ -102,6 +101,40 @@ function Velo({
   );
 }
 
+/** L'arbre de rue. */
+function Arbre({
+  x,
+  sol,
+  rayon,
+}: {
+  x: number;
+  sol: number;
+  rayon: number;
+}) {
+  return (
+    <>
+      <path
+        d={`M${arrondi(x - rayon * 0.14)} ${sol} v${arrondi(-rayon * 1.9)}h${arrondi(rayon * 0.28)}V${sol}z`}
+        className="dessin-bois"
+      />
+      <circle
+        cx={x}
+        cy={arrondi(sol - rayon * 2.7)}
+        r={rayon}
+        className="dessin-feuillage"
+      />
+      {/* Une ombre portée dans la couronne, en bas à droite : plus grande, elle
+          se lirait comme une seconde forme posée sur l'arbre. */}
+      <circle
+        cx={arrondi(x + rayon * 0.34)}
+        cy={arrondi(sol - rayon * 2.36)}
+        r={arrondi(rayon * 0.46)}
+        className="dessin-feuillage-clair"
+      />
+    </>
+  );
+}
+
 /**
  * La grande scène du haut de page : une maison de rangée, garage ouvert.
  *
@@ -112,64 +145,50 @@ function Velo({
 function LaRemise() {
   return (
     <>
+      <path d="M0 270h420v30H0z" className="dessin-sol" />
       <path d="M8 270h404" />
       <g className="illustration__leger">
-        <path d="M30 270v8M120 270v8M210 270v8M300 270v8M390 270v8" />
+        <path d="M40 276v10M120 276v10M210 276v10M300 276v10M380 276v10" />
       </g>
 
-      {/* L'arbre de rue. Sa couronne reste vide : deux branches dessinées
-          dedans faisaient un cercle coché, et un cercle coché veut dire
-          « vérifié » partout ailleurs sur ce site (règle 6). */}
-      <circle cx="32" cy="192" r="28" />
-      <path d="M32 220v50" />
-      <g className="illustration__leger">
-        <circle cx="32" cy="192" r="18" />
-      </g>
+      <Arbre x={32} sol={270} rayon={28} />
 
       {/* La façade : plate et haute, comme une maison de rangée. */}
-      <path d="M60 270V78h300v192" />
-      <path d="M50 78h320" />
-      <g className="illustration__leger">
-        <path d="M54 88h312" />
-      </g>
+      <path d="M60 270V84h300v186" className="dessin-facade" />
+      <path d="M50 70h320v14H50z" className="dessin-bandeau" />
 
-      <rect x="92" y="104" width="52" height="46" />
-      <path d="M118 104v46M92 127h52M86 154h64" />
+      <path d="M92 104h52v46H92z" className="dessin-vitre" />
+      <path d="M118 104v46M92 127h52" />
+      <path d="M86 150h64v8H86z" className="dessin-bandeau" />
 
-      <path d="M96 270v-78h40v78" />
-      <circle cx="128" cy="234" r="2.6" />
-      <g className="illustration__leger">
-        <path d="M92 270v-6h48v6" />
-      </g>
+      <path d="M96 270v-78h40v78z" className="dessin-menuiserie" />
+      <circle cx="128" cy="234" r="2.8" className="dessin-lumiere" />
 
       {/* La lampe au-dessus de l'entrée du garage. */}
       <path d="M256 104v10" />
-      <path d="M246 114h20l-4 14h-12z" />
+      <path d="M246 114h20l-4 15h-12z" className="dessin-lumiere" />
 
       {/* Le garage ouvert : le seul creux de la façade, et tout est dedans. */}
-      <rect
-        x="190"
-        y="140"
-        width="146"
-        height="130"
-        className="illustration__creux"
-      />
-      <path d="M190 270V140h146v130" />
+      <path d="M190 270V140h146v130z" className="dessin-creux" />
+      <path d="M190 140h146v26H190z" className="dessin-bandeau" />
       <g className="illustration__leger">
-        <path d="M197 148h132M197 156h132M197 164h132" />
+        <path d="M197 147h132M197 153h132M197 159h132" />
       </g>
 
       <path d="M204 196h118" />
-      <rect x="212" y="172" width="30" height="24" />
-      <rect x="252" y="178" width="24" height="18" />
+      <path d="M212 172h30v24h-30z" className="dessin-bandeau" />
+      <path d="M252 178h24v18h-24z" className="dessin-terre" />
 
       <Velo moyeuArriere={[232, 240]} moyeuAvant={[300, 240]} rayon={24} />
 
       {/* La plante en pot, sur le seuil : personne ne range un vélo dans un
           lieu où il ne met jamais les pieds. */}
-      <path d="M162 270v-20h20v20z" />
+      <path d="M162 270v-20h20v20z" className="dessin-terre" />
       <path d="M172 250v-18" />
-      <path d="M172 240c-9 0-13-6-13-12 7 0 13 4 13 12ZM172 236c0-8 6-13 13-13 0 7-5 13-13 13Z" />
+      <path
+        d="M172 240c-9 0-13-6-13-12 7 0 13 4 13 12ZM172 236c0-8 6-13 13-13 0 7-5 13-13 13Z"
+        className="dessin-feuillage"
+      />
     </>
   );
 }
@@ -178,33 +197,31 @@ function LaRemise() {
 function VeloALAbri() {
   return (
     <>
+      <path d="M0 210h340v30H0z" className="dessin-sol" />
+
       {/* La pluie ne touche pas le toit : c'est tout ce que le dessin dit. */}
-      <g className="illustration__leger">
+      <g className="illustration__leger dessin-trait-pluie">
         <path d="M30 34 24 48M52 22 46 36M74 12 68 26M18 62 12 76M40 50 34 64M62 40 56 54" />
       </g>
 
-      <path d="M12 210h316" />
+      <path d="M56 118h228v92H56z" className="dessin-facade" />
+      <path d="M44 118 170 46l126 72z" className="dessin-bandeau" />
       <path d="M44 118 170 46l126 72" />
-      <path d="M56 118v92M284 118v92" />
+      <path d="M56 118v92M284 118v92M12 210h316" />
       {/* La cheminée descend jusqu'à la pente : le versant droit vaut
           y = 46 + 0,571 (x − 170), soit 82 en x=232 et 92 en x=250. Sans ce
           calcul, un des deux montants flotte au-dessus du toit. */}
-      <path d="M232 58v24M250 58v34M232 58h18" />
+      <path d="M232 58h18v34h-18z" className="dessin-terre" />
 
-      <rect
-        x="120"
-        y="132"
-        width="112"
-        height="78"
-        className="illustration__creux"
-      />
-      <path d="M120 210V132h112v78" />
+      <path d="M120 210V132h112v78z" className="dessin-creux" />
+      <path d="M120 132h112v22H120z" className="dessin-bandeau" />
       <g className="illustration__leger">
         <path d="M126 138h100M126 144h100M126 150h100" />
       </g>
 
-      <rect x="72" y="148" width="32" height="28" />
-      <path d="M88 148v28M72 162h32M68 180h40" />
+      <path d="M72 148h32v28H72z" className="dessin-vitre" />
+      <path d="M88 148v28M72 162h32" />
+      <path d="M68 176h40v6H68z" className="dessin-bandeau" />
 
       <Velo moyeuArriere={[152, 191]} moyeuAvant={[200, 191]} rayon={17} />
     </>
@@ -215,13 +232,19 @@ function VeloALAbri() {
 function LaCave() {
   return (
     <>
+      <path
+        d="M60 200v-70a110 110 0 0 1 220 0v70z"
+        className="dessin-creux"
+      />
+      <path d="M0 200h340v40H0z" className="dessin-sol" />
       <path d="M40 200h260" />
       <path d="M60 200v-70a110 110 0 0 1 220 0v70" />
 
+      <path d="M64 152h22v16h22v16h22v16h22v16H64z" className="dessin-facade" />
       <path d="M64 152h22v16h22v16h22v16h22" />
 
       <path d="M170 22v36" />
-      <circle cx="170" cy="66" r="8" />
+      <circle cx="170" cy="66" r="8" className="dessin-lumiere" />
       <g className="illustration__leger">
         <path d="M158 78 152 88M182 78l6 10M170 80v12" />
       </g>
@@ -235,31 +258,29 @@ function LaCave() {
 function LaRue() {
   return (
     <>
+      <path d="M0 210h340v30H0z" className="dessin-sol" />
       <path d="M10 210h320" />
 
-      <path d="M30 210V96h88v114M26 96h96" />
-      <rect x="46" y="118" width="24" height="26" />
-      <rect x="82" y="118" width="24" height="26" />
-      <rect x="60" y="168" width="32" height="42" />
+      <path d="M30 210V96h88v114z" className="dessin-facade" />
+      <path d="M26 90h96v10H26z" className="dessin-bandeau" />
+      <path d="M46 118h24v26H46zM82 118h24v26H82z" className="dessin-vitre" />
+      <path d="M60 168h32v42H60z" className="dessin-menuiserie" />
 
-      <path d="M126 210V70h96v140M122 70h104" />
-      <rect x="140" y="92" width="24" height="26" />
-      <rect x="184" y="92" width="24" height="26" />
+      <path d="M126 210V70h96v140z" className="dessin-facade" />
+      <path d="M122 64h104v10H122z" className="dessin-bandeau" />
+      <path d="M140 92h24v26h-24zM184 92h24v26h-24z" className="dessin-vitre" />
 
-      <rect
-        x="146"
-        y="148"
-        width="60"
-        height="62"
-        className="illustration__creux"
-      />
+      {/* La porte ouverte : le seul creux de la rue, et un vélo dedans. */}
+      <path d="M146 210v-62h60v62z" className="dessin-creux" />
       <path d="M146 210v-62h60v62" />
       <Velo moyeuArriere={[164, 196]} moyeuAvant={[190, 196]} rayon={12} />
 
-      <path d="M230 210V110h82v100M226 110h90" />
-      <rect x="244" y="132" width="24" height="26" />
-      <rect x="280" y="132" width="24" height="26" />
-      <rect x="256" y="176" width="32" height="34" />
+      <path d="M230 210V110h82v100z" className="dessin-facade" />
+      <path d="M226 104h90v10h-90z" className="dessin-bandeau" />
+      <path d="M244 132h24v26h-24zM280 132h24v26h-24z" className="dessin-vitre" />
+      <path d="M256 176h32v34h-32z" className="dessin-menuiserie" />
+
+      <Arbre x={324} sol={210} rayon={17} />
     </>
   );
 }
@@ -268,12 +289,14 @@ function LaRue() {
 function Confier() {
   return (
     <>
-      <path d="M20 124h160" />
-      <Velo moyeuArriere={[68, 100]} moyeuAvant={[132, 100]} rayon={22} />
-      <path d="M128 62v12" />
-      <path d="M118 74h22l-4 18h-14z" />
+      <path d="M0 124h200v16H0z" className="dessin-sol" />
+      <path d="M14 124h172" />
+      <Arbre x={176} sol={124} rayon={15} />
+      <Velo moyeuArriere={[62, 100]} moyeuAvant={[126, 100]} rayon={22} />
+      <path d="M122 62v12" />
+      <path d="M112 74h22l-4 18h-14z" className="dessin-lumiere" />
       <g className="illustration__leger">
-        <path d="M124 81h10M124 86h7" />
+        <path d="M118 81h10M118 86h7" />
       </g>
     </>
   );
@@ -283,19 +306,15 @@ function Confier() {
 function Garder() {
   return (
     <>
-      <path d="M14 124h172" />
+      <path d="M0 124h200v16H0z" className="dessin-sol" />
+      <path d="M44 50h112v74H44z" className="dessin-facade" />
+      <path d="M36 50 100 16l64 34z" className="dessin-bandeau" />
       <path d="M36 50 100 16l64 34" />
-      <path d="M44 50v74M156 50v74" />
-      <rect
-        x="60"
-        y="66"
-        width="80"
-        height="58"
-        className="illustration__creux"
-      />
-      <path d="M60 124V66h80v58" />
+      <path d="M44 50v74M156 50v74M14 124h172" />
+      <path d="M60 124V66h80v58z" className="dessin-creux" />
+      <path d="M60 66h80v14H60z" className="dessin-bandeau" />
       <g className="illustration__leger">
-        <path d="M65 71h70M65 77h70" />
+        <path d="M65 70h70M65 76h70" />
       </g>
       <Velo moyeuArriere={[80, 106]} moyeuAvant={[120, 106]} rayon={14} />
     </>
@@ -306,13 +325,13 @@ function Garder() {
 function Ensemble() {
   return (
     <>
+      <path d="M0 124h200v16H0z" className="dessin-sol" />
       <path d="M14 124h172" />
       <Velo moyeuArriere={[38, 104]} moyeuAvant={[62, 104]} rayon={11} />
       <Velo moyeuArriere={[88, 104]} moyeuAvant={[112, 104]} rayon={11} />
       <Velo moyeuArriere={[138, 104]} moyeuAvant={[162, 104]} rayon={11} />
-      <g className="illustration__leger">
-        <path d="M26 118h148" />
-      </g>
+      <path d="M22 112h4v12h-4zM174 112h4v12h-4z" className="dessin-menuiserie" />
+      <path d="M22 112h156" />
     </>
   );
 }
@@ -335,7 +354,6 @@ export default function Illustration({ scene }: { scene: Scene }) {
       className="illustration"
       viewBox={CADRAGES[scene]}
       fill="none"
-      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

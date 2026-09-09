@@ -38,8 +38,14 @@ proposer un emplacement est une action, jamais un statut à demander.
    réponse de l'API. Avant, une zone approximative.
 5. **Le vélo ne change d'état qu'avec un code.** Celui qui remet le vélo détient le
    code, celui qui le reçoit le saisit. Trois essais, puis régénération.
-6. **Une couleur, un sens.** Bleu = action. Vert = vérifié. Ambre = vélo actuellement
-   gardé. Rouge = refus ou erreur. Aucune couleur décorative.
+6. **Une couleur, un sens.** Vert = action (c'est aussi la marque). Bleu = vérifié.
+   Ambre = vélo actuellement gardé. Rouge = refus ou erreur. Aucune couleur
+   décorative dans l'interface.
+   *Le vert et le bleu ont échangé leurs rôles : une marque dont on ne clique
+   jamais la couleur ne sert à rien. Le principe n'a pas bougé.*
+   *Une seule exception, tenue à part : les illustrations ont leur propre
+   palette (`--dessin-*`), qui ne sort jamais de `.illustration`. Un dessin ne
+   porte aucune information, il ne peut donc pas se tromper de sens.*
 
 ## Ce qui a été écarté, et pourquoi
 

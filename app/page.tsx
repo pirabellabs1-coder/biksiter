@@ -249,7 +249,7 @@ const FACONS = [
 
 function TroisFacons() {
   return (
-    <section className="section section--claire">
+    <section className="section section--marque">
       <div className="section__interieur">
         <div className="entete-de-section entete-de-section--centree apparait">
           <p className="surtitre">Un réseau, pas une place de marché</p>
