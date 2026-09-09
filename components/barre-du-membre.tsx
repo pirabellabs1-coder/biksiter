@@ -15,7 +15,7 @@ export default function BarreDuMembre({
   page,
 }: {
   membre: MembreConnecte;
-  page: 'compte' | 'emplacements' | 'stationnements';
+  page: 'compte' | 'profil' | 'emplacements' | 'stationnements' | 'catalogue';
 }) {
   return (
     <div className="barre-membre">
@@ -55,6 +55,18 @@ export default function BarreDuMembre({
           aria-current={page === 'stationnements' ? 'page' : undefined}
         >
           Mes stationnements
+        </Link>
+        <Link
+          href="/profil"
+          aria-current={page === 'profil' ? 'page' : undefined}
+        >
+          Mon profil
+        </Link>
+        <Link
+          href="/catalogue"
+          aria-current={page === 'catalogue' ? 'page' : undefined}
+        >
+          Catalogue
         </Link>
         {membre.moderateur ? <Link href="/moderation">Modération</Link> : null}
       </nav>

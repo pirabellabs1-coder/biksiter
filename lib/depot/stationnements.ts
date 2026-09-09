@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
+import { crediterLaGarde } from '@/lib/depot/maillons';
 import { mettreEnFile } from '@/lib/envois/file';
 import {
   demandeAcceptee,
@@ -424,6 +425,14 @@ export async function saisirLeCodeDeRemise(
           where id = $1`,
         [stationnementId, nouvelEtat],
       );
+
+      // Le vélo est reparti : c'est le moment où la garde se remercie. Dans la
+      // même transaction, pour qu'un maillon n'existe jamais sans la garde qui
+      // l'a mérité.
+      if (nouvelEtat === 'termine') {
+        await crediterLaGarde(client, stationnementId);
+      }
+
       return { accepte: true, nouvelEtat };
     }
 

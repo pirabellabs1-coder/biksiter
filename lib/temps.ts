@@ -82,3 +82,15 @@ export function enFrancais(instant: Date): string {
 export function creneauEnFrancais(debut: Date, fin: Date): string {
   return `${JOUR_ET_HEURE.format(debut)} → ${HEURE_SEULE.format(fin)}`;
 }
+
+const JOUR_SEUL = new Intl.DateTimeFormat('fr-BE', {
+  timeZone: FUSEAU,
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+/** « 8 septembre 2026 » — pour dater une garde sans l'heure. */
+export function enJour(instant: Date): string {
+  return JOUR_SEUL.format(instant);
+}

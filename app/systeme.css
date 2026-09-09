@@ -1430,3 +1430,132 @@ legend {
   margin-bottom: 0;
   white-space: pre-wrap;
 }
+
+/* --- Profil : compteurs et registre ------------------------------------------ */
+/* Les compteurs sont neutres, pas verts. Le vert dit « vérifié » (règle 6) et
+   un nombre de gardes n'est pas une vérification. Aucun de ces blocs ne se
+   compare à celui de quelqu'un d'autre : ce sont des compteurs, pas des rangs. */
+
+.row-identite {
+  display: flex;
+  align-items: center;
+  gap: var(--e3);
+  margin-bottom: var(--e3);
+}
+
+.row-identite p {
+  margin: 0;
+}
+
+.pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2);
+}
+
+.compteur {
+  margin-bottom: var(--e3);
+}
+
+.compteur__valeur {
+  font-family: var(--titres);
+  font-size: var(--t-grand);
+  line-height: 1.2;
+  margin: 0 0 var(--e1);
+  font-variant-numeric: tabular-nums;
+}
+
+.registre {
+  list-style: none;
+  margin: var(--e4) 0 0;
+  padding: var(--e3) 0 0;
+  border-top: 1px solid var(--craie);
+}
+
+.registre li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e4);
+  padding: var(--e1) 0;
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+}
+
+.registre li strong {
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+
+.registre__attente {
+  margin: var(--e3) 0 0;
+}
+
+/* --- Catalogue ---------------------------------------------------------------- */
+
+.offres {
+  list-style: none;
+  margin: 0 0 var(--e5);
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.offre {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+  flex-wrap: wrap;
+}
+
+.offre__corps {
+  flex: 1;
+  min-width: 220px;
+}
+
+.offre__corps p {
+  margin: 0 0 var(--e1);
+}
+
+/* Le coût est une information, pas une action : il n'est donc pas bleu. */
+.offre__cout {
+  font-family: var(--titres);
+  font-size: var(--t-moyen);
+  margin: var(--e2) 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.bons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--e3);
+}
+
+.bon {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+  flex-wrap: wrap;
+}
+
+.bon > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.bon p {
+  margin: 0;
+}
+
+/* Le code se lit à voix haute au comptoir : chiffres de largeur fixe. */
+.bon__code {
+  font-family: var(--titres);
+  font-size: var(--t-moyen);
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  background: var(--papier);
+  border: 1px solid var(--craie-forte);
+  border-radius: var(--rayon);
+  padding: var(--e2) var(--e3);
+}
