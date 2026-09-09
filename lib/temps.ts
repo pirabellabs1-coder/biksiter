@@ -94,3 +94,21 @@ const JOUR_SEUL = new Intl.DateTimeFormat('fr-BE', {
 export function enJour(instant: Date): string {
   return JOUR_SEUL.format(instant);
 }
+
+const JOUR_ISO = new Intl.DateTimeFormat('en-CA', {
+  timeZone: FUSEAU,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/**
+ * « 2026-09-09 » — le jour à Bruxelles, dans la forme qu'attend un champ date.
+ *
+ * Sert à proposer aujourd'hui par défaut dans la recherche. Un serveur en UTC
+ * est déjà demain à 23h00 heure de Bruxelles : sans cette conversion, le
+ * formulaire proposerait la veille pendant deux heures chaque soir.
+ */
+export function jourABruxelles(instant: Date = new Date()): string {
+  return JOUR_ISO.format(instant);
+}

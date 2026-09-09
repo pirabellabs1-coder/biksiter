@@ -4,6 +4,7 @@ import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
 import {
   affluenceMaximale,
   capaciteSuffisante,
+  MARGE_ENTRE_STATIONNEMENTS_MINUTES,
   type Creneau,
 } from '@/lib/regles/capacite';
 import { decisionDeRetrait } from '@/lib/regles/emplacements';
@@ -64,23 +65,60 @@ const COLONNES_VISIBLES = `
   longitude_de_zone::double precision   as longitude
 `;
 
+/**
+ * Ce qui reste libre sur un créneau, écrit en SQL.
+ *
+ * La règle est la même que `laPlaceEstLibre` : un emplacement est plein quand
+ * le nombre de stationnements qui se chevauchent atteint sa capacité, et deux
+ * stationnements se chevauchent dès qu'il y a moins de trente minutes entre
+ * eux. Elle est écrite deux fois — ici et dans `lib/regles/capacite.ts` — pour
+ * la même raison que les autres : une règle qui ne vit que dans le code
+ * applicatif tombe dès qu'un second chemin d'écriture apparaît.
+ */
+const PLACE_RESTANTE = `
+  (select count(*)
+     from stationnement s
+     join emplacement e on e.id = s.emplacement_id
+    where e.reference = emplacement_visible.reference
+      and s.etat in ('accepte', 'en_cours')
+      and s.debut < $3::timestamptz + make_interval(mins => $4::int)
+      and s.fin   > $2::timestamptz - make_interval(mins => $4::int)
+  ) < emplacement_visible.capacite
+`;
+
+/**
+ * Le quartier est toujours passé en paramètre, même vide.
+ *
+ * Coudre le filtre dans le texte de la requête selon qu'il y a une recherche
+ * ou non laissait `$1` sans emploi, et PostgreSQL refuse d'en deviner le type.
+ * Une chaîne vide qui veut dire « tous les quartiers » se lit aussi bien et ne
+ * fabrique qu'une seule requête.
+ */
+const FILTRE_DU_QUARTIER = `($1::text = '' or quartier ilike '%' || $1::text || '%')`;
+
 export async function emplacementsPublies(
   quartier?: string,
+  creneau?: Creneau,
 ): Promise<FicheDEmplacement[]> {
-  if (quartier && quartier.trim() !== '') {
+  const recherche = quartier?.trim() ?? '';
+
+  if (!creneau) {
     return interroger<FicheDEmplacement>(
       `select ${COLONNES_VISIBLES}
          from emplacement_visible
-        where quartier ilike '%' || $1 || '%'
+        where ${FILTRE_DU_QUARTIER}
         order by quartier, "prenomDuBikeSitter"`,
-      [quartier.trim()],
+      [recherche],
     );
   }
 
   return interroger<FicheDEmplacement>(
     `select ${COLONNES_VISIBLES}
        from emplacement_visible
+      where ${FILTRE_DU_QUARTIER}
+        and ${PLACE_RESTANTE}
       order by quartier, "prenomDuBikeSitter"`,
+    [recherche, creneau.debut, creneau.fin, MARGE_ENTRE_STATIONNEMENTS_MINUTES],
   );
 }
 

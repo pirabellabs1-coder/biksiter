@@ -227,6 +227,46 @@ identité pour en accepter un serait une façon de classer les gens.
 
 **Aucune donnée bancaire ne passe par ce site, et il ne faut pas en ajouter.**
 
+## Le système de design
+
+Il tient toujours dans `app/systeme.css`. Les primitives écrites pour la page
+d'accueil sont volontairement génériques, parce qu'elles serviront aussi aux
+tableaux de bord :
+
+| Classe | Ce qu'elle fait |
+|---|---|
+| `.section` / `.section--claire` | Une bande pleine largeur. Le rythme vertical vient de l'alternance des deux fonds, jamais d'une teinte. |
+| `.section__interieur` | Recentre le contenu sur `--largeur-page`. |
+| `.entete-de-section` | Surtitre, titre, chapeau. Variante `--centree`. |
+| `.parcours` | Une suite d'étapes numérotées reliées par un trait. |
+| `.garanties` / `.garantie` | Une liste de points avec pictogramme. |
+| `.carte--illustree` / `.carte--profil` | Les deux formes de carte de la page. |
+| `.apparait` | L'apparition au défilement. |
+
+**Le mouvement n'utilise pas de JavaScript.** Il est porté par
+`animation-timeline: view()` et `scroll()`, sous un double garde-fou :
+`@media (prefers-reduced-motion: no-preference)` et `@supports`. Là où le
+navigateur ne sait pas faire, le contenu est simplement là — et comme
+`opacity: 0` ne vit que dans l'image-clé et jamais dans la règle de base,
+aucun contenu ne peut rester invisible si l'animation ne se déclenche pas.
+
+C'est aussi ce qui évite d'avoir à autoriser un script de plus dans la
+Content-Security-Policy.
+
+## La recherche par créneau
+
+La barre de recherche de l'accueil envoie une destination, un jour et deux
+heures à `/emplacements`, qui filtre pour de vrai : un emplacement dont les
+stationnements acceptés atteignent la capacité sur le créneau demandé n'est pas
+affiché, marge de trente minutes comprise.
+
+La règle est donc écrite deux fois, comme les autres : `laPlaceEstLibre` dans
+`lib/regles/capacite.ts`, et la même chose en SQL dans `emplacementsPublies`.
+
+Deux listes vides différentes en découlent, et elles ne disent pas la même
+chose : « ce quartier n'est pas encore ouvert » envoie sur la liste d'attente,
+« rien de libre sur ce créneau » propose de changer d'heure.
+
 ## Les chiffres affichés
 
 Aucun chiffre du site n’est saisi à la main. `lib/depot/chiffres.ts` les compte

@@ -15,11 +15,34 @@
  * une vérification, ni un vélo gardé. Les seules variations sont des valeurs,
  * jamais des teintes.
  *
+ * On n'y dessine personne. Ce n'est pas de la pudeur : un personnage au trait
+ * a forcément un âge, une carrure, une silhouette, et le réseau s'adresse à
+ * tout le monde. Les lieux et les vélos disent la même chose sans que
+ * quiconque ait à se reconnaître ou non dedans.
+ *
  * Elles sont décoratives : `aria-hidden`, et jamais porteuses d'une
  * information qui ne serait pas déjà écrite à côté.
  */
 
-export type Scene = 'velo-a-labri' | 'la-cave' | 'la-rue';
+export type Scene =
+  | 'la-remise'
+  | 'velo-a-labri'
+  | 'la-cave'
+  | 'la-rue'
+  | 'confier'
+  | 'garder'
+  | 'ensemble';
+
+/** Le cadrage propre à chaque scène : un dessin large ne tient pas au carré. */
+const CADRAGES: Record<Scene, string> = {
+  'la-remise': '0 0 420 300',
+  'velo-a-labri': '0 0 340 240',
+  'la-cave': '0 0 340 240',
+  'la-rue': '0 0 340 240',
+  confier: '0 0 200 140',
+  garder: '0 0 200 140',
+  ensemble: '0 0 200 140',
+};
 
 /**
  * Deux décimales suffisent à un dessin, et évitent qu'un `0.29` produise un
@@ -79,6 +102,78 @@ function Velo({
   );
 }
 
+/**
+ * La grande scène du haut de page : une maison de rangée, garage ouvert.
+ *
+ * C'est le seul dessin qui a le droit d'être détaillé. Il porte à lui seul ce
+ * que fait le service — une porte ouverte chez quelqu'un — et il est vu en
+ * grand, donc chaque approximation s'y verrait.
+ */
+function LaRemise() {
+  return (
+    <>
+      <path d="M8 270h404" />
+      <g className="illustration__leger">
+        <path d="M30 270v8M120 270v8M210 270v8M300 270v8M390 270v8" />
+      </g>
+
+      {/* L'arbre de rue. Sa couronne reste vide : deux branches dessinées
+          dedans faisaient un cercle coché, et un cercle coché veut dire
+          « vérifié » partout ailleurs sur ce site (règle 6). */}
+      <circle cx="32" cy="192" r="28" />
+      <path d="M32 220v50" />
+      <g className="illustration__leger">
+        <circle cx="32" cy="192" r="18" />
+      </g>
+
+      {/* La façade : plate et haute, comme une maison de rangée. */}
+      <path d="M60 270V78h300v192" />
+      <path d="M50 78h320" />
+      <g className="illustration__leger">
+        <path d="M54 88h312" />
+      </g>
+
+      <rect x="92" y="104" width="52" height="46" />
+      <path d="M118 104v46M92 127h52M86 154h64" />
+
+      <path d="M96 270v-78h40v78" />
+      <circle cx="128" cy="234" r="2.6" />
+      <g className="illustration__leger">
+        <path d="M92 270v-6h48v6" />
+      </g>
+
+      {/* La lampe au-dessus de l'entrée du garage. */}
+      <path d="M256 104v10" />
+      <path d="M246 114h20l-4 14h-12z" />
+
+      {/* Le garage ouvert : le seul creux de la façade, et tout est dedans. */}
+      <rect
+        x="190"
+        y="140"
+        width="146"
+        height="130"
+        className="illustration__creux"
+      />
+      <path d="M190 270V140h146v130" />
+      <g className="illustration__leger">
+        <path d="M197 148h132M197 156h132M197 164h132" />
+      </g>
+
+      <path d="M204 196h118" />
+      <rect x="212" y="172" width="30" height="24" />
+      <rect x="252" y="178" width="24" height="18" />
+
+      <Velo moyeuArriere={[232, 240]} moyeuAvant={[300, 240]} rayon={24} />
+
+      {/* La plante en pot, sur le seuil : personne ne range un vélo dans un
+          lieu où il ne met jamais les pieds. */}
+      <path d="M162 270v-20h20v20z" />
+      <path d="M172 250v-18" />
+      <path d="M172 240c-9 0-13-6-13-12 7 0 13 4 13 12ZM172 236c0-8 6-13 13-13 0 7-5 13-13 13Z" />
+    </>
+  );
+}
+
 /** La maison, le garage ouvert, et la pluie qui tombe à côté. */
 function VeloALAbri() {
   return (
@@ -96,7 +191,6 @@ function VeloALAbri() {
           calcul, un des deux montants flotte au-dessus du toit. */}
       <path d="M232 58v24M250 58v34M232 58h18" />
 
-      {/* Le creux du garage : une valeur plus sombre, pas une couleur. */}
       <rect
         x="120"
         y="132"
@@ -152,7 +246,6 @@ function LaRue() {
       <rect x="140" y="92" width="24" height="26" />
       <rect x="184" y="92" width="24" height="26" />
 
-      {/* La porte ouverte : le seul creux de la rue, et un vélo dedans. */}
       <rect
         x="146"
         y="148"
@@ -171,10 +264,67 @@ function LaRue() {
   );
 }
 
+/** Confier : un vélo, et l'étiquette qu'on lui accroche le temps d'une garde. */
+function Confier() {
+  return (
+    <>
+      <path d="M20 124h160" />
+      <Velo moyeuArriere={[68, 100]} moyeuAvant={[132, 100]} rayon={22} />
+      <path d="M128 62v12" />
+      <path d="M118 74h22l-4 18h-14z" />
+      <g className="illustration__leger">
+        <path d="M124 81h10M124 86h7" />
+      </g>
+    </>
+  );
+}
+
+/** Garder : sa propre porte, ouverte pour le vélo de quelqu'un d'autre. */
+function Garder() {
+  return (
+    <>
+      <path d="M14 124h172" />
+      <path d="M36 50 100 16l64 34" />
+      <path d="M44 50v74M156 50v74" />
+      <rect
+        x="60"
+        y="66"
+        width="80"
+        height="58"
+        className="illustration__creux"
+      />
+      <path d="M60 124V66h80v58" />
+      <g className="illustration__leger">
+        <path d="M65 71h70M65 77h70" />
+      </g>
+      <Velo moyeuArriere={[80, 106]} moyeuAvant={[120, 106]} rayon={14} />
+    </>
+  );
+}
+
+/** Ensemble : plusieurs vélos rangés côte à côte, donc plusieurs personnes. */
+function Ensemble() {
+  return (
+    <>
+      <path d="M14 124h172" />
+      <Velo moyeuArriere={[38, 104]} moyeuAvant={[62, 104]} rayon={11} />
+      <Velo moyeuArriere={[88, 104]} moyeuAvant={[112, 104]} rayon={11} />
+      <Velo moyeuArriere={[138, 104]} moyeuAvant={[162, 104]} rayon={11} />
+      <g className="illustration__leger">
+        <path d="M26 118h148" />
+      </g>
+    </>
+  );
+}
+
 const SCENES: Record<Scene, () => React.ReactElement> = {
+  'la-remise': LaRemise,
   'velo-a-labri': VeloALAbri,
   'la-cave': LaCave,
   'la-rue': LaRue,
+  confier: Confier,
+  garder: Garder,
+  ensemble: Ensemble,
 };
 
 export default function Illustration({ scene }: { scene: Scene }) {
@@ -183,7 +333,7 @@ export default function Illustration({ scene }: { scene: Scene }) {
   return (
     <svg
       className="illustration"
-      viewBox="0 0 340 240"
+      viewBox={CADRAGES[scene]}
       fill="none"
       stroke="currentColor"
       strokeWidth="2"

@@ -465,6 +465,18 @@ svg {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.grille--trois {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Une grille de cartes est une liste : on lui retire ses puces sans lui
+   retirer sa sémantique. */
+.cartes-nues {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .carte {
   background: var(--surface);
   border: 1px solid var(--craie);
@@ -1189,32 +1201,6 @@ legend {
 
 /* --- Accueil ---------------------------------------------------------------- */
 
-.accroche {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: var(--e7);
-  align-items: center;
-  max-width: var(--largeur-page);
-  margin: 0 auto;
-  padding: var(--e8) var(--e6);
-}
-
-.bandeau-chiffres {
-  background: var(--surface);
-  border-top: 1px solid var(--craie);
-  border-bottom: 1px solid var(--craie);
-  padding: var(--e6);
-}
-
-.bandeau-chiffres .chiffres {
-  max-width: var(--largeur-page);
-  margin: 0 auto;
-  border: 0;
-  padding: 0;
-  background: none;
-  box-shadow: none;
-}
-
 .resultats {
   margin-top: var(--e6);
 }
@@ -1293,14 +1279,9 @@ legend {
     grid-template-columns: 1fr 1fr;
   }
 
-  .accroche,
   .deux-colonnes {
     grid-template-columns: 1fr;
     gap: var(--e6);
-  }
-
-  .accroche {
-    padding: var(--e6) var(--e5);
   }
 
   .page {
@@ -1801,50 +1782,6 @@ legend {
   }
 }
 
-/* --- Accueil : accroche, alternance, jetons ---------------------------------- */
-
-/* Le titre de l'accueil est une phrase, point final compris. Une phrase se lit
-   d'un trait : ligne courte, coupures réparties, interlignage resserré. */
-.titre-page--phrase {
-  max-width: 20ch;
-  text-wrap: balance;
-  line-height: 1.08;
-}
-
-/* La recherche est l'action de l'écran ; les deux chemins qui la suivent sont
-   des liens et non des boutons, pour ne pas lui disputer le regard. */
-.accroche .recherche {
-  margin-bottom: var(--e4);
-}
-
-.accroche__chemins {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--e2) var(--e5);
-  font-size: var(--t-petit);
-  margin: 0 0 var(--e5);
-}
-
-/* --- Rangs alternés --------------------------------------------------------- */
-
-.alternance__rang {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--e7);
-  align-items: center;
-}
-
-.alternance__rang + .alternance__rang {
-  margin-top: var(--e8);
-}
-
-/* Le second rang inverse les colonnes à l'écran, jamais dans le document : le
-   texte reste lu en premier au clavier et au lecteur d'écran. */
-.alternance__rang:nth-child(even) > :first-child {
-  order: 2;
-}
-
 /* --- Listes de jetons et de points ------------------------------------------ */
 
 .jetons {
@@ -1918,23 +1855,6 @@ legend {
    distingue du numéro d'entreprise qui la précède. */
 .pied__mentions a {
   text-decoration: underline;
-}
-
-@media (max-width: 900px) {
-  .alternance__rang {
-    grid-template-columns: 1fr;
-    gap: var(--e5);
-  }
-
-  /* En une colonne, l'inversion n'a plus de sens : elle ferait passer
-     l'illustration avant le texte qu'elle illustre. */
-  .alternance__rang:nth-child(even) > :first-child {
-    order: 0;
-  }
-
-  .titre-page--phrase {
-    max-width: none;
-  }
 }
 
 /* --- Illustrations ---------------------------------------------------------- */
@@ -2047,4 +1967,582 @@ legend {
    pas son compteur. */
 .quartiers a:hover .discret {
   color: var(--ardoise);
+}
+
+/* =============================================================================
+   La page d'accueil.
+
+   Ces primitives ne lui appartiennent pas en propre : elles sont écrites pour
+   servir aussi aux tableaux de bord. D'où les noms génériques — `.section`,
+   `.entete-de-section`, `.parcours`, `.garanties` — et le fait qu'aucune ne
+   suppose un contenu particulier.
+
+   Le rythme vertical est porté par l'alternance de deux fonds, `--surface` et
+   `--papier`. Pas de teinte : une bande colorée voudrait dire quelque chose
+   (règle 6), et une section n'est ni une action, ni une vérification.
+   ========================================================================== */
+
+.section {
+  padding: var(--e8) var(--e6);
+  background: var(--papier);
+}
+
+.section--claire {
+  background: var(--surface);
+  border-top: 1px solid var(--craie);
+  border-bottom: 1px solid var(--craie);
+}
+
+/* Deux sections claires qui se suivent ne doivent pas doubler le trait. */
+.section--claire + .section--claire {
+  border-top: 0;
+}
+
+.section__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+}
+
+.section__interieur--etroit {
+  max-width: 860px;
+}
+
+/* --- L'en-tête d'une section ------------------------------------------------ */
+
+.entete-de-section {
+  max-width: 62ch;
+  margin-bottom: var(--e7);
+}
+
+.entete-de-section--centree {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.entete-de-section .chapeau {
+  margin-bottom: 0;
+}
+
+.entete-de-section--centree .chapeau {
+  margin-inline: auto;
+}
+
+.entete-de-section .titre-section {
+  margin-bottom: var(--e3);
+}
+
+/* Un titre de section a le droit de respirer plus qu'un titre courant : c'est
+   ce qui distingue une page d'accueil d'un formulaire. */
+.titre-section--large {
+  font-size: clamp(1.65rem, 1.2rem + 1.9vw, 2.5rem);
+  line-height: 1.12;
+  max-width: 22ch;
+}
+
+.entete-de-section--centree .titre-section--large {
+  margin-inline: auto;
+}
+
+/* --- 1. L'accroche ---------------------------------------------------------- */
+
+.accroche {
+  padding: var(--e8) var(--e6) calc(var(--e8) + var(--e7));
+  /* Un dégradé de gris, pas de couleur : il pose une profondeur derrière le
+     titre sans rien signifier. */
+  background:
+    radial-gradient(120% 90% at 78% 8%, var(--surface) 0%, transparent 62%),
+    linear-gradient(var(--surface), var(--papier));
+}
+
+.accroche__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: var(--e7);
+  align-items: center;
+}
+
+/* La scène n'est pas encadrée : un cadre au milieu d'une accroche referme ce
+   que l'accroche essaie d'ouvrir. Elle se pose sur le fond, simplement. */
+.accroche__scene {
+  color: var(--ardoise);
+}
+
+/* Le titre de l'accueil est une phrase, point final compris. Une phrase se lit
+   d'un trait : ligne courte, coupures réparties, interlignage resserré. */
+.titre-page--phrase {
+  max-width: 15ch;
+  text-wrap: balance;
+  line-height: 1.06;
+}
+
+.accroche .chapeau {
+  max-width: 54ch;
+}
+
+.accroche .boutons {
+  margin-top: var(--e5);
+}
+
+/* --- Les trois gages -------------------------------------------------------- */
+
+.gages {
+  list-style: none;
+  margin: var(--e6) 0 0;
+  padding: var(--e5) 0 0;
+  border-top: 1px solid var(--craie);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e3) var(--e5);
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+}
+
+.gages li {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+}
+
+.gages svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--ardoise);
+}
+
+/* --- 2. La recherche mise en avant ------------------------------------------ */
+/* Elle chevauche le bas de l'accroche : c'est ce qui la désigne comme l'action
+   de l'écran sans avoir à la peindre d'une couleur de plus. */
+
+.recherche-vedette {
+  padding: 0 var(--e6);
+  margin-top: calc(var(--e7) * -1);
+  position: relative;
+  z-index: 1;
+}
+
+.recherche-vedette__carte {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  box-shadow: var(--ombre-levee);
+  padding: var(--e6);
+}
+
+.recherche-vedette__entete {
+  margin-bottom: var(--e5);
+}
+
+.recherche-vedette__entete .titre-section {
+  margin-bottom: var(--e1);
+}
+
+.recherche-vedette__entete p {
+  margin: 0;
+  max-width: 68ch;
+}
+
+.recherche-detaillee {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 0.8fr 0.8fr auto;
+  gap: var(--e3);
+  align-items: end;
+}
+
+/* Un champ dont l'étiquette est posée au-dessus, serrée : dans une barre de
+   recherche, la ligne compte plus que l'aération. */
+.champ-en-ligne label {
+  display: block;
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+  margin-bottom: var(--e1);
+}
+
+.champ-en-ligne input {
+  min-height: 48px;
+}
+
+.recherche-detaillee .bouton {
+  min-height: 48px;
+  padding-inline: var(--e6);
+}
+
+/* --- 3. Le bandeau de chiffres ---------------------------------------------- */
+
+.bandeau-chiffres {
+  padding: var(--e6);
+  background: var(--surface);
+  border-bottom: 1px solid var(--craie);
+}
+
+.bandeau-chiffres__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+}
+
+/* Les chiffres du bandeau sont posés sur une grille plutôt qu'espacés aux
+   extrémités : à trois, l'espacement aux extrémités les éloigne au point
+   qu'on ne les lit plus comme un ensemble. */
+.bandeau-chiffres .chiffres {
+  border: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--e6);
+}
+
+/* --- 5. Le parcours en quatre étapes ---------------------------------------- */
+
+.parcours {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--e6);
+}
+
+.parcours__etape {
+  position: relative;
+}
+
+/* Le trait qui relie les étapes dit « ensuite », pas « mieux ». Il s'arrête
+   avant la dernière, qui n'a pas de suite. */
+.parcours__etape:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: calc(56px + var(--e3));
+  right: calc((var(--e6) + var(--e3)) * -1);
+  height: 1px;
+  background: var(--craie);
+}
+
+.parcours__marque {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--e4);
+}
+
+.parcours__jeton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  color: var(--ardoise);
+}
+
+.parcours__jeton svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Le numéro est bleu parce qu'il ordonne un chemin qu'on va parcourir : c'est
+   la seule chose de cette section sur laquelle on agit. */
+.parcours__numero {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--action-voile);
+  color: var(--action-appuyee);
+  font-family: var(--titres);
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parcours h3 {
+  font-size: var(--t-moyen);
+  margin-bottom: var(--e2);
+}
+
+.parcours p {
+  margin: 0;
+}
+
+/* --- 6. Les cartes de profil ------------------------------------------------ */
+
+.carte--profil {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e4);
+}
+
+.carte__tete {
+  display: flex;
+  align-items: center;
+  gap: var(--e3);
+}
+
+.carte__tete h4 {
+  font-family: var(--titres);
+  font-weight: 500;
+  font-size: var(--t-moyen);
+  margin: 0 0 var(--e1);
+}
+
+.carte__tete .pastille {
+  margin: 0;
+}
+
+.details--serres > div {
+  padding: var(--e2) 0;
+  font-size: var(--t-menu);
+}
+
+.carte--profil .bouton {
+  margin-top: auto;
+}
+
+.deux-colonnes--figure {
+  align-items: start;
+  margin-bottom: var(--e8);
+}
+
+/* --- 7. Les garanties ------------------------------------------------------- */
+
+.deux-colonnes--collante {
+  align-items: start;
+}
+
+.garanties {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--e4);
+}
+
+.garantie {
+  display: flex;
+  gap: var(--e4);
+  background: var(--surface);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon-large);
+  padding: var(--e5);
+  box-shadow: var(--ombre-posee);
+}
+
+.garantie__jeton {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--rayon);
+  background: var(--papier);
+  border: 1px solid var(--craie);
+  color: var(--ardoise);
+}
+
+.garantie__jeton svg {
+  width: 22px;
+  height: 22px;
+}
+
+.garantie h3 {
+  font-size: var(--t-moyen);
+  margin-bottom: var(--e1);
+}
+
+.garantie p {
+  margin: 0;
+}
+
+/* --- 9 et 10. Jetons centrés, et l'appel de fin ----------------------------- */
+
+.jetons--centres {
+  justify-content: center;
+}
+
+.boutons--centres {
+  justify-content: center;
+  margin-top: var(--e7);
+}
+
+.appel {
+  padding: var(--e8) var(--e6);
+  text-align: center;
+  background:
+    radial-gradient(90% 120% at 50% 100%, var(--surface) 0%, transparent 68%),
+    linear-gradient(var(--papier), var(--surface));
+  border-top: 1px solid var(--craie);
+}
+
+.appel__interieur {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.appel .titre-page--phrase,
+.appel .chapeau {
+  max-width: none;
+  margin-inline: auto;
+}
+
+.appel .boutons {
+  margin-top: var(--e6);
+}
+
+.appel__note {
+  margin: var(--e6) 0 0;
+  font-size: var(--t-menu);
+}
+
+/* --- Le mouvement ------------------------------------------------------------ */
+/* Piloté par le défilement lui-même, sans une ligne de JavaScript : pas de
+   script à autoriser dans la Content-Security-Policy, pas d'observateur qui
+   tourne pendant qu'on lit, et rien à télécharger. Là où le navigateur ne sait
+   pas le faire, le contenu est simplement là — ce qui est le bon repli. */
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes entete-posee {
+  to {
+    box-shadow: var(--ombre-levee);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .apparait {
+      animation: apparition linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 38%;
+    }
+
+    /* Dans une grille, les cartes n'arrivent pas ensemble : chacune entre un
+       peu plus tard que la précédente, mesuré en défilement et non en
+       secondes, pour que le mouvement suive la main. */
+    .grille > .apparait:nth-child(2),
+    .garanties > .apparait:nth-child(2),
+    .parcours > .apparait:nth-child(2) {
+      animation-range: entry 6% entry 44%;
+    }
+
+    .grille > .apparait:nth-child(3),
+    .garanties > .apparait:nth-child(3),
+    .parcours > .apparait:nth-child(3) {
+      animation-range: entry 12% entry 50%;
+    }
+
+    .grille > .apparait:nth-child(4),
+    .garanties > .apparait:nth-child(4),
+    .parcours > .apparait:nth-child(4) {
+      animation-range: entry 18% entry 56%;
+    }
+  }
+
+  /* L'en-tête se décolle quand la page défile sous elle. Même mécanique, même
+     absence de script. */
+  @supports (animation-timeline: scroll()) {
+    .entete {
+      animation: entete-posee linear both;
+      animation-timeline: scroll();
+      animation-range: 0 90px;
+    }
+  }
+}
+
+/* --- Adaptations de l'accueil ----------------------------------------------- */
+
+@media (max-width: 1040px) {
+  .recherche-detaillee {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .champ-en-ligne--large,
+  .recherche-detaillee .bouton {
+    grid-column: 1 / -1;
+  }
+
+  .parcours {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e6) var(--e5);
+  }
+
+  /* Sur deux rangs, le trait de liaison ne relierait plus rien de vrai. */
+  .parcours__etape::after {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .accroche__interieur {
+    grid-template-columns: 1fr;
+    gap: var(--e6);
+  }
+
+  .accroche {
+    padding: var(--e7) var(--e5) calc(var(--e7) * 2);
+  }
+
+  .titre-page--phrase {
+    max-width: none;
+  }
+
+  .section,
+  .appel {
+    padding: var(--e7) var(--e5);
+  }
+
+  .recherche-vedette {
+    padding-inline: var(--e5);
+  }
+
+  .grille--trois {
+    grid-template-columns: 1fr;
+  }
+
+  .entete-de-section {
+    margin-bottom: var(--e6);
+  }
+
+  .deux-colonnes--figure {
+    margin-bottom: var(--e7);
+  }
+}
+
+@media (max-width: 620px) {
+  .parcours,
+  .recherche-detaillee {
+    grid-template-columns: 1fr;
+  }
+
+  /* Deux boutons empilés de largeurs différentes font un escalier. Sur une
+     colonne, ils prennent la même. */
+  .accroche .boutons .bouton,
+  .appel .boutons .bouton {
+    flex: 1 1 100%;
+  }
+
+  .recherche-vedette__carte {
+    padding: var(--e5);
+  }
+
+  .garantie {
+    padding: var(--e4);
+  }
 }

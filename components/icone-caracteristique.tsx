@@ -12,7 +12,13 @@ export type Pictogramme =
   | 'ancrage'
   | 'acces'
   | 'capacite'
-  | 'prive';
+  | 'prive'
+  | 'compte'
+  | 'carte'
+  | 'message'
+  | 'code'
+  | 'identite'
+  | 'journal';
 
 const TRACES: Record<Pictogramme, React.ReactNode> = {
   fermeture: (
@@ -51,6 +57,48 @@ const TRACES: Record<Pictogramme, React.ReactNode> = {
     <>
       <path d="M4 17V8.5L10 4l6 4.5V17" />
       <path d="M8 17v-4.5h4V17" />
+    </>
+  ),
+  compte: (
+    <>
+      <rect x="3" y="4.5" width="14" height="11" rx="2" />
+      <circle cx="7.6" cy="9" r="1.8" />
+      <path d="M4.9 13.2a2.7 2.7 0 0 1 5.4 0" />
+      <path d="M12.4 8.4h2.8M12.4 11.4h2.8" />
+    </>
+  ),
+  carte: (
+    <>
+      <path d="M10 17.2s5.2-4.8 5.2-8.7a5.2 5.2 0 0 0-10.4 0c0 3.9 5.2 8.7 5.2 8.7Z" />
+      <circle cx="10" cy="8.4" r="1.9" />
+    </>
+  ),
+  message: (
+    <>
+      <rect x="3" y="5" width="14" height="10" rx="2" />
+      <path d="m3.9 6.3 6.1 4.5 6.1-4.5" />
+    </>
+  ),
+  code: (
+    <>
+      <rect x="4.5" y="3" width="11" height="14" rx="2" />
+      <circle cx="8" cy="8" r="0.9" />
+      <circle cx="12" cy="8" r="0.9" />
+      <circle cx="8" cy="11.5" r="0.9" />
+      <circle cx="12" cy="11.5" r="0.9" />
+      <path d="M8.5 14.6h3" />
+    </>
+  ),
+  identite: (
+    <>
+      <path d="M10 3 4.2 5.4v4.1c0 3.4 2.3 5.9 5.8 7.2 3.5-1.3 5.8-3.8 5.8-7.2V5.4L10 3Z" />
+      <path d="m7.5 9.9 1.9 1.9 3.3-3.6" />
+    </>
+  ),
+  journal: (
+    <>
+      <rect x="4" y="3" width="12" height="14" rx="2" />
+      <path d="M7 7.2h6M7 10.2h6M7 13.2h3.2" />
     </>
   ),
 };
