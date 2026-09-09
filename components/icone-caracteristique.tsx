@@ -22,6 +22,7 @@ export type Pictogramme =
   | 'tableau'
   | 'calendrier'
   | 'etiquette'
+  | 'graphique'
   | 'sortie';
 
 const TRACES: Record<Pictogramme, React.ReactNode> = {
@@ -123,6 +124,12 @@ const TRACES: Record<Pictogramme, React.ReactNode> = {
     <>
       <path d="M10.4 3H16a1 1 0 0 1 1 1v5.6a2 2 0 0 1-.6 1.4l-5.4 5.4a2 2 0 0 1-2.8 0l-4.6-4.6a2 2 0 0 1 0-2.8L9 3.6a2 2 0 0 1 1.4-.6Z" />
       <circle cx="13.4" cy="6.6" r="1.2" />
+    </>
+  ),
+  graphique: (
+    <>
+      <path d="M3.2 16.8h13.6" />
+      <path d="M6 16.8V11M10 16.8V4.6M14 16.8V8.4" />
     </>
   ),
   sortie: (

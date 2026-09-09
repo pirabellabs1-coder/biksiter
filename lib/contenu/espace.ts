@@ -40,6 +40,17 @@ export const ESPACE_ANNEXE: readonly EntreeDEspace[] = [
   { chemin: '/catalogue', libelle: 'Le catalogue', pictogramme: 'etiquette' },
 ];
 
+/**
+ * Ce que voit un modérateur en plus.
+ *
+ * L'administration vient avant la modération : on regarde l'état du réseau
+ * puis on descend dans la pile de pièces à vérifier, jamais l'inverse.
+ */
 export const ESPACE_DU_MODERATEUR: readonly EntreeDEspace[] = [
+  {
+    chemin: '/administration',
+    libelle: 'Administration',
+    pictogramme: 'graphique',
+  },
   { chemin: '/moderation', libelle: 'Modération', pictogramme: 'identite' },
 ];

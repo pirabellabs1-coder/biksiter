@@ -264,6 +264,42 @@ demande sans réponse n'est pas un vélo gardé — son compteur est donc neutre
 contrasté, pas ambre. Et une identité en cours de vérification n'est ni un
 refus ni une erreur : elle n'est pas rouge.
 
+## L'administration
+
+`/administration` est réservée aux modérateurs, comme `/moderation` : un membre
+ordinaire y est renvoyé vers son tableau de bord, et les deux entrées
+n'apparaissent pas dans sa colonne de navigation. Vérifié en retirant puis en
+rendant le drapeau `moderateur` en base.
+
+L'écran répond à une question par panneau :
+
+- **L'état du réseau** — membres vérifiés, emplacements publiés, quartiers
+  ouverts, gardes en cours et terminées, liste d'attente.
+- **Où ouvrir ensuite** — la liste d'attente par quartier, classée par bike
+  sitters. Le seuil vit dans `lib/regles/ouverture.ts`, il est testé, et il se
+  change sur une ligne : `BIKE_SITTERS_POUR_OUVRIR = 5`.
+- **La file d'envoi** — c'est le seul organe qui peut tomber en panne sans que
+  rien ne casse à l'écran : les messages s'empilent, et quelqu'un attend devant
+  une porte l'adresse qu'il n'a jamais reçue. D'où le compteur d'attente en
+  heures.
+- **Le catalogue et les dons** — des nombres, rien de plus.
+
+### Ce que l'administration ne voit pas
+
+`lib/depot/administration.ts` ne sélectionne, nulle part :
+
+- **aucune adresse** — la règle 4 ne fait pas d'exception pour les
+  administrateurs ; une adresse ne sort que par `adresse_apres_acceptation()` ;
+- **aucun corps de message** — la file se compte, elle ne se lit pas, parce
+  qu'un message d'acceptation contient exactement l'adresse que le reste du
+  produit protège ;
+- **aucun donateur** — des annonces et une somme, jamais un prénom ;
+- **aucun classement de membres** (règle 3). Le seul tri du fichier porte sur
+  des quartiers : un quartier n'est pas quelqu'un.
+
+Vérifié sur la page servie : ni les adresses de la base, ni les adresses e-mail
+de la liste d'attente, ni celle du message en échec n'y apparaissent.
+
 ## Le système de design
 
 Il tient toujours dans `app/systeme.css`. Les primitives écrites pour la page
