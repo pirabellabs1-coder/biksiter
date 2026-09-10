@@ -96,29 +96,47 @@ const PLACE_RESTANTE = `
  */
 const FILTRE_DU_QUARTIER = `($1::text = '' or quartier ilike '%' || $1::text || '%')`;
 
-export async function emplacementsPublies(
-  quartier?: string,
-  creneau?: Creneau,
-): Promise<FicheDEmplacement[]> {
-  const recherche = quartier?.trim() ?? '';
+export type FiltresDeRecherche = {
+  quartier?: string;
+  creneau?: Creneau;
+  /** Un type de vélo que l'emplacement doit accepter. */
+  velo?: string;
+  /** Ne garder que ce qui se roule sans marche ni escalier. */
+  plainPied?: boolean;
+};
 
-  if (!creneau) {
-    return interroger<FicheDEmplacement>(
-      `select ${COLONNES_VISIBLES}
-         from emplacement_visible
-        where ${FILTRE_DU_QUARTIER}
-        order by quartier, "prenomDuBikeSitter"`,
-      [recherche],
-    );
-  }
+/** Les accès qu'on peut franchir avec un vélo lourd sans le porter. */
+const ACCES_DE_PLAIN_PIED = ['Plain-pied', 'Rampe'];
+
+export async function emplacementsPublies(
+  filtres: FiltresDeRecherche = {},
+): Promise<FicheDEmplacement[]> {
+  // Une seule requête, et tous les paramètres toujours présents et typés. Un
+  // filtre qu'on ne veut pas est neutralisé (`$2 is null`, `$5 = ''`) plutôt
+  // qu'absent du texte : PostgreSQL refuse de deviner le type d'un paramètre
+  // qui n'apparaît nulle part, et coudre le SQL au cas par cas donnait autant
+  // de requêtes que de combinaisons de filtres.
+  const conditions = [
+    FILTRE_DU_QUARTIER,
+    `($5::text = '' or $5::text = any(velos_acceptes))`,
+    `(not $7::boolean or acces = any($6::text[]))`,
+    `($2::timestamptz is null or ${PLACE_RESTANTE})`,
+  ];
 
   return interroger<FicheDEmplacement>(
     `select ${COLONNES_VISIBLES}
        from emplacement_visible
-      where ${FILTRE_DU_QUARTIER}
-        and ${PLACE_RESTANTE}
+      where ${conditions.join(`\n        and `)}
       order by quartier, "prenomDuBikeSitter"`,
-    [recherche, creneau.debut, creneau.fin, MARGE_ENTRE_STATIONNEMENTS_MINUTES],
+    [
+      filtres.quartier?.trim() ?? '',
+      filtres.creneau?.debut ?? null,
+      filtres.creneau?.fin ?? null,
+      MARGE_ENTRE_STATIONNEMENTS_MINUTES,
+      filtres.velo ?? '',
+      ACCES_DE_PLAIN_PIED,
+      filtres.plainPied ?? false,
+    ],
   );
 }
 

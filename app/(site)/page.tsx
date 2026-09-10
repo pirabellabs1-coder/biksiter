@@ -48,7 +48,7 @@ export default async function Accueil() {
         mesuresDuReseau(),
         derniersAvisDuReseau(),
         quartiersOuverts(),
-        emplacementsPublies(),
+        emplacementsPublies({}),
       ])
     : [
         RIEN_ENCORE,
