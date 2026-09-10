@@ -553,37 +553,35 @@ function Confiance() {
       <div className="section__interieur">
         <div className="rassurance">
           <div className="rassurance__entete">
-            <IconeCaracteristique pictogramme="identite" />
             <div>
+              <p className="surtitre">La confiance, dans les deux sens</p>
               <h2>Ce qui rend serein d’ouvrir sa porte</h2>
-              <p>
+              <p className="rassurance__chapeau">
                 Un cycliste confie un objet qui compte. Un bike sitter laisse
                 entrer quelqu’un chez lui. Les deux prennent un risque, et
                 c’est pour cela que rien n’est vérifié d’un seul côté.
               </p>
             </div>
-          </div>
 
-          <ul className="rassurance__points">
-            {GARANTIES.map((garantie) => (
-              <li key={garantie.titre}>
-                <IconeCaracteristique pictogramme={garantie.pictogramme} />
-                <div>
-                  <strong>{garantie.titre}</strong>
-                  <span>{garantie.texte}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <div className="boutons">
-            <Link
-              href="/questions-frequentes"
-              className="bouton bouton--clair"
-            >
+            <Link href="/questions-frequentes" className="bouton bouton--clair">
               Les questions qu’on nous pose
             </Link>
           </div>
+
+          <ul className="rassurance__points">
+            {GARANTIES.map((garantie, rang) => (
+              <li key={garantie.titre}>
+                <span className="rassurance__medaillon" aria-hidden="true">
+                  <IconeCaracteristique pictogramme={garantie.pictogramme} />
+                </span>
+                <span className="rassurance__rang" aria-hidden="true">
+                  {String(rang + 1).padStart(2, '0')}
+                </span>
+                <h3>{garantie.titre}</h3>
+                <p>{garantie.texte}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
