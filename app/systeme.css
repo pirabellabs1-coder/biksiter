@@ -349,6 +349,9 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* Un libellé de bouton ne se coupe pas : « Mon / compte » sur deux lignes
+     dans une barre d'en-tête, c'est un bouton qui a l'air cassé. */
+  white-space: nowrap;
   min-height: 46px;
   border: 1px solid transparent;
   border-radius: var(--rayon);
@@ -3727,19 +3730,17 @@ a.ligne:hover {
   margin-top: var(--e5);
 }
 
-/* =============================================================================
-   L'en-tête et le pied de page.
 
-   Les deux sont verts et encadrent la page comme une reliure encadre un livre.
-   C'est une surface de marque, pas un signal : rien ne s'y clique « parce que
-   c'est vert », et les actions qui s'y trouvent se distinguent par leur forme
-   pleine et claire, exactement comme ailleurs.
+/* --- L'en-tête et son menu ---------------------------------------------------
+   Sur écran large, la navigation et les liens de session tiennent sur la ligne.
+   En dessous de 900 pixels, tout passe derrière un bouton de menu : c'est le
+   même jeu de liens, jamais dupliqué dans le document.
    ========================================================================== */
 
 .entete {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 30;
   /* Fond plein plutôt qu'un flou d'arrière-plan : `backdrop-filter` fait
      recomposer toute la page à chaque pixel de défilement, pour un effet que
      personne ne remarque. Un bandeau opaque coûte zéro. */
@@ -3772,25 +3773,25 @@ a.ligne:hover {
 }
 
 /* Sans cela, le logo se laisse écraser à zéro pixel dès que la barre est à
-   l'étroit : c'est un enfant de boîte flexible, et `max-width: 100%` du
+   l'étroit : c'est un enfant de boîte flexible, et le `max-width: 100%` du
    fichier de base l'autorise à disparaître. */
 .marque svg {
   flex: none;
 }
 
-/* La navigation ne se replie jamais sur deux lignes : elle défile. Un menu
-   qui change de hauteur selon la largeur fait sauter tout ce qui est en
-   dessous, et une barre d'en-tête doit garder la même hauteur. */
 .entete__navigation {
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
-.entete__navigation::-webkit-scrollbar {
-  display: none;
+.menu {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
 }
 
 .navigation {
@@ -3798,9 +3799,17 @@ a.ligne:hover {
   align-items: center;
   gap: var(--e1);
   flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.navigation::-webkit-scrollbar {
+  display: none;
 }
 
 /* Un lien de navigation est une pastille sans fond : elle n'apparaît qu'au
@@ -3827,7 +3836,13 @@ a.ligne:hover {
 .navigation a[aria-current='page'] {
   background: rgb(255 255 255 / 14%);
   color: var(--marque-encre);
-  box-shadow: none;
+}
+
+.menu__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--e4);
+  flex: none;
 }
 
 .entete__connexion {
@@ -3857,41 +3872,135 @@ a.ligne:hover {
   outline-color: var(--marque-encre);
 }
 
-/* En dessous, la marque et les deux actions restent sur une ligne ; la
-   navigation passe dessous et continue de défiler. Pas de menu déroulant : il
-   faudrait du JavaScript et un piège à focus pour quatre liens. */
+/* --- Le bouton de menu -------------------------------------------------------
+   Trois barres qui deviennent une croix. Elles sont dessinées en CSS plutôt
+   qu'en SVG parce que ce sont trois rectangles, et qu'un fichier de plus pour
+   trois rectangles n'a pas de sens. */
+
+.menu__bouton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: var(--rayon);
+  background: none;
+  color: var(--marque-encre);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition);
+}
+
+.menu__bouton:hover {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 34%);
+}
+
+.menu__barres {
+  display: grid;
+  gap: 4px;
+  width: 20px;
+}
+
+.menu__barres span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform var(--transition),
+    opacity var(--transition);
+}
+
+/* Ouvert, les trois barres deviennent une croix : le bouton dit alors ce qu'il
+   fera, et non ce qu'il vient de faire. */
+.menu__bouton[aria-expanded='true'] .menu__barres span:first-child {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.menu__bouton[aria-expanded='true'] .menu__barres span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu__bouton[aria-expanded='true'] .menu__barres span:last-child {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 @media (max-width: 900px) {
   .entete__interieur {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: var(--e2) var(--e3);
-    padding: var(--e3) var(--e4);
-  }
-
-  .entete .marque {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .entete__connexion {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .entete .bouton {
-    grid-column: 3;
-    grid-row: 1;
-    justify-self: end;
-    min-height: 40px;
-    padding: var(--e2) var(--e4);
+    padding: var(--e3) var(--e5);
+    gap: var(--e3);
+    justify-content: space-between;
   }
 
   .entete__navigation {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    margin: 0 calc(-1 * var(--e4));
-    padding: var(--e1) var(--e4);
+    flex: none;
+  }
+
+  .menu__bouton {
+    display: flex;
+  }
+
+  /* Le panneau se pose sous la barre, sur toute la largeur, et il pousse
+     vers le bas plutôt que de recouvrir : sur un téléphone, un menu qui
+     recouvre le contenu oblige à le refermer pour savoir où l'on est. */
+  .menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--e4);
+    padding: var(--e4) var(--e5) var(--e5);
+    background: var(--marque-fond);
+    border-top: 1px solid rgb(255 255 255 / 12%);
+    box-shadow: var(--ombre-flottante);
+  }
+
+  .menu--ouvert {
+    display: flex;
+  }
+
+  .entete {
+    position: sticky;
+  }
+
+  .entete__interieur {
+    position: relative;
+  }
+
+  .navigation {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    overflow: visible;
+  }
+
+  .navigation a {
+    padding: var(--e3);
+    font-size: var(--t-petit);
+  }
+
+  .menu__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--e3);
+    padding-top: var(--e4);
+    border-top: 1px solid rgb(255 255 255 / 12%);
+  }
+
+  .menu__actions .entete__connexion {
+    padding-inline: var(--e3);
+  }
+
+  .menu__actions .bouton {
+    width: 100%;
   }
 }
 

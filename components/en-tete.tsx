@@ -11,6 +11,10 @@ import { membreConnecte } from '@/lib/session';
  * lire un cookie les aurait rendues dynamiques. Elles le sont désormais toutes,
  * pour la Content-Security-Policy (voir app/layout.tsx), donc l'objection est
  * tombée et un membre déjà connecté n'a plus à lire « Me connecter ».
+ *
+ * Les liens de session sont passés à `Navigation` plutôt que posés à côté :
+ * sur écran étroit ils rejoignent le menu, et il n'y a ainsi qu'un seul jeu de
+ * liens dans le document.
  */
 export default async function EnTete() {
   const membre = await membreConnecte();
@@ -24,26 +28,26 @@ export default async function EnTete() {
         </Link>
 
         <nav aria-label="Navigation principale" className="entete__navigation">
-          <Navigation />
+          <Navigation>
+            {membre ? (
+              <>
+                <span className="entete__connexion">Bonjour {membre.prenom}</span>
+                <Link href="/mon-compte" className="bouton bouton--principal">
+                  Mon compte
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/connexion" className="entete__connexion">
+                  Me connecter
+                </Link>
+                <Link href="/inscription" className="bouton bouton--principal">
+                  S’inscrire
+                </Link>
+              </>
+            )}
+          </Navigation>
         </nav>
-
-        {membre ? (
-          <>
-            <span className="entete__connexion">Bonjour {membre.prenom}</span>
-            <Link href="/mon-compte" className="bouton bouton--principal">
-              Mon compte
-            </Link>
-          </>
-        ) : (
-          <>
-            <Link href="/connexion" className="entete__connexion">
-              Me connecter
-            </Link>
-            <Link href="/inscription" className="bouton bouton--principal">
-              S’inscrire
-            </Link>
-          </>
-        )}
       </div>
     </header>
   );
