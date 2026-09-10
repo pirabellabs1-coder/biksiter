@@ -50,6 +50,16 @@
   --action-voile: #edf7f2;
   --texte-sur-action: #ffffff;
 
+  /* --- Les deux surfaces de marque : l'en-tête et le pied de page. ---
+     Elles encadrent la page comme une reliure encadre un livre. C'est une
+     surface, pas un signal : rien ne s'y clique parce qu'elle est verte, et
+     les actions qui s'y trouvent se distinguent par leur forme pleine et
+     claire, exactement comme partout ailleurs. */
+  --marque-fond: #12291f;
+  --marque-encre: #ffffff;
+  --marque-encre-douce: rgb(255 255 255 / 76%);
+  --marque-encre-tres-douce: rgb(255 255 255 / 55%);
+
   /* --- Vert clair teinté : ce qui est confirmé. ---
      Identité vérifiée, demande acceptée, vélo actuellement gardé, emplacement
      disponible. Même famille que l'action, mais teinté et jamais plein : dans
@@ -331,79 +341,6 @@ svg {
 
 .bloc:last-child {
   margin-bottom: 0;
-}
-
-/* --- En-tête ---------------------------------------------------------------- */
-
-.entete {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  /* Fond plein plutôt qu'un flou d'arrière-plan : `backdrop-filter` fait
-     recomposer toute la page à chaque pixel de défilement, pour un effet que
-     personne ne remarque. Un bandeau opaque coûte zéro. */
-  background: var(--surface);
-  border-bottom: 1px solid var(--craie);
-}
-
-.entete__interieur {
-  max-width: var(--largeur-page);
-  margin: 0 auto;
-  padding: var(--e3) var(--e6);
-  display: flex;
-  align-items: center;
-  gap: var(--e4);
-  flex-wrap: wrap;
-}
-
-.marque {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--e2);
-  /* Le nom de l'association ne se coupe pas : sur un écran étroit, « Bike »
-     seul sur une ligne et « Sitters » en dessous, ce n'est plus une marque. */
-  white-space: nowrap;
-  font-family: var(--titres);
-  font-size: 1.1875rem;
-  letter-spacing: -0.01em;
-  color: var(--encre);
-  text-decoration: none;
-}
-
-.entete__navigation {
-  flex: 1;
-}
-
-.navigation {
-  display: flex;
-  align-items: center;
-  gap: var(--e4);
-  flex-wrap: wrap;
-  flex: 1;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.navigation a,
-.entete__connexion {
-  white-space: nowrap;
-  font-size: var(--t-menu);
-  color: var(--ardoise);
-  text-decoration: none;
-  transition: color var(--transition);
-}
-
-.navigation a:hover,
-.entete__connexion:hover,
-.navigation a[aria-current='page'] {
-  color: var(--encre);
-}
-
-/* Le repère de la page courante est un trait posé sous le lien, pas un
-   souligné de texte : il garde sa place quand le libellé change. */
-.navigation a[aria-current='page'] {
-  box-shadow: inset 0 -2px 0 0 var(--action);
 }
 
 /* --- Boutons et liens ------------------------------------------------------- */
@@ -1215,59 +1152,6 @@ legend {
   align-items: start;
 }
 
-/* --- Pied de page ----------------------------------------------------------- */
-
-.pied {
-  background: var(--surface);
-  border-top: 1px solid var(--craie);
-  padding: var(--e7) var(--e6) var(--e8);
-}
-
-.pied__interieur {
-  max-width: var(--largeur-page);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: var(--e6);
-}
-
-.pied h2 {
-  font-family: var(--texte);
-  font-size: var(--t-menu);
-  font-weight: 500;
-  color: var(--ardoise);
-  margin: 0 0 var(--e3);
-}
-
-.pied ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.pied li {
-  padding: 3px 0;
-}
-
-.pied a {
-  font-size: var(--t-menu);
-  color: var(--ardoise);
-  text-decoration: none;
-  transition: color var(--transition);
-}
-
-.pied a:hover {
-  color: var(--encre);
-}
-
-.pied__marque {
-  margin-bottom: var(--e2);
-}
-
-.pied__phrase {
-  max-width: 34ch;
-}
-
 /* --- Adaptations ------------------------------------------------------------ */
 
 @media (max-width: 900px) {
@@ -1295,50 +1179,6 @@ legend {
 
   .chiffres {
     gap: var(--e5);
-  }
-}
-
-/* En dessous, la marque et les deux actions restent sur une ligne ; la
-   navigation passe dessous et défile horizontalement. Pas de menu déroulant :
-   il faudrait du JavaScript et un piège à focus pour quatre liens. */
-@media (max-width: 760px) {
-  .entete__interieur {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: var(--e2) var(--e3);
-    padding: var(--e3) var(--e4);
-  }
-
-  .entete .marque {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .entete__connexion {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .entete .bouton {
-    grid-column: 3;
-    grid-row: 1;
-    justify-self: end;
-    min-height: 40px;
-    padding: var(--e2) var(--e4);
-  }
-
-  .entete__navigation {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    margin: 0 calc(-1 * var(--e4));
-    padding: var(--e1) var(--e4);
-  }
-
-  .navigation {
-    flex-wrap: nowrap;
   }
 }
 
@@ -1502,38 +1342,6 @@ legend {
 .bloc__apres {
   margin: var(--e5) 0 0;
   font-size: var(--t-petit);
-}
-
-/* --- Pied de page : quartiers et mentions ----------------------------------- */
-
-.pied__quartiers,
-.pied__mentions {
-  max-width: var(--largeur-page);
-  margin: var(--e6) auto 0;
-  padding-top: var(--e5);
-  border-top: 1px solid var(--craie);
-}
-
-.pied__quartiers ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--e2) var(--e4);
-}
-
-.pied__quartiers li {
-  padding: 0;
-}
-
-.pied__mentions {
-  font-size: var(--t-menu);
-  color: var(--ardoise);
-  margin-bottom: 0;
-}
-
-/* Seule adresse cliquable du pied : elle se souligne, sinon rien ne la
-   distingue du numéro d'entreprise qui la précède. */
-.pied__mentions a {
-  text-decoration: underline;
 }
 
 /* --- Illustrations ---------------------------------------------------------- */
@@ -2320,8 +2128,11 @@ legend {
   overflow-y: auto;
 }
 
+/* Dans le rail, la marque est posée sur du blanc : elle reprend le vert, que
+   `.marque` laisse maintenant décider au contexte. */
 .rail__marque {
   padding-inline: var(--e2);
+  color: var(--action);
 }
 
 .rail__identite {
@@ -3914,4 +3725,390 @@ a.ligne:hover {
    que cet écran demande, et elle ne doit pas se noyer dans une colonne. */
 .panneau--decision {
   margin-top: var(--e5);
+}
+
+/* =============================================================================
+   L'en-tête et le pied de page.
+
+   Les deux sont verts et encadrent la page comme une reliure encadre un livre.
+   C'est une surface de marque, pas un signal : rien ne s'y clique « parce que
+   c'est vert », et les actions qui s'y trouvent se distinguent par leur forme
+   pleine et claire, exactement comme ailleurs.
+   ========================================================================== */
+
+.entete {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  /* Fond plein plutôt qu'un flou d'arrière-plan : `backdrop-filter` fait
+     recomposer toute la page à chaque pixel de défilement, pour un effet que
+     personne ne remarque. Un bandeau opaque coûte zéro. */
+  background: var(--marque-fond);
+  color: var(--marque-encre);
+}
+
+.entete__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--e4) var(--e6);
+  display: flex;
+  align-items: center;
+  gap: var(--e5);
+}
+
+.marque {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  /* Le nom de l'association ne se coupe pas : sur un écran étroit, « Bike »
+     seul sur une ligne et « Sitters » en dessous, ce n'est plus une marque. */
+  white-space: nowrap;
+  font-family: var(--titres);
+  font-weight: 600;
+  font-size: 1.1875rem;
+  letter-spacing: -0.015em;
+  color: currentColor;
+  text-decoration: none;
+}
+
+/* Sans cela, le logo se laisse écraser à zéro pixel dès que la barre est à
+   l'étroit : c'est un enfant de boîte flexible, et `max-width: 100%` du
+   fichier de base l'autorise à disparaître. */
+.marque svg {
+  flex: none;
+}
+
+/* La navigation ne se replie jamais sur deux lignes : elle défile. Un menu
+   qui change de hauteur selon la largeur fait sauter tout ce qui est en
+   dessous, et une barre d'en-tête doit garder la même hauteur. */
+.entete__navigation {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.entete__navigation::-webkit-scrollbar {
+  display: none;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--e1);
+  flex-wrap: nowrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Un lien de navigation est une pastille sans fond : elle n'apparaît qu'au
+   survol et sur la page courante. Un soulignement permanent sur cinq liens
+   ferait une frise. */
+.navigation a {
+  display: block;
+  white-space: nowrap;
+  padding: var(--e2) var(--e3);
+  border-radius: var(--rayon);
+  font-size: var(--t-menu);
+  color: var(--marque-encre-douce);
+  text-decoration: none;
+  transition:
+    background var(--transition),
+    color var(--transition);
+}
+
+.navigation a:hover {
+  background: rgb(255 255 255 / 10%);
+  color: var(--marque-encre);
+}
+
+.navigation a[aria-current='page'] {
+  background: rgb(255 255 255 / 14%);
+  color: var(--marque-encre);
+  box-shadow: none;
+}
+
+.entete__connexion {
+  white-space: nowrap;
+  font-size: var(--t-menu);
+  color: var(--marque-encre-douce);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.entete__connexion:hover {
+  color: var(--marque-encre);
+}
+
+/* Sur fond vert, le bouton principal s'inverse : c'est le seul élément clair
+   et plein de la barre, donc le seul qui se lise comme une action. */
+.entete .bouton--principal {
+  background: var(--surface);
+  color: var(--action);
+}
+
+.entete .bouton--principal:hover {
+  background: var(--action-voile);
+}
+
+.entete :focus-visible {
+  outline-color: var(--marque-encre);
+}
+
+/* En dessous, la marque et les deux actions restent sur une ligne ; la
+   navigation passe dessous et continue de défiler. Pas de menu déroulant : il
+   faudrait du JavaScript et un piège à focus pour quatre liens. */
+@media (max-width: 900px) {
+  .entete__interieur {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: var(--e2) var(--e3);
+    padding: var(--e3) var(--e4);
+  }
+
+  .entete .marque {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .entete__connexion {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .entete .bouton {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    min-height: 40px;
+    padding: var(--e2) var(--e4);
+  }
+
+  .entete__navigation {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0 calc(-1 * var(--e4));
+    padding: var(--e1) var(--e4);
+  }
+}
+
+/* --- Le pied de page --------------------------------------------------------- */
+
+.pied {
+  background: var(--marque-fond);
+  color: var(--marque-encre);
+  padding: var(--e8) var(--e6) var(--e6);
+}
+
+.pied__interieur {
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: var(--e7);
+}
+
+.pied h2 {
+  font-family: var(--titres);
+  font-size: var(--t-etiquette);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--marque-encre-tres-douce);
+  margin: 0 0 var(--e4);
+}
+
+.pied ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--e2);
+}
+
+.pied li {
+  padding: 0;
+}
+
+.pied a {
+  font-size: var(--t-menu);
+  color: var(--marque-encre-douce);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.pied a:hover {
+  color: var(--marque-encre);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pied__marque {
+  margin-bottom: var(--e3);
+  font-size: 1.25rem;
+}
+
+.pied__phrase {
+  max-width: 34ch;
+  font-size: var(--t-menu);
+  color: var(--marque-encre-douce);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* --- Les quartiers, en jetons ------------------------------------------------
+   Quatorze liens à la file faisaient un pavé de texte où l'œil ne trouvait
+   rien. En jetons, chacun a ses bords, et la liste se parcourt. */
+
+.pied__quartiers,
+.pied__mentions {
+  max-width: var(--largeur-page);
+  margin: var(--e7) auto 0;
+  padding-top: var(--e5);
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+.pied__quartiers ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e2);
+}
+
+.pied__quartiers a {
+  display: block;
+  padding: 6px var(--e3);
+  border-radius: 99px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  color: var(--marque-encre-douce);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.pied__quartiers a:hover {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 30%);
+  color: var(--marque-encre);
+  text-decoration: none;
+}
+
+.pied__mentions {
+  margin-top: var(--e5);
+  font-size: var(--t-menu);
+  color: var(--marque-encre-tres-douce);
+  margin-bottom: 0;
+}
+
+.pied__mentions a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pied :focus-visible {
+  outline-color: var(--marque-encre);
+}
+
+@media (max-width: 900px) {
+  .pied {
+    padding: var(--e7) var(--e5) var(--e5);
+  }
+
+  .pied__interieur {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e5);
+  }
+
+  .pied__interieur > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .pied__interieur {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- La console d'administration ---------------------------------------------
+   Cet écran ne se lit pas, il se consulte : les six nombres qui le résument
+   doivent tenir dans le premier regard, avant tout le reste. D'où un bandeau
+   de marque plutôt qu'un en-tête de page ordinaire — et c'est le même vert que
+   l'en-tête du site, pas une couleur de plus. */
+
+.console {
+  background: var(--marque-fond);
+  color: var(--marque-encre);
+  border-radius: var(--rayon-flottant);
+  padding: var(--e7);
+  margin-bottom: var(--e5);
+}
+
+.console__propos {
+  max-width: 62ch;
+  margin-bottom: var(--e6);
+}
+
+.console .surtitre {
+  color: var(--marque-encre-tres-douce);
+}
+
+.console h1 {
+  font-family: var(--titres);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--e2);
+}
+
+.console__propos p {
+  margin: 0;
+  font-size: var(--t-petit);
+  color: var(--marque-encre-douce);
+}
+
+.console__chiffres {
+  list-style: none;
+  margin: 0 0 var(--e6);
+  padding: var(--e5) 0 0;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--e5);
+}
+
+.console__valeur {
+  display: block;
+  font-family: var(--titres);
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.console__libelle {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--t-menu);
+  color: var(--marque-encre-tres-douce);
+}
+
+.console :focus-visible {
+  outline-color: var(--marque-encre);
+}
+
+/* Quand rien n'attend, la ligne le dit sans emprunter le filet des choses à
+   faire : ce n'est pas une tâche, c'est une absence de tâche. */
+.a-faire__entree--calme {
+  border-left-color: var(--verifie);
+}
+
+@media (max-width: 620px) {
+  .console {
+    padding: var(--e5);
+    border-radius: var(--rayon-large);
+  }
 }

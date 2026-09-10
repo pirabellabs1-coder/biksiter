@@ -1,13 +1,11 @@
 /**
  * La marque : un vélo sous un toit.
  *
- * La couleur du logo lui appartient en propre et ne participe pas au code
- * couleur de l'interface (règle 6) : elle ne dit ni « action », ni « vérifié »,
- * ni « gardé ». C'est pour cela qu'elle est écrite en dur ici plutôt que prise
- * dans les variables du système — un jeton sémantique détourné pour une marque
- * finirait par brouiller les deux.
+ * Le trait prend la couleur du texte qui l'entoure. Le logo vit sur deux fonds
+ * — clair dans une page, vert sombre dans l'en-tête et le pied — et un vert
+ * écrit en dur ici disparaîtrait sur le second. C'est donc la règle CSS qui
+ * décide, et le composant n'a plus d'avis sur la question.
  */
-const VERT_DE_LA_MARQUE = '#007D38';
 
 export default function Logo({ taille = 26 }: { taille?: number }) {
   return (
@@ -16,7 +14,7 @@ export default function Logo({ taille = 26 }: { taille?: number }) {
       height={taille}
       viewBox="0 0 100 100"
       fill="none"
-      stroke={VERT_DE_LA_MARQUE}
+      stroke="currentColor"
       aria-hidden="true"
       focusable="false"
     >

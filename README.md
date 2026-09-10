@@ -445,6 +445,26 @@ npm run bd:piece -- <uuid du membre>
 L'image générée dit en toutes lettres qu'elle n'est pas une pièce d'identité.
 Elle est chiffrée par le même chemin que le dépôt réel.
 
+## L'en-tête et le pied de page
+
+Les deux sont verts et encadrent la page comme une reliure encadre un livre.
+C'est une **surface de marque, pas un signal** : rien ne s'y clique parce que
+c'est vert, et les actions qui s'y trouvent se distinguent par leur forme
+pleine et claire, exactement comme partout ailleurs. Le bouton principal s'y
+inverse — clair sur fond vert — pour rester le seul élément plein de la barre.
+
+Les jetons `--marque-fond` et `--marque-encre*` ne servent qu'à ces deux
+surfaces, à la console d'administration et au panneau de rassurance de
+l'accueil. Contrastes mesurés sur `#12291f` : blanc 15,4 : 1, texte adouci
+9,3 : 1, étiquettes 5,6 : 1.
+
+Le logo prend la couleur du texte qui l'entoure (`currentColor`) : il vit sur
+deux fonds, et un vert écrit en dur disparaîtrait sur le second.
+
+**La navigation ne se replie jamais sur deux lignes, elle défile.** Un menu qui
+change de hauteur selon la largeur fait sauter tout ce qui est en dessous, et
+une barre d'en-tête doit garder la même hauteur.
+
 ## Les couleurs
 
 | Couleur | Sens | Où |

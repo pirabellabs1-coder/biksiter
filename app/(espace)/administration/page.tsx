@@ -141,20 +141,87 @@ export default async function Administration() {
       : []),
   ];
 
+  const chiffres = [
+    {
+      valeur: `${ecrireUnNombre(reseau.membresVerifies)} / ${ecrireUnNombre(reseau.membres)}`,
+      libelle: 'membres vérifiés',
+    },
+    {
+      valeur: `${ecrireUnNombre(reseau.emplacementsPublies)} / ${ecrireUnNombre(reseau.emplacements)}`,
+      libelle: 'emplacements publiés',
+    },
+    {
+      valeur: ecrireUnNombre(reseau.quartiersOuverts),
+      libelle:
+        reseau.quartiersOuverts > 1 ? 'quartiers ouverts' : 'quartier ouvert',
+    },
+    {
+      valeur: ecrireUnNombre(reseau.gardesEnCours),
+      libelle:
+        reseau.gardesEnCours > 1
+          ? 'vélos gardés en ce moment'
+          : 'vélo gardé en ce moment',
+    },
+    {
+      valeur: ecrireUnNombre(reseau.gardesTerminees),
+      libelle:
+        reseau.gardesTerminees > 1
+          ? 'gardes menées à bien'
+          : 'garde menée à bien',
+    },
+    {
+      valeur: ecrireUnNombre(reseau.surLaListeDAttente),
+      libelle:
+        reseau.surLaListeDAttente > 1
+          ? 'personnes sur la liste d’attente'
+          : 'personne sur la liste d’attente',
+    },
+  ];
+
   return (
     <>
-      <EnteteDePage
-        surtitre="Administration"
-        titre="L’état du réseau"
-        phrase={`Bonjour ${moderateur.prenom}. Des nombres et des états — aucune adresse, aucun corps de message, aucun classement entre membres.`}
-        actions={
-          <Link href="/moderation" className="bouton bouton--principal">
+      {/* Un bandeau de marque plutôt qu'un en-tête de page ordinaire : cet
+          écran ne se lit pas, il se consulte, et les six nombres qui le
+          résument doivent tenir dans le premier regard. */}
+      <section className="console">
+        <div className="console__propos">
+          <p className="surtitre">Administration</p>
+          <h1>L’état du réseau</h1>
+          <p>
+            Bonjour {moderateur.prenom}. Des nombres et des états — aucune
+            adresse, aucun corps de message, aucun classement entre membres.
+          </p>
+        </div>
+
+        <ul className="console__chiffres">
+          {chiffres.map((chiffre) => (
+            <li key={chiffre.libelle}>
+              <span className="console__valeur">{chiffre.valeur}</span>
+              <span className="console__libelle">{chiffre.libelle}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="boutons">
+          <Link href="/moderation" className="bouton bouton--clair">
             Aller à la modération
           </Link>
-        }
-      />
+        </div>
+      </section>
 
-      {aFaire.length === 0 ? null : (
+      {aFaire.length === 0 ? (
+        <div className="a-faire">
+          <div className="a-faire__entree a-faire__entree--calme">
+            <div className="a-faire__corps">
+              <strong>Rien n’attend de décision</strong>
+              <p>
+                Pas de pièce à relire, pas de candidature à classer, pas de
+                message en échec. C’est l’état normal, et c’est très bien.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
         <div className="a-faire">
           {aFaire.map((entree) => (
             <div
@@ -178,62 +245,6 @@ export default async function Administration() {
           ))}
         </div>
       )}
-
-      <ul className="tuiles">
-        <li className="tuile">
-          <span className="tuile__valeur">
-            {ecrireUnNombre(reseau.membresVerifies)}
-            <span className="discret"> / {ecrireUnNombre(reseau.membres)}</span>
-          </span>
-          <span className="tuile__libelle">membres vérifiés</span>
-        </li>
-        <li className="tuile">
-          <span className="tuile__valeur">
-            {ecrireUnNombre(reseau.emplacementsPublies)}
-            <span className="discret">
-              {' '}
-              / {ecrireUnNombre(reseau.emplacements)}
-            </span>
-          </span>
-          <span className="tuile__libelle">emplacements publiés</span>
-        </li>
-        <li className="tuile">
-          <span className="tuile__valeur">
-            {ecrireUnNombre(reseau.quartiersOuverts)}
-          </span>
-          <span className="tuile__libelle">
-            {reseau.quartiersOuverts > 1 ? 'quartiers ouverts' : 'quartier ouvert'}
-          </span>
-        </li>
-        <li
-          className={reseau.gardesEnCours > 0 ? 'tuile tuile--verifie' : 'tuile'}
-        >
-          <span className="tuile__valeur">
-            {ecrireUnNombre(reseau.gardesEnCours)}
-          </span>
-          <span className="tuile__libelle">
-            {reseau.gardesEnCours > 1 ? 'vélos gardés' : 'vélo gardé'} en ce
-            moment
-          </span>
-        </li>
-        <li className="tuile">
-          <span className="tuile__valeur">
-            {ecrireUnNombre(reseau.gardesTerminees)}
-          </span>
-          <span className="tuile__libelle">
-            {reseau.gardesTerminees > 1 ? 'gardes menées' : 'garde menée'} à bien
-          </span>
-        </li>
-        <li className="tuile">
-          <span className="tuile__valeur">
-            {ecrireUnNombre(reseau.surLaListeDAttente)}
-          </span>
-          <span className="tuile__libelle">
-            {reseau.surLaListeDAttente > 1 ? 'personnes' : 'personne'} sur la
-            liste d’attente
-          </span>
-        </li>
-      </ul>
 
       <div className="panneaux panneaux--deux">
         <section className="panneau">
