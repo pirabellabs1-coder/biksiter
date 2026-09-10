@@ -525,7 +525,7 @@ const GARANTIES = [
     pictogramme: 'identite' as const,
     titre: 'Une identité vérifiée par une personne',
     texte:
-      'Pièce d’identité, adresse e-mail et téléphone. La vérification est faite à la main par un membre de l’association : aucun emplacement ne se publie avant.',
+      'Pièce d’identité, adresse e-mail et téléphone, contrôlées à la main par un membre de l’association. Aucun emplacement ne se publie avant.',
   },
   {
     pictogramme: 'carte' as const,
@@ -551,44 +551,39 @@ function Confiance() {
   return (
     <section className="section">
       <div className="section__interieur">
-        <div className="deux-colonnes deux-colonnes--collante">
-          <div className="apparait">
-            <div className="entete-de-section">
-              <p className="surtitre">La confiance, dans les deux sens</p>
-              <h2 className="titre-section titre-section--large">
-                Ce qui rend acceptable d’ouvrir sa porte.
-              </h2>
-              <p className="chapeau">
+        <div className="rassurance">
+          <div className="rassurance__entete">
+            <IconeCaracteristique pictogramme="identite" />
+            <div>
+              <h2>Ce qui rend serein d’ouvrir sa porte</h2>
+              <p>
                 Un cycliste confie un objet qui compte. Un bike sitter laisse
-                entrer quelqu’un chez lui. Les deux prennent un risque, et c’est
-                pour cela que rien n’est vérifié d’un seul côté.
+                entrer quelqu’un chez lui. Les deux prennent un risque, et
+                c’est pour cela que rien n’est vérifié d’un seul côté.
               </p>
             </div>
-
-            <figure className="figure-illustree">
-              <Illustration scene="velo-a-labri" />
-            </figure>
           </div>
 
-          <ul className="garanties">
+          <ul className="rassurance__points">
             {GARANTIES.map((garantie) => (
-              <li key={garantie.titre} className="garantie apparait">
-                <span className="garantie__jeton">
-                  <IconeCaracteristique pictogramme={garantie.pictogramme} />
-                </span>
+              <li key={garantie.titre}>
+                <IconeCaracteristique pictogramme={garantie.pictogramme} />
                 <div>
-                  <h3>{garantie.titre}</h3>
-                  <p className="discret">{garantie.texte}</p>
+                  <strong>{garantie.titre}</strong>
+                  <span>{garantie.texte}</span>
                 </div>
               </li>
             ))}
           </ul>
-        </div>
 
-        <div className="boutons boutons--centres apparait">
-          <Link href="/questions-frequentes" className="bouton bouton--discret">
-            Les questions qu’on nous pose
-          </Link>
+          <div className="boutons">
+            <Link
+              href="/questions-frequentes"
+              className="bouton bouton--clair"
+            >
+              Les questions qu’on nous pose
+            </Link>
+          </div>
         </div>
       </div>
     </section>

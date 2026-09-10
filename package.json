@@ -12,7 +12,8 @@
     "bd:migrer": "tsx --env-file-if-exists=.env.local scripts/migrer.ts",
     "bd:semer": "tsx --env-file-if-exists=.env.local scripts/semer.ts",
     "bd:purger": "tsx --env-file-if-exists=.env.local scripts/purger.ts",
-    "bd:messages": "tsx --env-file-if-exists=.env.local scripts/envoyer-messages.ts"
+    "bd:messages": "tsx --env-file-if-exists=.env.local scripts/envoyer-messages.ts",
+    "bd:piece": "tsx --env-file-if-exists=.env.local scripts/piece-de-demonstration.ts"
   },
   "dependencies": {
     "next": "^15.5.4",

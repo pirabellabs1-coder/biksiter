@@ -406,6 +406,45 @@ Un test garantit qu’aucun message ne peut partir avec l’un de ces trous
 dedans : `lib/courriel/modeles.test.ts` refuse « null », « undefined » et
 « 0000 » dans le corps de tous les messages.
 
+## Les écrans portés depuis la maquette
+
+Quatre écrans ont été maquettés avec Google Stitch, et portés ici structure par
+structure. Le texte a été revu — vocabulaire, chiffres réels, contraintes du
+produit — mais la disposition est celle de la maquette.
+
+| Écran | Ce qui en vient |
+|---|---|
+| Accueil | Le panneau vert plein « ce qui rend serein d'ouvrir sa porte » |
+| Recherche | Les filtres en pilules, les cartes d'emplacement, la jauge de mobilisation d'un quartier |
+| Fiche | La galerie qui défile, l'en-tête à jetons, le mot d'accueil, les créneaux ligne par ligne, le périmètre, les récits |
+| Mes stationnements | Le code de remise en tuiles, le fil d'échanges en bulles |
+
+**Les filtres de la recherche sont des adresses, pas des cases à cocher.** Ils
+se partagent, se mettent en favori et reviennent avec le bouton « précédent »,
+sans une ligne de script.
+
+**La frise horizontale a disparu.** Elle se lisait d'un coup d'œil mais ne se
+lisait qu'à l'œil : les heures y étaient minuscules et rien n'y était
+énonçable. `components/creneaux-du-jour.tsx` dit « 08h30 à 13h00, complet » en
+toutes lettres, et nomme le battement de trente minutes plutôt que de le
+laisser passer pour un trou.
+
+**Ce qui n'a pas été porté** : les photographies de personnes générées, les
+chiffres inventés, et le vert des zones cartographiques — une zone d'accueil
+n'est ni une action ni un état confirmé, elle reste grise.
+
+### Regarder l'écran de modération
+
+Il n'existe que s'il y a un document à relire, et déposer un vrai document sur
+un poste de développement serait exactement ce qu'il ne faut pas faire :
+
+```bash
+npm run bd:piece -- <uuid du membre>
+```
+
+L'image générée dit en toutes lettres qu'elle n'est pas une pièce d'identité.
+Elle est chiffrée par le même chemin que le dépôt réel.
+
 ## Les couleurs
 
 | Couleur | Sens | Où |

@@ -2820,6 +2820,17 @@ a.ligne:hover {
     justify-content: center;
   }
 
+  /* Des icônes seules ont besoin de plus d'air entre elles que des lignes de
+     texte : sans écart, la pastille de compteur de l'une touche l'autre. */
+  .rail__liste {
+    gap: var(--e2);
+  }
+
+  .rail__lien,
+  .rail__pied .bouton-lien {
+    padding-block: var(--e3);
+  }
+
   /* Le trait de la page courante passe sous l'icône : à 76 pixels, un filet
      à gauche colle au bord de l'écran et ne se voit plus. */
   .rail__lien {
@@ -3784,4 +3795,123 @@ a.ligne:hover {
    que les liens qui la composent. */
 .rail__lien--discret {
   font-size: var(--t-menu);
+}
+
+/* --- Le panneau de rassurance ------------------------------------------------
+   Le seul bloc plein vert de tout le site, et c'est voulu : il porte ce qui
+   décide quelqu'un à ouvrir sa porte, et il ne doit ressembler à rien d'autre
+   sur la page. Le vert plein dit habituellement « on clique ici » — ici il ne
+   se clique pas, mais rien d'autre n'est plein sur cet écran, donc aucune
+   confusion n'est possible. */
+
+.rassurance {
+  background: var(--action);
+  color: var(--texte-sur-action);
+  border-radius: var(--rayon-flottant);
+  padding: var(--e7);
+}
+
+.rassurance__entete {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e4);
+  margin-bottom: var(--e6);
+}
+
+.rassurance__entete > svg {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  color: rgb(255 255 255 / 70%);
+}
+
+.rassurance h2 {
+  font-size: clamp(1.375rem, 1.1rem + 1.1vw, 1.75rem);
+  margin: 0 0 var(--e2);
+}
+
+.rassurance__entete p {
+  margin: 0;
+  max-width: 62ch;
+  color: rgb(255 255 255 / 78%);
+}
+
+.rassurance__points {
+  list-style: none;
+  margin: 0 0 var(--e6);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--e5);
+}
+
+.rassurance__points li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e3);
+}
+
+.rassurance__points svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 2px;
+  color: rgb(255 255 255 / 62%);
+}
+
+.rassurance__points strong {
+  display: block;
+  font-family: var(--titres);
+  font-weight: 600;
+  font-size: var(--t-petit);
+  margin-bottom: 2px;
+}
+
+.rassurance__points span {
+  display: block;
+  font-size: var(--t-menu);
+  color: rgb(255 255 255 / 74%);
+  line-height: 1.6;
+}
+
+/* Un bouton posé sur du vert plein : il s'inverse plutôt que de disparaître. */
+.bouton--clair {
+  background: var(--surface);
+  color: var(--action);
+}
+
+.bouton--clair:hover {
+  background: var(--action-voile);
+}
+
+@media (max-width: 620px) {
+  .rassurance {
+    padding: var(--e5);
+    border-radius: var(--rayon-large);
+  }
+}
+
+/* --- L'examen d'une pièce d'identité ----------------------------------------- */
+
+.piece-examinee {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 62vh;
+  object-fit: contain;
+  background: var(--carte-fond);
+  border: 1px solid var(--craie);
+  border-radius: var(--rayon);
+}
+
+.consigne {
+  margin: var(--e4) 0 var(--e2);
+  font-size: var(--t-menu);
+  color: var(--ardoise);
+}
+
+/* La décision se prend en bas et sur toute la largeur : c'est la seule chose
+   que cet écran demande, et elle ne doit pas se noyer dans une colonne. */
+.panneau--decision {
+  margin-top: var(--e5);
 }
