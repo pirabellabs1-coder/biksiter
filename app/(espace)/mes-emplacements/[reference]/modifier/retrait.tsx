@@ -3,7 +3,10 @@
 import { useActionState } from 'react';
 
 import MessageDeFormulaire from '@/components/message-de-formulaire';
-import { FORMULAIRE_VIERGE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
+import {
+  FORMULAIRE_VIERGE,
+  type EtatDuFormulaire,
+} from '@/lib/formulaires/etat';
 
 /**
  * Le retrait est séparé du reste de la page, et demande une confirmation
@@ -37,14 +40,15 @@ export default function Retrait({
             </strong>{' '}
             {retenu} stationnement{retenu > 1 ? 's' : ''} y{' '}
             {retenu > 1 ? 'sont' : 'est'} en cours ou en attente de réponse.
-            Mettez-le en pause : il disparaît de la carte, ne reçoit plus de
-            demande, et laisse vivre ce qui est déjà convenu.
+            Vous pouvez le mettre en pause : il n’apparaîtra plus sur la carte
+            et ne recevra plus de demande, tout en conservant les stationnements
+            déjà prévus.
           </p>
         </div>
       ) : null}
 
       <div className="champ">
-        <div className="case">
+        <label className="case">
           <input
             type="checkbox"
             id="confirmation"
@@ -56,11 +60,11 @@ export default function Retrait({
               erreurs.confirmation ? 'confirmation-erreur' : undefined
             }
           />
-          <label htmlFor="confirmation">
+          <span>
             Je comprends que les stationnements passés de cet emplacement seront
             effacés avec lui.
-          </label>
-        </div>
+          </span>
+        </label>
         {erreurs.confirmation ? (
           <span id="confirmation-erreur" className="champ__erreur">
             {erreurs.confirmation}

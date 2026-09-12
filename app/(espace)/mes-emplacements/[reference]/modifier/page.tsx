@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import FormulaireDEmplacement from '@/components/formulaire-d-emplacement';
 import {
   emplacementAModifier,
@@ -49,9 +49,9 @@ export default async function ModifierUnEmplacement({
     <div className="page-de-lespace">
       <EnteteDePage
         surtitre="Mes emplacements"
-        titre="Corriger cet emplacement"
-        phrase={`${emplacement.type} · ${emplacement.quartier}${
-          emplacement.publie ? '' : ' · en pause, invisible sur la carte'
+        titre="Modifier cet emplacement"
+        chapeau={`${emplacement.type} · ${emplacement.quartier}${
+          emplacement.publie ? '' : ' · en pause, masqué sur la carte'
         }`}
         actions={
           <Link href="/mes-emplacements" className="bouton bouton--discret">
@@ -62,16 +62,16 @@ export default async function ModifierUnEmplacement({
 
       <div className="encart">
         <p>
-          Ce que vous changez ici vaut pour les demandes à venir. Les
-          stationnements déjà acceptés tiennent : vous vous êtes engagé, et le
-          cycliste s’est organisé.
+          Vos modifications s’appliquent aux prochaines demandes. Les
+          stationnements déjà acceptés restent inchangés : les cyclistes
+          concernés se sont organisés en conséquence.
         </p>
       </div>
 
       <FormulaireDEmplacement
         action={modifierLEmplacement.bind(null, reference)}
         membreDejaConnu
-        libelleDuBouton="Enregistrer les corrections"
+        libelleDuBouton="Enregistrer les modifications"
         valeurs={{
           adresseExacte: emplacement.adresseExacte,
           quartier: emplacement.quartier,
@@ -89,8 +89,8 @@ export default async function ModifierUnEmplacement({
 
       <h2 className="titre-section titre-section--aere">Les photos</h2>
       <p className="discret">
-        Trois photos au plus. Elles aident un cycliste à reconnaître le lieu et
-        à savoir où son vélo va dormir.
+        Jusqu’à trois photos. Elles aident les cyclistes à reconnaître le lieu
+        et à voir où leur vélo sera rangé.
       </p>
       <Photos
         action={envoyerLesPhotos.bind(null, reference)}
@@ -102,8 +102,9 @@ export default async function ModifierUnEmplacement({
         Retirer cet emplacement
       </h2>
       <p className="discret">
-        Si vous partez pour un temps, mettez-le plutôt en pause depuis la liste :
-        c’est réversible et rien n’est perdu. Le retrait, lui, est définitif.
+        Si vous vous absentez quelque temps, vous pouvez plutôt le mettre en
+        pause depuis la liste : rien n’est perdu, et vous le réactivez quand
+        vous le souhaitez. Le retrait, lui, est définitif.
       </p>
 
       <Retrait

@@ -30,8 +30,7 @@ export default function FormulaireDuCode({
       <div className="champ">
         <label htmlFor="code">Le code que {quiRemet} vous dicte</label>
         <span id="code-aide" className="champ__aide">
-          Quatre chiffres. Il se dit à voix haute — pas besoin de réseau ni
-          d’enlever ses gants.
+          Quatre chiffres, à saisir ici. Le code fonctionne même sans réseau.
         </span>
         <input
           id="code"

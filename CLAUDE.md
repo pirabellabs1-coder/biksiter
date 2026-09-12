@@ -24,6 +24,24 @@ produit découle de ces trois faits.
 Un membre est cycliste **et** bike sitter selon le moment. Le compte est unique :
 proposer un emplacement est une action, jamais un statut à demander.
 
+## Le ton du texte
+
+Tout ce qui s'affiche — site, espace membre, administration, e-mails — est
+**professionnel, pédagogique et doux**. On explique simplement comment ça
+marche et ce que ça apporte à la personne qui lit.
+
+- **Commencer par ce qui est possible**, pas par ce qui est interdit :
+  « Le stationnement est entièrement gratuit » plutôt que « Aucun paiement, ni
+  sur le site ni en direct ».
+- **Expliquer sans faire la leçon** : pas de maximes (« c'est la contrepartie
+  de… »), pas de justification morale, pas de sous-entendu.
+- **Rassurer par des faits** : les étapes, les délais, ce qui se passe ensuite.
+- **Parler à la personne** (« vous »), en phrases courtes et calmes.
+- **Les règles ci-dessous guident le produit ; elles ne s'écrivent pas telles
+  quelles à l'écran.** « Proposer un emplacement est une action, pas un statut »
+  est une règle de conception ; à l'écran, on écrit « Vous pourrez proposer un
+  emplacement à tout moment depuis votre espace ».
+
 ## Les règles qui ne se négocient pas
 
 1. **L'espace privé.** Un emplacement n'est publiable que s'il est inaccessible au

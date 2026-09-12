@@ -3,7 +3,10 @@
 import { useActionState } from 'react';
 
 import MessageDeFormulaire from '@/components/message-de-formulaire';
-import { FORMULAIRE_VIERGE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
+import {
+  FORMULAIRE_VIERGE,
+  type EtatDuFormulaire,
+} from '@/lib/formulaires/etat';
 import { LONGUEUR_MAXIMALE_DE_LAVIS } from '@/lib/regles/avis';
 
 /**
@@ -37,9 +40,8 @@ export default function FormulaireDAvis({
           <div className="champ">
             <label htmlFor="avis">Comment ça s’est passé&nbsp;?</label>
             <span id="avis-aide" className="champ__aide">
-              Ce que vous écrivez apparaît sur la fiche de l’emplacement, signé
-              de votre prénom. Racontez le lieu et l’accueil — il n’y a rien à
-              noter.
+              Votre récit apparaîtra sur la fiche de l’emplacement, signé de
+              votre prénom. Parlez du lieu et de l’accueil reçu.
             </span>
             <textarea
               id="avis"

@@ -117,7 +117,9 @@ export default function Fiche({
                     repasser dans l'optimiseur n'apporterait rien. */}
                 <img
                   src={`/emplacements/${fiche.reference}/photo/${photo.rang}`}
-                  alt={SUJETS_DES_PHOTOS[photo.rang] ?? 'Photo de l’emplacement'}
+                  alt={
+                    SUJETS_DES_PHOTOS[photo.rang] ?? 'Photo de l’emplacement'
+                  }
                   width={photo.largeur}
                   height={photo.hauteur}
                 />
@@ -188,7 +190,7 @@ export default function Fiche({
                     Membre depuis {signaux.membreDepuis}
                     {signaux.gardesAccueillies > 0
                       ? ` · ${signaux.gardesAccueillies} vélo${signaux.gardesAccueillies > 1 ? 's' : ''} accueilli${signaux.gardesAccueillies > 1 ? 's' : ''}`
-                      : ' · n’a pas encore accueilli'}
+                      : ' · premier accueil à venir'}
                   </p>
                 ) : null}
               </div>
@@ -284,10 +286,9 @@ export default function Fiche({
               </figure>
 
               <p className="encart">
-                L’adresse exacte et les consignes d’accès ne vous seront
-                communiquées qu’une fois votre demande acceptée par{' '}
-                {fiche.prenomDuBikeSitter}. Elles n’apparaissent nulle part
-                avant, ni sur cette page, ni ailleurs.
+                Pour préserver la vie privée de {fiche.prenomDuBikeSitter},
+                l’adresse exacte et les consignes d’accès vous sont transmises
+                dès que votre demande est acceptée.
               </p>
             </div>
           </section>
@@ -309,10 +310,9 @@ export default function Fiche({
               <div className="vide">
                 <IconeCaracteristique pictogramme="message" />
                 <p>
-                  Personne n’a encore raconté sa garde ici. Ce sont les
-                  cyclistes qui écrivent, après avoir repris leur vélo — il n’y
-                  a ni note, ni classement, et nous n’écrivons rien à leur
-                  place.
+                  Les premiers récits apparaîtront ici. Après chaque
+                  stationnement, le cycliste peut partager quelques mots sur son
+                  expérience.
                 </p>
               </div>
             ) : (
@@ -347,8 +347,9 @@ export default function Fiche({
             <div className="panneau__corps">
               <p className="fiche__prix">Gratuit</p>
               <p className="discret">
-                Aucun paiement, ni sur le site ni en direct. C’est une
-                association, et il n’y a rien à vendre.
+                Le stationnement est entièrement gratuit, pour vous comme pour{' '}
+                {fiche.prenomDuBikeSitter}. Bike Sitters est une association à
+                but non lucratif.
               </p>
 
               {peutDemander ? (
@@ -361,9 +362,9 @@ export default function Fiche({
               ) : (
                 <>
                   <p className="discret">
-                    Demander suppose un compte dont l’identité a été vérifiée.
-                    C’est la contrepartie de ce qu’on demande à{' '}
-                    {fiche.prenomDuBikeSitter}.
+                    Pour envoyer une demande, il vous faut un compte vérifié.
+                    Cette vérification permet à {fiche.prenomDuBikeSitter}{' '}
+                    d’accueillir votre vélo en toute confiance.
                   </p>
                   <Link
                     href="/invitation"
@@ -375,7 +376,7 @@ export default function Fiche({
                     href="/liste-attente"
                     className="bouton bouton--discret bouton--large fiche__second"
                   >
-                    Je n’en ai pas
+                    Rejoindre la liste d’attente
                   </Link>
                 </>
               )}
@@ -389,7 +390,7 @@ export default function Fiche({
       <div className="barre-collee">
         <div>
           <strong>Gratuit</strong>
-          <span className="discret"> — réseau d’entraide, sans commission</span>
+          <span className="discret"> — entraide entre voisins</span>
         </div>
         <Link
           href={

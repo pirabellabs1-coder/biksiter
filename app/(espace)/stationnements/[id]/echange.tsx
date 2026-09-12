@@ -3,7 +3,10 @@
 import { useActionState } from 'react';
 
 import MessageDeFormulaire from '@/components/message-de-formulaire';
-import { FORMULAIRE_VIERGE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
+import {
+  FORMULAIRE_VIERGE,
+  type EtatDuFormulaire,
+} from '@/lib/formulaires/etat';
 import { LONGUEUR_MAXIMALE_DU_MESSAGE } from '@/lib/regles/echanges';
 
 export default function Echange({
@@ -27,8 +30,8 @@ export default function Echange({
       <div className="champ">
         <label htmlFor="corps">Écrire à {prenomDeLAutre}</label>
         <span id="corps-aide" className="champ__aide">
-          Le message part par courriel. Il n’y a ni accusé de lecture, ni délai
-          de réponse : chacun répond quand il peut.
+          Votre message est envoyé par e-mail. Chacun répond quand il le peut,
+          sans délai imposé.
         </span>
         <textarea
           id="corps"

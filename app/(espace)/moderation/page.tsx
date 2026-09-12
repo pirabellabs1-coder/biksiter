@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import {
   candidaturesEnAttente,
@@ -39,16 +39,14 @@ export default async function Moderation() {
               ? 'Une identité à vérifier'
               : `${dossiers.length} identités à vérifier`
         }
-        phrase={`Bonjour ${moderateur.prenom}. La règle 2 dit qu’une personne regarde les pièces d’identité, et cette personne c’est vous.`}
+        chapeau={`Bonjour ${moderateur.prenom}. Merci de prendre le temps d’examiner les pièces d’identité : c’est ce qui permet aux membres de se faire confiance.`}
       />
 
       <ul className="tuiles">
         <li className={dossiers.length > 0 ? 'tuile tuile--attente' : 'tuile'}>
           <span className="tuile__valeur">{dossiers.length}</span>
           <span className="tuile__libelle">
-            {dossiers.length > 1
-              ? 'pièces à examiner'
-              : 'pièce à examiner'}
+            {dossiers.length > 1 ? 'pièces à examiner' : 'pièce à examiner'}
           </span>
         </li>
         <li
@@ -64,9 +62,7 @@ export default async function Moderation() {
         <li className="tuile">
           <span className="tuile__valeur">{decisions.length}</span>
           <span className="tuile__libelle">
-            {decisions.length > 1
-              ? 'décisions récentes'
-              : 'décision récente'}
+            {decisions.length > 1 ? 'décisions récentes' : 'décision récente'}
           </span>
         </li>
       </ul>
@@ -75,10 +71,9 @@ export default async function Moderation() {
           prend l'encart neutre et non le filet des choses à faire. */}
       <div className="encart">
         <p>
-          <strong>Ce que vous vérifiez, et rien d’autre.</strong> Que la photo
-          est lisible, que le nom correspond à celui du compte, et que le
-          document a l’air authentique. Vous ne notez personne, vous ne jugez
-          personne, et vous ne recopiez aucun numéro nulle part.
+          <strong>Ce que vous vérifiez.</strong> La photo est lisible, le nom
+          correspond à celui du compte et le document semble authentique. Aucune
+          information du document n’est à recopier.
         </p>
       </div>
 
@@ -95,8 +90,8 @@ export default async function Moderation() {
             <div className="vide">
               <IconeCaracteristique pictogramme="identite" />
               <p>
-                Aucune pièce en attente de relecture. C’est le cas normal —
-                elles arrivent au rythme des inscriptions.
+                Aucune pièce en attente. Les nouvelles pièces arrivent au fil
+                des inscriptions.
               </p>
             </div>
           ) : (
@@ -209,9 +204,9 @@ export default async function Moderation() {
           </div>
           <div className="panneau__corps">
             <p className="discret">
-              Les conditions générales promettent que les décisions de
-              modération sont journalisées et motivées. Les voici — sans les
-              documents, qui sont supprimés.
+              Les décisions de modération sont conservées avec leur motif, comme
+              le prévoient les conditions générales. Les documents, eux, sont
+              supprimés.
             </p>
           </div>
 
@@ -243,7 +238,9 @@ export default async function Moderation() {
                             : 'pastille pastille--refus'
                         }
                       >
-                        {entree.decision === 'verifiee' ? 'vérifiée' : 'refusée'}
+                        {entree.decision === 'verifiee'
+                          ? 'vérifiée'
+                          : 'refusée'}
                       </span>
                     </span>
                   </div>

@@ -18,11 +18,11 @@ import { exigerUnMembre } from '@/lib/session';
  */
 const MOTIFS: Record<string, string> = {
   jamais_accueilli:
-    'Le catalogue s’ouvre en accueillant un vélo. C’est la seule façon d’y accéder, et cela ne s’achète pas.',
+    'Les offres du catalogue sont réservées aux personnes qui accueillent des vélos : elles s’ouvrent dès votre premier accueil.',
   offre_indisponible: 'Ce partenaire a retiré cette offre.',
-  rupture: 'Il n’en reste plus. Le partenaire en remettra peut-être.',
+  rupture: 'Cette offre est épuisée pour le moment.',
   solde_insuffisant:
-    'Votre solde ne couvre pas encore cette offre. Rien ne presse : les maillons ne périment pas.',
+    'Votre solde ne couvre pas encore cette offre. Vos maillons restent valables sans limite de durée.',
   introuvable: 'Cette offre n’existe plus.',
 };
 
@@ -47,6 +47,6 @@ export async function echanger(
 
   return {
     statut: 'valide',
-    message: `Votre bon : ${resultat.code}. Présentez-le au commerçant — il ne porte ni votre nom, ni votre solde. Vous le retrouverez plus bas.`,
+    message: `Votre bon : ${resultat.code}. Présentez-le au commerçant ; vous le retrouverez aussi plus bas sur cette page.`,
   };
 }

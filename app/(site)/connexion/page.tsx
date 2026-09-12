@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import BaseNonBranchee from '@/components/base-non-branchee';
+import PageDeFormulaire from '@/components/page-de-formulaire';
 import { baseConfiguree } from '@/lib/bd/client';
 import { membreConnecte } from '@/lib/session';
 
@@ -21,27 +22,26 @@ export default async function Connexion() {
   }
 
   return (
-    <div className="page page--lecture">
-      <p className="surtitre">Connexion</p>
-      <h1 className="titre-page">Me connecter</h1>
-      <p className="chapeau">
-        Un seul compte pour les deux rôles : vous êtes cycliste quand vous
-        cherchez une place, bike sitter quand vous en proposez une.
-      </p>
-
+    <PageDeFormulaire
+      surtitre="Connexion"
+      scene="velo-a-labri"
+      titre="Me connecter."
+      chapeau="Heureux de vous revoir. Retrouvez vos stationnements et vos emplacements."
+      apres={
+        <p className="discret">
+          Pas encore de compte ?{' '}
+          <Link href="/invitation" className="lien">
+            Utilisez votre invitation
+          </Link>{' '}
+          ou{' '}
+          <Link href="/liste-attente" className="lien">
+            rejoignez la liste d’attente
+          </Link>
+          .
+        </p>
+      }
+    >
       {baseConfiguree() ? <FormulaireDeConnexion /> : <BaseNonBranchee />}
-
-      <p className="discret centre">
-        Pas encore de compte ?{' '}
-        <Link href="/invitation" className="lien">
-          Entrez avec une invitation
-        </Link>{' '}
-        ou{' '}
-        <Link href="/liste-attente" className="lien">
-          rejoignez la liste d’attente
-        </Link>
-        .
-      </p>
-    </div>
+    </PageDeFormulaire>
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import BaseNonBranchee from '@/components/base-non-branchee';
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import { baseConfiguree } from '@/lib/bd/client';
 import { emplacementsDuMembre } from '@/lib/depot/emplacements';
@@ -75,9 +75,9 @@ export default async function TableauDeBord() {
             variante: 'bloquant',
             titre: 'Votre identité n’est pas encore vérifiée',
             phrase:
-              'Tant qu’une personne ne l’a pas contrôlée, vous ne pouvez ni publier un emplacement ni demander un stationnement.',
+              'Une fois votre identité vérifiée, vous pourrez publier un emplacement et demander un stationnement.',
             lien: '/inscription/verification',
-            action: 'Voir où ça en est',
+            action: 'Suivre ma vérification',
           },
         ]),
     ...(aRepondre.length > 0
@@ -90,7 +90,7 @@ export default async function TableauDeBord() {
                 ? 'Une demande attend votre réponse'
                 : `${aRepondre.length} demandes attendent votre réponse`,
             phrase:
-              'Personne ici ne compte le temps que vous mettez à répondre, et refuser ne se justifie pas.',
+              'Prenez le temps qu’il vous faut : vous êtes libre d’accepter ou non.',
             lien: '/mes-stationnements',
             action: 'Y répondre',
           },
@@ -100,13 +100,13 @@ export default async function TableauDeBord() {
       ? [
           {
             cle: 'en-cours',
-            variante: 'garde',
+            variante: 'confirme',
             titre:
               enCours.length === 1
                 ? 'Un vélo est gardé en ce moment'
                 : `${enCours.length} vélos sont gardés en ce moment`,
             phrase:
-              'La reprise se fait avec un code à quatre chiffres, dicté sur place.',
+              'Au moment de la reprise, un code à quatre chiffres confirme la remise du vélo.',
             lien: `/stationnements/${enCours[0].id}`,
             action: 'Ouvrir',
           },
@@ -119,10 +119,10 @@ export default async function TableauDeBord() {
       <EnteteDePage
         surtitre="Tableau de bord"
         titre={`Bonjour ${membre.prenom}`}
-        phrase={
+        chapeau={
           aFaire.length === 0
-            ? 'Rien n’attend de réponse. C’est le cas normal, et c’est très bien.'
-            : 'Voici ce qui attend quelque chose de vous.'
+            ? 'Tout est à jour : rien n’attend votre réponse.'
+            : 'Voici ce qui attend votre attention.'
         }
         actions={
           verifie && emplacements.length < EMPLACEMENTS_PAR_MEMBRE ? (
@@ -141,11 +141,7 @@ export default async function TableauDeBord() {
           {aFaire.map((entree) => (
             <div
               key={entree.cle}
-              className={
-                entree.variante === 'attente'
-                  ? 'a-faire__entree'
-                  : `a-faire__entree a-faire__entree--${entree.variante}`
-              }
+              className={`a-faire__entree a-faire__entree--${entree.variante}`}
             >
               <div className="a-faire__corps">
                 <strong>{entree.titre}</strong>
@@ -169,12 +165,12 @@ export default async function TableauDeBord() {
             {publies > 1 ? 'emplacements publiés' : 'emplacement publié'}
           </span>
         </li>
-        <li
-          className={aRepondre.length > 0 ? 'tuile tuile--attente' : 'tuile'}
-        >
+        <li className={aRepondre.length > 0 ? 'tuile tuile--attente' : 'tuile'}>
           <span className="tuile__valeur">{aRepondre.length}</span>
           <span className="tuile__libelle">
-            {aRepondre.length > 1 ? 'demandes à répondre' : 'demande à répondre'}
+            {aRepondre.length > 1
+              ? 'demandes à répondre'
+              : 'demande à répondre'}
           </span>
         </li>
         <li className={enCours.length > 0 ? 'tuile tuile--verifie' : 'tuile'}>
@@ -216,9 +212,9 @@ export default async function TableauDeBord() {
             <div className="vide">
               <IconeCaracteristique pictogramme="calendrier" />
               <p>
-                Aucune garde prévue. Une garde apparaît ici dès qu’un bike
-                sitter accepte une demande — la vôtre, ou celle de quelqu’un
-                pour votre emplacement.
+                Aucun stationnement prévu pour le moment. Ils s’afficheront ici
+                dès qu’une demande sera acceptée, pour votre vélo comme pour
+                votre emplacement.
               </p>
               <div className="boutons">
                 <Link href="/emplacements" className="bouton bouton--discret">
@@ -234,7 +230,10 @@ export default async function TableauDeBord() {
                     href={`/stationnements/${stationnement.id}`}
                     className="ligne"
                   >
-                    <span className="jeton-initiale jeton-initiale--petit" aria-hidden="true">
+                    <span
+                      className="jeton-initiale jeton-initiale--petit"
+                      aria-hidden="true"
+                    >
                       {autrePersonne(stationnement, membre.id).charAt(0)}
                     </span>
                     <span className="ligne__corps">
@@ -253,13 +252,10 @@ export default async function TableauDeBord() {
                       </span>
                     </span>
                     <span className="ligne__fin">
-                      <span
-                        className={
-                          stationnement.etat === 'en_cours'
-                            ? 'pastille pastille--verifie'
-                            : 'pastille pastille--verifie'
-                        }
-                      >
+                      {/* Accepté et vélo gardé sont tous deux « confirmés »
+                          au sens de la règle 6 : c'est le mot qui les
+                          distingue, pas la couleur. */}
+                      <span className="pastille pastille--verifie">
                         {stationnement.etat === 'en_cours'
                           ? 'Vélo gardé'
                           : 'Accepté'}
@@ -283,9 +279,9 @@ export default async function TableauDeBord() {
               <div className="vide">
                 <IconeCaracteristique pictogramme="prive" />
                 <p>
-                  Vous n’en proposez aucun. Un garage, une cave, une cour
-                  fermée suffisent, et refuser une demande ne se justifie
-                  jamais.
+                  Vous n’en proposez pas encore. Un garage, une cave ou une cour
+                  fermée suffisent, et vous restez libre d’accepter chaque
+                  demande.
                 </p>
               </div>
             ) : (
@@ -326,14 +322,14 @@ export default async function TableauDeBord() {
             </div>
             <div className="panneau__corps">
               <p className="discret">
-                Le réseau s’agrandit par recommandation&nbsp;: quelqu’un répond
-                de la personne qu’il fait entrer. Une invitation vaut le plus
-                dans votre propre quartier.
+                Invitez les personnes de votre entourage à rejoindre le réseau :
+                chaque invitation aide Bike Sitters à s’étendre, en particulier
+                dans votre quartier.
               </p>
               {invitations.length === 0 ? (
                 <p className="discret">
-                  Vous n’en avez pas de disponible. On en gagne une après
-                  chaque stationnement mené à bien.
+                  Vous n’avez plus d’invitation disponible pour le moment. Vous
+                  en recevrez une nouvelle après chaque stationnement réussi.
                 </p>
               ) : (
                 <ul className="codes">

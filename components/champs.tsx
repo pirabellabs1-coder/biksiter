@@ -157,22 +157,21 @@ export function GroupeDeCases({
     <fieldset id={nom} tabIndex={-1} aria-describedby={decrit(nom, aide, erreur)}>
       <legend>{legende}</legend>
       <Aide id={nom} aide={aide} />
+      {/* La ligne entière est l'étiquette : on coche en cliquant n'importe où
+          dessus, et non sur un carré de dix-huit pixels. Un `label` qui
+          enveloppe son champ n'a pas besoin de `htmlFor`. */}
       <div className="cases">
-        {options.map((option) => {
-          const identifiant = `${nom}-${option.valeur.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-          return (
-            <div className="case" key={option.valeur}>
-              <input
-                type="checkbox"
-                id={identifiant}
-                name={nom}
-                value={option.valeur}
-                defaultChecked={coches.includes(option.valeur)}
-              />
-              <label htmlFor={identifiant}>{option.libelle}</label>
-            </div>
-          );
-        })}
+        {options.map((option) => (
+          <label className="case" key={option.valeur}>
+            <input
+              type="checkbox"
+              name={nom}
+              value={option.valeur}
+              defaultChecked={coches.includes(option.valeur)}
+            />
+            <span>{option.libelle}</span>
+          </label>
+        ))}
       </div>
       <Erreur id={nom} erreur={erreur} />
     </fieldset>

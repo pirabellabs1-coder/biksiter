@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import { dossier } from '@/lib/depot/moderation';
 import { joursAvantSuppression } from '@/lib/regles/pieces';
@@ -18,14 +18,14 @@ export const dynamic = 'force-dynamic';
 const A_VERIFIER = [
   'La photo est lisible, et le document n’est ni coupé ni flou.',
   'Le nom du document correspond à celui du compte.',
-  'Le document a l’air authentique — pas une photo d’écran, pas un montage.',
+  'Le document semble authentique : ni capture d’écran, ni montage.',
 ];
 
 /** Ce qu'on ne fait pas, et qui mérite d'être écrit noir sur blanc. */
 const A_NE_PAS_FAIRE = [
-  'Ne recopiez ni le numéro de pièce, ni la date de naissance, ni l’adresse.',
-  'Ne jugez pas la personne : vous vérifiez un document, pas quelqu’un.',
-  'N’enregistrez pas le fichier. Il disparaît dès que vous aurez tranché.',
+  'Aucune donnée du document n’est à recopier : ni numéro, ni date de naissance, ni adresse.',
+  'Votre examen porte uniquement sur le document.',
+  'Le fichier n’a pas à être enregistré : il est supprimé dès votre décision.',
 ];
 
 export default async function ExaminerUnePiece({
@@ -53,7 +53,7 @@ export default async function ExaminerUnePiece({
       <EnteteDePage
         surtitre="Modération"
         titre={`${aVerifier.prenom} ${aVerifier.nom}`}
-        phrase="Vous regardez une pièce d’identité. C’est ce que la règle 2 confie à une personne, et cette personne c’est vous."
+        chapeau="Merci d’examiner cette pièce d’identité avec attention. Elle sera supprimée dès votre décision."
         actions={
           <Link href="/moderation" className="bouton bouton--discret">
             Retour à la file
@@ -68,13 +68,10 @@ export default async function ExaminerUnePiece({
               <IconeCaracteristique pictogramme="identite" />
               Le document
             </h2>
-            <span
-              className={
-                restants === 0
-                  ? 'pastille pastille--refus'
-                  : 'pastille pastille--attente'
-              }
-            >
+            {/* Ambre dans les deux cas : la pièce attend une décision, elle
+                n'a été ni refusée ni perdue (règle 6). C'est le texte qui dit
+                l'urgence. */}
+            <span className="pastille pastille--attente">
               {restants === 0
                 ? 'supprimé d’un instant à l’autre'
                 : `supprimé dans ${restants} jour${restants > 1 ? 's' : ''}`}
@@ -96,8 +93,8 @@ export default async function ExaminerUnePiece({
               <div className="vide">
                 <IconeCaracteristique pictogramme="journal" />
                 <p>
-                  Ce document est un PDF. Il s’ouvre dans un onglet, et ce
-                  onglet-là non plus ne le met pas en cache.
+                  Ce document est un PDF. Il s’ouvre dans un nouvel onglet, sans
+                  être conservé par le navigateur.
                 </p>
                 <div className="boutons">
                   <a
@@ -161,7 +158,7 @@ export default async function ExaminerUnePiece({
               </ul>
 
               <p className="consigne">
-                <strong>Et ce que vous ne faites pas.</strong>
+                <strong>Bonnes pratiques.</strong>
               </p>
               <ul className="marques">
                 {A_NE_PAS_FAIRE.map((point) => (

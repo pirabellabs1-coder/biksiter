@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import FormulaireDEmplacement from '@/components/formulaire-d-emplacement';
+import PageDeFormulaire from '@/components/page-de-formulaire';
 import { membreConnecte } from '@/lib/session';
 
 import { proposerUnEmplacement } from './actions';
@@ -8,37 +9,51 @@ import { proposerUnEmplacement } from './actions';
 export const metadata: Metadata = {
   title: 'Proposer un emplacement',
   description:
-    'Un garage, une cave, une cour fermée suffisent. Accueillir un vélo ne coûte rien, n’engage à rien, et votre adresse reste masquée tant que vous n’avez pas accepté une demande.',
+    'Un garage, une cave ou une cour fermée suffisent. Accueillir un vélo est gratuit et sans engagement, et votre adresse reste confidentielle jusqu’à ce que vous acceptiez une demande.',
 };
 
 export const dynamic = 'force-dynamic';
+
+/** Les trois choses qu'on veut savoir avant de décrire sa cave. */
+const CE_QUI_EST_GARANTI = [
+  {
+    titre: 'Votre adresse reste confidentielle',
+    detail:
+      'La carte n’affiche qu’une zone d’au moins 250 mètres. L’adresse exacte n’est transmise qu’au cycliste dont vous acceptez la demande, et elle lui est retirée si le stationnement est annulé.',
+  },
+  {
+    titre: 'Seuls des membres vérifiés peuvent vous écrire',
+    detail:
+      'Leur e-mail, leur téléphone et leur pièce d’identité ont été vérifiés par l’association.',
+  },
+  {
+    titre: 'Vous restez libre de vos choix',
+    detail:
+      'Vous répondez librement à chaque demande. Les membres ne sont ni notés ni classés.',
+  },
+];
 
 export default async function ProposerUnEmplacement() {
   const membre = await membreConnecte();
   const publiera = membre?.verification === 'verifiee';
 
   return (
-    <div className="page">
-      <div className="deux-colonnes">
-        <div>
-          <p className="surtitre">Proposer un emplacement</p>
-          <h1 className="titre-page">
-            Votre garage vide peut sauver un vélo
-          </h1>
-          <p className="chapeau">
-            Un garage, une cave, une cour, une véranda. Si un vélo peut y tenir
-            quelques heures à l’abri et que personne d’autre que vous n’y entre,
-            vous pouvez accueillir.
-          </p>
-
+    <PageDeFormulaire
+      surtitre="Proposer un emplacement"
+      collant={false}
+      titre="Un peu de place chez vous peut rendre un grand service."
+      chapeau="Un garage, une cave, une cour ou une véranda suffisent, dès lors que le lieu est fermé et réservé à votre usage. Vous accueillez un vélo quelques heures ou quelques jours, quand cela vous convient."
+      propos={
+        <>
           <ol className="etapes">
             <li className="etape">
               <span className="etape__numero" aria-hidden="true" />
               <div>
                 <h2>Vous décrivez le lieu</h2>
                 <p>
-                  Type d’emplacement, nombre de vélos, fermeture, accès. C’est
-                  ce qui évite les demandes impossibles.
+                  Type d’emplacement, nombre de vélos, fermeture, accès : ces
+                  précisions permettent aux cyclistes de vous envoyer des
+                  demandes adaptées.
                 </p>
               </div>
             </li>
@@ -47,8 +62,8 @@ export default async function ProposerUnEmplacement() {
               <div>
                 <h2>Une personne vérifie</h2>
                 <p>
-                  Nous contrôlons votre identité avant toute publication.
-                  Personne n’apparaît sur la carte sans être passé par là.
+                  Une personne de l’association vérifie votre identité avant la
+                  publication, généralement sous 24 heures.
                 </p>
               </div>
             </li>
@@ -57,59 +72,39 @@ export default async function ProposerUnEmplacement() {
               <div>
                 <h2>Vous recevez des demandes</h2>
                 <p>
-                  Vous répondez à celles qui vous conviennent. Chaque demande
-                  est une proposition, jamais une obligation.
+                  Les cyclistes vous écrivent, et vous acceptez les demandes qui
+                  vous conviennent.
                 </p>
               </div>
             </li>
           </ol>
 
-          <div className="encart encart--verifie">
-            <p>
-              <strong>
-                Vous ne recevez que des demandes de membres vérifiés.
-              </strong>{' '}
-              Prénom, e-mail, téléphone et pièce d’identité sont contrôlés avant
-              qu’une personne puisse vous écrire.
-            </p>
-          </div>
-
-          <div className="encart">
-            <p>
-              <strong>Votre adresse n’est jamais publique.</strong> La carte
-              affiche une zone d’au moins 250 mètres, pas un point. Vous
-              communiquez l’adresse vous-même, uniquement à la personne dont
-              vous avez accepté la demande — et elle la reperd si la garde est
-              annulée.
-            </p>
-          </div>
-
-          <div className="encart">
-            <p>
-              <strong>Il n’y a ni note, ni classement, ni palmarès.</strong> Un
-              classement entre bénévoles crée des perdants et pousse à accepter
-              des gardes qu’on aurait dû refuser. Refuser une demande ne vous
-              coûte rien.
-            </p>
-          </div>
-        </div>
-
-        <div className="carte carte--aeree">
-          <h2 className="titre-section">Décrire mon emplacement</h2>
-          <p className="discret">
-            {publiera
-              ? 'Votre identité est vérifiée : cet emplacement sera publié dès que vous l’aurez décrit. Vous pouvez en proposer deux au maximum.'
-              : 'Rien n’est visible tant qu’une personne n’a pas vérifié votre identité. Vous décrivez le lieu, nous vous répondons.'}
-          </p>
-          <FormulaireDEmplacement
-            action={proposerUnEmplacement}
-            membreDejaConnu={membre !== null}
-            libelleDuBouton={
-              publiera ? 'Publier mon emplacement' : 'Envoyer ma candidature'
-            }
-          />
-        </div>
-      </div>
-    </div>
+          {/* Trois encarts empilés se lisaient comme trois alertes. C'est une
+              seule promesse en trois points, et elle se lit comme telle. */}
+          <dl className="garanties">
+            {CE_QUI_EST_GARANTI.map(({ titre, detail }) => (
+              <div key={titre}>
+                <dt>{titre}</dt>
+                <dd>{detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      }
+    >
+      <h2 className="titre-section">Décrire mon emplacement</h2>
+      <p className="discret">
+        {publiera
+          ? 'Votre identité est vérifiée : votre emplacement sera publié dès que vous l’aurez décrit. Vous pouvez en proposer jusqu’à deux.'
+          : 'Décrivez votre emplacement : il sera publié une fois votre identité vérifiée par l’association, et nous vous répondons par e-mail.'}
+      </p>
+      <FormulaireDEmplacement
+        action={proposerUnEmplacement}
+        membreDejaConnu={membre !== null}
+        libelleDuBouton={
+          publiera ? 'Publier mon emplacement' : 'Envoyer ma candidature'
+        }
+      />
+    </PageDeFormulaire>
   );
 }

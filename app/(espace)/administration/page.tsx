@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import BaseNonBranchee from '@/components/base-non-branchee';
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import { baseConfiguree } from '@/lib/bd/client';
 import {
@@ -44,17 +44,25 @@ export default async function Administration() {
     );
   }
 
-  const [reseau, file, quartiers, catalogue, dons, suspens, dossiers, candidatures] =
-    await Promise.all([
-      etatDuReseau(),
-      fileDEnvoi(),
-      quartiersACouvrir(),
-      etatDuCatalogue(),
-      etatDesDons(),
-      maillonsEnSuspens(),
-      dossiersAVerifier(),
-      candidaturesEnAttente(),
-    ]);
+  const [
+    reseau,
+    file,
+    quartiers,
+    catalogue,
+    dons,
+    suspens,
+    dossiers,
+    candidatures,
+  ] = await Promise.all([
+    etatDuReseau(),
+    fileDEnvoi(),
+    quartiersACouvrir(),
+    etatDuCatalogue(),
+    etatDesDons(),
+    maillonsEnSuspens(),
+    dossiersAVerifier(),
+    candidaturesEnAttente(),
+  ]);
 
   const fileEnRetard =
     file.attenteLaPlusLongueEnHeures !== null &&
@@ -62,7 +70,8 @@ export default async function Administration() {
 
   const prets = quartiers.filter(
     (quartier) =>
-      !quartier.dejaOuvert && maturiteDUnQuartier(quartier.bikeSitters) === 'pret',
+      !quartier.dejaOuvert &&
+      maturiteDUnQuartier(quartier.bikeSitters) === 'pret',
   );
 
   const aFaire = [
@@ -76,7 +85,7 @@ export default async function Administration() {
                 ? `${file.enEchec} message${file.enEchec > 1 ? 's' : ''} en échec d’envoi`
                 : 'La file d’envoi n’avance plus',
             phrase:
-              'Rien ne casse à l’écran quand la file s’arrête : les messages s’empilent, et quelqu’un attend devant une porte l’adresse qu’il n’a jamais reçue.',
+              'Des e-mails n’ont pas pu partir. Certains peuvent contenir une adresse attendue par un cycliste : à vérifier rapidement.',
             lien: null,
           },
         ]
@@ -91,7 +100,7 @@ export default async function Administration() {
                 ? 'Une pièce d’identité attend une relecture'
                 : `${dossiers.length} pièces d’identité attendent une relecture`,
             phrase:
-              'Elles sont supprimées automatiquement au bout de quelques jours, vérifiées ou non.',
+              'Elles sont supprimées automatiquement après quelques jours, qu’elles aient été examinées ou non.',
             lien: '/moderation',
           },
         ]
@@ -115,12 +124,12 @@ export default async function Administration() {
       ? [
           {
             cle: 'contestations',
-            variante: 'actif' as const,
+            variante: 'attente' as const,
             titre:
               suspens.gardesContestees === 1
                 ? 'Une garde est contestée'
                 : `${suspens.gardesContestees} gardes sont contestées`,
-            phrase: `${suspens.maillonsRetenus} maillon${suspens.maillonsRetenus > 1 ? 's sont retenus' : ' est retenu'} le temps que quelqu’un regarde.`,
+            phrase: `${suspens.maillonsRetenus} maillon${suspens.maillonsRetenus > 1 ? 's sont retenus' : ' est retenu'} en attendant l’examen de la situation.`,
             lien: null,
           },
         ]
@@ -132,8 +141,8 @@ export default async function Administration() {
             variante: 'attente' as const,
             titre:
               prets.length === 1
-                ? `${prets[0].quartier} a de quoi ouvrir`
-                : `${prets.length} quartiers ont de quoi ouvrir`,
+                ? `${prets[0].quartier} est prêt à ouvrir`
+                : `${prets.length} quartiers sont prêts à ouvrir`,
             phrase: `Au moins ${BIKE_SITTERS_POUR_OUVRIR} bike sitters y sont inscrits sur la liste d’attente, et aucun emplacement n’y est publié.`,
             lien: null,
           },
@@ -188,8 +197,8 @@ export default async function Administration() {
           <p className="surtitre">Administration</p>
           <h1>L’état du réseau</h1>
           <p>
-            Bonjour {moderateur.prenom}. Des nombres et des états — aucune
-            adresse, aucun corps de message, aucun classement entre membres.
+            Bonjour {moderateur.prenom}. Voici l’activité du réseau, présentée
+            sans données personnelles.
           </p>
         </div>
 
@@ -215,8 +224,8 @@ export default async function Administration() {
             <div className="a-faire__corps">
               <strong>Rien n’attend de décision</strong>
               <p>
-                Pas de pièce à relire, pas de candidature à classer, pas de
-                message en échec. C’est l’état normal, et c’est très bien.
+                Aucune pièce à examiner, aucune candidature en attente et aucun
+                envoi en échec.
               </p>
             </div>
           </div>
@@ -226,11 +235,7 @@ export default async function Administration() {
           {aFaire.map((entree) => (
             <div
               key={entree.cle}
-              className={
-                entree.variante === 'attente'
-                  ? 'a-faire__entree'
-                  : `a-faire__entree a-faire__entree--${entree.variante}`
-              }
+              className={`a-faire__entree a-faire__entree--${entree.variante}`}
             >
               <div className="a-faire__corps">
                 <strong>{entree.titre}</strong>
@@ -257,9 +262,8 @@ export default async function Administration() {
 
           <div className="panneau__corps">
             <p className="discret">
-              Ce sont les bike sitters qui décident, jamais les cyclistes&nbsp;:
-              un quartier plein de gens qui cherchent une place et vide de gens
-              qui en offrent n’est pas près d’ouvrir, il est près de décevoir.
+              Un quartier peut ouvrir dès qu’il compte assez de bike sitters
+              pour accueillir les cyclistes qui l’attendent.
             </p>
           </div>
 
@@ -267,9 +271,8 @@ export default async function Administration() {
             <div className="vide">
               <IconeCaracteristique pictogramme="carte" />
               <p>
-                Personne ne s’est encore inscrit sur la liste d’attente. Ce
-                panneau est la carte des quartiers à venir&nbsp;: il se remplit
-                à mesure que les gens disent où ils habitent.
+                La liste d’attente est encore vide. Ce panneau présentera les
+                quartiers à ouvrir au fil des inscriptions.
               </p>
             </div>
           ) : (
@@ -324,9 +327,8 @@ export default async function Administration() {
                   contiennent les adresses que tout le reste du produit
                   protège (règle 4). */}
               <p className="discret">
-                On compte les messages, on ne les ouvre pas. Un message
-                d’acceptation contient une adresse exacte, et cet écran n’a
-                aucune raison de la connaître.
+                Seul le nombre de messages est affiché : leur contenu, qui peut
+                comporter une adresse, reste confidentiel.
               </p>
             </div>
           </section>
@@ -383,10 +385,8 @@ export default async function Administration() {
                 </div>
               </dl>
               <p className="discret">
-                Des annonces, jamais des donateurs&nbsp;: ni prénom ni adresse
-                n’apparaissent ici. Un don ne donne aucun avantage sur le
-                service, et un écran qui nommerait ceux qui donnent finirait par
-                en donner un.
+                Les dons sont présentés sans le nom des donateurs, afin que tous
+                les membres soient traités de la même manière.
               </p>
             </div>
           </section>
@@ -403,11 +403,11 @@ function LigneDeQuartier({ quartier }: { quartier: QuartierACouvrir }) {
   const etat = quartier.dejaOuvert
     ? { classe: 'pastille pastille--verifie', mot: 'ouvert' }
     : maturite === 'pret'
-      ? { classe: 'pastille pastille--verifie', mot: 'de quoi ouvrir' }
+      ? { classe: 'pastille pastille--verifie', mot: 'prêt à ouvrir' }
       : maturite === 'bientot'
         ? {
             classe: 'pastille pastille--neutre',
-            mot: `il en manque ${manquants}`,
+            mot: `plus que ${manquants}`,
           }
         : { classe: 'pastille pastille--neutre', mot: 'trop tôt' };
 

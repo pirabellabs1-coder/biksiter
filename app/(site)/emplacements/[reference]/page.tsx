@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import BandeauDePage from '@/components/bandeau-de-page';
 import BaseNonBranchee from '@/components/base-non-branchee';
 
 import Fiche from './fiche';
@@ -47,10 +48,14 @@ export default async function FicheEmplacement({
 }) {
   if (!baseConfiguree()) {
     return (
-      <div className="page page--lecture">
-        <h1 className="titre-page">Emplacement</h1>
-        <BaseNonBranchee />
-      </div>
+      <>
+        <BandeauDePage titre="Emplacement" />
+        <section className="section">
+          <div className="section__interieur">
+            <BaseNonBranchee />
+          </div>
+        </section>
+      </>
     );
   }
 

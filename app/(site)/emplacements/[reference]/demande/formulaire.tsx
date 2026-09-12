@@ -112,8 +112,8 @@ export default function FormulaireDeDemande({
       <div className="champ">
         <label htmlFor="message">Un mot pour {prenomDuBikeSitter}</label>
         <span id="message-aide" className="champ__aide">
-          Facultatif. Ce qui l’aide à décider : d’où vous venez, pourquoi vous
-          passez par là.
+          Facultatif. Quelques mots pour vous présenter l’aideront à vous
+          répondre : votre trajet, l’occasion de votre venue.
         </span>
         <textarea id="message" name="message" aria-describedby="message-aide" />
       </div>

@@ -36,7 +36,7 @@ export async function saisirLeCode(
   if (!stationnement) {
     return {
       statut: 'erreur',
-      erreurs: { [ERREUR_GENERALE]: 'Ce stationnement n’existe pas.' },
+      erreurs: { [ERREUR_GENERALE]: 'Ce stationnement est introuvable.' },
     };
   }
 
@@ -49,14 +49,17 @@ export async function saisirLeCode(
       statut: 'erreur',
       erreurs: {
         [ERREUR_GENERALE]:
-          'C’est à l’autre personne de saisir le code : celui qui reçoit le vélo le saisit, celui qui le remet le dicte.',
+          'Le code est saisi par la personne qui reçoit le vélo ; c’est vous qui le lui communiquez.',
       },
     };
   }
 
   const saisie = texte(donnees, 'code');
   if (!/^\d{4}$/.test(saisie)) {
-    return { statut: 'erreur', erreurs: { code: 'Le code fait quatre chiffres.' } };
+    return {
+      statut: 'erreur',
+      erreurs: { code: 'Le code comporte quatre chiffres.' },
+    };
   }
 
   const resultat = await saisirLeCodeDeRemise(identifiant, sens, saisie);
@@ -68,7 +71,7 @@ export async function saisirLeCode(
       statut: 'valide',
       message:
         resultat.nouvelEtat === 'en_cours'
-          ? 'Le vélo est gardé. Le code de reprise sera donné à celui qui vous le rendra.'
+          ? 'Le dépôt est confirmé : le vélo est désormais gardé. Un nouveau code servira au moment de la reprise.'
           : 'Le vélo est repris, le stationnement est terminé. Merci à tous les deux.',
     };
   }
@@ -79,7 +82,7 @@ export async function saisirLeCode(
     return {
       statut: 'erreur',
       erreurs: {
-        code: 'Ce code a plus de six heures : il est périmé. Demandez-en un nouveau.',
+        code: 'Ce code n’est plus valable : il date de plus de six heures. Demandez-en un nouveau.',
       },
     };
   }
@@ -88,8 +91,7 @@ export async function saisirLeCode(
     return {
       statut: 'erreur',
       erreurs: {
-        code:
-          'Les trois essais sont épuisés. Un nouveau code vient d’être envoyé à la personne qui remet le vélo.',
+        code: 'Les trois essais sont épuisés. Un nouveau code vient d’être envoyé à la personne qui remet le vélo.',
       },
     };
   }
@@ -131,10 +133,10 @@ export async function ecrireAuSujetDuStationnement(
 
   if (!resultat.ecrit) {
     const motifs: Record<string, string> = {
-      vide: 'Écrivez quelque chose avant d’envoyer.',
+      vide: 'Votre message est vide.',
       trop_long: `Ce message dépasse ${LONGUEUR_MAXIMALE_DU_MESSAGE} caractères.`,
       etat_ferme:
-        'Ce stationnement est refusé ou annulé : le fil est fermé.',
+        'Ce stationnement a été refusé ou annulé : les échanges sont clos.',
       pas_concerne: 'Ce stationnement ne vous concerne pas.',
     };
     return {
@@ -148,7 +150,7 @@ export async function ecrireAuSujetDuStationnement(
   return {
     statut: 'valide',
     message:
-      'Message envoyé. L’autre le reçoit par courriel — rien ne dit quand il le lira, et c’est très bien ainsi.',
+      'Message envoyé. Il est transmis par e-mail, et la réponse arrivera dès que l’autre personne sera disponible.',
   };
 }
 
@@ -170,12 +172,11 @@ export async function ecrireUnAvisSurLaGarde(
 
   if (!resultat.ecrit) {
     const motifs: Record<string, string> = {
-      vide: 'Écrivez quelque chose avant d’envoyer.',
+      vide: 'Votre avis est vide.',
       trop_long: `Cet avis dépasse ${LONGUEUR_MAXIMALE_DE_LAVIS} caractères.`,
       garde_non_terminee:
-        'Un avis s’écrit après la reprise du vélo, pas pendant la garde.',
-      pas_le_cycliste:
-        'Seule la personne qui a déposé le vélo écrit l’avis.',
+        'Vous pourrez écrire votre avis après la reprise du vélo.',
+      pas_le_cycliste: 'L’avis est écrit par la personne qui a déposé le vélo.',
       deja_ecrit: 'Vous avez déjà écrit un avis pour cette garde.',
       introuvable: 'Ce stationnement n’existe plus.',
     };
@@ -186,7 +187,6 @@ export async function ecrireUnAvisSurLaGarde(
 
   return {
     statut: 'valide',
-    message:
-      'Merci. Votre avis apparaît sur la fiche de l’emplacement, sans note ni étoile — juste ce que vous avez écrit.',
+    message: 'Merci ! Votre avis est publié sur la fiche de l’emplacement.',
   };
 }

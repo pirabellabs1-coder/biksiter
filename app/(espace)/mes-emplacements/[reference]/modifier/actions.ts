@@ -7,19 +7,10 @@ import {
   modifierUnEmplacement,
   retirerUnEmplacement,
 } from '@/lib/depot/emplacements';
-import {
-  ajouterUnePhoto,
-  identifiantDeLEmplacement,
-} from '@/lib/depot/photos';
-import {
-  PHOTOS_PAR_EMPLACEMENT,
-  refusDeLaPhoto,
-} from '@/lib/regles/photos';
+import { ajouterUnePhoto, identifiantDeLEmplacement } from '@/lib/depot/photos';
+import { PHOTOS_PAR_EMPLACEMENT, refusDeLaPhoto } from '@/lib/regles/photos';
 import { lireLesChampsDEmplacement } from '@/lib/formulaires/emplacement';
-import {
-  ERREUR_GENERALE,
-  type EtatDuFormulaire,
-} from '@/lib/formulaires/etat';
+import { ERREUR_GENERALE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
 import { HORS_ZONE, situerLEmplacement } from '@/lib/geocodage/situer';
 import { RAYON_MINIMAL_DE_ZONE_METRES } from '@/lib/regles/adresse';
 import { exigerUnMembre } from '@/lib/session';
@@ -104,7 +95,7 @@ export async function retirerLEmplacement(
       statut: 'erreur',
       erreurs: {
         confirmation:
-          'Cochez la case : retirer efface aussi les stationnements passés de cet emplacement.',
+          'Merci de cocher la case pour confirmer : le retrait efface aussi les stationnements passés de cet emplacement.',
       },
     };
   }
@@ -116,7 +107,7 @@ export async function retirerLEmplacement(
       return {
         statut: 'erreur',
         erreurs: {
-          [ERREUR_GENERALE]: `${resultat.combien} stationnement${resultat.combien > 1 ? 's' : ''} en cours ou en attente de réponse. Répondez-y ou attendez la reprise du vélo — quelqu’un compte sur cet emplacement. En attendant, vous pouvez le mettre en pause : il disparaît de la carte sans rien effacer.`,
+          [ERREUR_GENERALE]: `${resultat.combien} stationnement${resultat.combien > 1 ? 's' : ''} en cours ou en attente de réponse. Vous pourrez le retirer une fois ces stationnements terminés. En attendant, vous pouvez le mettre en pause : il n’apparaîtra plus sur la carte.`,
         },
       };
     }
@@ -135,7 +126,8 @@ export async function retirerLEmplacement(
 const REFUS_DE_PHOTO: Record<string, string> = {
   vide: 'Ce fichier est vide.',
   type_refuse: 'Envoyez une photo (JPEG, PNG, WebP ou HEIC).',
-  trop_lourde: 'Cette photo dépasse 8 Mo. Une photo de téléphone suffit.',
+  trop_lourde:
+    'Cette photo dépasse 8 Mo. Une photo prise au téléphone convient très bien.',
   rang_hors_limites: 'Cet emplacement de photo n’existe pas.',
 };
 
@@ -157,7 +149,9 @@ export async function envoyerLesPhotos(
   if (!emplacementId) {
     return {
       statut: 'erreur',
-      erreurs: { [ERREUR_GENERALE]: 'Cet emplacement n’est pas le vôtre.' },
+      erreurs: {
+        [ERREUR_GENERALE]: 'Cet emplacement n’est pas associé à votre compte.',
+      },
     };
   }
 

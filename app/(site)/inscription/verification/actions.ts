@@ -53,7 +53,7 @@ export async function deposerLaPieceDidentite(
       statut: 'erreur',
       erreurs: {
         [ERREUR_GENERALE]:
-          'Le dépôt est momentanément fermé : la clé de chiffrement des pièces n’est pas configurée. Rien n’est stocké tant qu’elle ne l’est pas.',
+          'Le dépôt est momentanément indisponible. Merci de réessayer un peu plus tard.',
       },
     };
   }
@@ -89,7 +89,7 @@ export async function deposerLaPieceDidentite(
   return {
     statut: 'valide',
     message:
-      'Votre pièce est enregistrée, chiffrée. Une personne la relit sous 24 heures, puis elle est supprimée — au plus tard après sept jours, même si personne ne l’a regardée.',
+      'Votre pièce d’identité a bien été reçue et chiffrée. Une personne de l’association l’examine généralement sous 24 heures ; elle est ensuite supprimée, au plus tard après sept jours.',
   };
 }
 
@@ -112,7 +112,7 @@ export async function demanderUnCodeSms(
       erreurs: {
         telephone:
           lecture.motif === 'pas_un_mobile'
-            ? 'Indiquez un numéro de mobile : un SMS n’arrive pas sur une ligne fixe.'
+            ? 'Merci d’indiquer un numéro de mobile : les SMS ne peuvent pas être reçus sur une ligne fixe.'
             : 'Ce numéro n’est pas lisible. Exemple : 0470 12 34 56.',
       },
     };
@@ -123,7 +123,7 @@ export async function demanderUnCodeSms(
 
   return {
     statut: 'valide',
-    message: `Un code à ${CHIFFRES_DU_CODE} chiffres part vers le ${lecture.numero}. Il vaut ${VALIDITE_DU_CODE_MINUTES} minutes.`,
+    message: `Un code à ${CHIFFRES_DU_CODE} chiffres vient d’être envoyé au ${lecture.numero}. Il reste valable ${VALIDITE_DU_CODE_MINUTES} minutes.`,
   };
 }
 
@@ -145,13 +145,13 @@ export async function confirmerLeCodeSms(
   if (confirmation.resultat === null) {
     return {
       statut: 'erreur',
-      erreurs: { code: 'Aucun code en attente. Demandez-en un.' },
+      erreurs: { code: 'Aucun code en attente : demandez-en un nouveau.' },
     };
   }
 
   const resultat = confirmation.resultat;
   const messages: Record<string, string> = {
-    expire: 'Ce code a plus de dix minutes. Demandez-en un nouveau.',
+    expire: 'Ce code n’est plus valable : demandez-en un nouveau.',
     epuise: 'Les trois essais sont épuisés. Demandez un nouveau code.',
   };
 

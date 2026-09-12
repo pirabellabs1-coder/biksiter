@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import { emplacementsDuMembre } from '@/lib/depot/emplacements';
 import { EMPLACEMENTS_PAR_MEMBRE } from '@/lib/regles/emplacements';
@@ -27,7 +27,7 @@ export default async function MesEmplacements() {
             ? 'Vous n’en proposez aucun'
             : `${emplacements.length} sur ${EMPLACEMENTS_PAR_MEMBRE} possibles`
         }
-        phrase={`Deux au maximum. Au-delà, on ne parle plus d’un voisin qui rend service.`}
+        chapeau={`Vous pouvez proposer jusqu’à ${EMPLACEMENTS_PAR_MEMBRE} emplacements.`}
         actions={
           decision.autorise ? (
             <Link
@@ -44,21 +44,23 @@ export default async function MesEmplacements() {
         <div className="a-faire">
           <div
             className={
+              // Être au maximum n'est pas un blocage : c'est une limite qu'on
+              // a choisie, et la ligne le dit sans filet sombre.
               decision.motif === 'quota_atteint'
-                ? 'a-faire__entree'
+                ? 'a-faire__entree a-faire__entree--calme'
                 : 'a-faire__entree a-faire__entree--bloquant'
             }
           >
             <div className="a-faire__corps">
               <strong>
                 {decision.motif === 'quota_atteint'
-                  ? 'Vous êtes au maximum'
-                  : 'Votre identité doit d’abord être vérifiée'}
+                  ? 'Vous avez atteint le maximum'
+                  : 'Une vérification d’identité est nécessaire'}
               </strong>
               <p>
                 {decision.motif === 'quota_atteint'
-                  ? `Vous proposez déjà ${EMPLACEMENTS_PAR_MEMBRE} emplacements. Retirez-en un pour en décrire un autre.`
-                  : 'Une personne doit avoir contrôlé votre pièce d’identité. C’est ce qui rend acceptable, pour un cycliste, de confier son vélo à quelqu’un qu’il ne connaît pas.'}
+                  ? `Vous proposez déjà ${EMPLACEMENTS_PAR_MEMBRE} emplacements. Pour en ajouter un nouveau, retirez d’abord l’un d’eux.`
+                  : 'Votre emplacement pourra être publié dès qu’une personne de l’association aura vérifié votre pièce d’identité. Cette étape permet aux cyclistes de confier leur vélo en toute confiance.'}
               </p>
             </div>
             {decision.motif === 'quota_atteint' ? null : (
@@ -66,7 +68,7 @@ export default async function MesEmplacements() {
                 href="/inscription/verification"
                 className="bouton bouton--discret"
               >
-                Voir où ça en est
+                Suivre ma vérification
               </Link>
             )}
           </div>
@@ -75,7 +77,7 @@ export default async function MesEmplacements() {
 
       <section className="panneau">
         <div className="panneau__entete">
-          <h2>Ce que je propose</h2>
+          <h2>Vos emplacements</h2>
           {emplacements.length === 0 ? null : (
             <Link href="/emplacements">Voir la recherche publique</Link>
           )}
@@ -85,9 +87,8 @@ export default async function MesEmplacements() {
           <div className="vide">
             <IconeCaracteristique pictogramme="prive" />
             <p>
-              Un garage, une cave, une cour, une véranda. Si un vélo peut y
-              tenir quelques heures à l’abri et que personne d’autre que vous
-              n’y entre, vous pouvez accueillir.
+              Un garage, une cave, une cour ou une véranda suffisent, dès lors
+              que le lieu est fermé et réservé à votre usage.
             </p>
             {decision.autorise ? (
               <div className="boutons">

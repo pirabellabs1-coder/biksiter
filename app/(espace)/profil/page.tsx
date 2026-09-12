@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import { comptesDuMembre, registre, soldeDuMembre } from '@/lib/depot/maillons';
 import { etatDuTelephone } from '@/lib/depot/telephone';
@@ -36,10 +36,10 @@ export default async function Profil() {
       <EnteteDePage
         surtitre="Mon profil"
         titre={`${membre.prenom} ${membre.nom.charAt(0)}.`}
-        phrase={
+        chapeau={
           accueille
-            ? 'Cycliste et bike sitter — c’est le même compte, selon le moment.'
-            : 'Ce que le réseau sait de vous, et ce que vous y avez fait.'
+            ? 'Votre compte vous permet de faire garder votre vélo et d’accueillir celui des autres membres.'
+            : 'Vos informations et votre activité dans le réseau.'
         }
         actions={
           accueille ? (
@@ -97,9 +97,7 @@ export default async function Profil() {
         <section className="panneau">
           <div className="panneau__entete">
             <h2>{accueille ? 'Mon registre' : 'Mes gardes'}</h2>
-            {accueille ? (
-              <Link href="/catalogue">Ce que ça ouvre</Link>
-            ) : null}
+            {accueille ? <Link href="/catalogue">Voir les offres</Link> : null}
           </div>
 
           {lignes.length === 0 ? (
@@ -107,8 +105,8 @@ export default async function Profil() {
               <IconeCaracteristique pictogramme="journal" />
               <p>
                 {accueille
-                  ? 'Rien d’écrit pour l’instant.'
-                  : 'Vous n’avez encore accueilli aucun vélo. Les maillons se gagnent en accueillant, jamais en demandant — et ils ne s’achètent pas.'}
+                  ? 'Aucun récit pour le moment.'
+                  : 'Vous n’avez pas encore accueilli de vélo. Chaque vélo accueilli vous rapporte des maillons, à échanger contre les offres de nos partenaires.'}
               </p>
               {accueille ? null : (
                 <div className="boutons">
@@ -196,9 +194,9 @@ export default async function Profil() {
             </ul>
 
             <p className="discret">
-              Ces trois-là sont contrôlées par une personne, pas par un
-              automate. C’est ce qui rend acceptable d’ouvrir sa porte — et
-              c’est aussi pourquoi ça prend un peu de temps.
+              Ces vérifications sont réalisées par une personne de
+              l’association. Elles assurent la confiance entre membres, ce qui
+              explique qu’elles demandent un peu de temps.
             </p>
           </div>
         </section>

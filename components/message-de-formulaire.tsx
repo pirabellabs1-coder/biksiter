@@ -36,8 +36,8 @@ export default function MessageDeFormulaire({
           {nombreDeChamps === 0
             ? 'Votre demande n’a pas pu être envoyée.'
             : nombreDeChamps === 1
-              ? 'Un champ demande une correction.'
-              : `${nombreDeChamps} champs demandent une correction.`}
+              ? 'Un champ est à compléter ou à corriger.'
+              : `${nombreDeChamps} champs sont à compléter ou à corriger.`}
         </strong>
       </p>
       <ul className="liste-erreurs">

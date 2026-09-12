@@ -312,7 +312,9 @@ tableaux de bord :
 | `.section__interieur` | Recentre le contenu sur `--largeur-page`. |
 | `.entete-de-section` | Surtitre, titre, chapeau. Variante `--centree`. |
 | `.parcours` | Une suite d'étapes numérotées reliées par un trait. |
-| `.garanties` / `.garantie` | Une liste de points avec pictogramme. |
+| `.bandeau` | L'ouverture des pages intérieures : le fond de l'accueil, le propos à gauche, un dessin à droite. |
+| `.colonnes-editoriales` | Une section en deux colonnes : le titre, qui reste à l'écran, puis le détail. |
+| `.appel` | La bande qui ferme une page, avec ses deux boutons. |
 | `.carte--illustree` / `.carte--profil` | Les deux formes de carte de la page. |
 | `.apparait` | L'apparition au défilement. |
 
@@ -493,10 +495,10 @@ porte aucune information : sa couleur ne peut donc pas se tromper de sens. Si
 l'un de ces jetons apparaît un jour sur un bouton ou une pastille, c'est une
 erreur.
 
-**Le site est clair, chez tout le monde.** `color-scheme: light`, et le mode
-sombre ne suit plus `prefers-color-scheme`. Ses valeurs restent écrites et à
-jour sous `:root[data-theme='sombre']` : pour le rendre, il suffit de poser cet
-attribut sur `<html>` ou de remettre le bloc derrière sa requête média.
+**Le site est clair, chez tout le monde.** `color-scheme: light`, et il n'y a
+pas de mode sombre. Il y en a eu un, gardé en réserve sans être branché : un
+thème qu'aucun réglage n'active et que personne ne relit finit toujours par
+diverger du thème réel, et il a été retiré plutôt que laissé vieillir.
 
 ## Les images du site
 

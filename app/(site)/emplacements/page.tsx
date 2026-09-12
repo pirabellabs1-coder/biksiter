@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import BaseNonBranchee from '@/components/base-non-branchee';
+import BandeauDePage from '@/components/bandeau-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import ZoneApproximative from '@/components/zone-approximative';
 import { baseConfiguree } from '@/lib/bd/client';
@@ -53,7 +54,8 @@ export default async function Emplacements({
   const parametres = await searchParams;
   const recherche = parametres.quartier?.trim() ?? '';
   const velo =
-    parametres.velo && (TYPES_VELO as readonly string[]).includes(parametres.velo)
+    parametres.velo &&
+    (TYPES_VELO as readonly string[]).includes(parametres.velo)
       ? parametres.velo
       : undefined;
   const plainPied = parametres.acces === 'plain-pied';
@@ -70,14 +72,18 @@ export default async function Emplacements({
       ? instantABruxelles(parametres.jour, parametres.retour)
       : null;
   const creneau =
-    debut && fin && fin.getTime() > debut.getTime() ? { debut, fin } : undefined;
+    debut && fin && fin.getTime() > debut.getTime()
+      ? { debut, fin }
+      : undefined;
 
   if (!baseConfiguree()) {
     return (
-      <div className="page">
+      <>
         <EnteteDeRecherche />
-        <BaseNonBranchee />
-      </div>
+        <div className="page">
+          <BaseNonBranchee />
+        </div>
+      </>
     );
   }
 
@@ -117,239 +123,249 @@ export default async function Emplacements({
     : undefined;
 
   return (
-    <div className="page">
+    <>
       <EnteteDeRecherche />
+      <div className="page">
+        <form
+          action="/emplacements"
+          method="get"
+          className="recherche-detaillee"
+        >
+          <div className="champ-en-ligne champ-en-ligne--large">
+            <label htmlFor="quartier">Destination ou quartier</label>
+            <input
+              id="quartier"
+              name="quartier"
+              type="search"
+              defaultValue={recherche}
+              placeholder="Sainte-Catherine, Flagey, Châtelain…"
+            />
+          </div>
 
-      <form action="/emplacements" method="get" className="recherche-detaillee">
-        <div className="champ-en-ligne champ-en-ligne--large">
-          <label htmlFor="quartier">Destination ou quartier</label>
-          <input
-            id="quartier"
-            name="quartier"
-            type="search"
-            defaultValue={recherche}
-            placeholder="Sainte-Catherine, Flagey, Châtelain…"
-          />
-        </div>
+          <div className="champ-en-ligne">
+            <label htmlFor="jour">Jour</label>
+            <input
+              id="jour"
+              name="jour"
+              type="date"
+              defaultValue={parametres.jour ?? ''}
+            />
+          </div>
 
-        <div className="champ-en-ligne">
-          <label htmlFor="jour">Jour</label>
-          <input
-            id="jour"
-            name="jour"
-            type="date"
-            defaultValue={parametres.jour ?? ''}
-          />
-        </div>
+          <div className="champ-en-ligne">
+            <label htmlFor="arrivee">Dépôt</label>
+            <input
+              id="arrivee"
+              name="arrivee"
+              type="time"
+              step={1800}
+              defaultValue={parametres.arrivee ?? ''}
+            />
+          </div>
 
-        <div className="champ-en-ligne">
-          <label htmlFor="arrivee">Dépôt</label>
-          <input
-            id="arrivee"
-            name="arrivee"
-            type="time"
-            step={1800}
-            defaultValue={parametres.arrivee ?? ''}
-          />
-        </div>
+          <div className="champ-en-ligne">
+            <label htmlFor="retour">Reprise</label>
+            <input
+              id="retour"
+              name="retour"
+              type="time"
+              step={1800}
+              defaultValue={parametres.retour ?? ''}
+            />
+          </div>
 
-        <div className="champ-en-ligne">
-          <label htmlFor="retour">Reprise</label>
-          <input
-            id="retour"
-            name="retour"
-            type="time"
-            step={1800}
-            defaultValue={parametres.retour ?? ''}
-          />
-        </div>
+          {velo ? <input type="hidden" name="velo" value={velo} /> : null}
+          {plainPied ? (
+            <input type="hidden" name="acces" value="plain-pied" />
+          ) : null}
 
-        {velo ? <input type="hidden" name="velo" value={velo} /> : null}
-        {plainPied ? (
-          <input type="hidden" name="acces" value="plain-pied" />
-        ) : null}
+          <button type="submit" className="bouton bouton--principal">
+            Chercher
+          </button>
+        </form>
 
-        <button type="submit" className="bouton bouton--principal">
-          Chercher
-        </button>
-      </form>
-
-      {/* Des liens et non des cases à cocher : chaque filtre est une adresse,
+        {/* Des liens et non des cases à cocher : chaque filtre est une adresse,
           donc il se partage, se met en favori et revient avec le bouton
           « précédent ». Aucun script n'est nécessaire pour cela. */}
-      <nav aria-label="Filtres" className="filtres">
-        {FILTRES.map((filtre) => {
-          const actif = (velo ?? '') === filtre.cle;
-          return (
-            <Link
-              key={filtre.libelle}
-              href={avec({ velo: filtre.cle || undefined })}
-              className={actif ? 'filtre filtre--actif' : 'filtre'}
-              aria-current={actif ? 'true' : undefined}
-            >
-              <IconeCaracteristique pictogramme="capacite" />
-              {filtre.libelle}
-            </Link>
-          );
-        })}
-        <Link
-          href={avec({ acces: plainPied ? undefined : 'plain-pied' })}
-          className={plainPied ? 'filtre filtre--actif' : 'filtre'}
-          aria-current={plainPied ? 'true' : undefined}
-        >
-          <IconeCaracteristique pictogramme="acces" />
-          Plain-pied
-        </Link>
-      </nav>
-
-      {peutDemander ? null : (
-        <p className="encart">
-          <strong>Vous pouvez regarder, pas encore demander.</strong> Le réseau
-          est ouvert sur invitation pendant sa phase de démarrage. Vous voyez où
-          sont les emplacements ; envoyer une demande suppose un compte dont
-          l’identité a été vérifiée.
-        </p>
-      )}
-
-      <section className="panneau">
-        <div className="panneau__entete">
-          <h2>
-            <IconeCaracteristique pictogramme="carte" />
-            Zones d’accueil
-          </h2>
-          <span className="pastille pastille--neutre pastille--sans-puce">
-            rayon d’environ 500 m
-          </span>
-        </div>
-        <div className="panneau__corps">
-          <ZoneApproximative
-            taches={emplacements.map(({ latitude, longitude }) => ({
-              latitude,
-              longitude,
-            }))}
-          />
-          <p className="encart">
-            <strong>Ce que vous voyez, et ce que vous ne voyez pas.</strong>{' '}
-            Chaque tache situe un quartier, jamais une maison. L’adresse exacte
-            n’apparaît qu’une fois votre demande acceptée — c’est ce qui rend
-            acceptable, pour un habitant, de proposer sa porte.
-          </p>
-        </div>
-      </section>
-
-      <div className="resultats__entete">
-        <h2 className="titre-section">
-          {emplacements.length === 0
-            ? 'Aucun emplacement ici'
-            : emplacements.length === 1
-              ? 'Un emplacement libre'
-              : `${emplacements.length} emplacements libres`}
-        </h2>
-        {creneau ? (
-          <p className="discret">
-            pour {creneauEnFrancais(creneau.debut, creneau.fin)} ·{' '}
-            <Link href={avec({ jour: undefined, arrivee: undefined, retour: undefined })} className="lien">
-              sans le créneau
-            </Link>
-          </p>
-        ) : null}
-      </div>
-
-      {emplacements.length === 0 ? (
-        <ListeVide
-          creneau={creneau !== undefined}
-          recherche={recherche}
-          mobilisation={mobilisation}
-          sansCreneau={avec({
-            jour: undefined,
-            arrivee: undefined,
-            retour: undefined,
+        <nav aria-label="Filtres" className="filtres">
+          {FILTRES.map((filtre) => {
+            const actif = (velo ?? '') === filtre.cle;
+            return (
+              <Link
+                key={filtre.libelle}
+                href={avec({ velo: filtre.cle || undefined })}
+                className={actif ? 'filtre filtre--actif' : 'filtre'}
+                aria-current={actif ? 'true' : undefined}
+              >
+                <IconeCaracteristique pictogramme="capacite" />
+                {filtre.libelle}
+              </Link>
+            );
           })}
-          quartiersOuverts={quartiers}
-        />
-      ) : (
-        <ul className="offres-emplacements">
-          {emplacements.map((emplacement) => (
-            <li key={emplacement.reference} className="panneau">
-              <div className="panneau__corps carte-emplacement">
-                <div className="carte-emplacement__tete">
-                  <span className="jeton-initiale" aria-hidden="true">
-                    {emplacement.prenomDuBikeSitter.charAt(0)}
-                  </span>
-                  <div>
-                    <p className="carte-emplacement__nom">
-                      {emplacement.prenomDuBikeSitter}
-                      <span className="pastille pastille--verifie">
-                        Identité vérifiée
-                      </span>
-                    </p>
-                    <p className="discret">{emplacement.quartier}</p>
+          <Link
+            href={avec({ acces: plainPied ? undefined : 'plain-pied' })}
+            className={plainPied ? 'filtre filtre--actif' : 'filtre'}
+            aria-current={plainPied ? 'true' : undefined}
+          >
+            <IconeCaracteristique pictogramme="acces" />
+            Plain-pied
+          </Link>
+        </nav>
+
+        {peutDemander ? null : (
+          <p className="encart">
+            <strong>Les emplacements sont consultables librement.</strong> Pour
+            envoyer une demande, il vous faudra un compte vérifié ; pendant son
+            lancement, le réseau s’ouvre sur invitation.
+          </p>
+        )}
+
+        <section className="panneau">
+          <div className="panneau__entete">
+            <h2>
+              <IconeCaracteristique pictogramme="carte" />
+              Zones d’accueil
+            </h2>
+            <span className="pastille pastille--neutre pastille--sans-puce">
+              rayon d’environ 500 m
+            </span>
+          </div>
+          <div className="panneau__corps">
+            <ZoneApproximative
+              taches={emplacements.map(({ latitude, longitude }) => ({
+                latitude,
+                longitude,
+              }))}
+            />
+            <p className="encart">
+              <strong>Des zones plutôt que des adresses.</strong> Chaque zone
+              situe un quartier. L’adresse exacte vous est transmise dès que
+              votre demande est acceptée, pour préserver la vie privée des bike
+              sitters.
+            </p>
+          </div>
+        </section>
+
+        <div className="resultats__entete">
+          <h2 className="titre-section">
+            {emplacements.length === 0
+              ? 'Aucun emplacement ici'
+              : emplacements.length === 1
+                ? 'Un emplacement libre'
+                : `${emplacements.length} emplacements libres`}
+          </h2>
+          {creneau ? (
+            <p className="discret">
+              pour {creneauEnFrancais(creneau.debut, creneau.fin)} ·{' '}
+              <Link
+                href={avec({
+                  jour: undefined,
+                  arrivee: undefined,
+                  retour: undefined,
+                })}
+                className="lien"
+              >
+                sans le créneau
+              </Link>
+            </p>
+          ) : null}
+        </div>
+
+        {emplacements.length === 0 ? (
+          <ListeVide
+            creneau={creneau !== undefined}
+            recherche={recherche}
+            mobilisation={mobilisation}
+            sansCreneau={avec({
+              jour: undefined,
+              arrivee: undefined,
+              retour: undefined,
+            })}
+            quartiersOuverts={quartiers}
+          />
+        ) : (
+          <ul className="offres-emplacements">
+            {emplacements.map((emplacement) => (
+              <li key={emplacement.reference} className="panneau">
+                <div className="panneau__corps carte-emplacement">
+                  <div className="carte-emplacement__tete">
+                    <span className="jeton-initiale" aria-hidden="true">
+                      {emplacement.prenomDuBikeSitter.charAt(0)}
+                    </span>
+                    <div>
+                      <p className="carte-emplacement__nom">
+                        {emplacement.prenomDuBikeSitter}
+                        <span className="pastille pastille--verifie">
+                          Identité vérifiée
+                        </span>
+                      </p>
+                      <p className="discret">{emplacement.quartier}</p>
+                    </div>
+                    <span className="pastille pastille--neutre pastille--sans-puce">
+                      Gratuit
+                    </span>
                   </div>
-                  <span className="pastille pastille--neutre pastille--sans-puce">
-                    Gratuit
-                  </span>
-                </div>
 
-                <h3 className="carte-emplacement__titre">{emplacement.type}</h3>
+                  <h3 className="carte-emplacement__titre">
+                    {emplacement.type}
+                  </h3>
 
-                <ul className="caracteres">
-                  <li className="caractere">
-                    <IconeCaracteristique pictogramme="fermeture" />
-                    {VERROUILLAGES[emplacement.verrouillage]}
-                  </li>
-                  <li className="caractere">
-                    <IconeCaracteristique pictogramme="abri" />
-                    {INTEMPERIES[emplacement.intemperie]}
-                  </li>
-                  <li className="caractere">
-                    <IconeCaracteristique pictogramme="acces" />
-                    {emplacement.acces}
-                  </li>
-                  <li className="caractere">
-                    <IconeCaracteristique pictogramme="capacite" />
-                    {emplacement.capacite > 1
-                      ? `Jusqu’à ${emplacement.capacite} vélos`
-                      : 'Un vélo à la fois'}
-                  </li>
-                </ul>
-
-                <div className="carte-emplacement__velos">
-                  <p className="carte-emplacement__libelle">
-                    Vélos accueillis
-                  </p>
-                  <ul className="mini-jetons">
-                    {emplacement.velosAcceptes.map((type) => (
-                      <li key={type}>{type}</li>
-                    ))}
+                  <ul className="caracteres">
+                    <li className="caractere">
+                      <IconeCaracteristique pictogramme="fermeture" />
+                      {VERROUILLAGES[emplacement.verrouillage]}
+                    </li>
+                    <li className="caractere">
+                      <IconeCaracteristique pictogramme="abri" />
+                      {INTEMPERIES[emplacement.intemperie]}
+                    </li>
+                    <li className="caractere">
+                      <IconeCaracteristique pictogramme="acces" />
+                      {emplacement.acces}
+                    </li>
+                    <li className="caractere">
+                      <IconeCaracteristique pictogramme="capacite" />
+                      {emplacement.capacite > 1
+                        ? `Jusqu’à ${emplacement.capacite} vélos`
+                        : 'Un vélo à la fois'}
+                    </li>
                   </ul>
-                </div>
 
-                <Link
-                  href={`/emplacements/${emplacement.reference}`}
-                  className="bouton bouton--principal bouton--large"
-                >
-                  Voir l’emplacement
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                  <div className="carte-emplacement__velos">
+                    <p className="carte-emplacement__libelle">
+                      Vélos accueillis
+                    </p>
+                    <ul className="mini-jetons">
+                      {emplacement.velosAcceptes.map((type) => (
+                        <li key={type}>{type}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Link
+                    href={`/emplacements/${emplacement.reference}`}
+                    className="bouton bouton--principal bouton--large"
+                  >
+                    Voir l’emplacement
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </>
   );
 }
 
 function EnteteDeRecherche() {
   return (
-    <>
-      <p className="surtitre">Trouver un emplacement</p>
-      <h1 className="titre-page">Où souhaitez-vous laisser votre vélo ?</h1>
-      <p className="chapeau">
-        Les emplacements sont affichés en zone approximative. L’adresse exacte
-        vous est communiquée dès que le bike sitter accepte votre demande — pas
-        avant.
-      </p>
-    </>
+    <BandeauDePage
+      surtitre="Trouver un emplacement"
+      titre="Où souhaitez-vous laisser votre vélo ?"
+      chapeau="Les emplacements sont affichés en zone approximative. L’adresse exacte vous est communiquée dès que le bike sitter accepte votre demande — pas avant."
+      scene="la-cave"
+    />
   );
 }
 
@@ -385,9 +401,9 @@ function ListeVide({
         </div>
         <div className="panneau__corps">
           <p className="discret">
-            Les emplacements de cette recherche sont déjà pris à ce moment-là,
-            ou complets. Une demi-heure de décalage suffit souvent — il faut
-            trente minutes entre deux vélos, et c’est ce battement qui bloque.
+            Les emplacements de cette recherche sont déjà occupés à ce
+            moment-là. Essayez de décaler votre créneau d’une demi-heure : un
+            battement de trente minutes est prévu entre deux vélos.
           </p>
           <div className="boutons">
             <Link href={sansCreneau} className="bouton bouton--principal">
@@ -414,10 +430,9 @@ function ListeVide({
       </div>
       <div className="panneau__corps">
         <p className="discret">
-          Le réseau s’étend quartier par quartier. Un quartier ouvre quand il
-          compte assez de bike sitters pour qu’un cycliste y trouve une place à
-          chaque fois — ouvrir plus tôt reviendrait à promettre une place qui
-          n’existe pas.
+          Le réseau s’étend quartier par quartier. Chaque quartier ouvre dès
+          qu’il compte assez de bike sitters pour accueillir les cyclistes dans
+          de bonnes conditions.
         </p>
 
         {mobilisation ? (
@@ -442,8 +457,8 @@ function ListeVide({
             </div>
             <p className="discret">
               {bikeSittersManquants(mobilisation.bikeSitters) === 0
-                ? 'Le quartier a de quoi ouvrir. Nous y travaillons.'
-                : `Il en manque ${bikeSittersManquants(mobilisation.bikeSitters)} pour ouvrir.`}
+                ? 'Ce quartier compte assez de bike sitters : son ouverture est en préparation.'
+                : `Plus que ${bikeSittersManquants(mobilisation.bikeSitters)} pour ouvrir ce quartier.`}
             </p>
           </div>
         ) : null}

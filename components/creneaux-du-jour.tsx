@@ -47,9 +47,7 @@ export default function CreneauxDuJour({
               ) : null}
 
               <div
-                className={
-                  segment.libre ? 'creneau creneau--libre' : 'creneau'
-                }
+                className={segment.libre ? 'creneau creneau--libre' : 'creneau'}
               >
                 <span className="creneau__puce" aria-hidden="true" />
                 <span className="creneau__corps">
@@ -60,7 +58,7 @@ export default function CreneauxDuJour({
                   <span className="creneau__detail">
                     {segment.libre
                       ? 'Emplacement libre, accueil possible'
-                      : `Déjà pris — ${capacite > 1 ? 'la capacité est atteinte' : 'un vélo est attendu'}`}
+                      : `Complet — ${capacite > 1 ? 'toutes les places sont prises' : 'un vélo est déjà prévu'}`}
                   </span>
                 </span>
                 <span
@@ -80,8 +78,8 @@ export default function CreneauxDuJour({
 
       {libre ? null : (
         <p className="discret">
-          Rien de libre aujourd’hui. Un autre jour, ou un autre emplacement du
-          quartier, aura de la place.
+          Cet emplacement est complet aujourd’hui. Essayez un autre jour, ou un
+          autre emplacement du quartier.
         </p>
       )}
     </>

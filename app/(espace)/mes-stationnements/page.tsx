@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import {
   demandesRecues,
@@ -89,7 +89,7 @@ export default async function MesStationnements() {
               ? 'Une demande attend votre réponse'
               : `${aRepondre} demandes attendent votre réponse`
         }
-        phrase="Vous êtes cycliste d’un côté, bike sitter de l’autre. C’est le même compte, et les deux listes vivent côte à côte."
+        chapeau="Retrouvez ici les demandes reçues pour votre emplacement et celles que vous avez envoyées pour votre vélo."
         actions={
           <Link href="/emplacements" className="bouton bouton--discret">
             Chercher un emplacement
@@ -99,9 +99,9 @@ export default async function MesStationnements() {
 
       <div className="panneaux">
         <ListeDeStationnements
-          titre="Ce qu’on me demande"
+          titre="Demandes reçues"
           stationnements={recues.slice().sort(parUrgence)}
-          vide="Personne ne vous a encore écrit. Un emplacement publié met un peu de temps à être trouvé."
+          vide="Aucune demande pour le moment. Les cyclistes découvrent peu à peu les nouveaux emplacements."
           rendu={(stationnement) => (
             <>
               <span className="ligne__titre">
@@ -155,9 +155,9 @@ export default async function MesStationnements() {
         />
 
         <ListeDeStationnements
-          titre="Ce que je demande"
+          titre="Demandes envoyées"
           stationnements={miennes.slice().sort(parUrgence)}
-          vide="Vous n’avez encore rien demandé."
+          vide="Vous n’avez pas encore envoyé de demande."
           rendu={(stationnement) => (
             <>
               <span className="ligne__titre">
@@ -239,19 +239,23 @@ function ListeDeStationnements({
         <>
           {vivants.length === 0 ? (
             <div className="vide">
-              <p>Rien en cours. Ce qui est terminé est replié ci-dessous.</p>
+              <p>
+                Aucun stationnement en cours. Les stationnements terminés sont
+                regroupés ci-dessous.
+              </p>
             </div>
           ) : (
             <ul className="lignes">
               {vivants.map((stationnement) => (
                 <li key={stationnement.id}>
                   <div className="ligne">
-                    <span className="jeton-initiale jeton-initiale--petit" aria-hidden="true">
+                    <span
+                      className="jeton-initiale jeton-initiale--petit"
+                      aria-hidden="true"
+                    >
                       {stationnement.prenomDuCycliste.charAt(0)}
                     </span>
-                    <span className="ligne__corps">
-                      {rendu(stationnement)}
-                    </span>
+                    <span className="ligne__corps">{rendu(stationnement)}</span>
                     <span className="ligne__fin">
                       <span className={pastille(stationnement.etat)}>
                         {LIBELLES[stationnement.etat]}

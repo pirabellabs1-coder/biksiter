@@ -2,14 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import EnteteDePage from '@/components/espace/entete-de-page';
+import EnteteDePage from '@/components/entete-de-page';
 import { adresseDuStationnement } from '@/lib/depot/emplacements';
 import { avisDejaEcrit } from '@/lib/depot/avis';
 import { messagesDuStationnement } from '@/lib/depot/echanges';
-import {
-  codeVivant,
-  stationnementParId,
-} from '@/lib/depot/stationnements';
+import { codeVivant, stationnementParId } from '@/lib/depot/stationnements';
 import { onPeutEcrire } from '@/lib/regles/echanges';
 import { VALIDITE_CODE_HEURES } from '@/lib/regles/remise';
 import { exigerUnMembre } from '@/lib/session';
@@ -78,7 +75,7 @@ export default async function LeStationnement({
             ? `Votre vélo chez ${stationnement.prenomDuBikeSitter}`
             : `Le vélo de ${stationnement.prenomDuCycliste}`
         }
-        phrase={`${stationnement.quartier} · ${creneauEnFrancais(new Date(stationnement.debut), new Date(stationnement.fin))}`}
+        chapeau={`${stationnement.quartier} · ${creneauEnFrancais(new Date(stationnement.debut), new Date(stationnement.fin))}`}
         actions={
           <Link href="/mes-stationnements" className="bouton bouton--discret">
             Tous mes stationnements
@@ -170,8 +167,8 @@ export default async function LeStationnement({
                 essais.
               </p>
               <p>
-                Ne l’envoyez pas à l’avance : il n’a de sens qu’au moment où
-                vous êtes tous les deux devant le vélo.
+                Communiquez-le au moment de la remise, lorsque vous êtes tous
+                les deux devant le vélo.
               </p>
             </div>
           ) : (
@@ -182,9 +179,7 @@ export default async function LeStationnement({
 
       {avisPossible ? (
         <>
-          <h2 className="titre-section titre-section--aere">
-            Laisser un avis
-          </h2>
+          <h2 className="titre-section titre-section--aere">Laisser un avis</h2>
           <FormulaireDAvis
             action={ecrireUnAvisSurLaGarde.bind(null, id)}
             prenomDuBikeSitter={stationnement.prenomDuBikeSitter}
@@ -197,9 +192,7 @@ export default async function LeStationnement({
       </h2>
 
       {messages.length === 0 ? (
-        <p className="discret">
-          Rien n’a encore été écrit ici.
-        </p>
+        <p className="discret">Aucun message pour le moment.</p>
       ) : (
         <ol className="fil">
           {messages.map((message) => (
@@ -231,7 +224,7 @@ export default async function LeStationnement({
         />
       ) : (
         <p className="discret">
-          Ce stationnement est clos : le fil est fermé.
+          Ce stationnement est terminé : les échanges sont clos.
         </p>
       )}
     </div>

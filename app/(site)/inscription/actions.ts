@@ -67,11 +67,12 @@ export async function creerLeCompte(
   const code = texte(donnees, 'code');
   if (code === '') {
     erreurs.code =
-      'Le réseau s’ouvre sur invitation : indiquez le code qu’un membre vous a transmis.';
+      'Pendant son lancement, le réseau s’ouvre sur invitation : indiquez le code transmis par un membre.';
   }
 
   if (donnees.get('conditions') !== 'acceptees') {
-    erreurs.conditions = 'Vous devez accepter les conditions générales.';
+    erreurs.conditions =
+      'Merci d’accepter les conditions générales pour continuer.';
   }
 
   if (Object.keys(erreurs).length > 0) {
@@ -102,7 +103,8 @@ export async function creerLeCompte(
       return {
         statut: 'erreur',
         erreurs: {
-          email: 'Un compte existe déjà avec cette adresse. Connectez-vous.',
+          email:
+            'Un compte existe déjà avec cette adresse : vous pouvez vous connecter.',
         },
       };
     }

@@ -54,7 +54,7 @@ export default function FormulaireDInscription({
         label="Mot de passe"
         type="password"
         autoComplete="new-password"
-        aide="Douze caractères au minimum. Une phrase dont vous vous souvenez vaut mieux qu’un mot compliqué."
+        aide="Au moins douze caractères. Une courte phrase facile à retenir fait un excellent mot de passe."
         erreur={erreurs.motDePasse}
       />
 
@@ -69,7 +69,7 @@ export default function FormulaireDInscription({
       />
 
       <div className="champ">
-        <div className="case">
+        <label className="case">
           <input
             type="checkbox"
             id="conditions"
@@ -80,14 +80,14 @@ export default function FormulaireDInscription({
               erreurs.conditions ? 'conditions-erreur' : undefined
             }
           />
-          <label htmlFor="conditions">
+          <span>
             J’accepte les{' '}
             <Link href="/conditions-generales" className="lien">
               conditions générales
             </Link>
             .
-          </label>
-        </div>
+          </span>
+        </label>
         {erreurs.conditions ? (
           <span id="conditions-erreur" className="champ__erreur">
             {erreurs.conditions}

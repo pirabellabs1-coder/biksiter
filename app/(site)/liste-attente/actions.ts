@@ -34,12 +34,12 @@ export async function rejoindreLaListe(
   const quartier = texte(donnees, 'quartier');
   if (quartier === '') {
     erreurs.quartier =
-      'Indiquez votre quartier : c’est ce qui nous dit où ouvrir.';
+      'Indiquez votre quartier : il nous aide à choisir les prochaines ouvertures.';
   }
 
   const role = texte(donnees, 'role');
   if (!estUnRole(role)) {
-    erreurs.role = 'Dites-nous ce que vous seriez plutôt.';
+    erreurs.role = 'Indiquez ce que vous seriez plutôt.';
   }
 
   if (Object.keys(erreurs).length > 0 || !estUnRole(role)) {
@@ -52,7 +52,7 @@ export async function rejoindreLaListe(
     return {
       statut: 'valide',
       message:
-        'Vous étiez déjà sur la liste avec cette adresse — c’est noté, il n’y a rien à faire de plus.',
+        'Vous êtes déjà inscrit sur la liste avec cette adresse : nous vous préviendrons dès l’ouverture de votre quartier.',
     };
   }
 
@@ -60,7 +60,7 @@ export async function rejoindreLaListe(
     statut: 'valide',
     message:
       role === 'cycliste'
-        ? 'Vous êtes sur la liste. Nous ouvrirons votre quartier quand il comptera assez de bike sitters pour qu’une place s’y trouve à chaque fois.'
-        : 'Vous êtes sur la liste, et c’est votre inscription qui compte le plus : ce sont les bike sitters qui font ouvrir un quartier.',
+        ? 'Merci, vous êtes inscrit ! Nous vous préviendrons dès l’ouverture de votre quartier.'
+        : 'Merci, vous êtes inscrit ! En tant que futur bike sitter, vous aidez directement votre quartier à ouvrir.',
   };
 }

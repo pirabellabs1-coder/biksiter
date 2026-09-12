@@ -34,7 +34,7 @@ export async function annoncerMonDon(
       statut: 'erreur',
       erreurs: {
         [ERREUR_GENERALE]:
-          'Les dons ne sont pas encore ouverts : l’association n’a pas de compte tant qu’elle n’est pas constituée.',
+          'Les dons ouvriront dès que l’association disposera de son compte bancaire.',
       },
     };
   }
@@ -86,7 +86,7 @@ export async function annoncerMonDon(
     message:
       `Virement à ${ASSOCIATION.nom}, IBAN ${ASSOCIATION.iban}, ` +
       `communication structurée ${communication}. ` +
-      'Recopiez-la telle quelle : c’est ce qui nous permet de reconnaître votre virement.' +
+      'Indiquez-la telle quelle lors de votre virement : elle nous permet de le reconnaître.' +
       (email === '' ? '' : ' Elle vous est aussi envoyée par courriel.'),
   };
 }

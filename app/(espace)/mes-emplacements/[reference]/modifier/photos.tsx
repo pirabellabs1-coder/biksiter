@@ -3,7 +3,10 @@
 import { useActionState } from 'react';
 
 import MessageDeFormulaire from '@/components/message-de-formulaire';
-import { FORMULAIRE_VIERGE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
+import {
+  FORMULAIRE_VIERGE,
+  type EtatDuFormulaire,
+} from '@/lib/formulaires/etat';
 import { SUJETS_DES_PHOTOS, TYPES_ACCEPTES } from '@/lib/regles/photos';
 
 /**
@@ -35,10 +38,10 @@ export default function Photos({
 
       <div className="encart">
         <p>
-          <strong>Ne cadrez ni le numéro, ni la plaque de rue.</strong> Les
-          coordonnées GPS de vos photos sont effacées à l’arrivée, mais une
-          façade reconnaissable, elle, resterait lisible. Montrez le garage, pas
-          la maison.
+          <strong>Conseil : photographiez l’intérieur du lieu.</strong> Évitez
+          le numéro de rue ou une façade reconnaissable, qui pourraient révéler
+          votre adresse. Les coordonnées GPS de vos photos sont effacées
+          automatiquement.
         </p>
       </div>
 
@@ -47,7 +50,8 @@ export default function Photos({
           <label htmlFor={`photo-${rang}`}>{sujet}</label>
           {presentes.includes(rang) ? (
             <span className="champ__aide">
-              Une photo est déjà là. En envoyer une autre la remplacera.
+              Une photo est déjà enregistrée ; en envoyer une nouvelle la
+              remplacera.
             </span>
           ) : null}
           <input

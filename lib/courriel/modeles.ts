@@ -10,6 +10,9 @@ import { VALIDITE_CODE_HEURES } from '@/lib/regles/remise';
  * dans n'importe quel client de messagerie. Une association qui demande à des
  * gens d'ouvrir leur porte n'a pas besoin de savoir qui a ouvert son courrier.
  *
+ * Le ton est celui du site : professionnel, pédagogique et doux. Un message
+ * dit ce qui s'est passé, ce qui vient ensuite, et remercie quand il y a lieu.
+ *
  * Ce sont des fonctions pures : elles n'écrivent rien, ne lisent rien, et se
  * testent donc directement.
  */
@@ -38,21 +41,22 @@ export function inscriptionSurLaListe(details: {
   quartier: string;
   peutAccueillir: boolean;
 }): Message {
-  return rediger('Vous êtes sur la liste d’attente', [
+  return rediger('Bienvenue sur la liste d’attente', [
     'Bonjour,',
     '',
-    `Votre inscription est enregistrée pour ${details.quartier}.`,
+    `Merci ! Votre inscription est bien enregistrée pour ${details.quartier}.`,
     '',
     details.peutAccueillir
-      ? 'Vous avez indiqué pouvoir accueillir un vélo : c’est ce qui compte le'
-        + '\nplus. Un quartier ouvre quand il compte assez de bike sitters pour'
-        + '\nqu’un cycliste y trouve une place à chaque fois — pas avant, parce'
-        + '\nqu’ouvrir trop tôt revient à promettre une place qui n’existe pas.'
-      : 'Nous ouvrirons votre quartier quand il comptera assez de bike sitters'
-        + '\npour qu’une place s’y trouve à chaque fois. Vous serez prévenu.',
+      ? 'Vous avez indiqué pouvoir accueillir un vélo : merci, c’est précieux.' +
+        '\nUn quartier ouvre dès qu’il compte assez de bike sitters pour' +
+        '\naccueillir les cyclistes dans de bonnes conditions, et votre' +
+        '\ninscription nous en rapproche.'
+      : 'Votre quartier ouvrira dès qu’il comptera assez de bike sitters pour' +
+        '\naccueillir les cyclistes dans de bonnes conditions. Nous vous' +
+        '\npréviendrons à ce moment-là.',
     '',
-    'Si vous connaissez quelqu’un du réseau, son invitation vous fait entrer',
-    'tout de suite : l’attente devient inutile.',
+    'Si vous connaissez un membre du réseau, son invitation vous permet de',
+    'rejoindre Bike Sitters dès aujourd’hui.',
   ]);
 }
 
@@ -60,14 +64,13 @@ export function candidatureRecue(details: { prenom: string }): Message {
   return rediger('Nous avons bien reçu votre emplacement', [
     `Bonjour ${details.prenom},`,
     '',
-    'Merci d’avoir décrit votre emplacement. Une personne va le relire et',
-    'vérifier votre identité avant toute publication : personne n’apparaît sur',
-    'la carte sans être passé par là, et c’est ce qui rend acceptable, pour un',
-    'cycliste, de confier son vélo à quelqu’un qu’il ne connaît pas.',
+    'Merci d’avoir décrit votre emplacement ! Une personne de l’association',
+    'va le relire et vérifier votre identité avant la publication. Nous',
+    'revenons vers vous par e-mail.',
     '',
-    'Votre adresse ne sera jamais publiée. La carte affiche une zone, et vous',
-    'seul communiquez l’adresse exacte, à la personne dont vous avez accepté',
-    'la demande.',
+    'Votre adresse reste confidentielle : la carte n’affiche qu’une zone',
+    'approximative, et l’adresse exacte n’est transmise qu’au cycliste dont',
+    'vous acceptez la demande.',
   ]);
 }
 
@@ -75,19 +78,19 @@ export function bienvenue(details: {
   prenom: string;
   invitePar: string | null;
 }): Message {
-  return rediger('Votre compte Bike Sitters est créé', [
+  return rediger('Bienvenue sur Bike Sitters', [
     `Bonjour ${details.prenom},`,
     '',
     details.invitePar
-      ? `Votre compte est créé, avec l’invitation de ${details.invitePar}.`
-      : 'Votre compte est créé.',
+      ? `Votre compte est créé, grâce à l’invitation de ${details.invitePar}. Bienvenue !`
+      : 'Votre compte est créé. Bienvenue !',
     '',
-    'Il reste la vérification de votre identité : e-mail, téléphone et pièce',
-    'd’identité. Elle vaut autant pour vous que pour la personne qui vous',
-    'ouvrira sa porte — vous saurez, vous aussi, à qui vous confiez votre vélo.',
+    'Dernière étape : la vérification de votre identité (e-mail, téléphone et',
+    'pièce d’identité). Elle ne prend que quelques minutes et assure la',
+    'confiance entre tous les membres du réseau.',
     '',
-    'Votre pièce n’est pas conservée : elle est supprimée dès la vérification,',
-    'et au plus tard après sept jours.',
+    'Votre pièce d’identité est supprimée juste après la vérification, et au',
+    'plus tard après sept jours.',
   ]);
 }
 
@@ -95,13 +98,12 @@ export function identiteVerifiee(details: { prenom: string }): Message {
   return rediger('Votre identité est vérifiée', [
     `Bonjour ${details.prenom},`,
     '',
-    'Une personne a relu votre pièce d’identité : votre compte est actif.',
-    'Le document a été supprimé dans la foulée, comme annoncé — nous ne',
-    'gardons ni l’image, ni le numéro, seulement le fait que la vérification a',
-    'eu lieu.',
+    'Bonne nouvelle : votre identité est vérifiée et votre compte est actif.',
+    'Votre pièce d’identité a été supprimée ; seul le résultat de la',
+    'vérification est conservé.',
     '',
-    'Vous pouvez maintenant demander un stationnement, et proposer un',
-    'emplacement si vous en avez un.',
+    'Vous pouvez dès maintenant demander un stationnement, et proposer un',
+    'emplacement si vous le souhaitez.',
   ]);
 }
 
@@ -112,13 +114,12 @@ export function identiteRefusee(details: {
   return rediger('Nous n’avons pas pu vérifier votre identité', [
     `Bonjour ${details.prenom},`,
     '',
-    'Nous n’avons pas pu valider la pièce que vous avez envoyée.',
+    'Nous n’avons pas pu valider la pièce d’identité que vous avez envoyée.',
     '',
-    `La raison : ${details.motif}`,
+    `Le motif : ${details.motif}`,
     '',
-    'Votre document a été supprimé. Vous pouvez en déposer un autre quand vous',
-    'voulez — il n’y a pas de limite au nombre d’essais, et un refus n’est pas',
-    'un jugement sur vous.',
+    'Votre document a été supprimé. Vous pouvez en envoyer un nouveau à tout',
+    'moment depuis votre espace, sans limite d’essais.',
   ]);
 }
 
@@ -134,13 +135,13 @@ export function demandeRecue(details: {
     [
       `Bonjour ${details.prenomDuBikeSitter},`,
       '',
-      `${details.prenomDuCycliste} voudrait déposer un vélo (${details.typeVelo.toLowerCase()})`,
+      `${details.prenomDuCycliste} souhaite déposer un vélo (${details.typeVelo.toLowerCase()}) chez vous`,
       `${details.creneau}.`,
-      ...(details.message ? ['', `Son mot : « ${details.message} »`] : []),
+      ...(details.message ? ['', `Son message : « ${details.message} »`] : []),
       '',
-      'Son identité a été vérifiée par nos soins. Vous acceptez ou vous refusez,',
-      'sans avoir à vous justifier et sans que cela ne vous coûte quoi que ce',
-      'soit : il n’y a ni note, ni classement, ni score dans ce réseau.',
+      'Son identité a été vérifiée par l’association. Vous êtes libre',
+      'd’accepter ou non cette demande, depuis votre espace, rubrique',
+      '« Mes stationnements ».',
       '',
       'Votre adresse ne lui sera communiquée que si vous acceptez.',
     ],
@@ -155,20 +156,23 @@ export function demandeAcceptee(details: {
 }): Message {
   // C'est le seul message qui contient une adresse exacte, et c'est le moment
   // prévu par la règle 4 : la demande est acceptée.
-  return rediger(`${details.prenomDuBikeSitter} accepte d’accueillir votre vélo`, [
-    `Bonjour ${details.prenomDuCycliste},`,
-    '',
-    `${details.prenomDuBikeSitter} vous attend ${details.creneau}.`,
-    '',
-    `L’adresse : ${details.adresse}`,
-    '',
-    'Gardez-la pour vous : elle n’est publiée nulle part et n’est communiquée',
-    'qu’aux personnes dont la demande a été acceptée.',
-    '',
-    `Au dépôt, vous dicterez un code à quatre chiffres à ${details.prenomDuBikeSitter},`,
-    `qui le saisira de son côté. Il vaut ${VALIDITE_CODE_HEURES} heures et se lit à voix haute :`,
-    'pas besoin de réseau dans une cave, ni d’enlever ses gants.',
-  ]);
+  return rediger(
+    `${details.prenomDuBikeSitter} accepte d’accueillir votre vélo`,
+    [
+      `Bonjour ${details.prenomDuCycliste},`,
+      '',
+      `Bonne nouvelle : ${details.prenomDuBikeSitter} vous attend ${details.creneau}.`,
+      '',
+      `L’adresse : ${details.adresse}`,
+      '',
+      'Merci de la garder pour vous : elle n’est communiquée qu’aux cyclistes',
+      'dont la demande a été acceptée.',
+      '',
+      `Au moment du dépôt, vous communiquerez un code à quatre chiffres à ${details.prenomDuBikeSitter},`,
+      `qui le saisira de son côté. Il reste valable ${VALIDITE_CODE_HEURES} heures et fonctionne même`,
+      'sans réseau.',
+    ],
+  );
 }
 
 export function demandeRefusee(details: {
@@ -176,16 +180,13 @@ export function demandeRefusee(details: {
   prenomDuBikeSitter: string;
   creneau: string;
 }): Message {
-  return rediger('Votre demande n’a pas été retenue', [
+  return rediger('Votre demande n’a pas pu être acceptée', [
     `Bonjour ${details.prenomDuCycliste},`,
     '',
-    `${details.prenomDuBikeSitter} ne peut pas vous accueillir ${details.creneau}.`,
+    `${details.prenomDuBikeSitter} n’est pas disponible pour vous accueillir ${details.creneau}.`,
     '',
-    'Un refus n’est pas un jugement : les bike sitters sont des bénévoles et',
-    'refusent quand cela ne leur convient pas, ce qui est exactement ce qu’on',
-    'leur demande de faire plutôt que d’accepter à contrecœur.',
-    '',
-    'D’autres emplacements sont ouverts près de votre destination.',
+    'Les bike sitters accueillent selon leurs disponibilités : d’autres',
+    'emplacements sont sûrement libres près de votre destination.',
   ]);
 }
 
@@ -202,9 +203,8 @@ export function messageRecu(details: {
     '',
     details.corps,
     '',
-    'Répondez depuis la page du stationnement. Rien ne presse : personne ici',
-    'ne compte le temps que vous mettez à répondre, et personne ne sait si',
-    'vous avez lu ce message.',
+    'Vous pouvez répondre depuis la page du stationnement, quand cela vous',
+    'convient.',
   ]);
 }
 
@@ -222,22 +222,21 @@ export function donAnnonce(details: {
   return rediger('Les coordonnées pour votre don', [
     details.prenom ? `Bonjour ${details.prenom},` : 'Bonjour,',
     '',
-    'Merci. Voici de quoi faire le virement :',
+    'Merci pour votre soutien ! Voici les informations pour votre virement :',
     '',
     `  Bénéficiaire   : ${ASSOCIATION.nom}`,
     `  IBAN           : ${details.iban}`,
     ...(details.montant ? [`  Montant        : ${details.montant} €`] : []),
     `  Communication  : ${details.communication}`,
     '',
-    'La communication structurée est ce qui nous permet de reconnaître votre',
-    'virement : recopiez-la telle quelle, votre banque saura la lire.',
+    'La communication structurée nous permet de reconnaître votre virement :',
+    'merci de la recopier telle quelle.',
     '',
-    'Nous ne passons pas par un prestataire de paiement : sa commission prend',
-    'deux à trois pour cent de chaque don, et un virement n’en prend rien.',
-    'Sur de petits montants, c’est un mois de fonctionnement par an.',
+    'Nous privilégions le virement : il ne coûte rien, ni à vous ni à',
+    'l’association, contrairement à un paiement par carte.',
     '',
-    'Un don ne donne aucun avantage sur le service. Un membre qui donne et un',
-    'membre qui ne donne pas sont traités exactement pareil.',
+    'Tous les membres bénéficient du même service, qu’ils fassent un don ou',
+    'non. Merci de contribuer à le garder gratuit.',
   ]);
 }
 
@@ -247,16 +246,16 @@ export function desistement(details: {
   creneau: string;
   tardif: boolean;
 }): Message {
-  return rediger('Un stationnement est annulé', [
+  return rediger('Un stationnement a été annulé', [
     `Bonjour ${details.prenomDuDestinataire},`,
     '',
     `${details.prenomDeCeluiQuiSeDesiste} a annulé le stationnement prévu ${details.creneau}.`,
     ...(details.tardif
       ? [
           '',
-          `L’annulation arrive à moins de ${SEUIL_DESISTEMENT_TARDIF_HEURES} heures du dépôt, et nous en sommes`,
-          'désolés pour l’organisation que vous aviez prise. Cela n’entraîne',
-          'aucune pénalité pour personne : il n’y a pas de score ici.',
+          `L’annulation intervient moins de ${SEUIL_DESISTEMENT_TARDIF_HEURES} heures avant le dépôt : nous sommes`,
+          'désolés pour l’organisation que vous aviez prévue. Cette annulation',
+          'n’entraîne aucune pénalité.',
         ]
       : []),
     '',

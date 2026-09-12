@@ -15,23 +15,17 @@ import {
 } from './emplacements';
 
 export type EtatDeVerification =
-  | 'absente'
-  | 'en_cours'
-  | 'verifiee'
-  | 'refusee';
+  'absente' | 'en_cours' | 'verifiee' | 'refusee';
 
 export type Membre = {
   verification: EtatDeVerification;
   emplacementsPublies: number;
 };
 
-export type RefusDePublication =
-  | 'identite_non_verifiee'
-  | 'quota_atteint';
+export type RefusDePublication = 'identite_non_verifiee' | 'quota_atteint';
 
 export type DecisionDePublication =
-  | { autorise: true }
-  | { autorise: false; motif: RefusDePublication };
+  { autorise: true } | { autorise: false; motif: RefusDePublication };
 
 export function decisionDePublication(membre: Membre): DecisionDePublication {
   if (membre.verification !== 'verifiee') {
@@ -47,8 +41,8 @@ export function decisionDePublication(membre: Membre): DecisionDePublication {
 
 export const MOTIFS_DE_REFUS: Record<RefusDePublication, string> = {
   identite_non_verifiee:
-    'Votre identité doit être vérifiée avant de publier un emplacement.',
-  quota_atteint: `Un membre publie au maximum ${EMPLACEMENTS_PAR_MEMBRE} emplacements.`,
+    'Votre emplacement pourra être publié dès que votre identité aura été vérifiée.',
+  quota_atteint: `Vous proposez déjà ${EMPLACEMENTS_PAR_MEMBRE} emplacements, le maximum par membre.`,
 };
 
 /**

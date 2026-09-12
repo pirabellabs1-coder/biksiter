@@ -12,7 +12,10 @@ import {
 } from '@/components/champs';
 import MessageDeFormulaire from '@/components/message-de-formulaire';
 import { NOMS_DE_QUARTIER } from '@/lib/contenu/quartiers';
-import { FORMULAIRE_VIERGE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
+import {
+  FORMULAIRE_VIERGE,
+  type EtatDuFormulaire,
+} from '@/lib/formulaires/etat';
 import {
   ACCES,
   ANCRAGES,
@@ -90,7 +93,7 @@ export default function FormulaireDEmplacement({
       <ChampTexte
         id="adresse"
         label="Adresse du lieu"
-        aide="Elle n’est jamais publiée. La carte n’affiche qu’une zone, et vous seul communiquez l’adresse, à la personne dont vous avez accepté la demande."
+        aide="Elle reste confidentielle : la carte n’affiche qu’une zone approximative, et l’adresse n’est transmise qu’au cycliste dont vous acceptez la demande."
         autoComplete="street-address"
         defaultValue={valeurs?.adresseExacte}
         erreur={erreurs.adresse}
@@ -99,7 +102,7 @@ export default function FormulaireDEmplacement({
       <ChampListe
         id="quartier"
         label="Le quartier le plus proche"
-        aide="Il situe votre emplacement sur la carte, en zone approximative. Votre adresse, elle, n’y figure jamais."
+        aide="Il sert à situer votre emplacement sur la carte, dans une zone approximative."
         options={optionsDepuis(NOMS_DE_QUARTIER)}
         defaultValue={valeurs?.quartier ?? ''}
         erreur={erreurs.quartier}
@@ -108,7 +111,7 @@ export default function FormulaireDEmplacement({
       <ChampListe
         id="type"
         label="Type d’emplacement"
-        aide="Un emplacement doit être inaccessible au public et aux autres résidents de l’immeuble : c’est pourquoi un local à vélos partagé ne figure pas dans cette liste."
+        aide="Le lieu doit être fermé et réservé à votre usage, sans accès pour le public ni pour les autres résidents. C’est pourquoi les locaux à vélos partagés ne figurent pas dans la liste."
         options={optionsDepuis(TYPES_EMPLACEMENT_PRIVE)}
         defaultValue={valeurs?.type ?? ''}
         erreur={erreurs.type}
@@ -161,7 +164,7 @@ export default function FormulaireDEmplacement({
       <GroupeDeCases
         nom="velos"
         legende="Les vélos que vous pouvez accueillir"
-        aide="Un cargo ou un vélo à sacoches ne passe pas partout : ce que vous cochez ici évite des demandes impossibles."
+        aide="Cochez les vélos qui entrent facilement chez vous : vous ne recevrez que des demandes adaptées."
         options={optionsDepuis(TYPES_VELO)}
         coches={valeurs?.velosAcceptes}
         erreur={erreurs.velos}

@@ -77,7 +77,8 @@ export function lireLesChampsDEmplacement(
 
   const adresse = texte(donnees, 'adresse');
   if (adresse === '') {
-    erreurs.adresse = 'Indiquez l’adresse du lieu. Elle ne sera jamais publiée.';
+    erreurs.adresse =
+      'Indiquez l’adresse du lieu. Elle restera confidentielle.';
   }
 
   const quartier = quartierParNom(texte(donnees, 'quartier'));
@@ -93,7 +94,11 @@ export function lireLesChampsDEmplacement(
   }
 
   const capacite = Number.parseInt(texte(donnees, 'capacite'), 10);
-  if (!Number.isInteger(capacite) || capacite < 1 || capacite > CAPACITE_MAXIMALE) {
+  if (
+    !Number.isInteger(capacite) ||
+    capacite < 1 ||
+    capacite > CAPACITE_MAXIMALE
+  ) {
     erreurs.capacite = `Indiquez un nombre de vélos entre 1 et ${CAPACITE_MAXIMALE}.`;
   }
 
@@ -109,7 +114,7 @@ export function lireLesChampsDEmplacement(
 
   const acces = texte(donnees, 'acces');
   if (!estUnAcces(acces)) {
-    erreurs.acces = 'Indiquez le chemin à faire avec le vélo à la main.';
+    erreurs.acces = 'Indiquez comment accéder au lieu avec le vélo.';
   }
 
   const ancrage = texte(donnees, 'ancrage');
@@ -119,14 +124,15 @@ export function lireLesChampsDEmplacement(
 
   const velos = donnees.getAll('velos').filter(estUneChaine);
   if (velos.length === 0) {
-    erreurs.velos = 'Cochez au moins un type de vélo que vous pouvez accueillir.';
+    erreurs.velos =
+      'Cochez au moins un type de vélo que vous pouvez accueillir.';
   } else if (!velos.every(estUnTypeVelo)) {
-    erreurs.velos = 'Un des types de vélo cochés n’existe pas.';
+    erreurs.velos = 'Un des types de vélo cochés n’est pas reconnu.';
   }
 
   const services = donnees.getAll('services').filter(estUneChaine);
   if (!services.every(estUnService)) {
-    erreurs.services = 'Un des services cochés n’existe pas.';
+    erreurs.services = 'Un des services cochés n’est pas reconnu.';
   }
 
   if (

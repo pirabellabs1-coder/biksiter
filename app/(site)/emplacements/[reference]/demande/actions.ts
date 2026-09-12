@@ -29,7 +29,7 @@ export async function demanderUnStationnement(
       statut: 'erreur',
       erreurs: {
         [ERREUR_GENERALE]:
-          'Votre identité doit être vérifiée avant de demander un stationnement.',
+          'Une vérification d’identité est nécessaire pour demander un stationnement.',
       },
     };
   }
@@ -68,7 +68,12 @@ export async function demanderUnStationnement(
     erreurs.velo = 'Choisissez un type de vélo dans la liste.';
   }
 
-  if (Object.keys(erreurs).length > 0 || !debut || !fin || !estUnTypeVelo(velo)) {
+  if (
+    Object.keys(erreurs).length > 0 ||
+    !debut ||
+    !fin ||
+    !estUnTypeVelo(velo)
+  ) {
     return { statut: 'erreur', erreurs };
   }
 
@@ -88,8 +93,7 @@ export async function demanderUnStationnement(
       return {
         statut: 'erreur',
         erreurs: {
-          jour:
-            'Cet emplacement est déjà pris sur ce créneau, ou trop près d’un autre stationnement. Essayez un autre horaire.',
+          jour: 'Cet emplacement est déjà occupé sur ce créneau. Essayez un autre horaire, en prévoyant une demi-heure entre deux vélos.',
         },
       };
     }
@@ -101,6 +105,6 @@ export async function demanderUnStationnement(
   return {
     statut: 'valide',
     message:
-      'Votre demande est enregistrée. Le bike sitter décide s’il l’accepte, et n’a pas à se justifier s’il refuse. Vous la retrouvez dans « Mes stationnements ».',
+      'Votre demande a bien été envoyée. Vous retrouverez la réponse du bike sitter dans « Mes stationnements ».',
   };
 }

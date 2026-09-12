@@ -7,10 +7,7 @@ import { deposerUneCandidature } from '@/lib/depot/candidatures';
 import { creerUnEmplacement } from '@/lib/depot/emplacements';
 import { HORS_ZONE, situerLEmplacement } from '@/lib/geocodage/situer';
 import { lireLesChampsDEmplacement } from '@/lib/formulaires/emplacement';
-import {
-  ERREUR_GENERALE,
-  type EtatDuFormulaire,
-} from '@/lib/formulaires/etat';
+import { ERREUR_GENERALE, type EtatDuFormulaire } from '@/lib/formulaires/etat';
 import { RAYON_MINIMAL_DE_ZONE_METRES } from '@/lib/regles/adresse';
 import { EMPLACEMENTS_PAR_MEMBRE } from '@/lib/regles/emplacements';
 import { decisionDePublication } from '@/lib/regles/publication';
@@ -61,7 +58,7 @@ export async function proposerUnEmplacement(
       return {
         statut: 'erreur',
         erreurs: {
-          [ERREUR_GENERALE]: `Vous proposez déjà ${EMPLACEMENTS_PAR_MEMBRE} emplacements, c’est le maximum. Retirez-en un pour en ajouter un autre.`,
+          [ERREUR_GENERALE]: `Vous proposez déjà ${EMPLACEMENTS_PAR_MEMBRE} emplacements, le maximum par membre. Pour en ajouter un, retirez d’abord l’un d’eux.`,
         },
       };
     }
@@ -93,7 +90,7 @@ export async function proposerUnEmplacement(
       return {
         statut: 'valide',
         message:
-          'Votre emplacement est publié. Il apparaît en zone approximative : votre adresse reste chez vous jusqu’à ce que vous acceptiez une demande.',
+          'Votre emplacement est publié ! Il apparaît sur la carte dans une zone approximative, et votre adresse reste confidentielle jusqu’à ce que vous acceptiez une demande.',
       };
     }
   }
@@ -117,7 +114,7 @@ export async function proposerUnEmplacement(
   return {
     statut: 'valide',
     message:
-      'Votre candidature est enregistrée. Une personne la relit et vérifie votre identité avant toute publication : personne n’apparaît sur la carte sans être passé par là.',
+      'Merci, votre candidature est enregistrée. Une personne de l’association la relit et vérifie votre identité avant la publication ; nous vous répondons par e-mail.',
   };
 }
 

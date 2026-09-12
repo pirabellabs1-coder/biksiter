@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import BandeauDePage from '@/components/bandeau-de-page';
 import BaseNonBranchee from '@/components/base-non-branchee';
+import PageDeFormulaire from '@/components/page-de-formulaire';
 import { baseConfiguree } from '@/lib/bd/client';
 import { ficheParReference } from '@/lib/depot/emplacements';
 import { peutDemanderUnStationnement } from '@/lib/regles/publication';
@@ -23,10 +25,14 @@ export default async function DemandeDeStationnement({
 }) {
   if (!baseConfiguree()) {
     return (
-      <div className="page page--lecture">
-        <h1 className="titre-page">Demander un stationnement</h1>
-        <BaseNonBranchee />
-      </div>
+      <>
+        <BandeauDePage titre="Demander un stationnement." />
+        <section className="section">
+          <div className="section__interieur">
+            <BaseNonBranchee />
+          </div>
+        </section>
+      </>
     );
   }
 
@@ -41,30 +47,58 @@ export default async function DemandeDeStationnement({
   const autorise =
     membre !== null && peutDemanderUnStationnement(await membrePourLesRegles());
 
+  // Le rappel de la fiche est le même dans les deux cas : on écrit toujours à
+  // quelqu'un, qu'on ait le droit d'envoyer ou non. Ce qui change, c'est ce
+  // qu'on peut faire ensuite.
+  const rappel = (
+    <dl className="rappel-de-fiche">
+      <div>
+        <dt>Chez</dt>
+        <dd>{fiche.prenomDuBikeSitter}</dd>
+      </div>
+      <div>
+        <dt>Emplacement</dt>
+        <dd>{fiche.type}</dd>
+      </div>
+      <div>
+        <dt>Quartier</dt>
+        <dd>{fiche.quartier}</dd>
+      </div>
+      <div>
+        <dt>Vélos acceptés</dt>
+        <dd>{fiche.velosAcceptes.join(', ')}</dd>
+      </div>
+      <div>
+        <dt>Adresse exacte</dt>
+        <dd className="discret">après acceptation</dd>
+      </div>
+    </dl>
+  );
+
   if (!autorise) {
     return (
-      <div className="page page--lecture">
-        <p className="surtitre">Demande de stationnement</p>
-        <h1 className="titre-page">
-          Avant d’écrire à {fiche.prenomDuBikeSitter}
-        </h1>
-        <p className="chapeau">
-          Un compte unique, vérifié. Vous serez cycliste quand vous cherchez une
-          place, bike sitter si vous décidez d’en proposer une — c’est la même
-          personne, le même compte.
+      <PageDeFormulaire
+        surtitre="Demande de stationnement"
+        titre={`Avant d’écrire à ${fiche.prenomDuBikeSitter}`}
+        chapeau="Les demandes se font depuis un compte vérifié. Ce même compte vous permettra aussi, si vous le souhaitez, d’accueillir un vélo chez vous."
+        retour={{
+          href: `/emplacements/${fiche.reference}`,
+          libelle: 'Revenir à l’emplacement',
+        }}
+        propos={rappel}
+      >
+        <p>
+          <strong>
+            {membre
+              ? 'Votre identité est en cours de vérification.'
+              : 'Une vérification d’identité est nécessaire pour envoyer une demande.'}
+          </strong>
         </p>
-
-        <div className="encart">
-          <p>
-            <strong>
-              {membre
-                ? 'Votre identité est en cours de vérification.'
-                : 'Votre identité doit être vérifiée avant d’envoyer une demande.'}
-            </strong>{' '}
-            Ouvrir sa porte à quelqu’un suppose de savoir qui c’est ; c’est ce
-            que nous demandons aussi de votre côté.
-          </p>
-        </div>
+        <p className="discret">
+          Chaque membre est vérifié par une personne de l’association,
+          généralement sous 24 heures. C’est ce qui permet aux bike sitters
+          d’accueillir des vélos en toute confiance.
+        </p>
 
         <div className="boutons">
           {membre ? (
@@ -72,7 +106,7 @@ export default async function DemandeDeStationnement({
               href="/inscription/validation"
               className="bouton bouton--principal"
             >
-              Où en est ma vérification
+              Suivre ma vérification
             </Link>
           ) : (
             <>
@@ -84,58 +118,26 @@ export default async function DemandeDeStationnement({
               </Link>
             </>
           )}
-          <Link
-            href={`/emplacements/${fiche.reference}`}
-            className="bouton bouton--discret"
-          >
-            Revenir à l’emplacement
-          </Link>
         </div>
-      </div>
+      </PageDeFormulaire>
     );
   }
 
   return (
-    <div className="page page--lecture">
-      <p className="surtitre">Demande de stationnement</p>
-      <h1 className="titre-page">Votre demande à {fiche.prenomDuBikeSitter}</h1>
-
-      <div className="encart encart--verifie">
-        <p>
-          <strong>Votre profil est vérifié.</strong> {fiche.prenomDuBikeSitter}{' '}
-          verra votre prénom et le fait que votre identité a été contrôlée —
-          c’est ce qui lui permet d’accepter en confiance.
-        </p>
-      </div>
-
-      <dl className="details carte">
-        <div>
-          <dt>Chez</dt>
-          <dd>{fiche.prenomDuBikeSitter}</dd>
-        </div>
-        <div>
-          <dt>Emplacement</dt>
-          <dd>{fiche.type}</dd>
-        </div>
-        <div>
-          <dt>Quartier</dt>
-          <dd>{fiche.quartier}</dd>
-        </div>
-        <div>
-          <dt>Vélos acceptés</dt>
-          <dd>{fiche.velosAcceptes.join(', ')}</dd>
-        </div>
-        <div>
-          <dt>Adresse exacte</dt>
-          <dd>après acceptation</dd>
-        </div>
-      </dl>
-
-      <h2 className="titre-section titre-section--aere">Votre demande</h2>
+    <PageDeFormulaire
+      surtitre="Demande de stationnement"
+      titre={`Votre demande à ${fiche.prenomDuBikeSitter}`}
+      chapeau={`${fiche.prenomDuBikeSitter} verra votre prénom et saura que votre identité a été vérifiée. Vous retrouverez sa réponse dans votre espace, rubrique « Mes stationnements ».`}
+      retour={{
+        href: `/emplacements/${fiche.reference}`,
+        libelle: 'Revenir à l’emplacement',
+      }}
+      propos={rappel}
+    >
       <FormulaireDeDemande
         reference={fiche.reference}
         prenomDuBikeSitter={fiche.prenomDuBikeSitter}
       />
-    </div>
+    </PageDeFormulaire>
   );
 }

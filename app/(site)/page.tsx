@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import Appel from '@/components/appel';
 import Chiffres from '@/components/chiffres';
 import IconeCaracteristique from '@/components/icone-caracteristique';
 import Illustration from '@/components/illustration';
@@ -94,8 +95,8 @@ function Accroche() {
           <p className="chapeau">
             Un bike sitter est un habitant qui range votre vélo chez lui — un
             garage, une cave, une cour fermée — pour quelques heures ou quelques
-            jours. C’est gratuit, et son identité a été vérifiée par une
-            personne avant qu’il puisse accueillir quoi que ce soit.
+            jours. Le service est gratuit, et chaque bike sitter est vérifié par
+            l’association avant de pouvoir accueillir.
           </p>
 
           <div className="boutons">
@@ -115,7 +116,7 @@ function Accroche() {
           <ul className="gages">
             <li>
               <IconeCaracteristique pictogramme="identite" />
-              Identité vérifiée à la main
+              Identité vérifiée par une personne
             </li>
             <li>
               <IconeCaracteristique pictogramme="prive" />
@@ -149,8 +150,9 @@ function Recherche() {
             Où souhaitez-vous laisser votre vélo&nbsp;?
           </h2>
           <p className="discret">
-            Les emplacements s’affichent en zone approximative. L’adresse exacte
-            vous est communiquée quand le bike sitter accepte — pas avant.
+            Les emplacements s’affichent dans une zone approximative ; l’adresse
+            exacte vous est transmise dès que le bike sitter accepte votre
+            demande.
           </p>
         </div>
 
@@ -231,19 +233,19 @@ const FACONS = [
     scene: 'confier' as const,
     titre: 'Confier son vélo',
     texte:
-      'Vous cherchez un emplacement près de là où vous allez, vous convenez d’une heure d’arrivée et d’une heure de retour, et le vélo passe la journée derrière une porte qui se ferme.',
+      'Choisissez un emplacement près de votre destination et convenez d’une heure de dépôt et de reprise : votre vélo passe la journée à l’abri, derrière une porte fermée.',
   },
   {
     scene: 'garder' as const,
     titre: 'Garder celui d’un autre',
     texte:
-      'Un garage, une cave, une cour fermée suffisent. Accueillir ne coûte rien et ne vous engage à rien : chaque demande se refuse sans avoir à se justifier.',
+      'Un garage, une cave ou une cour fermée suffisent. Accueillir est gratuit et sans engagement : vous acceptez les demandes qui vous conviennent.',
   },
   {
     scene: 'ensemble' as const,
     titre: 'Faire vivre le réseau',
     texte:
-      'Le compte est unique : on est cycliste et bike sitter selon le moment. Chaque garde ajoute une porte de plus à un quartier, et c’est ce qui le fait grandir.',
+      'Avec un seul compte, vous pouvez faire garder votre vélo comme accueillir celui d’un voisin. Chaque nouvel emplacement aide le réseau à s’étendre dans votre quartier.',
   },
 ];
 
@@ -252,14 +254,14 @@ function TroisFacons() {
     <section className="section section--marque">
       <div className="section__interieur">
         <div className="entete-de-section entete-de-section--centree apparait">
-          <p className="surtitre">Un réseau, pas une place de marché</p>
+          <p className="surtitre">Un réseau d’entraide</p>
           <h2 className="titre-section titre-section--large">
-            Personne ne paie, personne n’est classé.
+            Gratuit, entre voisins, en toute confiance.
           </h2>
           <p className="chapeau">
-            Il n’y a rien à vendre ici, donc rien à optimiser contre vous. Trois
-            façons d’en être, et la même personne les tient souvent toutes les
-            trois.
+            Bike Sitters est une association : le service est gratuit et le
+            restera. Vous pouvez y participer de trois façons, souvent toutes à
+            la fois.
           </p>
         </div>
 
@@ -288,7 +290,7 @@ const ETAPES = [
     pictogramme: 'compte' as const,
     titre: 'Vous entrez dans le réseau',
     texte:
-      'Sur invitation d’un membre pendant le démarrage. Votre identité est vérifiée par une personne : c’est ce qui rend acceptable d’ouvrir sa porte.',
+      'Sur invitation d’un membre pendant le lancement. Une personne de l’association vérifie votre identité, pour la sécurité de tous.',
   },
   {
     pictogramme: 'carte' as const,
@@ -300,13 +302,13 @@ const ETAPES = [
     pictogramme: 'message' as const,
     titre: 'Vous envoyez votre demande',
     texte:
-      'Vous proposez une heure d’arrivée et une heure de retour. Le bike sitter accepte, ou non — il n’a rien à justifier.',
+      'Vous proposez une heure de dépôt et une heure de reprise. Le bike sitter vous répond depuis son espace.',
   },
   {
     pictogramme: 'code' as const,
     titre: 'Vous déposez, puis vous reprenez',
     texte:
-      'L’adresse arrive à l’acceptation. Sur place, un code à quatre chiffres acte la remise, et un second acte le retour.',
+      'L’adresse vous est transmise dès l’acceptation. Sur place, un code à quatre chiffres confirme le dépôt, puis un second la reprise.',
   },
 ];
 
@@ -367,10 +369,9 @@ function PresDeChezVous({
               Le réseau se construit en ce moment.
             </h2>
             <p className="chapeau">
-              Aucun emplacement n’est encore publié. Un quartier ouvre quand il
-              compte assez de bike sitters pour qu’un cycliste y trouve une
-              place à chaque fois — ouvrir plus tôt reviendrait à promettre une
-              place qui n’existe pas.
+              Les premiers emplacements arrivent bientôt. Chaque quartier ouvre
+              dès qu’il compte assez de bike sitters pour accueillir les
+              cyclistes dans de bonnes conditions.
             </p>
             <div className="boutons">
               <Link
@@ -401,8 +402,7 @@ function PresDeChezVous({
           </h2>
           <p className="chapeau">
             Le réseau ouvre quartier par quartier. Les emplacements ci-dessous
-            sont réels, et montrés dans l’ordre où ils ont été publiés&nbsp;: il
-            n’existe ici aucun classement qui permettrait d’en préférer un.
+            sont présentés dans l’ordre de leur publication.
           </p>
         </div>
 
@@ -415,8 +415,8 @@ function PresDeChezVous({
               }))}
             />
             <figcaption className="discret">
-              Une figure, pas une carte&nbsp;: chaque tache situe un quartier,
-              jamais une maison.
+              Chaque zone situe un quartier ; les adresses restent
+              confidentielles.
             </figcaption>
           </figure>
 
@@ -443,7 +443,7 @@ function PresDeChezVous({
               <Link href="/liste-attente" className="lien">
                 Dites-le nous
               </Link>{' '}
-              — c’est ce qui nous dit où ouvrir ensuite.
+              et nous vous préviendrons dès son ouverture.
             </p>
           </div>
         </div>
@@ -525,25 +525,25 @@ const GARANTIES = [
     pictogramme: 'identite' as const,
     titre: 'Une identité vérifiée par une personne',
     texte:
-      'Pièce d’identité, adresse e-mail et téléphone, contrôlées à la main par un membre de l’association. Aucun emplacement ne se publie avant.',
+      'Pièce d’identité, adresse e-mail et téléphone sont vérifiés par une personne de l’association avant toute publication.',
   },
   {
     pictogramme: 'carte' as const,
-    titre: 'Une adresse qui n’apparaît nulle part',
+    titre: 'Une adresse qui reste confidentielle',
     texte:
-      'Ni sur la fiche, ni dans l’adresse de la page, ni dans les métadonnées des photos. Avant l’acceptation, il n’existe qu’une zone d’environ cinq cents mètres.',
+      'Jusqu’à l’acceptation d’une demande, seule une zone d’environ cinq cents mètres est visible. L’adresse n’apparaît ni sur la fiche ni dans les photos.',
   },
   {
     pictogramme: 'code' as const,
     titre: 'Un code pour chaque remise',
     texte:
-      'Celui qui remet le vélo détient le code, celui qui le reçoit le saisit. Il se dicte à voix haute, fonctionne dans une cave sans réseau, et expire au bout de six heures.',
+      'La personne qui remet le vélo communique le code, celle qui le reçoit le saisit. Il se dicte facilement, fonctionne même sans réseau et reste valable six heures.',
   },
   {
     pictogramme: 'journal' as const,
     titre: 'Une garde qui laisse une trace',
     texte:
-      'Chaque dépôt et chaque reprise sont datés. Les deux personnes voient la même chose au même moment, et rien ne change d’état sans que les deux soient d’accord.',
+      'Chaque dépôt et chaque reprise sont datés. Le cycliste et le bike sitter suivent le même stationnement, et chaque étape est confirmée par les deux.',
   },
 ];
 
@@ -555,11 +555,11 @@ function Confiance() {
           <div className="rassurance__entete">
             <div>
               <p className="surtitre">La confiance, dans les deux sens</p>
-              <h2>Ce qui rend serein d’ouvrir sa porte</h2>
+              <h2>Accueillir et confier en toute sérénité</h2>
               <p className="rassurance__chapeau">
-                Un cycliste confie un objet qui compte. Un bike sitter laisse
-                entrer quelqu’un chez lui. Les deux prennent un risque, et
-                c’est pour cela que rien n’est vérifié d’un seul côté.
+                Le cycliste confie un vélo qui compte pour lui ; le bike sitter
+                ouvre sa porte. C’est pourquoi les vérifications s’appliquent à
+                tous les membres, des deux côtés.
               </p>
             </div>
 
@@ -597,22 +597,20 @@ function Temoignages({ avis }: { avis: AvisDuReseau[] }) {
         <div className="entete-de-section entete-de-section--centree apparait">
           <p className="surtitre">Ce qu’en disent les cyclistes</p>
           <h2 className="titre-section titre-section--large">
-            Des récits, pas des notes.
+            Leurs mots, après chaque stationnement.
           </h2>
           <p className="chapeau">
-            Il n’y a ni étoiles, ni moyenne, ni classement — la note appartient
-            à la personne. On lit ce que les cyclistes ont écrit après avoir
-            repris leur vélo, dans l’ordre où ils l’ont écrit.
+            Après avoir repris leur vélo, les cyclistes peuvent partager
+            quelques mots sur leur expérience. Nous les publions tels qu’ils ont
+            été écrits.
           </p>
         </div>
 
         {avis.length === 0 ? (
           <div className="carte carte--aeree centre apparait">
             <p className="discret">
-              Rien à afficher pour l’instant. Les avis sont écrits par les
-              cyclistes après la reprise de leur vélo, et nous n’en écrivons
-              aucun à leur place&nbsp;: cette place restera vide tant que
-              personne n’aura raconté sa garde.
+              Les premiers récits apparaîtront ici, après les premiers
+              stationnements.
             </p>
           </div>
         ) : (
@@ -656,9 +654,9 @@ function LesVelos() {
             Tous, ou presque.
           </h2>
           <p className="chapeau">
-            Chaque bike sitter annonce ce qui passe par sa porte. Un cargo et un
-            longtail sont distingués parce qu’ils n’entrent pas aux mêmes
-            endroits — mieux vaut le savoir avant de traverser la ville.
+            Chaque bike sitter indique les vélos qu’il peut accueillir. Cargo et
+            longtail sont distingués, car ils ne demandent pas la même place :
+            vous le savez avant de vous déplacer.
           </p>
         </div>
 
@@ -678,19 +676,18 @@ function LesVelos() {
 
 function Rejoindre() {
   return (
-    <section className="appel">
-      <div className="appel__interieur apparait">
-        <p className="surtitre">Rejoindre le réseau</p>
-        <h2 className="titre-page titre-page--phrase">
-          Votre vélo mérite mieux qu’un poteau.
-        </h2>
-        <p className="chapeau">
-          Bike Sitters est une {ASSOCIATION.forme} bruxelloise. Pas de
-          commission, pas d’abonnement, pas de version payante&nbsp;: ce qui
-          coûte, c’est l’hébergement et le temps passé à vérifier les identités.
-        </p>
-
-        <div className="boutons boutons--centres">
+    <Appel
+      surtitre="Rejoindre le réseau"
+      titre="Votre vélo mérite mieux qu’un poteau."
+      chapeau={
+        <>
+          Bike Sitters est une {ASSOCIATION.forme} bruxelloise. Le service est
+          entièrement gratuit ; ses frais de fonctionnement sont couverts par
+          des dons et des partenariats.
+        </>
+      }
+      actions={
+        <>
           <Link href="/emplacements" className="bouton bouton--principal">
             Trouver un emplacement
           </Link>
@@ -700,16 +697,17 @@ function Rejoindre() {
           >
             Accueillir un vélo
           </Link>
-        </div>
-
-        <p className="appel__note discret">
-          Le réseau est ouvert sur invitation pendant son démarrage.{' '}
+        </>
+      }
+      note={
+        <>
+          Pendant son lancement, le réseau s’ouvre sur invitation.{' '}
           <Link href="/liste-attente" className="lien">
             Dites-nous où vous habitez
           </Link>{' '}
-          si vous n’en avez pas.
-        </p>
-      </div>
-    </section>
+          pour être prévenu de l’ouverture de votre quartier.
+        </>
+      }
+    />
   );
 }

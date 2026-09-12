@@ -42,7 +42,8 @@ export async function deciderDeLIdentite(
     return {
       statut: 'erreur',
       erreurs: {
-        motif: 'Expliquez le refus : c’est ce qui permet de redéposer une pièce correcte.',
+        motif:
+          'Merci d’indiquer le motif du refus : il aidera le membre à envoyer une pièce valide.',
       },
     };
   }
@@ -59,7 +60,7 @@ export async function deciderDeLIdentite(
       statut: 'erreur',
       erreurs: {
         [ERREUR_GENERALE]:
-          'Ce dossier n’est plus en attente — quelqu’un l’a peut-être traité entre-temps.',
+          'Ce dossier a déjà été traité, peut-être par un autre modérateur.',
       },
     };
   }

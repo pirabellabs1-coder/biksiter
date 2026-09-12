@@ -37,16 +37,19 @@ export default function FormulaireDeDecision({
       <div className="champ">
         <label htmlFor="motif">Motif</label>
         <span id="motif-aide" className="champ__aide">
-          Obligatoire pour un refus, et envoyé tel quel à {prenom}. Écrivez ce
-          qui permet de recommencer : « la photo est floue », « le nom ne
-          correspond pas à celui du compte ».
+          Obligatoire en cas de refus : ce message est envoyé tel quel à{' '}
+          {prenom}. Indiquez ce qui lui permettra d’envoyer une pièce valide,
+          par exemple « la photo est floue » ou « le nom ne correspond pas à
+          celui du compte ».
         </span>
         <textarea
           id="motif"
           name="motif"
           disabled={traite}
           aria-invalid={erreurs.motif ? true : undefined}
-          aria-describedby={erreurs.motif ? 'motif-aide motif-erreur' : 'motif-aide'}
+          aria-describedby={
+            erreurs.motif ? 'motif-aide motif-erreur' : 'motif-aide'
+          }
         />
         {erreurs.motif ? (
           <span id="motif-erreur" className="champ__erreur">

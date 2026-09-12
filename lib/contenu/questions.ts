@@ -15,66 +15,66 @@ export const QUESTIONS: readonly Question[] = [
   {
     question: 'C’est vraiment gratuit ?',
     reponse:
-      'Oui, des deux côtés. Les bike sitters ne sont pas rémunérés et aucune commission n’est prélevée. C’est un réseau d’entraide entre cyclistes, porté par une association sans but lucratif — pas un service de stockage.',
+      'Oui, pour tout le monde. Les bike sitters accueillent bénévolement et aucune commission n’est prélevée. Bike Sitters est un réseau d’entraide porté par une association sans but lucratif.',
   },
   {
     question: 'Mon adresse sera-t-elle visible ?',
     reponse:
-      'Non. La carte affiche une zone d’au moins 250 mètres, jamais un point. Vous communiquez l’adresse exacte vous-même, à la personne dont vous avez accepté la demande, et à elle seule.',
+      'Non. La carte n’affiche qu’une zone d’au moins 250 mètres. L’adresse exacte n’est transmise qu’au cycliste dont vous avez accepté la demande.',
   },
   {
-    question: 'Pourquoi ne peut-on pas s’inscrire librement ?',
+    question: 'Pourquoi faut-il une invitation ?',
     reponse:
-      'Pendant les premiers mois, on entre sur invitation d’un membre. C’est ce qui nous permet de faire grandir le réseau quartier par quartier et de vérifier chaque personne sérieusement. La liste d’attente, elle, est ouverte à tous : c’est elle qui nous dit où ouvrir ensuite.',
+      'Pendant son lancement, le réseau s’ouvre sur invitation d’un membre. Cela nous permet de grandir quartier par quartier et de vérifier chaque personne avec soin. La liste d’attente est ouverte à tous : elle nous indique où ouvrir ensuite.',
   },
   {
     question: 'Faut-il un compte pour demander une place ?',
     reponse:
-      'Oui, avec une identité vérifiée. C’est la contrepartie de ce qu’on demande aux bike sitters : ouvrir sa porte à quelqu’un suppose de savoir qui c’est.',
+      'Oui, un compte dont l’identité a été vérifiée. Les bike sitters accueillent ainsi des vélos en toute confiance, et vous savez vous aussi à qui vous confiez le vôtre.',
   },
   {
     question: 'Que devient ma pièce d’identité ?',
     reponse:
-      'Elle est vérifiée par une personne, puis supprimée — au plus tard après sept jours. Nous ne conservons ni l’image, ni le numéro : seulement le fait que la vérification a eu lieu.',
+      'Elle est vérifiée par une personne de l’association, puis supprimée, au plus tard après sept jours. Nous ne conservons que le résultat de la vérification.',
   },
   {
     question: 'Qui est responsable s’il arrive quelque chose ?',
     reponse:
-      'Cette question est traitée dans les conditions générales. Le service met en relation : il n’assure pas le vélo et n’en assure pas la garde.',
+      'Bike Sitters met en relation des cyclistes et des bike sitters ; le service n’assure ni le vélo ni la garde. Le partage des responsabilités est détaillé dans les conditions générales.',
   },
   {
     question: 'Quels vélos sont acceptés ?',
     reponse:
-      'Chaque bike sitter indique ce qu’il peut accueillir parmi les douze types du réseau. Un cargo, un longtail ou un vélo avec remorque ne passe pas partout : c’est précisé sur chaque emplacement.',
+      'Chaque bike sitter indique les types de vélo qu’il peut accueillir. Les vélos cargo, longtail ou avec remorque demandent plus de place : c’est précisé sur chaque emplacement.',
   },
   {
     question: 'Combien de temps puis-je laisser mon vélo ?',
     reponse:
-      'Cela se convient directement avec le bike sitter. La plupart des stationnements durent quelques heures, certains quelques jours.',
+      'Vous en convenez directement avec le bike sitter. La plupart des stationnements durent quelques heures, certains quelques jours.',
   },
   {
     question: 'Y a-t-il des notes ou un classement des membres ?',
     reponse:
-      'Non, et il n’y en aura pas. Ni palmarès, ni tri par popularité, ni filtre par note. Un classement dans un réseau de bénévoles crée des perdants et pousse à accepter des gardes qu’on aurait dû refuser.',
+      'Non. Les membres ne sont ni notés ni classés : chacun accueille selon ses disponibilités, sans pression. Après un stationnement, le cycliste peut simplement partager quelques mots sur son expérience.',
   },
   {
     question: 'Comment le vélo change-t-il de mains ?',
     reponse:
-      'Avec un code à quatre chiffres : celui qui remet le vélo le détient, celui qui le reçoit le saisit. Il vaut six heures et accepte trois essais, puis il est régénéré. Ni QR code ni Bluetooth : un code se dicte à voix haute, dans une cave sans réseau, avec des gants.',
+      'Avec un code à quatre chiffres. La personne qui remet le vélo le communique, celle qui le reçoit le saisit. Le code reste valable six heures et accepte trois essais. Il se dicte facilement, même dans une cave sans réseau.',
   },
   {
     question: 'Je n’ai pas de vélo, puis-je accueillir ?',
     reponse:
-      'Bien sûr. Beaucoup de bike sitters ne font pas de vélo : ils ont simplement un emplacement vide et l’envie de rendre service.',
+      'Bien sûr. Beaucoup de bike sitters n’ont pas de vélo : ils disposent simplement d’un emplacement libre et ont envie de rendre service.',
   },
   {
     question: 'Puis-je proposer le local à vélos de mon immeuble ?',
     reponse:
-      'Non. Un emplacement doit être inaccessible au public et aux autres résidents de l’immeuble : c’est ce qui fait la différence entre un abri et un vélo laissé à la vue de tous. Les quatorze types proposés respectent tous cette règle.',
+      'Non. L’emplacement doit être fermé et réservé à votre usage, sans accès pour le public ni pour les autres résidents. C’est ce qui garantit la sécurité des vélos accueillis.',
   },
   {
     question: 'Combien d’emplacements puis-je proposer ?',
     reponse:
-      'Deux au maximum. Au-delà, on ne parle plus d’un voisin qui rend service mais d’un gestionnaire de parking.',
+      'Jusqu’à deux par membre. Bike Sitters reste ainsi un réseau d’entraide entre particuliers.',
   },
 ];
