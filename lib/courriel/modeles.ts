@@ -48,10 +48,10 @@ export function inscriptionSurLaListe(details: {
   return rediger('Bienvenue sur la liste d’attente', [
     'Bonjour,',
     '',
-    `Merci ! Votre inscription est bien enregistrée pour ${details.quartier}.`,
+    `Votre inscription est bien enregistrée pour ${details.quartier}.`,
     '',
     details.peutAccueillir
-      ? 'Vous avez indiqué pouvoir accueillir un vélo : merci, c’est précieux.' +
+      ? 'Vous avez indiqué pouvoir accueillir un vélo. Cette information est précieuse pour ouvrir votre quartier.' +
         '\nUn quartier ouvre dès qu’il compte assez de bike sitters pour' +
         '\naccueillir les cyclistes dans de bonnes conditions, et votre' +
         '\ninscription nous en rapproche.'
@@ -68,9 +68,9 @@ export function candidatureRecue(details: { prenom: string }): Message {
   return rediger('Nous avons bien reçu votre emplacement', [
     `Bonjour ${details.prenom},`,
     '',
-    'Merci d’avoir décrit votre emplacement ! Une personne de l’association',
-    'va le relire et vérifier votre identité avant la publication. Nous',
-    'revenons vers vous par e-mail.',
+    'Votre emplacement est bien enregistré. Une personne de l’association va',
+    'relire les informations et vérifier votre identité avant la publication.',
+    'Vous serez informé de la suite par e-mail.',
     '',
     'Votre adresse reste confidentielle : la carte n’affiche qu’une zone',
     'approximative, et l’adresse exacte n’est transmise qu’au cycliste dont',
@@ -87,8 +87,8 @@ export function bienvenue(details: {
     `Bonjour ${details.prenom},`,
     '',
     details.invitePar
-      ? `Votre compte est créé, grâce à l’invitation de ${details.invitePar}. Bienvenue !`
-      : 'Votre compte est créé. Bienvenue !',
+      ? `Bienvenue sur Bike Sitters. Votre compte est créé, grâce à l’invitation de ${details.invitePar}.`
+      : 'Bienvenue sur Bike Sitters. Votre compte est créé.',
     '',
     'Pour confirmer votre adresse e-mail, ouvrez ce lien :',
     details.lienDeConfirmation,
@@ -110,7 +110,7 @@ export function confirmationDAdresse(details: {
   return rediger('Confirmez votre adresse e-mail', [
     `Bonjour ${details.prenom},`,
     '',
-    'Voici un nouveau lien pour confirmer votre adresse e-mail :',
+    'Vous pouvez confirmer votre adresse e-mail en ouvrant le lien suivant :',
     details.lien,
     '',
     `Il reste valable ${VALIDITE_DU_LIEN_DE_CONFIRMATION_HEURES} heures. Les liens envoyés`,
@@ -140,7 +140,7 @@ export function identiteVerifiee(details: { prenom: string }): Message {
   return rediger('Votre identité est vérifiée', [
     `Bonjour ${details.prenom},`,
     '',
-    'Bonne nouvelle : votre identité est vérifiée et votre compte est actif.',
+    'Votre identité a été vérifiée et votre compte est désormais actif.',
     'Votre pièce d’identité a été supprimée ; seul le résultat de la',
     'vérification est conservé.',
     '',
@@ -203,7 +203,7 @@ export function demandeAcceptee(details: {
     [
       `Bonjour ${details.prenomDuCycliste},`,
       '',
-      `Bonne nouvelle : ${details.prenomDuBikeSitter} vous attend ${details.creneau}.`,
+      `${details.prenomDuBikeSitter} a accepté votre demande. L’accueil est prévu ${details.creneau}.`,
       '',
       `L’adresse : ${details.adresse}`,
       '',
@@ -264,7 +264,7 @@ export function donAnnonce(details: {
   return rediger('Les coordonnées pour votre don', [
     details.prenom ? `Bonjour ${details.prenom},` : 'Bonjour,',
     '',
-    'Merci pour votre soutien ! Voici les informations pour votre virement :',
+    'Merci pour votre soutien. Voici les informations utiles à votre virement :',
     '',
     `  Bénéficiaire   : ${ASSOCIATION.nom}`,
     `  IBAN           : ${details.iban}`,
