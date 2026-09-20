@@ -83,7 +83,7 @@ export default async function Messages({
             <span className="messagerie-vide-icone">
               <Icone nom="messages" taille={30} />
             </span>
-            <strong>{p('Choisissez une conversation')}</strong>
+            <strong>{p('Sélectionnez une conversation')}</strong>
             <span>
               {p(
                 'Vos échanges avec les bike sitters et les cyclistes s’affichent ici.',

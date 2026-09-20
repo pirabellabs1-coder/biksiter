@@ -35,7 +35,7 @@ export default async function Accessibilite({
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Accessibilité')}</h1>
         <p className="sous-titre">
-          {p('Adaptez l’application à vos besoins pour une utilisation confortable.')}
+          {p('L’application propose plusieurs réglages pour l’adapter à vos besoins.')}
         </p>
 
         {enregistre ? (
@@ -71,7 +71,7 @@ export default async function Accessibilite({
           <div className="encart gris" style={{ marginTop: 12 }}>
             <Icone nom="info" taille={20} />
             <span>
-              {p('Les écrans sont conçus pour les lecteurs d’écran et la navigation au clavier. Le zoom de votre navigateur fonctionne aussi partout.')}
+              {p('Les écrans sont conçus pour être utilisables avec un lecteur d’écran et pour la navigation au clavier. Le zoom du navigateur est également pris en charge.')}
             </span>
           </div>
 

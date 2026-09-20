@@ -95,7 +95,7 @@ export function CarteDAvisPublie({
         <p style={{ margin: '10px 0 0' }}>
           <span className="pastille ambre">
             <Icone nom="horloge" taille={14} />
-            {p('Signalé à la modération.')}
+            {p('Le signalement a été transmis à la modération.')}
           </span>
         </p>
       ) : null}

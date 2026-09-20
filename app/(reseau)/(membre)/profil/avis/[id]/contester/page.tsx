@@ -39,7 +39,7 @@ export default async function ContesterUnAvis({
           retour="/profil/avis"
           textes={{
             libelle: p('Ce qui ne va pas'),
-            exemple: p('Cet avis décrit une autre garde…'),
+            exemple: p('Cet avis semble décrire une autre garde.'),
             envoyer: p('Envoyer à la modération'),
             envoi: p('Envoi…'),
             revenir: p('Revenir'),

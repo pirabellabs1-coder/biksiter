@@ -86,8 +86,8 @@ export default async function Parametres() {
                   : p('Passer en mode Cycliste')}
               </strong>
               {autreMode === 'bike_sitter'
-                ? p('Accueillez des vélos et gagnez des points.')
-                : p('Trouvez une place pour votre vélo.')}
+                ? p('L’accueil d’un vélo mené à son terme vous rapporte des points.')
+                : p('Vous pouvez rechercher un emplacement pour votre vélo.')}
             </span>
             <Icone nom="chevron" taille={20} />
           </button>

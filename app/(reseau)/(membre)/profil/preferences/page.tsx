@@ -48,7 +48,7 @@ export default async function Preferences({
             </span>
             <span className="ligne-texte">
               <strong>{p('Notifications dans l’application')}</strong>
-              <span>{p('Demandes, gardes, messages et points : tout arrive dans l’onglet des notifications.')}</span>
+              <span>{p('L’onglet des notifications regroupe les demandes, les gardes, les messages et les points.')}</span>
             </span>
             <span className="pastille">{p('Actives')}</span>
           </li>
@@ -58,7 +58,7 @@ export default async function Preferences({
             </span>
             <span className="ligne-texte">
               <strong>{p('E-mails')}</strong>
-              <span>{p('Les étapes importantes d’une garde vous sont aussi envoyées par e-mail.')}</span>
+              <span>{p('Les étapes importantes d’une garde vous sont également envoyées par courriel.')}</span>
             </span>
             <span className="pastille">{p('Actifs')}</span>
           </li>
@@ -72,7 +72,7 @@ export default async function Preferences({
               </span>
               <span className="ligne-texte">
                 <strong>{p('Heures de calme')}</strong>
-                <span>{p('Aucune notification ne vous dérange pendant cette plage.')}</span>
+                <span>{p('Aucune notification n’est envoyée pendant cette plage horaire.')}</span>
               </span>
               <input
                 type="checkbox"
@@ -102,7 +102,7 @@ export default async function Preferences({
               </label>
             </div>
             <p className="petit texte-doux" style={{ margin: 0 }}>
-              {p('Les notifications reçues pendant cette plage vous attendent à la fin de la nuit : rien n’est perdu. Une urgence sur une garde en cours passe toujours.')}
+              {p('Les notifications reçues pendant cette plage vous sont présentées à la fin de la nuit. Une urgence sur une garde en cours est toutefois transmise immédiatement.')}
             </p>
           </div>
 

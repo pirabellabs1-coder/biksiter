@@ -62,13 +62,13 @@ export default async function Profil({
           'etoile',
           p('Mes avis'),
           '/profil/avis',
-          p('Ce que les cyclistes disent de vous'),
+          p('Les avis reçus des cyclistes'),
         ],
         [
           'oeil',
           p('Aperçu du profil public'),
           `/membres/${membre.id}`,
-          p('Voir comment les cyclistes vous voient'),
+          p('Consulter votre profil public'),
         ],
       ]
     : [
@@ -274,7 +274,7 @@ export default async function Profil({
               <Link href="/devenir-bike-sitter" className="encart lien-encart">
                 <Icone nom="utilisateurs" taille={30} />
                 <span>
-                  <strong>{p('Envie de partager votre passion ?')}</strong>
+                  <strong>{p('Vous souhaitez proposer un emplacement ?')}</strong>
                   {p(
                     'Devenir Bike Sitter et gardez des vélos près de chez vous.',
                   )}

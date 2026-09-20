@@ -19,8 +19,8 @@ export default async function Confidentialite() {
   const apparait = await apparaitAuClassement(membre.id);
 
   const liens: [NomDIcone, string, string, string][] = [
-    ['utilisateurs', p('Membres bloqués'), '/profil/bloques', p('Ils ne peuvent plus vous contacter ni vous demander une garde.')],
-    ['document', p('Politique de confidentialité'), '/confidentialite', p('Ce que nous gardons, pourquoi et combien de temps.')],
+    ['utilisateurs', p('Membres bloqués'), '/profil/bloques', p('Les comptes bloqués ne peuvent plus vous contacter ni vous demander une garde.')],
+    ['document', p('Politique de confidentialité'), '/confidentialite', p('Voici les données conservées, leur usage et leur durée de conservation.')],
   ];
 
   return (
@@ -34,7 +34,7 @@ export default async function Confidentialite() {
           <Icone nom="bouclier" taille={34} />
           <span>
             <strong>{p('Vos informations sont protégées.')}</strong>
-            {p('Les autres membres voient votre prénom et l’initiale de votre nom. Votre nom complet et votre e-mail ne sont visibles par personne.')}
+            {p('Les autres membres voient uniquement votre prénom et l’initiale de votre nom. Votre nom complet et votre adresse e-mail restent confidentiels.')}
           </span>
         </div>
 
@@ -45,7 +45,7 @@ export default async function Confidentialite() {
             </span>
             <span className="ligne-texte">
               <strong>{p('Adresse exacte après acceptation')}</strong>
-              <span>{p('Votre adresse n’est communiquée qu’à la personne dont vous acceptez la garde. Avant, la fiche montre une zone approximative.')}</span>
+              <span>{p('Votre adresse est communiquée uniquement au membre dont vous acceptez la garde. Avant l’acceptation, seule la zone approximative de l’emplacement apparaît sur la fiche.')}</span>
               <span className="pastille" style={{ width: 'fit-content', marginTop: 4 }}>
                 <Icone nom="cadenas" taille={13} />
                 {p('Toujours actif')}
@@ -58,7 +58,7 @@ export default async function Confidentialite() {
             </span>
             <span className="ligne-texte">
               <strong>{p('Numéro de téléphone')}</strong>
-              <span>{p('Communiqué à l’autre personne pendant une garde acceptée, et à elle seule. Il disparaît à la fin de la garde.')}</span>
+              <span>{p('Ce numéro est communiqué uniquement au membre concerné pendant une garde acceptée. Il n’est plus visible à la fin de la garde.')}</span>
             </span>
           </li>
         </ul>
@@ -70,7 +70,7 @@ export default async function Confidentialite() {
             <strong>{p('Apparaître dans le classement')}</strong>
             <span>
               {apparait
-                ? p('Votre prénom et vos points figurent dans le Top Bike Sitters, jamais votre adresse ni votre quartier.')
+                ? p('Le classement Top Bike Sitters affiche uniquement votre prénom et vos points. Votre adresse et votre quartier n’y apparaissent pas.')
                 : p('Vous n’apparaissez pas dans le Top Bike Sitters.')}
             </span>
           </span>
@@ -103,7 +103,7 @@ export default async function Confidentialite() {
             </span>
             <span className="ligne-texte">
               <strong>{p('Télécharger mes données')}</strong>
-              <span>{p('Un fichier avec tout ce que le réseau sait de vous.')}</span>
+              <span>{p('Un fichier qui contient l’ensemble des informations vous concernant.')}</span>
             </span>
             <Icone nom="chevron" taille={20} className="texte-leger" />
           </a>

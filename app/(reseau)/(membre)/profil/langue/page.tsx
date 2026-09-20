@@ -72,7 +72,7 @@ export default async function Langue() {
           </li>
         </ul>
         <p className="petit texte-doux" style={{ marginTop: 8 }}>
-          {p('Le réseau ouvre quartier par quartier à Bruxelles : toutes les heures s’affichent à l’heure de Bruxelles.')}
+          {p('Le réseau ouvre quartier par quartier à Bruxelles. L’ensemble des horaires est affiché à l’heure de Bruxelles.')}
         </p>
       </div>
     </main>

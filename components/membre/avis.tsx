@@ -95,7 +95,7 @@ export function CarteDAvis({
         ) : null}
         {avis.conteste ? (
           <p className="t-xs muted" style={{ marginTop: 8 }}>
-            {p('Signalé à la modération.')}
+            {p('Le signalement a été transmis à la modération.')}
           </p>
         ) : null}
       </div>

@@ -35,7 +35,7 @@ export default async function RepondreAUnAvis({
           retour="/profil/avis"
           textes={{
             libelle: p('Votre réponse'),
-            exemple: p('Merci pour votre retour…'),
+            exemple: p('Votre retour a bien été transmis.'),
             envoyer: p('Publier la réponse'),
             envoi: p('Publication…'),
             revenir: p('Revenir'),
