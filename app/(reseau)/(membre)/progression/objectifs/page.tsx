@@ -110,8 +110,8 @@ export default async function MesObjectifs() {
         ) : (
           <div className="carte vide-liste" style={{ marginTop: 12 }}>
             <Icone nom="trophee" taille={30} className="texte-vert" />
-            <strong>{p('Tous les badges sont à vous.')}</strong>
-            <span className="texte-doux">{p('Merci pour chacune de vos gardes.')}</span>
+            <strong>{p('Vous avez obtenu l’ensemble des badges disponibles.')}</strong>
+            <span className="texte-doux">{p('Vous avez pris soin de chaque garde.')}</span>
           </div>
         )}
       </div>

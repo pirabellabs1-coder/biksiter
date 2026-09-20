@@ -114,7 +114,7 @@ export default async function Notifications({
           <div className="carte vide-liste" style={{ marginTop: 14 }}>
             <Icone nom="cloche" taille={30} />
             <strong>{p('Aucune notification.')}</strong>
-            <span>{p('Vous serez prévenu ici des demandes, des messages et des gardes.')}</span>
+            <span>{p('Vous retrouverez ici les demandes, les messages et les mises à jour de vos gardes.')}</span>
           </div>
         ) : (
           groupes.map(([titre, liste]) =>

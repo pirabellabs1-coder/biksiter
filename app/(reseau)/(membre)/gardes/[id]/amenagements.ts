@@ -56,7 +56,7 @@ export async function demanderLaProlongation(
   const nouvelleFin = estUneHeure(heure) ? instantABruxelles(jour, heure) : null;
   if (!nouvelleFin) {
     const p = phraseur(await langueCourante());
-    return { erreur: p('Choisissez le jour et l’heure de la nouvelle fin.') };
+    return { erreur: p('Indiquez le jour et l’heure souhaités pour la nouvelle fin de garde.') };
   }
   const resultat = await demanderUneProlongation(
     membre.id,

@@ -137,8 +137,8 @@ export default async function RemiseDuVelo({
             <Icone nom="batterie" taille={22} />
           </span>
           <span className="ligne-texte">
-            <strong>{p('La batterie vous inquiète ?')}</strong>
-            <span>{p('Gonflée, chaude, abîmée ou odorante : vous pouvez refuser le vélo.')}</span>
+            <strong>{p('La batterie présente un doute ?')}</strong>
+            <span>{p('En cas de batterie gonflée, chaude, abîmée ou dégageant une odeur, vous pouvez refuser d’accueillir le vélo.')}</span>
           </span>
           <Icone nom="chevron" taille={20} />
         </summary>
@@ -151,7 +151,7 @@ export default async function RemiseDuVelo({
             )}
           </p>
           <button type="submit" className="bouton danger-contour">
-            {p('Refuser le vélo : batterie inquiétante')}
+            {p('Refuser le vélo pour un problème de batterie')}
           </button>
         </form>
       </details>
@@ -171,7 +171,7 @@ export default async function RemiseDuVelo({
           </p>
           <div className="encart ambre" role="status">
             <Icone nom="horloge" taille={22} />
-            <span>{p('Les photos arrivent : cet écran se met à jour tout seul.')}</span>
+            <span>{p('Les photos sont en cours de réception. L’écran se met à jour automatiquement.')}</span>
           </div>
           {refusPourLaBatterie}
         </div>

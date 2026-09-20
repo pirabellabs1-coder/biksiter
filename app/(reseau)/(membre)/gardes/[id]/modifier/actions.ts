@@ -34,7 +34,7 @@ export async function verifierLaModification(
     return { motifs: [p('Cette demande ne peut plus être modifiée.')], placesLibres: 0 };
   }
   if (!creneauValide(champs)) {
-    return { motifs: [p('Choisissez la date du dépôt.')], placesLibres: 0 };
+    return { motifs: [p('Sélectionnez la date du dépôt.')], placesLibres: 0 };
   }
   const verification = await motifsPourUneDemande(
     { membreId: membre.id, reference: demande.reference, veloId: champs.veloId, creneau: champs },
@@ -64,7 +64,7 @@ export async function enregistrerLaModification(
     heureReprise: lire('a'),
     veloId: lire('velo'),
   };
-  if (!creneauValide(champs)) return { motifs: [p('Choisissez la date du dépôt.')] };
+  if (!creneauValide(champs)) return { motifs: [p('Sélectionnez la date du dépôt.')] };
 
   const resultat = await modifierUneDemande(membre.id, id, {
     veloId: champs.veloId,

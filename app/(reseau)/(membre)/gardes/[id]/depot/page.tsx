@@ -62,7 +62,7 @@ export default async function PreparerLeDepot({ params }: { params: Promise<{ id
     [
       'photo',
       p('Photos du vélo'),
-      p('Vous allez photographier votre vélo sous plusieurs angles, avec ses éventuels défauts.'),
+      p('Le constat consiste à photographier votre vélo sous plusieurs angles, en indiquant les éventuels défauts.'),
       photosPrises,
     ],
     ...(electrique
@@ -70,7 +70,7 @@ export default async function PreparerLeDepot({ params }: { params: Promise<{ id
           [
             'batterie',
             p('État de la batterie'),
-            p('Vérifiez qu’elle n’est ni gonflée, ni chaude, ni abîmée.'),
+            p('La batterie doit être examinée pour vérifier qu’elle ne présente ni gonflement, ni chaleur excessive, ni signe de dommage.'),
             photosPrises,
           ] as [NomDIcone, string, string, boolean],
         ]
@@ -115,7 +115,7 @@ export default async function PreparerLeDepot({ params }: { params: Promise<{ id
 
         <div className="encart" style={{ marginTop: 12 }}>
           <Icone nom="info" taille={20} />
-          <span>{p('Ces informations sécurisent la garde et protègent tout le monde.')}</span>
+          <span>{p('Ces informations contribuent à la sécurité de la garde pour les deux membres.')}</span>
         </div>
 
         <div className="boutons" style={{ marginTop: 16 }}>
@@ -139,7 +139,7 @@ export default async function PreparerLeDepot({ params }: { params: Promise<{ id
                 {p('Je suis devant la porte')}
               </button>
               <p className="petit texte-doux centre" style={{ margin: 0 }}>
-                {p('Vous pourrez signaler votre arrivée une demi-heure avant l’heure du dépôt.')}
+                {p('Votre arrivée pourra être signalée à partir de trente minutes avant l’heure prévue du dépôt.')}
               </p>
             </>
           )}

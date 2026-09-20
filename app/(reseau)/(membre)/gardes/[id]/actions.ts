@@ -78,13 +78,13 @@ export async function gesteAvecMotif(
   const membre = await exigerUnMembre();
   const p = phraseur(await langueCourante());
   if (!GESTES_AVEC_MOTIF.includes(geste))
-    return { erreur: p('Choisissez un motif.') };
+    return { erreur: p('Sélectionnez un motif.') };
 
   const choisi = String(donnees.get('motif') ?? '').trim();
   const precision = String(donnees.get('precision') ?? '')
     .trim()
     .slice(0, 400);
-  if (!choisi) return { erreur: p('Choisissez un motif.') };
+  if (!choisi) return { erreur: p('Sélectionnez un motif.') };
   const motif = precision ? `${choisi} — ${precision}` : choisi;
 
   const resultat = await effectuerUnGeste(membre.id, id, geste, motif);
@@ -161,12 +161,12 @@ export async function validerLeConstat(
   const photos: (PhotoPreparee & { rang: number })[] = [];
   for (const { rang, fichier } of fichiers) {
     if (fichier.size > TAILLE_MAXIMALE_D_UNE_PHOTO_DE_CONSTAT) {
-      return { erreur: p('Une photo est trop lourde. Reprenez-la directement avec l’appareil photo du téléphone.') };
+      return { erreur: p('Une photo dépasse la taille autorisée. Il est conseillé de la reprendre directement avec l’appareil photo du téléphone.') };
     }
     const contenu = Buffer.from(await fichier.arrayBuffer());
     const type = typeReelDuFichier(contenu);
     if (!type || type === 'application/pdf') {
-      return { erreur: p('Envoyez des photos (JPEG, PNG ou WebP).') };
+      return { erreur: p('Les photos peuvent être envoyées au format JPEG, PNG ou WebP.') };
     }
     try {
       photos.push({ rang, ...(await nettoyerLaPhoto(contenu)) });

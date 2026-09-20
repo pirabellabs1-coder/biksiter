@@ -52,7 +52,7 @@ export default async function CentreDAide({
           <div className="carte vide-liste" style={{ marginTop: 14 }}>
             <Icone nom="recherche" taille={30} className="texte-leger" />
             <strong>{p('Aucune réponse ne correspond.')}</strong>
-            <span className="texte-doux">{p('Essayez d’autres mots, ou écrivez-nous.')}</span>
+            <span className="texte-doux">{p('Vous pouvez reformuler votre recherche ou nous écrire pour toute question.')}</span>
             <Link href="/aide" className="lien-souligne">
               {p('Voir toutes les questions')}
             </Link>

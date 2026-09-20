@@ -74,7 +74,7 @@ export default async function HistoriqueDesPoints({
         {lignes.length === 0 ? (
           <div className="carte vide-liste" style={{ marginTop: 14 }}>
             <Icone nom="document" taille={30} className="texte-leger" />
-            <strong>{p('Rien à afficher pour l’instant.')}</strong>
+            <strong>{p('Aucun élément à afficher pour le moment.')}</strong>
             <span className="texte-doux">
               {p('Vos points apparaissent ici dès la fin d’une garde.')}
             </span>

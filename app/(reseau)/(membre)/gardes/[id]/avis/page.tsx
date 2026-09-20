@@ -41,7 +41,7 @@ export default async function Avis({
         <div className="ecran-app ecran-parcours">
           <div className="carte vide-liste">
             <Icone nom="etoile" taille={30} />
-            <strong>{p('Le délai pour laisser un avis est passé.')}</strong>
+            <strong>{p('Le délai pour publier un avis est dépassé.')}</strong>
             <span>
               {p('Il court pendant {n} jours après la fin de la garde.', {
                 n: DELAI_POUR_DEPOSER_JOURS,
@@ -98,7 +98,7 @@ export default async function Avis({
             "Votre avis reste invisible tant que {prenom} n'a pas déposé le sien. Publication automatique après 7 jours.",
             { prenom: garde.autre.prenom },
           ),
-          obligatoire: p('Donnez une note générale.'),
+          obligatoire: p('Une note générale peut être attribuée à cette garde.'),
           publier: p('Publier mon avis'),
           envoi: p('Envoi…'),
         }}

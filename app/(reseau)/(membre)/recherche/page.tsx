@@ -142,7 +142,7 @@ export default async function Rechercher({
         <div className="ecran-app">
           <div className="carte vide-liste">
             <Icone nom="epingle" taille={30} />
-            <strong>{p('Ce lieu ne nous dit rien.')}</strong>
+            <strong>{p('Ce lieu n’est pas reconnu.')}</strong>
             <span>
               {p(
                 'Essayez le nom d’un quartier, d’une place ou d’une commune de Bruxelles.',

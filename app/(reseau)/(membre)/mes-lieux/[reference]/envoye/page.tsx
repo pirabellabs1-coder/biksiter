@@ -59,7 +59,7 @@ export default async function LieuEnregistre({
         <h1 className="titre-ecran centre">
           {lieu.publie ? p('Votre lieu est en ligne !') : p('Lieu enregistré')}
         </h1>
-        <p className="sous-titre centre">{p('Merci pour votre engagement !')}</p>
+        <p className="sous-titre centre">{p('Merci pour votre participation au réseau.')}</p>
 
         <ol className="suivi" style={{ marginTop: 10 }}>
           {etapes.map(([fait, titre, texte]) => (

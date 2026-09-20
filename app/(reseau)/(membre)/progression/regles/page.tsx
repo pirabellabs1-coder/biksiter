@@ -94,7 +94,7 @@ export default async function ReglesDesPoints() {
 
         <div className="boutons" style={{ marginTop: 16 }}>
           <Link href="/progression" className="bouton plein">
-            {p('Compris !')}
+            {p('J’ai compris')}
           </Link>
         </div>
       </div>

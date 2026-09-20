@@ -152,7 +152,7 @@ export async function envoyerLesPhotosDuLieu(
     const contenu = Buffer.from(await fichier.arrayBuffer());
     const type = typeReelDuFichier(contenu);
     if (!type || type === 'application/pdf') {
-      return { erreurs: { photo: p('Envoyez des photos (JPEG, PNG ou WebP).') } };
+      return { erreurs: { photo: p('Les photos peuvent être envoyées au format JPEG, PNG ou WebP.') } };
     }
     try {
       await ajouterUnePhoto(emplacementId, rang, contenu);

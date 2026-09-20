@@ -136,10 +136,10 @@ export default async function Motif({
           motifs={motifsProposes(geste, garde.role).map((m) => [m, p(m)] as const)}
           danger={['refuser', 'signaler', 'absence', 'annuler'].includes(geste)}
           textes={{
-            motif: geste === 'signaler' ? p('Que s’est-il passé ?') : p('Raison'),
+            motif: geste === 'signaler' ? p('Description de la situation') : p('Raison'),
             precision:
               geste === 'signaler'
-                ? p('Décrivez ce qui s’est passé')
+                ? p('Description de la situation')
                 : p('Précisez si vous le souhaitez (facultatif)'),
             confirmer,
             revenir: p('Revenir à la garde'),

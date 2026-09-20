@@ -75,10 +75,10 @@ export default async function MesGardes({
             <strong>
               {onglet.cle === 'a-venir'
                 ? p('Aucune autre garde prévue.')
-                : p('Rien dans cette rubrique.')}
+                : p('Aucun élément dans cette rubrique.')}
             </strong>
             <span>
-              {p('Trouvez un Bike Sitter pour vos prochaines sorties.')}
+              {p('Vous pouvez rechercher un bike sitter pour votre prochaine sortie.')}
             </span>
             <Link href="/recherche" className="bouton contour petit">
               {p('Rechercher un bike sitter')}

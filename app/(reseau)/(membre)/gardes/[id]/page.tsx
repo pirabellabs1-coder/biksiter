@@ -215,7 +215,7 @@ export default async function DetailDUneGarde({
             titre: p('Demande acceptée'),
             texte:
               moi === 'cycliste'
-                ? p('Votre garde est confirmée !')
+                ? p('Votre garde est confirmée.')
                 : p('Nous prévenons {prenom}. La garde est ajoutée à vos gardes.', {
                     prenom: autre.prenom,
                   }),
@@ -234,7 +234,7 @@ export default async function DetailDUneGarde({
                 titre: p('Garde en cours'),
                 texte:
                   moi === 'cycliste'
-                    ? p('Votre vélo est gardé. Tout se passe bien !')
+                    ? p('Votre vélo est actuellement en garde.')
                     : p('Le vélo de {prenom} est chez vous.', { prenom: autre.prenom }),
                 ton: 'ambre',
               }
@@ -245,7 +245,7 @@ export default async function DetailDUneGarde({
                   texte:
                     moi === 'bike_sitter'
                       ? p('Vous avez aidé {prenom} à protéger son vélo.', { prenom: autre.prenom })
-                      : p('Le vélo est rendu. Merci pour cette garde !'),
+                      : p('Le vélo a été rendu. La garde est terminée.'),
                   ton: '',
                 }
               : garde.etat === 'expire'
@@ -528,8 +528,8 @@ export default async function DetailDUneGarde({
                 <strong>{p('Arrivée dépassée de {n} min', { n: retard })}</strong>
                 {moi === 'cycliste'
                   ? garde.retardAnnonceLe
-                    ? p('Votre bike sitter est prévenu.')
-                    : p('Prévenez votre bike sitter, même si vous arrivez dans une heure.')
+                    ? p('Votre bike sitter a été informé.')
+                    : p('Il est utile de prévenir votre bike sitter, même si votre retard est de courte durée.')
                   : garde.retardAnnonceLe
                     ? p('{prenom} vous a prévenu de son retard.', { prenom: autre.prenom })
                     : p("Sans nouvelles, vous pouvez signaler que personne n'est venu.")}
@@ -543,8 +543,8 @@ export default async function DetailDUneGarde({
               <span>
                 <strong>{p("L'heure de récupération est dépassée.")}</strong>
                 {moi === 'bike_sitter'
-                  ? p('Contactez le propriétaire du vélo, et gardez-le chez vous sans le sortir.')
-                  : p('Prévenez votre bike sitter, même si vous ne pouvez pas venir tout de suite.')}
+                  ? p('Il est recommandé de contacter le propriétaire du vélo et de conserver celui-ci chez vous, sans le sortir.')
+                  : p('Il est utile de prévenir votre bike sitter, même si vous ne pouvez pas venir immédiatement.')}
               </span>
             </div>
           ) : null}
@@ -696,7 +696,7 @@ export default async function DetailDUneGarde({
                     </span>
                     <span className="ligne-texte">
                       <strong>{p('Rejoindre la liste d’attente')}</strong>
-                      <span>{p('Soyez prévenu dès qu’une place se libère près d’ici.')}</span>
+                      <span>{p('Vous serez informé dès qu’un nouvel emplacement se libère à proximité.')}</span>
                     </span>
                     <Icone nom="chevron" taille={20} className="texte-leger" />
                   </button>
@@ -711,7 +711,7 @@ export default async function DetailDUneGarde({
             <Icone nom="bouclier" taille={22} />
             <span>
               <strong>{p('L’adresse du cycliste n’est pas nécessaire.')}</strong>
-              {p('La garde se déroule dans votre espace privé et sécurisé.')}
+              {p('La garde a lieu dans votre espace privé et sécurisé.')}
             </span>
           </div>
         ) : null}
@@ -800,8 +800,8 @@ export default async function DetailDUneGarde({
                 <strong>{phase === 'depot' ? p('Photos du dépôt à prendre') : p('Photos du retour à prendre')}</strong>
                 {cEstAMoi
                   ? phase === 'depot'
-                    ? p('Photographiez votre vélo avant de le remettre : ces photos protègent la garde.')
-                    : p('Photographiez votre vélo avant de repartir : ces photos protègent la fin de la garde.')
+                    ? p('Les photos prises avant la remise du vélo servent au constat de départ de la garde.')
+                    : p('Les photos prises au retour servent au constat de fin de garde.')
                   : p('{prenom} photographie son vélo avant la remise du code.', { prenom: autre.prenom })}
               </span>
             </div>

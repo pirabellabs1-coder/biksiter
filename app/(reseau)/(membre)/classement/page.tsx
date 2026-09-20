@@ -138,7 +138,7 @@ export default async function TopBikeSitters({
         {c.lignes.length === 0 ? (
           <div className="carte vide-liste" style={{ marginTop: 14 }}>
             <Icone nom="trophee" taille={32} className="texte-leger" />
-            <strong>{p('Personne au classement pour cette période.')}</strong>
+            <strong>{p('Aucun membre n’apparaît au classement sur cette période.')}</strong>
             <span className="texte-doux">
               {p('Le classement se remplit à mesure que des gardes se terminent.')}
             </span>

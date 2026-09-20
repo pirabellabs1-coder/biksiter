@@ -51,7 +51,7 @@ export default async function MesAvis({
         {recus.length === 0 ? (
           <div className="carte vide-liste">
             <Icone nom="etoile" taille={30} />
-            <span>{p('Nouveau membre — la note s’affiche à partir de trois avis.')}</span>
+            <span>{p('Nouveau membre : la note apparaît à partir de trois avis reçus.')}</span>
           </div>
         ) : (
           recus.map((avis) => <CarteDAvisPublie key={avis.id} p={p} avis={avis} actions />)

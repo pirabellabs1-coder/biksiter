@@ -59,7 +59,7 @@ export default async function SuiviDuSignalement({
       titre: p('Décision'),
       texte: decision
         ? decision.note ?? quand(new Date(decision.faitLe))
-        : p('Nous vous prévenons dès qu’une décision est prise.'),
+        : p('Vous serez informé dès qu’une décision aura été prise.'),
       etat: decision ? 'fait' : 'a-venir',
     },
   ];
@@ -114,7 +114,7 @@ export default async function SuiviDuSignalement({
         <div className="boutons" style={{ marginTop: 16 }}>
           <Link href="/contact" className="bouton contour">
             <Icone nom="messages" taille={20} />
-            {p('Ajouter des précisions pour l’association')}
+            {p('Ajouter des précisions à l’attention de l’association')}
           </Link>
           <Link href="/urgence" className="bouton discret texte-rouge">
             <Icone nom="alerte" taille={18} />

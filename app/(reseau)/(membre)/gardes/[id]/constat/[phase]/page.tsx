@@ -51,7 +51,7 @@ export default async function Constat({
     p('Vérifiez l’état général du vélo'),
     ...(electrique ? [p('Contrôlez la batterie')] : []),
     p('Comparez avec les photos du dépôt'),
-    p('Prenez les photos du vélo rendu'),
+    p('Photos du vélo au retour'),
   ];
 
   return (
@@ -128,9 +128,9 @@ export default async function Constat({
             photos: p('Photos du vélo'),
             facultative: p('facultative'),
             ajoutee: p('Photo ajoutée'),
-            tropLourde: p('Une photo est trop lourde. Reprenez-la directement avec l’appareil photo du téléphone.'),
+            tropLourde: p('Une photo dépasse la taille autorisée. Il est conseillé de la reprendre directement avec l’appareil photo du téléphone.'),
             etat: p('État du vélo'),
-            defaut: p('Décrivez le défaut'),
+            defaut: p('Description du défaut'),
             defautExemple: p('Rayure sur le cadre, garde-boue tordu…'),
             batterie: p('J’ai vérifié la batterie : elle n’est ni gonflée, ni chaude, ni abîmée.'),
             valider: p('Valider les photos'),

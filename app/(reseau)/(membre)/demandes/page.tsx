@@ -58,7 +58,7 @@ export default async function Demandes({
           <div className="carte vide-liste">
             <Icone nom="maison" taille={30} />
             <strong>{p('Vous n’accueillez pas encore de vélos.')}</strong>
-            <span>{p('Proposez votre espace privé pour recevoir des demandes de garde.')}</span>
+            <span>{p('Vous pouvez proposer votre espace privé pour recevoir des demandes de garde.')}</span>
             <Link href="/devenir-bike-sitter" className="bouton plein petit">
               {p('Devenir Bike Sitter')}
             </Link>
@@ -97,7 +97,7 @@ export default async function Demandes({
               <div className="carte vide-liste">
                 <Icone nom="demandes" taille={30} />
                 <strong>{p('Aucune demande ici.')}</strong>
-                <span>{p('Nous vous prévenons dès qu’un cycliste vous écrit.')}</span>
+                <span>{p('Vous serez informé dès qu’un cycliste vous écrira.')}</span>
               </div>
             ) : (
               <div className="pile">

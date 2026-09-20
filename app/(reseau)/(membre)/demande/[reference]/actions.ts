@@ -32,7 +32,7 @@ export async function verifierLaDemande(
   const membre = await exigerUnMembre();
   const p = phraseur(await langueCourante());
   if (!creneauValide(champs)) {
-    return { motifs: [p('Choisissez la date du dépôt.')], placesLibres: 0 };
+    return { motifs: [p('Sélectionnez la date du dépôt.')], placesLibres: 0 };
   }
   const verification = await motifsPourUneDemande({
     membreId: membre.id,
@@ -70,7 +70,7 @@ export async function envoyerLaDemande(
     veloId: lire('velo'),
   };
   if (!creneauValide(champs)) {
-    return { motifs: [p('Choisissez la date du dépôt.')] };
+    return { motifs: [p('Sélectionnez la date du dépôt.')] };
   }
 
   const resultat = await envoyerUneDemande({

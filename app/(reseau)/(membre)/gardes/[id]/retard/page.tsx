@@ -69,7 +69,7 @@ export default async function JeSeraiEnRetard({
           ] as const)}
           longueur={LONGUEUR_D_UN_MOT_D_ACCOMPAGNEMENT}
           textes={{
-            combien: p('De combien de temps ?'),
+            combien: p('Durée de la prolongation'),
             information: p('Nous prévenons {prenom} tout de suite, avec l’heure à laquelle vous pensez arriver.', {
               prenom: autre,
             }),
