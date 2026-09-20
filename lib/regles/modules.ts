@@ -8,8 +8,8 @@
 export const MODULE_VOLS_ACTIF = false;
 
 /**
- * Pendant le lancement, on entre dans le réseau sur invitation d'un membre :
- * c'est ce qui fait grandir un quartier assez dense pour qu'un cycliste y
- * trouve une place.
+ * Ouverture des inscriptions : quand `false`, quiconque peut créer un compte
+ * et rentre directement dans son espace. Quand `true`, on entre sur
+ * invitation d'un membre et le formulaire pointe vers une liste d'attente.
  */
-export const INSCRIPTION_SUR_INVITATION = true;
+export const INSCRIPTION_SUR_INVITATION = false;

@@ -30,66 +30,66 @@ export default async function CommentCaMarche() {
   }[] = [
     {
       icone: 'velo',
-      titre: p('Vous confiez votre vélo'),
+      titre: p('Vous confiez votre vélo à un bike sitter'),
       resume: p(
-        'Un lieu fermé et une personne de confiance, près de votre destination.',
+        'Vous cherchez un emplacement près de votre destination, envoyez une demande et déposez votre vélo pour la durée souhaitée.',
       ),
       etapes: [
         [
-          p('Trouvez un emplacement'),
+          p('Rechercher un emplacement'),
           p(
-            'Cherchez près de votre destination : chaque fiche indique une zone approximative, les horaires et les vélos acceptés.',
+            'Vous indiquez votre destination et la date souhaitée. Chaque fiche présente la zone approximative de l’emplacement, les horaires du bike sitter et les types de vélos acceptés.',
           ),
         ],
         [
-          p('Envoyez une demande'),
+          p('Envoyer une demande'),
           p(
-            'Choisissez votre créneau et votre vélo. Le bike sitter répond dans les {heures} heures ; dès qu’il accepte, vous recevez l’adresse exacte.',
+            'Vous choisissez votre créneau et le vélo à confier, puis envoyez la demande. Le bike sitter dispose de {heures} heures pour répondre. Une fois la demande acceptée, vous recevez l’adresse exacte.',
             { heures: EXPIRATION_D_UNE_DEMANDE_HEURES },
           ),
         ],
         [
-          p('Déposez votre vélo'),
+          p('Déposer votre vélo'),
           p(
-            'Devant la porte, photographiez votre vélo, puis montrez votre code de dépôt au bike sitter.',
+            'À la porte, vous prenez quelques photos de votre vélo pour établir un constat, puis vous communiquez votre code de dépôt au bike sitter.',
           ),
         ],
         [
-          p('Récupérez-le'),
+          p('Récupérer votre vélo'),
           p(
-            'Reprenez quelques photos, puis saisissez le code de restitution que le bike sitter vous montre.',
+            'Au retour, vous prenez à nouveau quelques photos, puis vous saisissez le code de restitution communiqué par le bike sitter pour clôturer la garde.',
           ),
         ],
       ],
     },
     {
       icone: 'maison',
-      titre: p('Vous accueillez un vélo'),
-      resume: p('Un garage, une cave ou une cour fermée suffit.'),
+      titre: p('Vous accueillez un vélo chez vous'),
+      resume: p('Vous proposez un espace privé, définissez vos disponibilités et acceptez les demandes qui vous conviennent.'),
       etapes: [
         [
-          p('Faites vérifier votre identité'),
+          p('Faire vérifier votre identité'),
           p(
-            'Une personne de l’association vérifie votre pièce d’identité avant la publication de votre emplacement.',
+            'Une personne de l’association vérifie votre pièce d’identité avant que votre emplacement puisse être publié. Cette étape prend en général quarante-huit heures.',
           ),
         ],
         [
-          p('Décrivez votre espace'),
+          p('Décrire votre espace'),
           p(
-            'Type d’espace, horaires, capacité et vélos acceptés. Votre adresse n’apparaît jamais sur la fiche.',
+            'Vous précisez le type d’espace, les horaires d’accueil, la capacité et les types de vélos acceptés. Votre adresse exacte n’apparaît pas sur la fiche publique.',
           ),
         ],
         [
-          p('Répondez aux demandes'),
+          p('Répondre aux demandes'),
           p(
-            'Vous acceptez celles qui vous conviennent, dans les {heures} heures.',
+            'Vous acceptez uniquement les demandes qui vous conviennent et disposez de {heures} heures pour répondre à chacune.',
             { heures: EXPIRATION_D_UNE_DEMANDE_HEURES },
           ),
         ],
         [
-          p('Accueillez le vélo'),
+          p('Accueillir le vélo'),
           p(
-            'Vérifiez les photos du cycliste, saisissez son code, et gagnez au moins {points} points à chaque garde menée à son terme.',
+            'Vous vérifiez les photos du cycliste, saisissez son code, puis suivez la garde depuis votre espace. Chaque garde menée à son terme vous rapporte au moins {points} points.',
             { points: POINTS_PAR_GARDE },
           ),
         ],
@@ -101,9 +101,9 @@ export default async function CommentCaMarche() {
     <PagePublique
       textes={lesTextes}
       surtitre={p('Comment ça marche')}
-      titre={p('Un espace fermé. Une personne présente.')}
+      titre={p('Une garde en quelques étapes, des deux côtés de la porte.')}
       introduction={p(
-        'Le stationnement est entièrement gratuit. Un seul compte pour les deux : vous confiez votre vélo quand vous en avez besoin, et vous pourrez proposer un emplacement à tout moment depuis votre espace.',
+        'Le fonctionnement du réseau est entièrement gratuit. Un même compte vous permet de confier votre vélo à un autre membre ou de proposer votre propre emplacement, à votre rythme.',
       )}
       enTete={
         <div className="actions-heros">

@@ -23,53 +23,53 @@ export default async function Securite() {
   const protections: [NomDIcone, string, string][] = [
     [
       'verifie',
-      p('Des membres vérifiés'),
+      p('Une communauté vérifiée'),
       p(
-        'Pour demander une garde ou accueillir un vélo, chaque membre confirme son e-mail et son téléphone, et fait vérifier sa pièce d’identité par une personne de l’association.',
+        'Chaque membre confirme son adresse e-mail et son numéro de téléphone, puis fait vérifier sa pièce d’identité par une personne de l’association avant de pouvoir demander une garde ou en accueillir une.',
       ),
     ],
     [
       'epingle',
-      p('Votre adresse reste privée'),
+      p('La confidentialité de votre adresse'),
       p(
-        'Une fiche montre une zone approximative, jamais un point précis. L’adresse exacte est communiquée après l’acceptation d’une demande, à la seule personne concernée.',
+        'La fiche publique de votre emplacement indique uniquement la zone du quartier. L’adresse exacte est transmise après l’acceptation d’une demande, uniquement au membre concerné.',
       ),
     ],
     [
       'document',
-      p('Votre pièce d’identité n’est pas conservée'),
+      p('La suppression de votre pièce d’identité'),
       p(
-        'Elle est vérifiée puis supprimée, au plus tard après {jours} jours. Seul le résultat est enregistré.',
+        'Votre pièce d’identité est vérifiée puis supprimée au plus tard après {jours} jours. Seul le résultat de la vérification est conservé dans votre dossier.',
         { jours: CONSERVATION_MAXIMALE_JOURS },
       ),
     ],
     [
       'cle',
-      p('Un code à chaque remise'),
+      p('Un code à la remise du vélo'),
       p(
-        'Le vélo change de mains avec un code à {chiffres} chiffres, après des photos prises devant la porte. Chaque étape de la garde est horodatée.',
+        'Chaque remise est confirmée par un code à {chiffres} chiffres, communiqué oralement, après un constat photo à la porte. L’ensemble des étapes de la garde est horodaté dans votre espace.',
         { chiffres: CHIFFRES_DU_CODE_DE_REMISE },
       ),
     ],
     [
       'utilisateurs',
-      p('Vous gardez la main'),
+      p('Vous restez maître de vos accueils'),
       p(
-        'Vous acceptez seulement les demandes qui vous conviennent, et vous pouvez bloquer ou signaler un membre à tout moment.',
+        'Vous acceptez uniquement les demandes qui vous conviennent. Vous pouvez également bloquer ou signaler un membre à tout moment depuis son profil ou depuis la conversation.',
       ),
     ],
     [
       'batterie',
-      p('Vélos électriques'),
+      p('Vélos à assistance électrique'),
       p(
-        'Au dépôt, le bike sitter jette un œil à la batterie. Gonflée, chaude ou abîmée : il peut refuser le vélo, sans reproche pour personne.',
+        'À la remise, le bike sitter examine l’état de la batterie du vélo. Si la batterie présente un signe d’usure ou de dommage, il peut refuser d’accueillir le vélo, sans que cela ne pénalise le cycliste.',
       ),
     ],
     [
       'alerte',
-      p('En cas de problème'),
+      p('L’assistance en cas de problème'),
       p(
-        'Signalez-le depuis la garde, la conversation ou le profil du membre : une personne de la modération reprend le dossier avec l’historique complet de la garde.',
+        'Vous pouvez signaler un incident depuis la garde concernée, une conversation ou un profil de membre. Une personne de l’équipe de modération reprend alors le dossier avec l’historique complet de la garde.',
       ),
     ],
   ];
@@ -78,9 +78,9 @@ export default async function Securite() {
     <PagePublique
       textes={lesTextes}
       surtitre={p('Sécurité')}
-      titre={p('Ce qui permet d’ouvrir sa porte.')}
+      titre={p('Les mesures qui protègent chaque garde.')}
       introduction={p(
-        'Identités vérifiées, adresses confidentielles et remises confirmées par un code : voici ce qui protège chaque garde.',
+        'Bike Sitters s’appuie sur plusieurs mesures pour garantir la confidentialité, l’identité des membres et le suivi de chaque garde.',
       )}
       cote={
         <>
@@ -88,9 +88,9 @@ export default async function Securite() {
           <div className="encart bleu">
             <Icone nom="bouclier" taille={26} />
             <span>
-              <strong>{p('Vos informations sont protégées')}</strong>
+              <strong>{p('La protection de vos informations')}</strong>
               {p(
-                'Identités vérifiées, adresses confidentielles et remises confirmées par un code.',
+                'Identité vérifiée par un humain, adresse exacte communiquée après acceptation, remise confirmée par un code.',
               )}
             </span>
           </div>

@@ -16,16 +16,16 @@ export const MESSAGES = {
     'ld.fresh': 'emplacements ouverts ces sept derniers jours',
     'ab.title': 'À propos',
     'ab.who':
-      "Ce n'est pas une entreprise. C'est un habitant du quartier qui en avait assez de voir des vélos disparaître, et qui a monté ce réseau avec les voisins qui ont bien voulu ouvrir leur porte.",
-    'ab.why': 'Pourquoi',
+      'Bike Sitters est un réseau d’entraide entre cyclistes bruxellois. L’association a été fondée par des habitants de la ville pour répondre au manque de solutions de stationnement sûres pour les vélos en milieu urbain.',
+    'ab.why': 'Le contexte',
     'ab.whyd':
-      "La moitié des vélos volés le sont lors d'un stationnement de moins de trente minutes. La plupart des cyclistes renoncent à sortir le leur plutôt que de le laisser attaché dans la rue.",
-    'ab.how': 'Comment',
+      'Le vol de vélo reste l’une des principales préoccupations des cyclistes urbains. Bike Sitters propose une alternative simple à l’attachement dans la rue : le vélo est accueilli, pour la durée souhaitée, dans un espace privé.',
+    'ab.how': 'Le principe',
     'ab.howd':
-      'Il existe des milliers de garages, caves, couloirs et cours vides derrière les façades. Il suffisait de les relier aux cyclistes qui passent devant.',
-    'ab.where': 'Où',
+      'Beaucoup d’habitants disposent d’un garage, d’une cave ou d’une cour peu utilisés dans la journée. L’association les met en relation avec les cyclistes qui cherchent un lieu sûr à proximité.',
+    'ab.where': 'La portée',
     'ab.whered':
-      'Le service démarre dans un quartier de Bruxelles. La suite dépendra de ce que ce premier quartier nous apprendra.',
+      'Le service ouvre progressivement à Bruxelles, un quartier à la fois, à mesure que suffisamment de bike sitters rejoignent le réseau pour répondre aux demandes locales.',
     'sc.title': 'Sécurité',
     'sc.verified':
       "Tous les membres sont vérifiés : e-mail, téléphone et pièce d'identité.",

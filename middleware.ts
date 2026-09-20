@@ -27,6 +27,9 @@ function politique(nonce: string, enDeveloppement: boolean): string {
     // Les styles en ligne restent nécessaires : Next et next/font en posent.
     // Le risque est faible — une feuille de style n'exécute rien.
     `style-src 'self' 'unsafe-inline'`,
+    // Toutes les images sont servies par notre origine, y compris les
+    // visuels éditoriaux de l'accueil (`public/images/`) : rien à charger
+    // chez un tiers, donc rien à autoriser ici.
     `img-src 'self' data: blob:`,
     `font-src 'self'`,
     `connect-src 'self'`,

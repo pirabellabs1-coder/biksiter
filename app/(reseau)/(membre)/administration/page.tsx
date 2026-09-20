@@ -27,10 +27,10 @@ export default async function TableauDeBordAdmin() {
     ['drapeau', chiffres.signalementsOuverts, p('signalements à traiter'), '/administration/signalements', 'ambre'],
   ];
   const libelleDeLActivite: Record<string, [NomDIcone, string]> = {
-    verification: ['verifie', p('Nouvelle demande de vérification')],
-    garde: ['velo', p('Garde commencée')],
-    signalement: ['drapeau', p('Nouveau signalement')],
-    litige: ['alerte', p('Litige ouvert')],
+    verification: ['verifie', p('Demande de vérification reçue')],
+    garde: ['velo', p('Une garde a démarré')],
+    signalement: ['drapeau', p('Signalement reçu')],
+    litige: ['alerte', p('Litige déclaré')],
   };
 
   return (
@@ -58,7 +58,7 @@ export default async function TableauDeBordAdmin() {
           <div className="encart rouge" style={{ marginTop: 12 }}>
             <Icone nom="alerte" taille={22} />
             <span>
-              {p('{n} e-mail(s) n’ont pas pu partir. Vérifiez la configuration de l’envoi.', {
+              {p('{n} e-mail(s) n’ont pas pu être envoyés. Veuillez vérifier la configuration du serveur d’envoi.', {
                 n: chiffres.envoisEnEchec,
               })}
             </span>
@@ -68,7 +68,7 @@ export default async function TableauDeBordAdmin() {
         <h2 className="titre-section">{p('Activité récente')}</h2>
         {activite.length === 0 ? (
           <div className="carte vide-liste">
-            <strong>{p('Rien de neuf pour l’instant.')}</strong>
+            <strong>{p('Aucune activité récente à afficher.')}</strong>
           </div>
         ) : (
           <ul className="liste" style={{ listStyle: 'none', padding: 0 }}>

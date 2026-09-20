@@ -31,14 +31,14 @@ export default async function Communaute() {
     <PagePublique
       textes={lesTextes}
       surtitre={p('Communauté')}
-      titre={p('Des voisins qui ouvrent leur porte.')}
+      titre={p('Une communauté de cyclistes bruxellois.')}
       introduction={
         reseauOuvert
           ? p(
-              'Chaque emplacement est proposé par un habitant, dans son garage, sa cave ou sa cour. Le réseau s’agrandit quartier par quartier, au rythme des voisins qui ouvrent leur porte.',
+              'Chaque emplacement du réseau est proposé par un habitant de Bruxelles, dans un espace privé de son domicile. Le réseau s’étend progressivement, quartier par quartier.',
             )
           : p(
-              'Le réseau ouvre ses premiers emplacements à Bruxelles. Chaque emplacement est proposé par un habitant, dans son garage, sa cave ou sa cour.',
+              'Le réseau ouvre progressivement ses premiers emplacements à Bruxelles. Chaque emplacement est proposé par un habitant, dans un espace privé de son domicile.',
             )
       }
       enTete={
@@ -63,11 +63,11 @@ export default async function Communaute() {
       }
       cote={
         <BlocDeCote
-          titre={p('Vous avez un garage, une cave ou une cour fermée ?')}
+          titre={p('Vous disposez d’un espace privé ?')}
         >
           <p>
             {p(
-              'Vous pourrez proposer un emplacement depuis votre espace, une fois votre identité vérifiée. Vous restez libre d’accepter chaque demande.',
+              'Après vérification de votre identité par l’association, vous pouvez proposer votre emplacement depuis votre espace membre. Vous restez libre d’accepter les demandes qui vous conviennent.',
             )}
           </p>
           <Link href="/bienvenue" className="bouton plein">

@@ -72,9 +72,9 @@ async function AccueilCycliste({ membreId, t, p }: Props) {
           <div className="carte vide-accueil">
             <Icone nom="calendrier" taille={28} />
             <p>
-              <strong>{p('Aucune garde prévue.')}</strong>
+              <strong>{p('Aucune garde n’est prévue pour le moment.')}</strong>
               {p(
-                'Trouvez un Bike Sitter près de chez vous pour votre prochaine sortie.',
+                'Vous pouvez rechercher un bike sitter à proximité de votre destination pour votre prochaine sortie.',
               )}
             </p>
           </div>
@@ -87,14 +87,14 @@ async function AccueilCycliste({ membreId, t, p }: Props) {
           <Link href="/recherche" className="raccourci">
             <Icone nom="recherche" taille={26} />
             <span className="raccourci-texte">
-              {p('Trouver un Bike Sitter')}
+              {p('Rechercher un bike sitter')}
               <Icone nom="chevron" taille={18} className="texte-leger" />
             </span>
           </Link>
           <Link href="/profil/velos/ajouter" className="raccourci">
             <Icone nom="plus" taille={26} />
             <span className="raccourci-texte">
-              {p('Ajouter un vélo')}
+              {p('Ajouter un de vos vélos')}
               <Icone nom="chevron" taille={18} className="texte-leger" />
             </span>
           </Link>
@@ -103,8 +103,8 @@ async function AccueilCycliste({ membreId, t, p }: Props) {
         <Link href="/comment-ca-marche" className="encart lien-encart">
           <Icone nom="verifie" taille={30} />
           <span>
-            <strong>{p('Votre vélo n’est jamais seul.')}</strong>
-            {p('Des particuliers de confiance près de chez vous.')}
+            <strong>{p('Comment fonctionne le réseau')}</strong>
+            {p('Découvrez chaque étape d’une garde, du dépôt à la reprise.')}
           </span>
           <Icone nom="chevron" taille={20} />
         </Link>
@@ -124,17 +124,17 @@ async function AccueilBikeSitter({ membreId, p }: Props) {
           <h2>{p('Devenir Bike Sitter')}</h2>
           <p className="texte-doux">
             {p(
-              'Mettez votre espace privé et sécurisé au service des cyclistes de votre quartier.',
+              'Vous pouvez proposer votre espace privé aux cyclistes de votre quartier qui cherchent un endroit sûr pour leur vélo.',
             )}
           </p>
           <div className="encart">
             <Icone nom="velo" taille={24} />
-            <strong>{p('Gardez des vélos et gagnez des points.')}</strong>
+            <strong>{p('Chaque garde menée à son terme vous rapporte des points.')}</strong>
           </div>
         </div>
         <div className="boutons" style={{ marginTop: 14 }}>
           <Link href="/devenir-bike-sitter" className="bouton plein">
-            {p('Commencer ma candidature')}
+            {p('Commencer la procédure')}
             <Icone nom="chevron" taille={20} />
           </Link>
         </div>
@@ -154,7 +154,7 @@ async function AccueilBikeSitter({ membreId, p }: Props) {
             <strong>
               {accueil.disponibleAujourdhui
                 ? p('Disponible aujourd’hui')
-                : p('Pas d’accueil aujourd’hui')}
+                : p('Aucun accueil prévu aujourd’hui')}
             </strong>
           </span>
           <Icone nom="chevron" taille={20} className="texte-leger" />

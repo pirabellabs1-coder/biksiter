@@ -34,7 +34,7 @@ export default async function APropos() {
       surtitre={p('L’association')}
       titre={p('À propos de Bike Sitters')}
       introduction={p(
-        'Un réseau d’entraide entre cyclistes, porté par une association sans but lucratif à Bruxelles.',
+        'Bike Sitters est une association bruxelloise à but non lucratif qui met en relation les cyclistes de la ville avec des particuliers qui accueillent leur vélo dans un espace privé.',
       )}
       cote={
         <>

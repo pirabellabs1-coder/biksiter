@@ -16,6 +16,7 @@
     "bd:piece": "tsx --env-file-if-exists=.env.local scripts/piece-de-demonstration.ts"
   },
   "dependencies": {
+    "animejs": "^4.5.0",
     "next": "^15.5.4",
     "nodemailer": "^10.0.1",
     "pg": "^8.23.0",
