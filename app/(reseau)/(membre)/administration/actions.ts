@@ -160,7 +160,7 @@ export async function changerLeStatutDuCompte(
   }
   if (resultat === 'interdit') {
     return {
-      erreur: await traduire('Ce compte ne se suspend pas d’ici : il s’agit de vous ou d’une personne qui modère.'),
+      erreur: await traduire('Ce compte ne peut pas être suspendu depuis cet écran. Il s’agit du vôtre ou de celui d’un membre de la modération.'),
     };
   }
   if (resultat === 'introuvable') return { erreur: await traduire('Ce compte n’existe plus.') };
@@ -192,7 +192,7 @@ export async function corrigerLeSolde(
   }
   if (refus === 'introuvable') return { erreur: await traduire('Ce compte n’existe plus.') };
   if (refus === 'interdit') {
-    return { erreur: await traduire('Vos propres points se corrigent par une autre personne de l’équipe.') };
+    return { erreur: await traduire('Vos propres points doivent être corrigés par un autre membre de l’équipe.') };
   }
   revalidatePath(`/administration/membres/${membreId}`);
   redirect(`/administration/membres/${membreId}?points=corriges`);

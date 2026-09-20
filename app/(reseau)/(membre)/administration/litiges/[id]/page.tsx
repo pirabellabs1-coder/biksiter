@@ -194,14 +194,14 @@ export default async function UnLitige({ params }: { params: Promise<{ id: strin
                   <div className="encart ambre">
                     <Icone nom="alerte" taille={20} />
                     <span>
-                      {p('Clore la garde retire l’adresse, le téléphone et la conversation. Vérifiez d’abord avec les deux membres que le vélo a été rendu.')}
+                      {p('La clôture de la garde retire l’adresse, le téléphone et la conversation. Il est recommandé de vérifier au préalable avec les deux membres que le vélo a bien été rendu.')}
                     </span>
                   </div>
                 ) : undefined
               }
               textes={{
                 motif: p('Explication de la décision'),
-                aideDuMotif: p('Elle est envoyée au cycliste et au Bike Sitter : écrivez-la pour eux.'),
+                aideDuMotif: p('Cette explication est transmise au cycliste et au bike sitter. Merci de la rédiger à leur attention.'),
                 confirmer: p('Enregistrer la décision'),
                 envoi: p('Enregistrement…'),
               }}

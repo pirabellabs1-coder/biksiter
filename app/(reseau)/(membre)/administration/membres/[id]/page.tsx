@@ -100,7 +100,7 @@ export default async function FicheDUnMembre({
           </span>
         </div>
         {fiche.id === moderateur.id ? (
-          <p className="texte-doux">{p('Vos propres points se corrigent par une autre personne de l’équipe.')}</p>
+          <p className="texte-doux">{p('Vos propres points doivent être corrigés par un autre membre de l’équipe.')}</p>
         ) : (
         <div className="carte" style={{ marginTop: 10 }}>
           <FormulaireDeCorrection
@@ -111,7 +111,7 @@ export default async function FicheDUnMembre({
               retirer: p('Retirer des points'),
               nombre: p('Nombre de points'),
               motif: p('Motif de la correction'),
-              aide: p('Le membre reçoit ce motif, et il reste dans l’historique.'),
+              aide: p('Ce motif est communiqué au membre et conservé dans son historique.'),
               enregistrer: p('Enregistrer la correction'),
               envoi: p('Enregistrement…'),
             }}
@@ -158,7 +158,7 @@ export default async function FicheDUnMembre({
           </div>
         ) : (
           <p className="texte-doux">
-            {p('Ce compte ne se suspend pas d’ici : il s’agit de vous ou d’une personne qui modère.')}
+            {p('Ce compte ne peut pas être suspendu depuis cet écran. Il s’agit du vôtre ou de celui d’un membre de la modération.')}
           </p>
         )}
 

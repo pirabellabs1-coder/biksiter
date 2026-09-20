@@ -34,9 +34,9 @@ export default async function ExaminerUnePiece({
   const lien = `/administration/verifications/${id}/piece`;
 
   const aVerifierPoints = [
-    p('La photo est lisible, et le document n’est ni coupé ni flou.'),
+    p('La photo est lisible et le document n’est ni coupé, ni flou.'),
     p('Le nom du document correspond à celui du compte.'),
-    p('Le document semble authentique : ni capture d’écran, ni montage.'),
+    p('Le document paraît authentique et ne présente ni signe de capture d’écran, ni signe de montage.'),
   ];
 
   return (
@@ -90,7 +90,7 @@ export default async function ExaminerUnePiece({
               </span>
             ))}
             <span style={{ display: 'block', marginTop: 6 }}>
-              {p('Aucune donnée du document n’est à recopier : ni numéro, ni date de naissance, ni adresse.')}
+              {p('Aucune information du document ne doit être recopiée : ni le numéro, ni la date de naissance, ni l’adresse.')}
             </span>
           </span>
         </div>
@@ -105,7 +105,7 @@ export default async function ExaminerUnePiece({
             textes={{
               legende: p('Décision'),
               motif: p('Motif (obligatoire en cas de refus)'),
-              aideDuMotif: p('Écrivez-le pour le membre : ce qui manque, et comment renvoyer une pièce valide.'),
+              aideDuMotif: p('Ce motif est communiqué au membre. Il est utile d’y préciser ce qui manque et la façon de renvoyer une pièce valide.'),
               confirmer: p('Enregistrer la décision'),
               envoi: p('Enregistrement…'),
             }}
