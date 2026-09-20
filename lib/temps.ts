@@ -112,3 +112,15 @@ const JOUR_ISO = new Intl.DateTimeFormat('en-CA', {
 export function jourABruxelles(instant: Date = new Date()): string {
   return JOUR_ISO.format(instant);
 }
+
+const HEURE_24 = new Intl.DateTimeFormat('fr-BE', {
+  timeZone: FUSEAU,
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+/** « 14:30 » — l'heure à Bruxelles, dans la forme des listes d'heures. */
+export function heureABruxelles(instant: Date = new Date()): string {
+  return HEURE_24.format(instant).replace('h', ':').padStart(5, '0');
+}

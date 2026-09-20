@@ -3,7 +3,10 @@ import 'server-only';
 import { dansUneTransaction } from '@/lib/bd/client';
 import { donAnnonce } from '@/lib/courriel/modeles';
 import { mettreEnFile } from '@/lib/envois/file';
-import { communicationStructuree } from '@/lib/regles/dons';
+import {
+  communicationStructuree,
+  peutEncoreAnnoncerUnDon,
+} from '@/lib/regles/dons';
 
 /**
  * Les dons.
@@ -13,9 +16,9 @@ import { communicationStructuree } from '@/lib/regles/dons';
  * permettra de rapprocher le virement quand il arrivera sur le compte.
  */
 
-export type DonAnnonce = {
-  communication: string;
-};
+export type DonAnnonce =
+  | { resultat: 'annonce'; communication: string }
+  | { resultat: 'trop_de_dons' };
 
 export async function annoncerUnDon(don: {
   prenom: string | null;
@@ -25,6 +28,28 @@ export async function annoncerUnDon(don: {
   iban: string;
 }): Promise<DonAnnonce> {
   return dansUneTransaction(async (client) => {
+    // Le comptage et l'écriture se font sous un verrou propre à l'adresse :
+    // sans lui, des envois simultanés passeraient tous sous la limite.
+    // Un don anonyme n'ouvre pas de canal d'envoi et ne bénéficie pas du
+    // même verrou — la limite y est portée par le rythme des annonces
+    // enregistrées côté serveur (voir count ci-dessous).
+    if (don.email) {
+      await client.query('select pg_advisory_xact_lock(hashtext(lower($1)))', [
+        don.email,
+      ]);
+      const { rows } = await client.query<{ combien: number }>(
+        `select count(*)::int as combien
+           from don
+          where email is not null
+            and lower(email) = lower($1)
+            and annonce_le > now() - interval '24 hours'`,
+        [don.email],
+      );
+      if (!peutEncoreAnnoncerUnDon(rows[0]?.combien ?? 0)) {
+        return { resultat: 'trop_de_dons' } as const;
+      }
+    }
+
     // La séquence garantit que deux dons annoncés à la même seconde ne
     // reçoivent pas la même communication — sans quoi ils deviendraient
     // impossibles à distinguer sur l'extrait de compte.
@@ -55,6 +80,6 @@ export async function annoncerUnDon(don: {
       );
     }
 
-    return { communication };
+    return { resultat: 'annonce', communication } as const;
   });
 }

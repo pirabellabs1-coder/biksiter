@@ -7,7 +7,10 @@ import {
   MARGE_ENTRE_STATIONNEMENTS_MINUTES,
   type Creneau,
 } from '@/lib/regles/capacite';
-import { decisionDeRetrait } from '@/lib/regles/emplacements';
+import {
+  decisionDeRetrait,
+  ETATS_QUI_RETIENNENT,
+} from '@/lib/regles/emplacements';
 import type {
   Acces,
   Ancrage,
@@ -80,7 +83,7 @@ const PLACE_RESTANTE = `
      from stationnement s
      join emplacement e on e.id = s.emplacement_id
     where e.reference = emplacement_visible.reference
-      and s.etat in ('accepte', 'en_cours')
+      and s.etat in ('accepte', 'arrivee', 'en_cours', 'reprise_demandee')
       and s.debut < $3::timestamptz + make_interval(mins => $4::int)
       and s.fin   > $2::timestamptz - make_interval(mins => $4::int)
   ) < emplacement_visible.capacite
@@ -252,7 +255,7 @@ export async function emplacementsDuMembre(
             count(s.id) filter (where s.etat = 'demande')::int
               as "demandesEnAttente",
             count(s.id) filter (
-              where s.etat in ('demande', 'accepte', 'en_cours'))::int
+              where s.etat in ('demande', 'accepte', 'arrivee', 'en_cours', 'reprise_demandee', 'litige'))::int
               as "stationnementsQuiRetiennent"
        from emplacement e
        left join stationnement s on s.emplacement_id = e.id
@@ -347,7 +350,7 @@ export async function modifierUnEmplacement(
 
     const acceptes = await client.query<{ debut: Date; fin: Date }>(
       `select debut, fin from stationnement
-        where emplacement_id = $1 and etat in ('accepte', 'en_cours')`,
+        where emplacement_id = $1 and etat in ('accepte', 'arrivee', 'en_cours', 'reprise_demandee')`,
       [id],
     );
 
@@ -453,8 +456,8 @@ export async function retirerUnEmplacement(
     const retenus = await client.query<{ combien: number }>(
       `select count(*)::int as combien from stationnement
         where emplacement_id = $1
-          and etat in ('demande', 'accepte', 'en_cours')`,
-      [id],
+          and etat = any($2::text[])`,
+      [id, ETATS_QUI_RETIENNENT],
     );
 
     const decision = decisionDeRetrait(retenus.rows[0].combien);
@@ -529,7 +532,7 @@ export async function creneauxAcceptesDuJour(
        from stationnement s
        join emplacement e on e.id = s.emplacement_id
       where e.reference = $1
-        and s.etat in ('accepte', 'en_cours')
+        and s.etat in ('accepte', 'arrivee', 'en_cours', 'reprise_demandee')
         and s.fin   >= $2::timestamptz - interval '1 hour'
         and s.debut <= $2::timestamptz + interval '1 day'`,
     [reference, jour],

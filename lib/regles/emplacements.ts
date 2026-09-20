@@ -56,7 +56,14 @@ export function peutAjouterUnEmplacement(nombreDejaPublies: number): boolean {
  * un bike sitter qui veut partir la refuse d'abord, il ne la fait pas
  * disparaître.
  */
-export const ETATS_QUI_RETIENNENT = ['demande', 'accepte', 'en_cours'] as const;
+export const ETATS_QUI_RETIENNENT = [
+  'demande',
+  'accepte',
+  'arrivee',
+  'en_cours',
+  'reprise_demandee',
+  'litige',
+] as const;
 
 export type MotifDeRefusDeRetrait = 'stationnements_en_cours';
 

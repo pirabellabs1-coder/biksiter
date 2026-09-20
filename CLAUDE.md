@@ -49,27 +49,33 @@ marche et ce que ça apporte à la personne qui lit.
    quatorze types proposés, pas par une question qu'on poserait à l'utilisateur.
 2. **L'identité avant la publication.** Personne ne publie un emplacement sans avoir
    été vérifié par un humain. C'est ce qui rend acceptable d'ouvrir sa porte.
-3. **Aucun classement entre membres.** Ni palmarès, ni tri par popularité, ni filtre
-   par note. Un classement dans un réseau de bénévoles crée des perdants et pousse à
-   accepter des gardes qu'on aurait dû refuser.
+3. **Des classements, des points et des badges, jamais au détriment de la garde.**
+   Les maquettes définitives les intègrent : points gagnés par garde, badges,
+   niveaux, classement « Top Bike Sitters » du jour, de la semaine et du mois,
+   filtre par note dans la recherche. Trois garde-fous : on n'apparaît dans un
+   classement que si on l'a choisi (interrupteur « Apparaître dans le
+   classement ») ; un classement ne montre jamais l'adresse ni la zone précise ;
+   les points récompensent une garde menée à son terme, jamais une acceptation.
 4. **L'adresse exacte n'existe qu'après acceptation.** Ni sur la fiche, ni dans la
    réponse de l'API. Avant, une zone approximative.
 5. **Le vélo ne change d'état qu'avec un code.** Celui qui remet le vélo détient le
-   code, celui qui le reçoit le saisit. Trois essais, puis régénération.
-6. **Une couleur, un sens.** Quatre sens, et la teinte dit le sens tandis que
-   le remplissage dit s'il y a quelque chose à cliquer :
-   - **vert sapin plein** = action (c'est aussi la marque) ;
-   - **vert clair teinté** = confirmé — identité vérifiée, demande acceptée,
-     vélo actuellement gardé, emplacement disponible ;
-   - **ambre** = en attente d'une réponse ;
-   - **rosé** = refusé, annulé, erreur.
+   code, celui qui le reçoit le saisit. Six chiffres, dictés en deux groupes de
+   trois. Trois essais, puis régénération, dans la limite de neuf refus par jour
+   pour une même remise.
+6. **Une couleur, un sens.** Quatre couleurs, quatre sens, définis dans
+   `app/(reseau)/systeme.css` :
+   - **vert** `#017628` = les actions, les liens, le focus et la marque ; en
+     teinte claire, le déroulement normal d'un stationnement (demande envoyée,
+     acceptée, terminée) ;
+   - **bleu** `#1677E8` = ce qui protège : identité vérifiée, bike sitter
+     vérifié. Jamais un bouton ;
+   - **ambre** `#C97A12` = ce qui est en cours ou pas encore ouvert : le vélo
+     chez le bike sitter (reçu, stationné), un dossier en examen, un accès
+     réservé aux membres ou un quartier qui n'a pas encore ouvert ;
+   - **corail** `#C0432C` = refusé, annulé, expiré, litige, erreur, vélo volé.
    Aucune couleur décorative dans l'interface.
-   *Une pastille d'état porte toujours une puce colorée en plus de sa teinte :
-   entre l'ambre et le vert clair, la teinte seule ne suffit pas à tout le
-   monde.*
-   *Une seule exception à la règle, tenue à part : les illustrations ont leur
-   propre palette (`--dessin-*`), qui ne sort jamais de `.illustration`. Un
-   dessin ne porte aucune information, il ne peut donc pas se tromper de sens.*
+   *La couleur n'est jamais seule à porter l'information : une pastille ou un
+   encart écrit toujours l'état en toutes lettres.*
 
 ## Ce qui a été écarté, et pourquoi
 
@@ -80,7 +86,6 @@ Ne pas les reproposer sans raison nouvelle.
 - **Notes en étoiles sur un emplacement** : la note appartient à la personne.
 - **SMS pour les rappels** : coût par message en Belgique ; réservé à la vérification.
 - **Notifications push** : imposeraient une application native.
-- **Points, badges, niveaux** : cela fonctionne entre inconnus, pas entre voisins.
 - **Chat en temps réel** : crée une attente de réponse que des bénévoles ne tiennent pas.
 
 ## Stack
@@ -114,9 +119,10 @@ Les tests doivent nommer la règle qu'ils vérifient :
 |---|---|---|
 | Emplacements par membre | 2 | `lib/regles/emplacements.ts` |
 | Marge entre stationnements | 30 minutes | `lib/regles/capacite.ts` |
+| Chiffres d'un code de remise | 6 | `lib/regles/remise.ts` |
 | Validité d'un code | 6 heures | `lib/regles/remise.ts` |
 | Essais par code | 3 | `lib/regles/remise.ts` |
-| Seuil de désistement tardif | 12 heures | `lib/regles/annulation.ts` |
+| Seuil de désistement tardif | 2 heures | `lib/regles/annulation.ts` |
 
 ## Les listes fermées
 
@@ -134,7 +140,11 @@ Ces listes sont des règles, pas des données de configuration.
 
 - `bike-sitters-cahier-des-charges.pdf` — la référence complète, 78 pages
 - `bike-sitters-perimetre-beta.md` — ce qu'on construit maintenant, et ce qui attend
+- `Bike-Sitters-Maquettes-Definitives-Completes.pdf` — les maquettes définitives :
+  101 écrans sur 27 planches. **Pour l'interface, les maquettes font foi** (mise en
+  page, composants, parcours, écrans), dans le respect des règles ci-dessus.
 - `bike-sitters-app.html` — le prototype : les règles y sont exécutables et testées
 
-**En cas de doute, le prototype fait foi.** Il porte 743 vérifications automatiques ;
-le document décrit, le prototype prouve.
+**En cas de doute sur une règle, le prototype fait foi.** Il porte 743 vérifications
+automatiques ; le document décrit, le prototype prouve. Les photos de personnes des
+maquettes sont des illustrations : elles ne représentent aucun membre.

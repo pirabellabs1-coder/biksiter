@@ -40,7 +40,11 @@ export async function membreDeLaSession(
        from session s
        join membre m on m.id = s.membre_id
       where s.empreinte_du_jeton = $1
-        and s.expire_le > now()`,
+        and s.expire_le > now()
+        -- Un compte suspendu ou supprimé ne se sert plus d'une session, même
+        -- si elle a échappé à la fermeture.
+        and not m.suspendu
+        and m.supprime_le is null`,
     [empreinteDuJeton(jeton)],
   );
 }

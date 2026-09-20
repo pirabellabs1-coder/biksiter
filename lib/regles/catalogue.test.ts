@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { bonValide, decisionDEchange, stockAAfficher } from './catalogue';
+import { bonValide, decisionDEchange, pointsManquants, stockAAfficher } from './catalogue';
 
 const offre = { coutEnMaillons: 25, stockRestant: 8, active: true };
 const solde = { acquis: 41, enAttente: 2 };
@@ -51,7 +51,7 @@ describe('qui peut échanger un remerciement', () => {
   });
 });
 
-describe('le stock s’affiche, le manque ne s’affiche pas', () => {
+describe('le stock restant et les points manquants', () => {
   test('le stock restant est un nombre, sans « plus que »', () => {
     expect(stockAAfficher(offre)).toBe('8 restants');
     expect(stockAAfficher({ ...offre, stockRestant: 1 })).toBe('1 restant');
@@ -59,6 +59,11 @@ describe('le stock s’affiche, le manque ne s’affiche pas', () => {
 
   test('une offre épuisée le dit', () => {
     expect(stockAAfficher({ ...offre, stockRestant: 0 })).toBe('épuisé');
+  });
+
+  test('les points manquants ne comptent que le solde acquis', () => {
+    expect(pointsManquants({ ...offre, coutEnMaillons: 45 }, { acquis: 44, enAttente: 5 })).toBe(1);
+    expect(pointsManquants(offre, solde)).toBe(0);
   });
 
   test('une offre retirée n’affiche pas de stock du tout', () => {

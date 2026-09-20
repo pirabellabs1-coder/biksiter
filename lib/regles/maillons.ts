@@ -1,28 +1,22 @@
 import { TYPES_VELO, type TypeVelo } from './velos';
 
 /**
- * Les maillons.
+ * Les maillons — les « points » de l'interface.
  *
- * Ce sont des remerciements, pas une monnaie et pas un score.
+ * Ils remercient une garde menée à son terme, jamais une acceptation : c'est
+ * le garde-fou de la règle 3, qui intègre désormais points, badges, niveaux et
+ * classement. Le calcul suit la place immobilisée, pas la valeur du vélo.
  *
- * Le CLAUDE.md avait écarté « points, badges, niveaux » en notant qu'ils
- * fonctionnent entre inconnus et pas entre voisins — et en précisant de ne pas
- * les reproposer « sans raison nouvelle ». La raison nouvelle est arrivée : des
- * commerçants de quartier veulent remercier ceux qui accueillent, et il faut
- * bien une unité pour dire ce que couvre un contrôle vélo.
- *
- * La règle 3, elle, ne bouge pas. Un maillon n'ordonne personne :
- *   - le solde n'apparaît que sur son propre profil ;
- *   - rien, nulle part, ne trie ni ne filtre les membres par leur solde ;
- *   - un cycliste qui n'accueille jamais n'a pas de solde, et ce n'est pas un
- *     manque : faire garder son vélo ne coûte rien et n'en consomme aucun.
- *
- * Le jour où un écran classerait des membres par maillons, c'est cet écran
- * qu'il faudrait retirer, pas cette règle.
+ * Un cycliste qui n'accueille jamais n'a pas de solde, et ce n'est pas un
+ * manque : faire garder son vélo ne coûte rien et n'en consomme aucun.
  */
 
-/** Un maillon par jour entamé : ce qui compte est la place immobilisée. */
-export const MAILLONS_PAR_JOUR = 1;
+/**
+ * Le barème : une garde menée à terme vaut cinq points, et chaque jour entamé
+ * au-delà du premier en ajoute un. Ce qui compte est la place immobilisée.
+ */
+export const POINTS_PAR_GARDE = 5;
+export const POINTS_PAR_JOUR_SUPPLEMENTAIRE = 1;
 
 /**
  * Les vélos qui prennent la place de deux.
@@ -63,8 +57,11 @@ export function maillonsPourUneGarde(garde: {
   typeVelo: TypeVelo;
 }): number {
   const jours = joursEntames(garde.debut, garde.fin);
-  const facteur = estEncombrant(garde.typeVelo) ? 2 : 1;
-  return jours * MAILLONS_PAR_JOUR * facteur;
+  if (jours === 0) {
+    return 0;
+  }
+  const points = POINTS_PAR_GARDE + (jours - 1) * POINTS_PAR_JOUR_SUPPLEMENTAIRE;
+  return estEncombrant(garde.typeVelo) ? points * 2 : points;
 }
 
 /**

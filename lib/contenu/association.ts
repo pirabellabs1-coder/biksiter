@@ -23,6 +23,12 @@ export type Association = {
   numeroDEntreprise: string | null;
   /** Compte de l’association. `null` ferme les dons, côté page et côté serveur. */
   iban: string | null;
+  /**
+   * La personne qui présente le réseau sur la page « À propos ». `null` tant
+   * qu’elle n’a pas choisi d’y paraître : la page présente alors le réseau
+   * sans visage, plutôt qu’avec un prénom inventé.
+   */
+  fondateur: { prenom: string; role: string } | null;
 };
 
 export const ASSOCIATION: Association = {
@@ -32,4 +38,5 @@ export const ASSOCIATION: Association = {
   contact: null,
   numeroDEntreprise: null,
   iban: null,
+  fondateur: null,
 };

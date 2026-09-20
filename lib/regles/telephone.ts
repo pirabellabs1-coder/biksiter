@@ -13,8 +13,12 @@
 
 export const VALIDITE_DU_CODE_MINUTES = 10;
 export const ESSAIS_PAR_CODE_TELEPHONE = 3;
-/** Assez long pour qu'on ne le devine pas, assez court pour le retenir. */
-export const CHIFFRES_DU_CODE = 6;
+/**
+ * Quatre chiffres, comme le code de remise : avec trois essais et dix minutes
+ * de validité, les chances de le deviner restent de trois sur dix mille, et
+ * quatre chiffres se recopient d'un coup d'œil.
+ */
+export const CHIFFRES_DU_CODE = 4;
 
 const MINUTE_EN_MS = 60 * 1000;
 
@@ -51,8 +55,7 @@ export function estUnMobileBelge(numeroNormalise: string): boolean {
 export type RefusDeNumero = 'illisible' | 'pas_un_mobile';
 
 export type LectureDuNumero =
-  | { valide: true; numero: string }
-  | { valide: false; motif: RefusDeNumero };
+  { valide: true; numero: string } | { valide: false; motif: RefusDeNumero };
 
 export function lireLeNumero(saisie: string): LectureDuNumero {
   const numero = normaliserLeNumero(saisie);

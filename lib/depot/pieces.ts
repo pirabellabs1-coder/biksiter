@@ -92,7 +92,8 @@ export async function lirePourModeration(
   }>(
     `select contenu_chiffre, vecteur, etiquette, type_mime as "typeMime"
        from piece_didentite
-      where membre_id = $1`,
+      where membre_id = $1
+        and deposee_le > now() - make_interval(days => ${CONSERVATION_MAXIMALE_JOURS})`,
     [membreId],
   );
 

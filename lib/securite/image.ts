@@ -24,8 +24,13 @@ export type PhotoNettoyee = {
   hauteur: number;
 };
 
+/** Cinquante mégapixels : bien au-delà d'un appareil photo de téléphone. */
+export const PIXELS_MAXIMAUX = 50_000_000;
+
 export async function nettoyerLaPhoto(original: Buffer): Promise<PhotoNettoyee> {
-  const resultat = await sharp(original)
+  // Une image très compressée de seize mille pixels de côté tient en quelques
+  // mégaoctets mais sature la mémoire au décodage : on refuse avant.
+  const resultat = await sharp(original, { limitInputPixels: PIXELS_MAXIMAUX })
     // `rotate()` sans argument applique l'orientation EXIF avant qu'on la
     // jette : sans lui, une photo prise en portrait s'afficherait couchée.
     .rotate()

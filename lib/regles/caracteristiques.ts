@@ -12,20 +12,20 @@
 /** Comment l'emplacement se ferme. « aucun » reste possible : une cour privée
  *  close par un portail sans serrure est privée sans être verrouillée. */
 export const VERROUILLAGES = {
-  cle: 'Fermé à clé',
-  code: 'Fermé par un code',
-  autre: 'Fermé autrement',
-  aucun: 'Sans fermeture',
+  cle: 'Serrure et clé',
+  code: 'Système électronique ou code',
+  autre: 'Autre système',
+  aucun: 'Pas de fermeture',
 } as const;
 
 export type Verrouillage = keyof typeof VERROUILLAGES;
 
 /** Ce que le vélo prend, ou non, de la pluie. */
 export const INTEMPERIES = {
-  interieur: 'À l’intérieur, totalement au sec',
-  abri: 'Sous un abri fermé',
-  partiel: 'Partiellement abrité',
-  dehors: 'À l’air libre',
+  interieur: 'Entièrement à l’intérieur',
+  abri: 'À l’extérieur sous abri',
+  partiel: 'Partiellement couvert',
+  dehors: 'À l’extérieur sans couverture',
 } as const;
 
 export type Intemperie = keyof typeof INTEMPERIES;

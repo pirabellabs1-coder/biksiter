@@ -8,7 +8,10 @@ import {
   uneLigne,
 } from '@/lib/bd/client';
 import { mettreEnFile } from '@/lib/envois/file';
+import { adresseDuSite } from '@/lib/adresse-du-site';
 import { bienvenue } from '@/lib/courriel/modeles';
+import { emettreUnJeton } from '@/lib/depot/jetons';
+import { INSCRIPTION_SUR_INVITATION } from '@/lib/regles/modules';
 import type { EtatDeVerification } from '@/lib/regles/publication';
 import { empreinteDuMotDePasse } from '@/lib/securite/mot-de-passe';
 
@@ -53,9 +56,10 @@ export async function membreParEmail(email: string): Promise<Membre | null> {
 export async function empreinteDuMembre(email: string): Promise<{
   id: string;
   empreinte: string;
+  suspendu: boolean;
 } | null> {
-  return uneLigne<{ id: string; empreinte: string }>(
-    'select id, empreinte from membre where lower(email) = lower($1)',
+  return uneLigne<{ id: string; empreinte: string; suspendu: boolean }>(
+    'select id, empreinte, suspendu from membre where lower(email) = lower($1) and supprime_le is null',
     [email],
   );
 }
@@ -65,33 +69,46 @@ export type Inscription = {
   nom: string;
   email: string;
   motDePasse: string;
-  codeDInvitation: string;
+  /** `null` quand le réseau accepte les inscriptions sans invitation. */
+  codeDInvitation: string | null;
 };
 
 /**
  * La création d'un compte consomme l'invitation dans la même transaction.
  * Sans cela, deux inscriptions simultanées avec le même code passeraient
  * toutes les deux.
+ *
+ * Le message de bienvenue part dans la même transaction, avec le lien qui
+ * confirme l'adresse : un compte ne peut pas exister sans que ce lien ait été
+ * mis en file.
  */
 export async function creerLeMembre(inscription: Inscription): Promise<Membre> {
   const empreinte = await empreinteDuMotDePasse(inscription.motDePasse);
 
+  if (inscription.codeDInvitation === null && INSCRIPTION_SUR_INVITATION) {
+    throw new InvitationInvalide();
+  }
+
   try {
     return await dansUneTransaction(async (client) => {
-      const invitation = await client.query<{
-        code: string;
-        prenomDeLInvitant: string;
-      }>(
-        `select i.code, m.prenom as "prenomDeLInvitant"
-           from invitation i
-           join membre m on m.id = i.emise_par
-          where i.code = $1 and i.utilisee_par is null
-          for update of i`,
-        [inscription.codeDInvitation.toUpperCase()],
-      );
+      let invitation: { code: string; prenomDeLInvitant: string } | null = null;
 
-      if (invitation.rowCount === 0) {
-        throw new InvitationInvalide();
+      if (inscription.codeDInvitation !== null) {
+        const trouvee = await client.query<{
+          code: string;
+          prenomDeLInvitant: string;
+        }>(
+          `select i.code, m.prenom as "prenomDeLInvitant"
+             from invitation i
+             join membre m on m.id = i.emise_par
+            where i.code = $1 and i.utilisee_par is null
+            for update of i`,
+          [inscription.codeDInvitation.toUpperCase()],
+        );
+        invitation = trouvee.rows[0] ?? null;
+        if (!invitation) {
+          throw new InvitationInvalide();
+        }
       }
 
       const cree = await client.query<Membre>(
@@ -101,20 +118,29 @@ export async function creerLeMembre(inscription: Inscription): Promise<Membre> {
         [inscription.prenom, inscription.nom, inscription.email, empreinte],
       );
 
-      const membre = cree.rows[0];
+      const membre = cree.rows[0]!;
 
-      await client.query(
-        `update invitation
-            set utilisee_par = $1, utilisee_le = now()
-          where code = $2`,
-        [membre.id, invitation.rows[0].code],
+      if (invitation) {
+        await client.query(
+          `update invitation
+              set utilisee_par = $1, utilisee_le = now()
+            where code = $2`,
+          [membre.id, invitation.code],
+        );
+      }
+
+      const jeton = await emettreUnJeton(
+        client,
+        membre.id,
+        'confirmation_email',
       );
 
       await mettreEnFile(
         membre.email,
         bienvenue({
           prenom: membre.prenom,
-          invitePar: invitation.rows[0].prenomDeLInvitant,
+          invitePar: invitation?.prenomDeLInvitant ?? null,
+          lienDeConfirmation: lienDeConfirmation(jeton),
         }),
         { client, aPropos: `membre ${membre.id}` },
       );
@@ -127,6 +153,43 @@ export async function creerLeMembre(inscription: Inscription): Promise<Membre> {
     }
     throw erreur;
   }
+}
+
+export function lienDeConfirmation(jeton: string): string {
+  return `${adresseDuSite()}/confirmer-mon-email?jeton=${encodeURIComponent(jeton)}`;
+}
+
+export type InvitationPresentee = {
+  prenom: string;
+  depuis: number;
+  identiteVerifiee: boolean;
+  /** Le quartier d'un emplacement publié par la personne qui invite, s'il y en a un. */
+  quartier: string | null;
+};
+
+/**
+ * Ce qu'on montre de la personne qui invite, avant même d'avoir un compte :
+ * son prénom, l'année de son arrivée, et si son identité est vérifiée. Rien
+ * qui permette de la trouver.
+ */
+export async function invitationPresentee(
+  code: string,
+): Promise<InvitationPresentee | null> {
+  if (!/^[A-Z0-9-]{6,20}$/.test(code.toUpperCase())) {
+    return null;
+  }
+  return uneLigne<InvitationPresentee>(
+    `select m.prenom,
+            extract(year from m.cree_le)::int as depuis,
+            m.verification = 'verifiee'       as "identiteVerifiee",
+            (select e.quartier from emplacement e
+              where e.membre_id = m.id and e.publie
+              order by e.cree_le limit 1)      as quartier
+       from invitation i
+       join membre m on m.id = i.emise_par
+      where i.code = $1 and i.utilisee_par is null`,
+    [code.toUpperCase()],
+  );
 }
 
 /**

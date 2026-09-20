@@ -33,6 +33,40 @@ export function estUnTypeAccepte(valeur: string): valeur is TypeDePiece {
   return (TYPES_ACCEPTES as readonly string[]).includes(valeur);
 }
 
+/**
+ * Le type d'un fichier, lu dans ses premiers octets.
+ *
+ * Le type annoncé par le navigateur se déclare, il ne se vérifie pas : c'est
+ * la signature du fichier qui dit ce qu'il est vraiment. Un fichier dont la
+ * signature n'est pas celle d'une photo ou d'un PDF n'est pas accepté, quel
+ * que soit son nom.
+ */
+export function typeReelDuFichier(octets: Uint8Array): TypeDePiece | null {
+  const commencePar = (...signature: number[]) =>
+    signature.every((octet, rang) => octets[rang] === octet);
+
+  if (commencePar(0xff, 0xd8, 0xff)) {
+    return 'image/jpeg';
+  }
+  if (commencePar(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a)) {
+    return 'image/png';
+  }
+  // « RIFF », quatre octets de taille, puis « WEBP ».
+  if (
+    commencePar(0x52, 0x49, 0x46, 0x46) &&
+    octets[8] === 0x57 &&
+    octets[9] === 0x45 &&
+    octets[10] === 0x42 &&
+    octets[11] === 0x50
+  ) {
+    return 'image/webp';
+  }
+  if (commencePar(0x25, 0x50, 0x44, 0x46, 0x2d)) {
+    return 'application/pdf';
+  }
+  return null;
+}
+
 export type RefusDeDepot = 'type_refuse' | 'trop_lourde' | 'vide';
 
 export function refusDuDepot(fichier: {

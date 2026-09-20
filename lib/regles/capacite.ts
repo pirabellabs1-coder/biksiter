@@ -9,6 +9,22 @@
 
 export const MARGE_ENTRE_STATIONNEMENTS_MINUTES = 30;
 
+/**
+ * Les états d'une garde qui occupent une place chez le bike sitter.
+ *
+ * Une demande en attente n'occupe rien : elle attend une réponse. Une garde en
+ * litige occupe encore la place, puisque le vélo y est toujours. C'est la
+ * seule liste à consulter pour savoir si une place est prise — celle du
+ * retrait d'un lieu (`emplacements.ts`) répond à une autre question.
+ */
+export const ETATS_QUI_OCCUPENT_UNE_PLACE = [
+  'accepte',
+  'arrivee',
+  'en_cours',
+  'reprise_demandee',
+  'litige',
+] as const;
+
 const MINUTE_EN_MS = 60 * 1000;
 
 export type Creneau = {

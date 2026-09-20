@@ -2,13 +2,14 @@
  * Règle 5 — le vélo ne change d'état qu'avec un code.
  *
  * Celui qui remet le vélo détient le code, celui qui le reçoit le saisit.
- * Quatre chiffres, parce qu'on doit pouvoir se les dicter à voix haute dans
- * une cave sans réseau, avec des gants. Le QR code et le Bluetooth ont été
+ * Six chiffres, dictés en deux groupes de trois : ils se lisent à voix haute
+ * dans une cave sans réseau, avec des gants, et résistent aux essais. Le QR code et le Bluetooth ont été
  * écartés pour cette raison précise — ne pas les reproposer.
  *
  * Trois essais, puis le code est régénéré et redonné à celui qui remet.
  */
 
+export const CHIFFRES_DU_CODE_DE_REMISE = 6;
 export const VALIDITE_CODE_HEURES = 6;
 export const ESSAIS_PAR_CODE = 3;
 

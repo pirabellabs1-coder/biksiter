@@ -66,3 +66,28 @@ export function lesDonsSontOuverts<T extends { iban: string | null }>(
 ): association is T & { iban: string } {
   return association.iban !== null;
 }
+
+/**
+ * Un prénom, une adresse : les tailles au-delà desquelles on refuse.
+ *
+ * Personne n'a un prénom de quatre-vingts caractères ; une adresse tient très
+ * largement en cent vingt. Refuser au-delà évite qu'un envoi automatique
+ * fasse gonfler la table `don` ou le corps du courriel de remerciement.
+ */
+export const LONGUEUR_MAXIMALE_DU_PRENOM_D_UN_DON = 80;
+export const LONGUEUR_MAXIMALE_DE_L_EMAIL_D_UN_DON = 120;
+
+/**
+ * On accepte jusqu'à trois annonces par adresse et par jour.
+ *
+ * Sans plafond, un formulaire ouvert au public devient un relais : quelqu'un
+ * de mal intentionné pourrait envoyer en boucle « les coordonnées du
+ * virement » à l'adresse d'un tiers. Trois annonces suffisent à quelqu'un
+ * qui hésite entre un premier essai anonyme et un envoi identifié ; au
+ * quatrième on demande de patienter.
+ */
+export const DONS_ANNONCES_PAR_ADRESSE_PAR_JOUR = 3;
+
+export function peutEncoreAnnoncerUnDon(dejaAnnonces: number): boolean {
+  return dejaAnnonces < DONS_ANNONCES_PAR_ADRESSE_PAR_JOUR;
+}

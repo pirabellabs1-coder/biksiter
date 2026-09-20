@@ -98,24 +98,65 @@ const PARTENAIRES = [
     nom: 'Cycles Delcourt',
     quartier: 'Ixelles',
     offres: [
-      { titre: 'Contrôle vélo complet', cout: 25, stock: 8 },
-      { titre: 'Réglage des freins', cout: 10, stock: 12 },
+      {
+        titre: 'Contrôle vélo complet',
+        cout: 25,
+        stock: 8,
+        categorie: 'entretien',
+        description: 'Freins, transmission, pneus et éclairage passés en revue par l’atelier.',
+        retrait: 'Sur rendez-vous à l’atelier, bon à présenter au comptoir.',
+      },
+      {
+        titre: 'Réglage des freins',
+        cout: 10,
+        stock: 12,
+        categorie: 'securite',
+        description: 'Un freinage réglé et vérifié, pour rouler serein.',
+        retrait: 'À l’atelier, sans rendez-vous, aux heures d’ouverture.',
+      },
     ],
   },
   {
     nom: 'Vélo Sud',
     quartier: 'Saint-Gilles',
-    offres: [{ titre: 'Antivol U certifié', cout: 40, stock: 3 }],
+    offres: [
+      {
+        titre: 'Antivol U certifié',
+        cout: 40,
+        stock: 3,
+        categorie: 'securite',
+        description: 'Un antivol en U robuste, pour attacher votre vélo en toute confiance.',
+        retrait: 'À retirer en boutique, bon à présenter en caisse.',
+      },
+    ],
   },
   {
     nom: 'Le Comptoir',
     quartier: 'Flagey',
-    offres: [{ titre: 'Café offert', cout: 5, stock: 20 }],
+    offres: [
+      {
+        titre: 'Café offert',
+        cout: 5,
+        stock: 20,
+        categorie: 'autre',
+        description: 'Un café à la terrasse, le temps d’une pause à vélo.',
+        retrait: 'Au comptoir, bon à présenter en commandant.',
+      },
+    ],
   },
   {
     nom: 'Atelier Flagey',
     quartier: 'Flagey',
-    offres: [{ titre: 'Nettoyage complet', cout: 15, stock: 6 }],
+    offres: [
+      {
+        titre: 'Nettoyage complet',
+        cout: 15,
+        stock: 6,
+        categorie: 'entretien',
+        description: 'Cadre, transmission et roues nettoyés, chaîne lubrifiée.',
+        retrait: 'À l’atelier, sur rendez-vous.',
+      },
+    ],
   },
 ];
 
@@ -159,12 +200,27 @@ async function semer(): Promise<void> {
     for (const membre of MEMBRES) {
       const cree = await reserve.query<{ id: string }>(
         `insert into membre
-           (prenom, nom, email, empreinte, verification, verifie_le, moderateur)
-         values ($1, $2, $3, $4, 'verifiee', now(), $5)
+           (prenom, nom, email, empreinte, verification, verifie_le, moderateur,
+            email_verifie_le, telephone, telephone_verifie_le)
+         values ($1, $2, $3, $4, 'verifiee', now(), $5, now(), $6, now())
          returning id`,
-        [membre.prenom, membre.nom, membre.email, empreinte, membre.modere],
+        [
+          membre.prenom,
+          membre.nom,
+          membre.email,
+          empreinte,
+          membre.modere,
+          `+3247000000${MEMBRES.indexOf(membre) + 1}`,
+        ],
       );
       identifiants.set(membre.email, cree.rows[0].id);
+
+      // Un vélo par membre : sans vélo enregistré, aucune demande ne part.
+      await reserve.query(
+        `insert into velo (membre_id, nom, type, marque, couleur)
+         values ($1, $2, 'Ville', 'Btwin', 'Bleu')`,
+        [cree.rows[0].id, `Le vélo de ${membre.prenom}`],
+      );
     }
 
     for (const emplacement of EMPLACEMENTS) {
@@ -177,10 +233,12 @@ async function semer(): Promise<void> {
         `insert into emplacement (
             membre_id, reference, type, quartier, adresse_exacte, position,
             rayon_de_la_zone, capacite, verrouillage, intemperie, acces,
-            ancrage, services, velos_acceptes, precisions, publie)
+            ancrage, services, velos_acceptes, precisions, publie,
+            jours_d_accueil, heure_d_ouverture, heure_de_fermeture, duree_max_jours)
          values ($1, $2, $3, $4, $5,
                  st_setsrid(st_makepoint($7, $6), 4326)::geography,
-                 400, $8, $9, $10, $11, $12, $13, $14, $15, true)`,
+                 400, $8, $9, $10, $11, $12, $13, $14, $15, true,
+                 '{0,1,2,3,4,5,6}', '07:00', '22:00', 7)`,
         [
           identifiants.get(emplacement.proprietaire),
           emplacement.reference,
@@ -220,9 +278,18 @@ async function semer(): Promise<void> {
       );
       for (const offre of partenaire.offres) {
         await reserve.query(
-          `insert into offre (partenaire_id, titre, cout_en_maillons, stock_restant)
-           values ($1, $2, $3, $4)`,
-          [cree.rows[0].id, offre.titre, offre.cout, offre.stock],
+          `insert into offre (partenaire_id, titre, cout_en_maillons, stock_restant,
+                              categorie, description, retrait)
+           values ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            cree.rows[0].id,
+            offre.titre,
+            offre.cout,
+            offre.stock,
+            offre.categorie,
+            offre.description,
+            offre.retrait,
+          ],
         );
       }
     }
@@ -254,8 +321,8 @@ async function semer(): Promise<void> {
         ],
       );
 
-      // Le calcul suit lib/regles/maillons.ts : un maillon par jour entamé,
-      // doublé pour un vélo encombrant.
+      // Le calcul suit lib/regles/maillons.ts : cinq points par garde, un de
+      // plus par jour entamé au-delà du premier, doublés pour un vélo encombrant.
       const encombrant = ['Cargo', 'Longtail', 'Tandem', 'Avec remorque'].includes(
         garde.velo,
       );
@@ -265,7 +332,7 @@ async function semer(): Promise<void> {
         [
           identifiants.get('thomas@exemple.be'),
           stationnement.rows[0].id,
-          garde.jours * (encombrant ? 2 : 1),
+          (5 + garde.jours - 1) * (encombrant ? 2 : 1),
         ],
       );
     }

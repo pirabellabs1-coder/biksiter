@@ -11,6 +11,7 @@ import {
   type MembreConnecte,
 } from '@/lib/depot/sessions';
 import { nombreDEmplacements } from '@/lib/depot/emplacements';
+import { ACCUEIL_DES_MEMBRES } from '@/lib/navigation';
 import type { Membre as MembreDesRegles } from '@/lib/regles/publication';
 
 export const NOM_DU_COOKIE = 'bike_sitters_session';
@@ -46,7 +47,7 @@ export async function membreConnecte(): Promise<MembreConnecte | null> {
 export async function exigerUnMembre(): Promise<MembreConnecte> {
   const membre = await membreConnecte();
   if (!membre) {
-    redirect('/connexion');
+    redirect('/bienvenue');
   }
   return membre;
 }
@@ -63,7 +64,7 @@ export async function exigerUnMembre(): Promise<MembreConnecte> {
 export async function exigerUnModerateur(): Promise<MembreConnecte> {
   const membre = await exigerUnMembre();
   if (!membre.moderateur) {
-    redirect('/mon-compte');
+    redirect(ACCUEIL_DES_MEMBRES);
   }
   return membre;
 }

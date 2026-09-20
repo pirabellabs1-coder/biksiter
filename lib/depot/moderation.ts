@@ -3,7 +3,7 @@ import 'server-only';
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
 import { mettreEnFile } from '@/lib/envois/file';
 import { identiteRefusee, identiteVerifiee } from '@/lib/courriel/modeles';
-import type { TypeDePiece } from '@/lib/regles/pieces';
+import { CONSERVATION_MAXIMALE_JOURS, type TypeDePiece } from '@/lib/regles/pieces';
 
 /**
  * Ce que fait une personne qui modère.
@@ -38,6 +38,7 @@ export async function dossiersAVerifier(): Promise<DossierAVerifier[]> {
        from piece_didentite p
        join membre m on m.id = p.membre_id
       where p.relue_le is null
+        and p.deposee_le > now() - make_interval(days => ${CONSERVATION_MAXIMALE_JOURS})
       order by p.deposee_le`,
   );
 }
@@ -55,7 +56,8 @@ export async function dossier(
             p.taille_en_octets as "tailleEnOctets"
        from piece_didentite p
        join membre m on m.id = p.membre_id
-      where m.id = $1 and p.relue_le is null`,
+      where m.id = $1 and p.relue_le is null
+        and p.deposee_le > now() - make_interval(days => ${CONSERVATION_MAXIMALE_JOURS})`,
     [membreId],
   );
 }
@@ -82,7 +84,7 @@ export async function trancher(
          from membre m
          join piece_didentite p on p.membre_id = m.id
         where m.id = $1 and p.relue_le is null
-        for update of m`,
+        for update of m, p`,
       [membreId],
     );
 

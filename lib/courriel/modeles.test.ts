@@ -3,12 +3,15 @@ import { describe, expect, test } from 'vitest';
 import {
   bienvenue,
   candidatureRecue,
+  confirmationDAdresse,
   demandeAcceptee,
   demandeRecue,
   demandeRefusee,
   desistement,
   donAnnonce,
   inscriptionSurLaListe,
+  messageDeContactRecu,
+  nouveauMotDePasse,
 } from './modeles';
 
 const CRENEAU = 'le mardi 8 septembre 2026, de 09:00 à 18:00';
@@ -54,7 +57,13 @@ describe('règle 3 — aucun message ne parle de note ni de classement', () => {
   const tous = [
     inscriptionSurLaListe({ quartier: 'Ixelles', peutAccueillir: true }),
     candidatureRecue({ prenom: 'Thomas' }),
-    bienvenue({ prenom: 'Lucas', invitePar: 'Manoelle' }),
+    bienvenue({
+      prenom: 'Lucas',
+      invitePar: 'Manoelle',
+      lienDeConfirmation: 'http://localhost:3000/confirmer-mon-email?jeton=abc',
+    }),
+    confirmationDAdresse({ prenom: 'Lucas', lien: 'http://localhost:3000/x' }),
+    nouveauMotDePasse({ prenom: 'Lucas', lien: 'http://localhost:3000/y' }),
     demandeRecue({
       prenomDuBikeSitter: 'Manoelle',
       prenomDuCycliste: 'Lucas',
@@ -166,5 +175,37 @@ describe('la liste d’attente dit au bike sitter que c’est lui qui compte', (
 
     expect(message.corps).toContain('bike sitters');
     expect(message.corps).toContain('Saint-Gilles');
+  });
+});
+
+describe('les liens envoyés par courriel', () => {
+  test('le message de bienvenue porte le lien de confirmation de l’adresse', () => {
+    const lien = 'http://localhost:3000/confirmer-mon-email?jeton=abc';
+    expect(
+      bienvenue({ prenom: 'Lucas', invitePar: null, lienDeConfirmation: lien })
+        .corps,
+    ).toContain(lien);
+  });
+
+  test('le message de nouveau mot de passe rassure qui ne l’a pas demandé', () => {
+    const message = nouveauMotDePasse({
+      prenom: 'Lucas',
+      lien: 'http://localhost:3000/nouveau-mot-de-passe?jeton=abc',
+    });
+    expect(message.corps).toContain('votre mot de passe actuel reste valable');
+  });
+});
+
+describe('les messages de la page Contact', () => {
+  test('la modération reçoit le message et l’adresse, présentée comme non vérifiée', () => {
+    const message = messageDeContactRecu({
+      sujet: 'Signaler un abus',
+      email: 'nom@exemple.be',
+      message: 'Bonjour, je souhaite signaler un comportement.',
+    });
+    expect(message.corps).toContain(
+      'Bonjour, je souhaite signaler un comportement.',
+    );
+    expect(message.corps).toContain('non vérifiée');
   });
 });

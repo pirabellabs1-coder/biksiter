@@ -1,5 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 
+import { CHIFFRES_DU_CODE_DE_REMISE } from '@/lib/regles/remise';
+
 /**
  * Les jetons de session.
  *
@@ -37,7 +39,7 @@ export function nouveauCodeNumerique(longueur: number): string {
   return chiffres.join('');
 }
 
-/** Le code de remise, à quatre chiffres (règle 5). */
+/** Le code de remise (règle 5). */
 export function nouveauCodeDeRemise(): string {
-  return nouveauCodeNumerique(4);
+  return nouveauCodeNumerique(CHIFFRES_DU_CODE_DE_REMISE);
 }

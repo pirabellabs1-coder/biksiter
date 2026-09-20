@@ -48,7 +48,7 @@ export const COLONNES_DU_PIED: readonly {
     liens: [
       { chemin: '/a-propos', libelle: 'Qui sommes-nous' },
       { chemin: '/questions-frequentes', libelle: 'Questions fréquentes' },
-      { chemin: '/soutenir', libelle: 'Nous soutenir' },
+      
       { chemin: '/conditions-generales', libelle: 'Conditions générales' },
     ],
   },

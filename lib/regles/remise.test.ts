@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  CHIFFRES_DU_CODE_DE_REMISE,
   ESSAIS_PAR_CODE,
   VALIDITE_CODE_HEURES,
   codeEncoreValide,
@@ -11,7 +12,7 @@ import {
 const emission = new Date('2026-09-08T09:00:00Z');
 
 function code(partiel: Partial<Code> = {}): Code {
-  return { chiffres: '4729', emisLe: emission, essaisUtilises: 0, ...partiel };
+  return { chiffres: '472913', emisLe: emission, essaisUtilises: 0, ...partiel };
 }
 
 function heuresApres(nombre: number): Date {
@@ -19,17 +20,18 @@ function heuresApres(nombre: number): Date {
 }
 
 describe('règle 5 — le vélo ne change d’état qu’avec un code', () => {
-  test('les valeurs de référence sont six heures et trois essais', () => {
+  test('les valeurs de référence sont six chiffres, six heures et trois essais', () => {
+    expect(CHIFFRES_DU_CODE_DE_REMISE).toBe(6);
     expect(VALIDITE_CODE_HEURES).toBe(6);
     expect(ESSAIS_PAR_CODE).toBe(3);
   });
 
   test('le bon code accepte la remise', () => {
-    expect(saisirLeCode(code(), '4729', heuresApres(1))).toEqual({ accepte: true });
+    expect(saisirLeCode(code(), '472913', heuresApres(1))).toEqual({ accepte: true });
   });
 
   test('un code faux consomme un essai sur les trois', () => {
-    expect(saisirLeCode(code(), '0000', heuresApres(1))).toEqual({
+    expect(saisirLeCode(code(), '000013', heuresApres(1))).toEqual({
       accepte: false,
       motif: 'incorrect',
       essaisRestants: 2,
@@ -38,7 +40,7 @@ describe('règle 5 — le vélo ne change d’état qu’avec un code', () => {
   });
 
   test('le troisième essai raté déclenche la régénération du code', () => {
-    expect(saisirLeCode(code({ essaisUtilises: 2 }), '0000', heuresApres(1))).toEqual({
+    expect(saisirLeCode(code({ essaisUtilises: 2 }), '000013', heuresApres(1))).toEqual({
       accepte: false,
       motif: 'incorrect',
       essaisRestants: 0,
@@ -47,7 +49,7 @@ describe('règle 5 — le vélo ne change d’état qu’avec un code', () => {
   });
 
   test('un code dont les trois essais sont épuisés n’accepte plus rien', () => {
-    expect(saisirLeCode(code({ essaisUtilises: 3 }), '4729', heuresApres(1))).toEqual({
+    expect(saisirLeCode(code({ essaisUtilises: 3 }), '472913', heuresApres(1))).toEqual({
       accepte: false,
       motif: 'epuise',
     });
@@ -64,7 +66,7 @@ describe('un code vaut six heures', () => {
   });
 
   test('un code expiré ne consomme pas d’essai', () => {
-    expect(saisirLeCode(code(), '0000', heuresApres(7))).toEqual({
+    expect(saisirLeCode(code(), '000013', heuresApres(7))).toEqual({
       accepte: false,
       motif: 'expire',
     });

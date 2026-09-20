@@ -3,20 +3,19 @@ import { soldeDisponible, type Solde } from './maillons';
 /**
  * Le catalogue.
  *
- * Ce ne sont pas des promotions : ce sont des remerciements de commerçants du
- * quartier à ceux qui accueillent des vélos. La différence se voit dans les
- * règles ci-dessous.
- *
- * Ce qu'on ne fait pas, et qu'il ne faut pas ajouter :
- *   - pas de « il vous manque 9 maillons » : on n'entretient pas un manque ;
- *   - pas de barre de progression vers l'offre suivante ;
- *   - pas de compte à rebours ni d'offre « qui expire bientôt » ;
- *   - pas de classement des membres par ce qu'ils ont échangé.
- *
- * Un membre qui n'a jamais accueilli voit tout le catalogue. Il ne peut rien
- * échanger, et c'est dit une fois, calmement, en haut de la page — pas offre
- * par offre.
+ * Des remerciements de commerçants du quartier à ceux qui accueillent des
+ * vélos, échangés contre des points. Tout le monde voit le même catalogue ;
+ * seul un membre qui a déjà accueilli peut échanger.
  */
+
+export const CATEGORIES_D_OFFRE = [
+  { cle: 'securite', titre: 'Sécurité' },
+  { cle: 'equipement', titre: 'Équipement' },
+  { cle: 'entretien', titre: 'Entretien' },
+  { cle: 'autre', titre: 'Autre' },
+] as const;
+
+export type CategorieDOffre = (typeof CATEGORIES_D_OFFRE)[number]['cle'];
 
 export type Offre = {
   coutEnMaillons: number;
@@ -58,11 +57,8 @@ export function decisionDEchange(
 }
 
 /**
- * Le stock restant s'affiche, contrairement au solde manquant.
- *
- * L'un est une information sur le commerçant — il a promis dix contrôles, il
- * en reste trois — et l'autre serait une pression sur le membre. On ne
- * l'affiche pas non plus en rouge ni avec « plus que » : c'est un nombre.
+ * Le stock restant est une information sur le commerçant — il a promis dix
+ * contrôles, il en reste trois. C'est un nombre, sans « plus que ».
  */
 export function stockAAfficher(offre: Offre): string | null {
   if (!offre.active) {
@@ -72,6 +68,11 @@ export function stockAAfficher(offre: Offre): string | null {
     return 'épuisé';
   }
   return `${offre.stockRestant} restant${offre.stockRestant > 1 ? 's' : ''}`;
+}
+
+/** Ce qu'il manque pour échanger une offre, en points ; 0 si le solde suffit. */
+export function pointsManquants(offre: Offre, solde: Solde): number {
+  return Math.max(0, offre.coutEnMaillons - soldeDisponible(solde));
 }
 
 /**

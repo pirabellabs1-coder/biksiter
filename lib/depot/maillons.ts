@@ -7,11 +7,11 @@ import { etatApresLaGarde, maillonsPourUneGarde } from '@/lib/regles/maillons';
 import type { TypeVelo } from '@/lib/regles/velos';
 
 /**
- * Le registre des maillons.
+ * Le registre des maillons — les points de l'interface.
  *
- * Aucune fonction d'ici ne trie ni ne compare des membres, et il ne faut pas
- * en ajouter : c'est la frontière entre un compteur et un classement
- * (règle 3). On lit toujours le registre d'une seule personne, la sienne.
+ * On lit ici le registre d'une seule personne, la sienne. Le classement, qui
+ * compare des membres, vit à part dans `progression.ts` et ne lit que ceux qui
+ * ont choisi d'y apparaître (règle 3).
  */
 
 export type SoldeDuMembre = {

@@ -65,8 +65,15 @@ describe('retirer un emplacement', () => {
     expect(decisionDeRetrait(3).retirable).toBe(false);
   });
 
-  test('les trois états qui retiennent sont la demande, l’acceptation et la garde', () => {
-    expect(ETATS_QUI_RETIENNENT).toEqual(['demande', 'accepte', 'en_cours']);
+  test('retiennent un emplacement : la demande, la garde de l’acceptation à la reprise, et le litige', () => {
+    expect(ETATS_QUI_RETIENNENT).toEqual([
+      'demande',
+      'accepte',
+      'arrivee',
+      'en_cours',
+      'reprise_demandee',
+      'litige',
+    ]);
   });
 
   test('mettre en pause reste possible en toutes circonstances', () => {

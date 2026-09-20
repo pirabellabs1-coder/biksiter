@@ -3,7 +3,9 @@ import { describe, expect, test } from 'vitest';
 import {
   communicationStructuree,
   communicationValide,
+  DONS_ANNONCES_PAR_ADRESSE_PAR_JOUR,
   lesDonsSontOuverts,
+  peutEncoreAnnoncerUnDon,
 } from './dons';
 
 describe('la communication structurée permet de rapprocher un virement', () => {
@@ -49,5 +51,20 @@ describe('un don suppose un compte pour le recevoir', () => {
 
   test('un compte renseigné rouvre les dons', () => {
     expect(lesDonsSontOuverts({ iban: 'BE68 5390 0754 7034' })).toBe(true);
+  });
+});
+
+describe('un formulaire de don ouvert au public reste borné', () => {
+  test('on accepte jusqu’à la limite quotidienne, pas au-delà', () => {
+    expect(peutEncoreAnnoncerUnDon(0)).toBe(true);
+    expect(peutEncoreAnnoncerUnDon(DONS_ANNONCES_PAR_ADRESSE_PAR_JOUR - 1)).toBe(
+      true,
+    );
+    expect(peutEncoreAnnoncerUnDon(DONS_ANNONCES_PAR_ADRESSE_PAR_JOUR)).toBe(
+      false,
+    );
+    expect(
+      peutEncoreAnnoncerUnDon(DONS_ANNONCES_PAR_ADRESSE_PAR_JOUR + 1),
+    ).toBe(false);
   });
 });

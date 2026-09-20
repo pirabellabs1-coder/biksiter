@@ -4,6 +4,7 @@ import { dansUneTransaction, interroger } from '@/lib/bd/client';
 import {
   LONGUEUR_DU_BON,
   decisionDEchange,
+  type CategorieDOffre,
   type RefusDEchange,
 } from '@/lib/regles/catalogue';
 import { soldeDisponible } from '@/lib/regles/maillons';
@@ -20,6 +21,9 @@ import { soldeDisponible } from '@/lib/regles/maillons';
 export type OffreDuCatalogue = {
   id: string;
   titre: string;
+  description: string | null;
+  categorie: CategorieDOffre;
+  retrait: string | null;
   partenaire: string;
   quartier: string | null;
   coutEnMaillons: number;
@@ -27,20 +31,39 @@ export type OffreDuCatalogue = {
   active: boolean;
 };
 
-export async function offresDuCatalogue(): Promise<OffreDuCatalogue[]> {
-  return interroger<OffreDuCatalogue>(
-    `select o.id,
+const COLONNES_D_OFFRE = `o.id,
             o.titre,
+            o.description,
+            o.categorie,
+            o.retrait,
             p.nom              as partenaire,
             p.quartier,
             o.cout_en_maillons as "coutEnMaillons",
             o.stock_restant    as "stockRestant",
-            o.active
+            o.active`;
+
+export async function offresDuCatalogue(): Promise<OffreDuCatalogue[]> {
+  return interroger<OffreDuCatalogue>(
+    `select ${COLONNES_D_OFFRE}
        from offre o
        join partenaire p on p.id = o.partenaire_id
-      where p.actif
+      where p.actif and o.active
       order by o.cout_en_maillons, o.titre`,
   );
+}
+
+const IDENTIFIANT = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function offreDuCatalogue(id: string): Promise<OffreDuCatalogue | null> {
+  if (!IDENTIFIANT.test(id)) return null;
+  const [offre] = await interroger<OffreDuCatalogue>(
+    `select ${COLONNES_D_OFFRE}
+       from offre o
+       join partenaire p on p.id = o.partenaire_id
+      where o.id = $1 and p.actif`,
+    [id],
+  );
+  return offre ?? null;
 }
 
 export type Bon = {
@@ -52,6 +75,22 @@ export type Bon = {
   echangeLe: Date;
   utiliseLe: Date | null;
 };
+
+export async function bonDuMembre(membreId: string, id: string): Promise<Bon | null> {
+  if (!IDENTIFIANT.test(id)) return null;
+  const [bon] = await interroger<Bon>(
+    `select e.id, e.code, o.titre, p.nom as partenaire,
+            e.cout_en_maillons as "coutEnMaillons",
+            e.echange_le       as "echangeLe",
+            e.utilise_le       as "utiliseLe"
+       from echange e
+       join offre o on o.id = e.offre_id
+       join partenaire p on p.id = o.partenaire_id
+      where e.membre_id = $1 and e.id = $2`,
+    [membreId, id],
+  );
+  return bon ?? null;
+}
 
 export async function mesBons(membreId: string): Promise<Bon[]> {
   return interroger<Bon>(
@@ -69,7 +108,7 @@ export async function mesBons(membreId: string): Promise<Bon[]> {
 }
 
 export type ResultatDEchange =
-  | { echange: true; code: string }
+  | { echange: true; code: string; id: string }
   | { echange: false; motif: RefusDEchange | 'introuvable' };
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -96,6 +135,11 @@ export async function echangerUneOffre(
   offreId: string,
 ): Promise<ResultatDEchange> {
   return dansUneTransaction(async (client) => {
+    // Le verrou sur le membre passe avant la lecture du solde : deux échanges
+    // simultanés d'offres différentes ne dépensent pas deux fois les mêmes points.
+    await client.query('select id from membre where id = $1 for update', [
+      membreId,
+    ]);
     const trouvee = await client.query<{
       coutEnMaillons: number;
       stockRestant: number;
@@ -146,21 +190,22 @@ export async function echangerUneOffre(
       [offreId],
     );
 
-    await client.query(
+    const bon = await client.query<{ id: string }>(
       `insert into echange (membre_id, offre_id, code, cout_en_maillons)
-       values ($1, $2, $3, $4)`,
+       values ($1, $2, $3, $4)
+       returning id`,
       [membreId, offreId, code, cout],
     );
 
     // La dépense est une ligne du registre comme une autre, en négatif : le
     // solde reste la somme de son historique.
     await client.query(
-      `insert into maillon (membre_id, nombre, etat, motif)
-       values ($1, $2, 'acquis', 'échange au catalogue')`,
-      [membreId, -cout],
+      `insert into maillon (membre_id, nombre, etat, motif, echange_id, nature)
+       values ($1, $2, 'acquis', 'échange au catalogue', $3, 'echange')`,
+      [membreId, -cout, bon.rows[0].id],
     );
 
-    return { echange: true, code };
+    return { echange: true, code, id: bon.rows[0].id };
   });
 }
 

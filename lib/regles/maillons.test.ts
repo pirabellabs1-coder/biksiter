@@ -14,34 +14,34 @@ function le(jour: string, heure = '09:00'): Date {
 }
 
 describe('un maillon remercie la place immobilisée, pas la valeur du vélo', () => {
-  test('un vélo de ville gardé une journée vaut un maillon', () => {
+  test('un vélo de ville gardé une journée vaut cinq points', () => {
     expect(
       maillonsPourUneGarde({
         debut: le('05', '09:00'),
         fin: le('05', '18:00'),
         typeVelo: 'Ville',
       }),
-    ).toBe(1);
+    ).toBe(5);
   });
 
-  test('un vélo de ville gardé trois jours vaut trois maillons', () => {
+  test('un vélo de ville gardé trois jours vaut sept points : un de plus par jour entamé', () => {
     expect(
       maillonsPourUneGarde({
         debut: le('02', '09:00'),
         fin: le('05', '09:00'),
         typeVelo: 'Ville',
       }),
-    ).toBe(3);
+    ).toBe(7);
   });
 
-  test('un cargo gardé deux jours vaut quatre maillons : il prend deux places', () => {
+  test('un cargo gardé deux jours vaut douze points : il prend deux places', () => {
     expect(
       maillonsPourUneGarde({
         debut: le('08', '09:00'),
         fin: le('10', '09:00'),
         typeVelo: 'Cargo',
       }),
-    ).toBe(4);
+    ).toBe(12);
   });
 
   test('un vélo électrique ne vaut pas plus qu’un vélo de ville', () => {
@@ -54,10 +54,10 @@ describe('un maillon remercie la place immobilisée, pas la valeur du vélo', ()
 
   test('un tandem et une remorque comptent double, comme le cargo', () => {
     const deuxJours = { debut: le('08'), fin: le('10') } as const;
-    expect(maillonsPourUneGarde({ ...deuxJours, typeVelo: 'Tandem' })).toBe(4);
+    expect(maillonsPourUneGarde({ ...deuxJours, typeVelo: 'Tandem' })).toBe(12);
     expect(
       maillonsPourUneGarde({ ...deuxJours, typeVelo: 'Avec remorque' }),
-    ).toBe(4);
+    ).toBe(12);
   });
 
   test('la liste des vélos encombrants ne contient que de vrais types', () => {

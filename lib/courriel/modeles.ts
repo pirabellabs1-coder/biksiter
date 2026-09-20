@@ -1,5 +1,9 @@
 import { ASSOCIATION } from '@/lib/contenu/association';
 import { SEUIL_DESISTEMENT_TARDIF_HEURES } from '@/lib/regles/annulation';
+import {
+  VALIDITE_DU_LIEN_DE_CONFIRMATION_HEURES,
+  VALIDITE_DU_LIEN_DE_MOT_DE_PASSE_MINUTES,
+} from '@/lib/regles/comptes';
 import { VALIDITE_CODE_HEURES } from '@/lib/regles/remise';
 
 /**
@@ -77,6 +81,7 @@ export function candidatureRecue(details: { prenom: string }): Message {
 export function bienvenue(details: {
   prenom: string;
   invitePar: string | null;
+  lienDeConfirmation: string;
 }): Message {
   return rediger('Bienvenue sur Bike Sitters', [
     `Bonjour ${details.prenom},`,
@@ -85,12 +90,49 @@ export function bienvenue(details: {
       ? `Votre compte est créé, grâce à l’invitation de ${details.invitePar}. Bienvenue !`
       : 'Votre compte est créé. Bienvenue !',
     '',
-    'Dernière étape : la vérification de votre identité (e-mail, téléphone et',
-    'pièce d’identité). Elle ne prend que quelques minutes et assure la',
+    'Pour confirmer votre adresse e-mail, ouvrez ce lien :',
+    details.lienDeConfirmation,
+    `Il reste valable ${VALIDITE_DU_LIEN_DE_CONFIRMATION_HEURES} heures.`,
+    '',
+    'Viennent ensuite la vérification de votre téléphone et de votre pièce',
+    'd’identité. Elles ne prennent que quelques minutes et assurent la',
     'confiance entre tous les membres du réseau.',
     '',
     'Votre pièce d’identité est supprimée juste après la vérification, et au',
     'plus tard après sept jours.',
+  ]);
+}
+
+export function confirmationDAdresse(details: {
+  prenom: string;
+  lien: string;
+}): Message {
+  return rediger('Confirmez votre adresse e-mail', [
+    `Bonjour ${details.prenom},`,
+    '',
+    'Voici un nouveau lien pour confirmer votre adresse e-mail :',
+    details.lien,
+    '',
+    `Il reste valable ${VALIDITE_DU_LIEN_DE_CONFIRMATION_HEURES} heures. Les liens envoyés`,
+    'précédemment ne fonctionnent plus.',
+  ]);
+}
+
+export function nouveauMotDePasse(details: {
+  prenom: string;
+  lien: string;
+}): Message {
+  return rediger('Choisir un nouveau mot de passe', [
+    `Bonjour ${details.prenom},`,
+    '',
+    'Vous avez demandé à choisir un nouveau mot de passe. Ouvrez ce lien :',
+    details.lien,
+    '',
+    `Il reste valable ${VALIDITE_DU_LIEN_DE_MOT_DE_PASSE_MINUTES} minutes et ne sert qu’une fois.`,
+    'Une fois le mot de passe changé, vos autres appareils sont déconnectés.',
+    '',
+    'Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce',
+    'message : votre mot de passe actuel reste valable.',
   ]);
 }
 
@@ -140,8 +182,8 @@ export function demandeRecue(details: {
       ...(details.message ? ['', `Son message : « ${details.message} »`] : []),
       '',
       'Son identité a été vérifiée par l’association. Vous êtes libre',
-      'd’accepter ou non cette demande, depuis votre espace, rubrique',
-      '« Mes stationnements ».',
+      'd’accepter ou non cette demande, depuis votre espace, onglet',
+      '« Activité ».',
       '',
       'Votre adresse ne lui sera communiquée que si vous acceptez.',
     ],
@@ -168,7 +210,7 @@ export function demandeAcceptee(details: {
       'Merci de la garder pour vous : elle n’est communiquée qu’aux cyclistes',
       'dont la demande a été acceptée.',
       '',
-      `Au moment du dépôt, vous communiquerez un code à quatre chiffres à ${details.prenomDuBikeSitter},`,
+      `Au moment du dépôt, vous communiquerez un code à six chiffres à ${details.prenomDuBikeSitter},`,
       `qui le saisira de son côté. Il reste valable ${VALIDITE_CODE_HEURES} heures et fonctionne même`,
       'sans réseau.',
     ],
@@ -260,5 +302,30 @@ export function desistement(details: {
       : []),
     '',
     'La place est de nouveau libre sur ce créneau.',
+  ]);
+}
+
+/**
+ * Le message transmis à la modération quand quelqu'un écrit depuis la page
+ * Contact. L'adresse est celle que la personne a saisie : rien ne garantit
+ * qu'elle soit la sienne, et le message le dit.
+ */
+export function messageDeContactRecu(details: {
+  sujet: string;
+  email: string;
+  message: string;
+}): Message {
+  return rediger(`Message reçu depuis la page Contact : ${details.sujet}`, [
+    'Bonjour,',
+    '',
+    `Un message est arrivé depuis la page Contact, sur le sujet « ${details.sujet} ».`,
+    `Adresse indiquée (non vérifiée) : ${details.email}`,
+    '',
+    '---',
+    details.message,
+    '---',
+    '',
+    'Pour répondre, écrivez à l’adresse indiquée. Pensez à marquer le message',
+    'comme traité dans l’administration.',
   ]);
 }

@@ -61,7 +61,7 @@ export const config = {
      */
     {
       source:
-        '/((?!_next/static|_next/image|favicon.ico|moderation/membres/[^/]+/piece).*)',
+        '/((?!_next/static|_next/image|favicon.ico|administration/verifications/[^/]+/piece).*)',
       missing: [{ type: 'header', key: 'next-router-prefetch' }],
     },
   ],
