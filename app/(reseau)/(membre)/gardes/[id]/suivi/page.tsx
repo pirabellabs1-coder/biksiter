@@ -69,7 +69,7 @@ export default async function SuiviDuSignalement({
       <EnTete p={p} retour={`/gardes/${id}`} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Suivi du signalement')}</h1>
-        <p className="sous-titre">{p('Nous vous informons à chaque étape.')}</p>
+        <p className="sous-titre">{p('Vous êtes informé à chaque étape d’une garde.')}</p>
 
         <div className="carte ligne ligne-info" style={{ alignItems: 'flex-start' }}>
           <span className="ligne-icone texte-rouge" aria-hidden="true">

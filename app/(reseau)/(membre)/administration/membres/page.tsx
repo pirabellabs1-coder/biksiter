@@ -39,7 +39,7 @@ export default async function GestionDesMembres({
       <EnTete p={p} />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Gestion des membres')}</h1>
-        <p className="sous-titre">{p('Recherchez un compte, suspendez-le ou réactivez-le, corrigez ses points.')}</p>
+        <p className="sous-titre">{p('Consultez le profil d’un membre pour ajuster son statut ou corriger son solde de points.')}</p>
         <NavigationDAdministration p={p} actif="membres" />
 
         <form action="/administration/membres" method="get" role="search">

@@ -50,7 +50,7 @@ export default async function FiltresDeRecherche({
       <form action="/recherche" method="get" className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Filtres de recherche')}</h1>
         <p className="sous-titre">
-          {p('Trouvez le lieu idéal pour votre vélo.')}
+          {p('Consultez les emplacements disponibles à proximité de votre destination.')}
         </p>
         <input type="hidden" name="lieu" value={recherche.texte} />
         <input type="hidden" name="jour" value={recherche.creneau.jourDepot} />

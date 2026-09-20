@@ -41,7 +41,7 @@ export default async function Signalements({
       <EnTete p={p} />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Signalements')}</h1>
-        <p className="sous-titre">{p('Les profils, lieux et avis signalés par les membres.')}</p>
+        <p className="sous-titre">{p('Les profils, emplacements et avis signalés par les membres du réseau.')}</p>
         <NavigationDAdministration p={p} actif="signalements" />
 
         <nav className="puces" aria-label={p('État des signalements')} style={{ marginTop: 0, marginBottom: 12 }}>

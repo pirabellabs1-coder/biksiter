@@ -57,7 +57,7 @@ export default async function DisponibilitesDuLieu({
         ) : null}
         <h1 className="titre-ecran">{p('Mes disponibilités')}</h1>
         <p className="sous-titre">
-          {p('Indiquez quand vous êtes disponible pour garder des vélos dans votre espace.')}
+          {p('Vous précisez ici les créneaux pendant lesquels vous êtes disponible pour accueillir un vélo.')}
         </p>
 
         <FormulaireDeDisponibilites

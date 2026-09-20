@@ -43,7 +43,7 @@ export default async function MesLieux({
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Mes lieux de garde')}</h1>
         <p className="sous-titre">
-          {p('Gérez vos lieux de garde et partagez-les avec la communauté Bike Sitters.')}
+          {p('Retrouvez ici les emplacements que vous proposez à la communauté Bike Sitters.')}
         </p>
 
         {retire ? (

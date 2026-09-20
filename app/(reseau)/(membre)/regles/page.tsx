@@ -21,7 +21,7 @@ export default async function ReglesDeLaCommunaute() {
       <EnTete p={p} retour="/aide" />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Règles de la communauté')}</h1>
-        <p className="sous-titre">{p('Un réseau de confiance pour vos vélos, qui tient à quelques règles simples.')}</p>
+        <p className="sous-titre">{p('Le bon fonctionnement du réseau repose sur quelques règles partagées par tous les membres.')}</p>
 
         <ListeDesRegles p={p} />
 

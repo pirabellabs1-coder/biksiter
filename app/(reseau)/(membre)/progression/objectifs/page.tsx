@@ -32,7 +32,7 @@ export default async function MesObjectifs() {
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Mes objectifs')}</h1>
         <p className="sous-titre">
-          {p('Progressez pour débloquer de nouveaux badges et atteindre le niveau suivant.')}
+          {p('Chaque garde menée à son terme contribue à votre progression et vous rapporte de nouveaux badges.')}
         </p>
 
         <div className="encart solde-encart">

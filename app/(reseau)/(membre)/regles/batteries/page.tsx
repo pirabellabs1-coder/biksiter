@@ -33,7 +33,7 @@ export default async function BatteriesDesVelosElectriques() {
       <EnTete p={p} retour="/regles" />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Vélos électriques')}</h1>
-        <p className="sous-titre">{p('Quelques vérifications sur la batterie, au moment du dépôt.')}</p>
+        <p className="sous-titre">{p('Voici les vérifications à effectuer sur la batterie au moment du dépôt.')}</p>
 
         <div className="carte">
           <strong style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>

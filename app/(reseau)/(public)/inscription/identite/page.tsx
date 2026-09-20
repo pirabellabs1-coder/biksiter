@@ -36,7 +36,7 @@ export default async function Identite() {
       <h1 className="titre-ecran">{p('Vérifiez votre identité')}</h1>
       <p className="sous-titre">
         {p(
-          'Une identité vérifiée vous permet de publier un emplacement et de demander une garde.',
+          'Une identité vérifiée est nécessaire pour publier un emplacement ou envoyer une demande de garde.',
         )}
       </p>
 

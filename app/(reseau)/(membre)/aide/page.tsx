@@ -31,7 +31,7 @@ export default async function CentreDAide({
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Centre d’aide')}</h1>
         <p className="sous-titre">
-          {p('Trouvez rapidement des réponses à vos questions sur Bike Sitters.')}
+          {p('Vous trouverez ici les réponses aux principales questions sur le fonctionnement de Bike Sitters.')}
         </p>
 
         <form action="/aide" method="get" role="search">

@@ -13,7 +13,7 @@ import { optionsEtTextesDuLieu } from '../textes-du-lieu';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Ajouter un lieu') };
+  return { title: p('Ajouter un emplacement') };
 }
 
 export default async function AjouterUnLieu() {
@@ -35,9 +35,9 @@ export default async function AjouterUnLieu() {
           </span>
           <span>1 / 3</span>
         </div>
-        <h1 className="titre-ecran">{p('Ajouter un lieu')}</h1>
+        <h1 className="titre-ecran">{p('Ajouter un emplacement')}</h1>
         <p className="sous-titre">
-          {p('Décrivez l’espace où vous garderez les vélos. Il doit être privé, fermé et sécurisé.')}
+          {p('L’espace où vous accueillez les vélos doit être privé, fermé et sécurisé. Vous en précisez ici le type et les caractéristiques.')}
         </p>
         <FormulaireDuLieu
           action={enregistrerLeLieu.bind(null, null)}

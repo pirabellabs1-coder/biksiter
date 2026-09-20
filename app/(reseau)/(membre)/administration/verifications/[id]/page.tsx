@@ -45,7 +45,7 @@ export default async function ExaminerUnePiece({
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Vérifier une identité')}</h1>
         <p className="sous-titre">
-          {p('Examinez la pièce avec attention : elle sera supprimée dès votre décision.')}
+          {p('La pièce d’identité doit être examinée avec attention. Elle sera supprimée dès que votre décision aura été enregistrée.')}
         </p>
 
         <div className="carte ligne ligne-info" style={{ alignItems: 'center' }}>

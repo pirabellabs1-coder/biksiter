@@ -26,7 +26,7 @@ export default async function MesAlertes() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Mes alertes')}</h1>
         <p className="sous-titre">
-          {p('Une alerte vous prévient dès qu’un emplacement ouvre là où votre recherche n’a rien trouvé.')}
+          {p('Vous serez notifié dès qu’un nouvel emplacement ouvre dans une zone où votre recherche n’a rien trouvé.')}
         </p>
 
         {alertes.length === 0 ? (

@@ -33,7 +33,7 @@ export default async function ModifierUnLieu({
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Modifier mon lieu')}</h1>
         <p className="sous-titre">
-          {p('Vos modifications s’appliquent aux prochaines demandes. Les gardes acceptées restent telles quelles.')}
+          {p('Les modifications s’appliquent aux prochaines demandes. Les gardes déjà acceptées ne sont pas affectées.')}
         </p>
         <FormulaireDuLieu
           action={enregistrerLeLieu.bind(null, reference)}

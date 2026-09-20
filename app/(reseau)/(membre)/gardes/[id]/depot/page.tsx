@@ -83,7 +83,7 @@ export default async function PreparerLeDepot({ params }: { params: Promise<{ id
       <div className="ecran-app ecran-parcours">
         <EtapesDuDepot p={p} etape={1} />
         <h1 className="titre-ecran">{p('Préparer le dépôt')}</h1>
-        <p className="sous-titre">{p('Quelques vérifications avant de confier votre vélo en toute sérénité.')}</p>
+        <p className="sous-titre">{p('Voici quelques points à vérifier avant de confier votre vélo au bike sitter.')}</p>
 
         <ul className="pile" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {points.map(([icone, titre, texte, fait, verifie]) => (

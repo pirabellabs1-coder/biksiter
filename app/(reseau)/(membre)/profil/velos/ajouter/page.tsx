@@ -19,7 +19,7 @@ export default async function AjouterUnVelo() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Ajouter un vélo')}</h1>
         <p className="sous-titre">
-          {p('Décrivez votre vélo : le bike sitter saura ce qu’il accueille.')}
+          {p('Une description claire de votre vélo permet au bike sitter de savoir ce qu’il accueille.')}
         </p>
         <FormulaireDeVelo
           types={TYPES_VELO.map((type) => [type, p(type)] as const)}

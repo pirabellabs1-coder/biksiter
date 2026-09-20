@@ -30,7 +30,7 @@ export default async function MesVelos({
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Mes vélos')}</h1>
         <p className="sous-titre">
-          {p('Enregistrez vos vélos une fois, puis choisissez-les dans chaque demande de garde.')}
+          {p('Une fois enregistrés, vos vélos sont proposés lors de chaque demande de garde.')}
         </p>
 
         {velo === 'ajoute' ? (

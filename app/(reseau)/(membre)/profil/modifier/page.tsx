@@ -57,7 +57,7 @@ export default async function ModifierMonProfil() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Modifier mes informations')}</h1>
         <p className="sous-titre">
-          {p('Gardez vos informations à jour.')}
+          {p('Retrouvez ici vos informations personnelles et vos préférences.')}
         </p>
         {modifiable ? (
           <FormulaireDuNom

@@ -32,7 +32,7 @@ export default async function Preferences({
       <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Préférences de communication')}</h1>
-        <p className="sous-titre">{p('Choisissez quand et comment le réseau vous prévient.')}</p>
+        <p className="sous-titre">{p('Vous choisissez les moments où le réseau vous informe et le canal utilisé.')}</p>
 
         {enregistre ? (
           <div className="encart" role="status" style={{ marginBottom: 12 }}>

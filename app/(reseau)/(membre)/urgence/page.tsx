@@ -35,7 +35,7 @@ export default async function UrgenceEtVol() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Urgence et vol')}</h1>
         <p className="sous-titre">
-          {p('En cas de danger ou de vol, voici les bons réflexes et les numéros à appeler.')}
+          {p('Voici les procédures à suivre en cas de danger ou de vol, ainsi que les numéros à contacter.')}
         </p>
 
         <h2 className="titre-section">{p('Numéros d’urgence en Belgique')}</h2>

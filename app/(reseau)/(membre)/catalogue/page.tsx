@@ -55,7 +55,7 @@ export default async function Catalogue({
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Catalogue')}</h1>
         <p className="sous-titre">
-          {p('Des avantages pour équiper, entretenir et profiter pleinement de votre vélo.')}
+          {p('Retrouvez ici les avantages proposés par nos partenaires pour équiper et entretenir votre vélo.')}
         </p>
 
         <div className="encart solde-encart">

@@ -38,7 +38,7 @@ export default async function MesFavoris() {
               {p('Touchez le cœur sur la fiche d’un Bike Sitter pour le retrouver ici.')}
             </span>
             <Link href="/recherche" className="bouton plein" style={{ marginTop: 8 }}>
-              {p('Trouver un Bike Sitter')}
+              {p('Rechercher un bike sitter')}
             </Link>
           </div>
         ) : (

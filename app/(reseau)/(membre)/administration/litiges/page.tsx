@@ -30,7 +30,7 @@ export default async function Litiges({
       <EnTete p={p} />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Gestion des litiges')}</h1>
-        <p className="sous-titre">{p('Les gardes signalées, du plus urgent au plus ancien.')}</p>
+        <p className="sous-titre">{p('Les gardes ayant fait l’objet d’un signalement, triées du plus urgent au plus ancien.')}</p>
         <NavigationDAdministration p={p} actif="litiges" />
 
         {tranche ? (

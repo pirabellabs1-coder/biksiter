@@ -61,7 +61,7 @@ export default async function MesVerifications() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Mes vérifications')}</h1>
         <p className="sous-titre">
-          {p('Une identité vérifiée vous permet de publier un emplacement et de demander une garde.')}
+          {p('Une identité vérifiée est nécessaire pour publier un emplacement ou envoyer une demande de garde.')}
         </p>
 
         <ul className="liste" style={{ listStyle: 'none', padding: 0, margin: 0 }}>

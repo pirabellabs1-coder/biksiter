@@ -28,7 +28,7 @@ export default async function CatalogueEnGestion({
       <EnTete p={p} />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Catalogue des avantages')}</h1>
-        <p className="sous-titre">{p('Créez et ajustez les avantages proposés par les partenaires.')}</p>
+        <p className="sous-titre">{p('Consultez et modifiez les avantages proposés par les partenaires du réseau.')}</p>
         <NavigationDAdministration p={p} actif="catalogue" />
 
         {enregistre ? (

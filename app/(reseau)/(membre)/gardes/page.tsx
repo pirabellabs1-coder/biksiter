@@ -81,7 +81,7 @@ export default async function MesGardes({
               {p('Trouvez un Bike Sitter pour vos prochaines sorties.')}
             </span>
             <Link href="/recherche" className="bouton contour petit">
-              {p('Trouver un Bike Sitter')}
+              {p('Rechercher un bike sitter')}
             </Link>
           </div>
         ) : (

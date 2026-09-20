@@ -26,7 +26,7 @@ import { creerUneAlerte } from './actions';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Trouver un Bike Sitter') };
+  return { title: p('Rechercher un bike sitter') };
 }
 
 export default async function Rechercher({
@@ -56,7 +56,7 @@ export default async function Rechercher({
           </Link>
         </EnTete>
         <div className="ecran-app ecran-large">
-          <h1 className="titre-ecran">{p('Trouver un Bike Sitter')}</h1>
+          <h1 className="titre-ecran">{p('Rechercher un bike sitter')}</h1>
           <p className="sous-titre">
             {p(
               'Trouvez un lieu sûr proche de chez vous pour confier votre vélo.',

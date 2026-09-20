@@ -38,7 +38,7 @@ export default async function Verifications({
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Vérifications d’identité')}</h1>
         <p className="sous-titre">
-          {p('Chaque pièce est examinée par une personne, puis supprimée dès la décision.')}
+          {p('Chaque pièce d’identité est examinée par un membre de l’équipe puis supprimée dès que la décision est prise.')}
         </p>
         <NavigationDAdministration p={p} actif="verifications" />
 

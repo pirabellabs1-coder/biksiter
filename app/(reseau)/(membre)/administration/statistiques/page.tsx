@@ -50,7 +50,7 @@ export default async function Statistiques({
       <EnTete p={p} />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Statistiques')}</h1>
-        <p className="sous-titre">{p('L’activité du réseau, en chiffres collectifs.')}</p>
+        <p className="sous-titre">{p('Consultez ici les indicateurs collectifs d’activité du réseau.')}</p>
         <NavigationDAdministration p={p} actif="statistiques" />
 
         <nav className="segments" aria-label={p('Période')}>

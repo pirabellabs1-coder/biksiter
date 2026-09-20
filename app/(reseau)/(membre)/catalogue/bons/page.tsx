@@ -23,7 +23,7 @@ export default async function MesBons() {
       <EnTete p={p} retour="/catalogue" />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Mes bons')}</h1>
-        <p className="sous-titre">{p('Les avantages que vous avez échangés, à présenter chez le partenaire.')}</p>
+        <p className="sous-titre">{p('Retrouvez ici les avantages que vous avez échangés, à présenter chez le partenaire concerné.')}</p>
 
         {bons.length === 0 ? (
           <div className="carte vide-liste">

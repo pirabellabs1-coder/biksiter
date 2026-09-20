@@ -28,7 +28,7 @@ export default async function Confidentialite() {
       <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Confidentialité et sécurité')}</h1>
-        <p className="sous-titre">{p('Vous gardez la main sur ce que les autres membres voient de vous.')}</p>
+        <p className="sous-titre">{p('Vous choisissez ici ce que les autres membres peuvent voir de votre profil.')}</p>
 
         <div className="encart">
           <Icone nom="bouclier" taille={34} />

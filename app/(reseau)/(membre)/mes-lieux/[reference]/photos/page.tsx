@@ -47,7 +47,7 @@ export default async function PhotosDuLieu({
         ) : null}
         <h1 className="titre-ecran">{p('Photos du lieu')}</h1>
         <p className="sous-titre">
-          {p('Ajoutez des photos claires pour rassurer les cyclistes. Évitez toute information sensible.')}
+          {p('Les photos de votre emplacement aident les cyclistes à visualiser où leur vélo sera accueilli. Merci d’éviter toute information sensible (documents, plaques, etc.).')}
         </p>
 
         <FormulaireDePhotos

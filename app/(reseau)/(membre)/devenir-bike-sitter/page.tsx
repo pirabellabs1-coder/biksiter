@@ -39,7 +39,7 @@ export default async function DevenirBikeSitter() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Devenir Bike Sitter')}</h1>
         <p className="sous-titre">
-          {p('Mettez votre espace privé et sécurisé au service des cyclistes de votre quartier.')}
+          {p('Vous pouvez proposer votre espace privé aux cyclistes de votre quartier qui cherchent un endroit sûr pour leur vélo.')}
         </p>
 
         <div className="illustration-devenir" aria-hidden="true">
