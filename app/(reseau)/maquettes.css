@@ -5350,3 +5350,213 @@ input.radio-app {
     font-size: 8px;
   }
 }
+
+/* --- Section « Faites accueillir votre vélo » --------------------------- */
+.section-vitrine {
+  padding: 96px 0;
+  background: linear-gradient(180deg, #f7fbf7 0%, #eef7ef 100%);
+}
+@media (min-width: 900px) {
+  .section-vitrine {
+    padding: 128px 0;
+  }
+}
+.section-vitrine-grille {
+  display: grid;
+  gap: 48px;
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .section-vitrine-grille {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 80px;
+  }
+}
+.section-vitrine-texte h2 {
+  margin: 12px 0 32px;
+}
+.vitrine-avantages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 24px;
+}
+.vitrine-avantages > li {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.vitrine-avantages strong {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--texte);
+}
+.vitrine-avantages p {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--texte-doux);
+  max-width: 56ch;
+}
+.vitrine-icone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(1, 118, 40, 0.1);
+  color: var(--trust);
+  flex: none;
+}
+
+.section-vitrine-visuel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+}
+
+/* --- Téléphone qui montre la liste des emplacements -------------------- */
+.telephone-liste {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.telephone-liste-halo {
+  position: absolute;
+  inset: 6%;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 55%,
+    rgba(1, 118, 40, 0.14) 0%,
+    rgba(1, 118, 40, 0.05) 45%,
+    transparent 70%
+  );
+  filter: blur(24px);
+  z-index: -1;
+}
+.telephone-cadre-droit {
+  transform: rotate(6deg);
+}
+@media (min-width: 900px) {
+  .telephone-cadre-droit {
+    transform: rotate(7deg);
+  }
+}
+@media (max-width: 560px) {
+  .telephone-cadre-droit {
+    transform: rotate(4deg);
+    max-width: 240px;
+  }
+}
+
+.telephone-liste-recherche {
+  margin: 12px 12px 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(1, 118, 40, 0.08);
+  color: var(--texte-doux);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.telephone-liste-recherche svg {
+  color: var(--trust);
+}
+.telephone-liste-filtres {
+  display: flex;
+  gap: 6px;
+  padding: 0 10px 8px;
+  overflow: hidden;
+  flex-wrap: nowrap;
+}
+.chip-filtre {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--fond);
+  border: 1px solid rgba(11, 25, 15, 0.08);
+  font-size: 10px;
+  color: var(--texte-doux);
+  white-space: nowrap;
+}
+.chip-filtre.actif {
+  background: var(--trust);
+  border-color: var(--trust);
+  color: #fff;
+  font-weight: 600;
+}
+.telephone-liste-section {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 12px 0;
+  overflow: hidden;
+}
+.telephone-liste-titre {
+  margin: 6px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texte);
+}
+.telephone-liste-grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.carte-emplacement {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(11, 25, 15, 0.08);
+  display: grid;
+  grid-template-rows: 64px auto;
+}
+.carte-emplacement-photo {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #e0eee1, #d3e7d6);
+  color: var(--trust);
+}
+.carte-emplacement.teinte-b .carte-emplacement-photo {
+  background: linear-gradient(135deg, #e6efdd, #d6e4c6);
+}
+.carte-emplacement.teinte-c .carte-emplacement-photo {
+  background: linear-gradient(135deg, #dde8e0, #c8dbcd);
+}
+.carte-emplacement.teinte-d .carte-emplacement-photo {
+  background: linear-gradient(135deg, #e4ecdd, #d0dfc4);
+}
+.carte-emplacement-corps {
+  padding: 6px 8px 8px;
+  display: grid;
+  gap: 1px;
+}
+.carte-emplacement-corps strong {
+  font-size: 10.5px;
+  color: var(--texte);
+  line-height: 1.15;
+}
+.carte-emplacement-quartier {
+  font-size: 9.5px;
+  color: var(--texte-doux);
+}
+.carte-emplacement-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9.5px;
+  color: var(--texte);
+  margin-top: 2px;
+}
+.carte-emplacement-note svg {
+  color: #f0b400;
+}

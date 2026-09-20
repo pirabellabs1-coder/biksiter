@@ -5,6 +5,7 @@ import { EnTeteDuSite } from '@/components/site/en-tete-du-site';
 import { ParcoursIllustre } from '@/components/site/parcours-illustre';
 import { PiedPublic } from '@/components/site/pied-public';
 import { TelephoneAccueil } from '@/components/site/telephone-accueil';
+import { TelephoneResultats } from '@/components/site/telephone-resultats';
 import {
   chiffresDeLaCommunaute,
   zonesOuvertes,
@@ -174,6 +175,67 @@ export default async function Accueil() {
                 },
               ]}
             />
+          </div>
+        </section>
+
+        {/* Section « Faites garder votre vélo » : trois arguments à gauche,
+            téléphone qui montre la vue liste à droite. */}
+        <section
+          className="section-vitrine"
+          aria-labelledby="titre-vitrine"
+        >
+          <div className="contenu-public section-vitrine-grille">
+            <div className="section-vitrine-texte">
+              <p className="surtitre-editorial">{p('L’application')}</p>
+              <h2 id="titre-vitrine" className="titre-editorial">
+                {p('Faites accueillir votre vélo par un particulier de confiance.')}
+              </h2>
+              <ul className="vitrine-avantages">
+                <li>
+                  <span className="vitrine-icone">
+                    <Icone nom="cle" taille={22} />
+                  </span>
+                  <div>
+                    <strong>{p('Un accès simple')}</strong>
+                    <p>
+                      {p(
+                        'Vous parcourez les emplacements proposés à proximité de votre destination directement depuis l’application, et envoyez votre demande en quelques minutes.',
+                      )}
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span className="vitrine-icone">
+                    <Icone nom="cadenas" taille={22} />
+                  </span>
+                  <div>
+                    <strong>{p('Un espace privé')}</strong>
+                    <p>
+                      {p(
+                        'Chaque emplacement est un espace fermé et à l’abri, proposé par un membre dont l’identité a été vérifiée par l’association.',
+                      )}
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span className="vitrine-icone">
+                    <Icone nom="horloge" taille={22} />
+                  </span>
+                  <div>
+                    <strong>{p('Une durée à votre rythme')}</strong>
+                    <p>
+                      {p(
+                        'La garde peut aller de quelques heures à plusieurs jours. Vous choisissez librement la durée qui vous convient.',
+                      )}
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div className="section-vitrine-visuel">
+              <TelephoneResultats p={p} />
+            </div>
           </div>
         </section>
 
