@@ -561,6 +561,10 @@ export const PHRASES_DU_SITE: Record<'nl' | 'en', Record<string, string>> = {
     'La photo est lisible et le document n’est ni coupé, ni flou.': 'De foto is leesbaar en het document is niet afgesneden, noch onscherp.',
     'Le document paraît authentique et ne présente ni signe de capture d’écran, ni signe de montage.': 'Het document lijkt authentiek en vertoont geen sporen van een schermopname of van montage.',
     'Vos propres points doivent être corrigés par un autre membre de l’équipe.': 'Uw eigen punten moeten door een ander teamlid worden gecorrigeerd.',
+    'Application': 'Toepassing',
+    'Ixelles · à 650 m': 'Elsene · op 650 m',
+    'avis': 'beoordelingen',
+    '{n} emplacements': '{n} plekken',
   },
   en: {
     'Confirmer mon adresse': 'Confirm my address',
@@ -1117,5 +1121,9 @@ export const PHRASES_DU_SITE: Record<'nl' | 'en', Record<string, string>> = {
     'La photo est lisible et le document n’est ni coupé, ni flou.': 'The photo is legible and the document is neither cropped nor blurred.',
     'Le document paraît authentique et ne présente ni signe de capture d’écran, ni signe de montage.': 'The document appears authentic and shows no sign of a screenshot or of tampering.',
     'Vos propres points doivent être corrigés par un autre membre de l’équipe.': 'Your own points must be corrected by another team member.',
+    'Application': 'Application',
+    'Ixelles · à 650 m': 'Ixelles · 650 m away',
+    'avis': 'reviews',
+    '{n} emplacements': '{n} places',
   },
 };

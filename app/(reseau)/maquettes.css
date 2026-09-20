@@ -5002,6 +5002,9 @@ input.radio-app {
   object-fit: cover;
   display: block;
 }
+.heros-duo-visuel {
+  min-height: 460px;
+}
 .heros-duo-pastille {
   position: absolute;
   display: flex;
@@ -5077,5 +5080,273 @@ input.radio-app {
   }
   .point-vivant::after {
     animation: none;
+  }
+}
+
+/* --- Téléphone en biais dans le hero ------------------------------------ */
+.telephone-accueil {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  /* halo derriere. */
+  isolation: isolate;
+}
+.telephone-halo {
+  position: absolute;
+  inset: 6%;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 55%,
+    rgba(1, 118, 40, 0.16) 0%,
+    rgba(1, 118, 40, 0.05) 45%,
+    transparent 70%
+  );
+  filter: blur(24px);
+  z-index: -1;
+}
+.telephone-cadre {
+  position: relative;
+  width: 78%;
+  max-width: 320px;
+  aspect-ratio: 320 / 660;
+  background: #0b190f;
+  border-radius: 46px;
+  padding: 10px;
+  transform: rotate(-9deg) translate3d(0, 0, 0);
+  box-shadow:
+    0 2px 4px rgba(11, 25, 15, 0.1),
+    0 24px 60px rgba(11, 25, 15, 0.28),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.08);
+}
+@media (min-width: 900px) {
+  .telephone-cadre {
+    transform: rotate(-8deg);
+  }
+}
+.telephone-encoche {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 22px;
+  border-radius: 999px;
+  background: #0b190f;
+  z-index: 2;
+}
+.telephone-ecran {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 38px;
+  overflow: hidden;
+  background: #f6f8f5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Carte. */
+.telephone-carte {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.telephone-carte-fond {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.telephone-carte-degrade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(246, 248, 245, 0.6) 0%,
+    transparent 22%,
+    transparent 68%,
+    rgba(246, 248, 245, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+/* Épingles. */
+.telephone-epingle {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  filter: drop-shadow(0 4px 8px rgba(11, 25, 15, 0.28));
+}
+.telephone-epingle-rond {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px 999px 999px 3px;
+  background: var(--trust);
+  color: #fff;
+  transform: rotate(-45deg);
+}
+.telephone-epingle-rond svg {
+  transform: rotate(45deg);
+}
+.telephone-epingle-rond.bleu {
+  background: var(--verified);
+}
+.telephone-epingle-1 {
+  top: 22%;
+  left: 30%;
+}
+.telephone-epingle-2 {
+  top: 30%;
+  left: 55%;
+}
+.telephone-epingle-3 {
+  top: 46%;
+  left: 40%;
+}
+.telephone-epingle-4 {
+  top: 40%;
+  left: 74%;
+}
+
+/* Barre « N résultats ». */
+.telephone-barre-resultats {
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  right: 8%;
+  padding: 8px 10px 12px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(160%) blur(6px);
+  border-radius: 20px 20px 0 0;
+  text-align: center;
+  transform: translateY(1px);
+}
+.telephone-barre-poignee {
+  display: block;
+  width: 40px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(11, 25, 15, 0.18);
+  margin: 0 auto 8px;
+}
+.telephone-barre-titre {
+  margin: 0;
+  font-size: 12px;
+  color: var(--texte);
+  font-weight: 600;
+}
+
+/* Fiche au premier plan. */
+.telephone-fiche {
+  position: relative;
+  margin: 8px 12px 12px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(11, 25, 15, 0.14);
+  overflow: hidden;
+}
+.telephone-fiche-photo {
+  position: relative;
+  height: 90px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #e0eee1, #d3e7d6);
+  color: var(--trust);
+}
+.telephone-fiche-pastille {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  padding: 3px 9px;
+  background: rgba(1, 118, 40, 0.12);
+  color: var(--trust);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.telephone-fiche-coeur {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  color: var(--texte-doux);
+}
+.telephone-fiche-corps {
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 3px;
+}
+.telephone-fiche-corps strong {
+  font-size: 12.5px;
+  color: var(--texte);
+}
+.telephone-fiche-adresse {
+  font-size: 11px;
+  color: var(--texte-doux);
+}
+.telephone-fiche-bas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+.telephone-fiche-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--texte);
+}
+.telephone-fiche-note svg {
+  color: #f0b400;
+}
+.telephone-fiche-prix {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--trust);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(1, 118, 40, 0.1);
+}
+
+/* Onglets. */
+.telephone-onglets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 6px 6px 10px;
+  background: #fff;
+  border-top: 1px solid rgba(11, 25, 15, 0.06);
+}
+.telephone-onglet {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 4px 0;
+  color: var(--texte-doux);
+}
+.telephone-onglet small {
+  font-size: 9px;
+}
+.telephone-onglet.actif {
+  color: var(--trust);
+}
+
+/* Sur mobile, pas d'inclinaison marquée : la maquette reste centrée. */
+@media (max-width: 560px) {
+  .telephone-cadre {
+    transform: rotate(-5deg);
+    max-width: 240px;
+  }
+  .telephone-onglet small {
+    font-size: 8px;
   }
 }

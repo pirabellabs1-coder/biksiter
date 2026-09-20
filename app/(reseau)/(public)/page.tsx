@@ -4,6 +4,7 @@ import { Icone } from '@/components/app/icone';
 import { EnTeteDuSite } from '@/components/site/en-tete-du-site';
 import { ParcoursIllustre } from '@/components/site/parcours-illustre';
 import { PiedPublic } from '@/components/site/pied-public';
+import { TelephoneAccueil } from '@/components/site/telephone-accueil';
 import {
   chiffresDeLaCommunaute,
   zonesOuvertes,
@@ -92,15 +93,8 @@ export default async function Accueil() {
             </div>
 
             <div className="heros-duo-visuel">
-              <div className="heros-duo-cadre">
-                {/* Une cycliste du quotidien en ville : ni course, ni sport. */}
-                <img
-                  src="/images/accueil-hero.jpg"
-                  alt=""
-                  fetchPriority="high"
-                />
-              </div>
-              {/* Deux pastilles posées sur la photo : ce qui rassure. */}
+              <TelephoneAccueil p={p} />
+              {/* Deux pastilles posées à côté du téléphone : ce qui rassure. */}
               <div className="heros-duo-pastille heros-duo-pastille-haut">
                 <span className="heros-duo-pastille-icone bleu">
                   <Icone nom="verifie" taille={20} />
