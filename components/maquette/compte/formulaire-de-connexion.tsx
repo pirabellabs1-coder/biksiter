@@ -16,12 +16,18 @@ const VIERGE: EtatDeLaConnexion = { statut: 'vierge' };
  * L'adresse revient de la réponse du serveur ; le mot de passe, jamais
  * renvoyé, s'efface — c'est ce qu'on attend d'un champ de mot de passe.
  */
-export function FormulaireDeConnexion() {
+export function FormulaireDeConnexion({
+  suite = null,
+}: {
+  /** La page où revenir après la connexion, déjà vérifiée par la page. */
+  suite?: string | null;
+}) {
   const [etat, envoyer, enCours] = useActionState(seConnecter, VIERGE);
   const erreur = etat.statut === 'erreur';
 
   return (
     <form className="bloc" action={envoyer} noValidate>
+      {suite ? <input type="hidden" name="suite" value={suite} /> : null}
       <h2>Se connecter</h2>
       <label className="champ">
         <span>Adresse e-mail</span>

@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { baseConfiguree } from '@/lib/bd/client';
 import { etatDuCompte } from '@/lib/depot/comptes';
 import { deposerLaPiece } from '@/lib/depot/pieces';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { langueCourante } from '@/lib/i18n/langue';
 import { phraseur } from '@/lib/i18n/traduction';
 import {
@@ -12,6 +13,7 @@ import {
   TAILLE_MAXIMALE_OCTETS,
   typeReelDuFichier,
 } from '@/lib/regles/pieces';
+import { coordonneesSuffisantes } from '@/lib/regles/comptes';
 import { chiffrementDisponible } from '@/lib/securite/chiffrement';
 import { exigerUnMembre } from '@/lib/session';
 
@@ -47,9 +49,19 @@ export async function envoyerLaPiece(
   }
 
   // Les étapes précédentes ne sont pas décoratives : une pièce n'est examinée
-  // que pour quelqu'un dont on sait déjà joindre l'adresse et le téléphone.
+  // que pour quelqu'un dont on sait déjà joindre l'adresse et le téléphone —
+  // dans la mesure de ce que les envois branchés permettent de confirmer.
   const compte = await etatDuCompte(membre.id);
-  if (!compte?.emailVerifieLe || !compte.telephoneVerifieLe) {
+  const canaux = canauxConfigures();
+  if (
+    !coordonneesSuffisantes({
+      emailVerifie: Boolean(compte?.emailVerifieLe),
+      telephoneVerifie: Boolean(compte?.telephoneVerifieLe),
+      telephoneConnu: Boolean(compte?.telephone),
+      courrielPossible: canaux.courriel,
+      smsPossible: canaux.sms,
+    })
+  ) {
     return {
       statut: 'erreur',
       erreur: p(

@@ -7,6 +7,7 @@ import { disponibiliteDe } from '@/lib/depot/reseau';
 import { textes } from '@/lib/i18n/langue';
 import { AVIS_POUR_AFFICHER_UNE_NOTE } from '@/lib/regles/avis-de-garde';
 import {
+  A_CONVENIR,
   ajouterJours,
   DUREES_MAX_JOURS,
   JOURS_ABREGES,
@@ -103,6 +104,9 @@ export async function NouvelleDemande({
             recherche.creneau.heureDepot,
             recherche.creneau.heureReprise,
           )}
+          joursMaximum={
+            emplacement.dureeMaxJours === A_CONVENIR ? null : emplacement.dureeMaxJours
+          }
           velos={velos}
           initial={{ ...recherche.creneau, veloId }}
           verificationInitiale={{

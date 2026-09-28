@@ -55,7 +55,7 @@ export default async function Invitation({
   const avancement = avancementDeLOuverture(bikeSitters);
 
   return (
-    <div className="page page-etroite" id="contenu">
+    <main className="page page-etroite" id="contenu">
       <header className="page-tete">
         <span className="kicker">ACCÈS FERMÉ</span>
         <h1>On n’entre que sur invitation.</h1>
@@ -190,6 +190,6 @@ export default async function Invitation({
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

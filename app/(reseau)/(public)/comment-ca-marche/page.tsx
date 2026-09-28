@@ -23,12 +23,15 @@ export default async function CommentCaMarche() {
   const { p } = lesTextes;
 
   const parcours: {
+    /** L'ancre du parcours, pour y mener depuis l'accueil et le pied de page. */
+    ancre: string;
     icone: NomDIcone;
     titre: string;
     resume: string;
     etapes: [string, string][];
   }[] = [
     {
+      ancre: 'cycliste',
       icone: 'velo',
       titre: p('Vous confiez votre vélo à un bike sitter'),
       resume: p(
@@ -63,6 +66,7 @@ export default async function CommentCaMarche() {
       ],
     },
     {
+      ancre: 'bike-sitter',
       icone: 'maison',
       titre: p('Vous accueillez un vélo chez vous'),
       resume: p('Vous proposez un espace privé, définissez vos disponibilités et acceptez les demandes qui vous conviennent.'),
@@ -121,6 +125,7 @@ export default async function CommentCaMarche() {
         {parcours.map((chemin) => (
           <section
             key={chemin.titre}
+            id={chemin.ancre}
             className="carte-de-parcours"
             aria-label={chemin.titre}
           >

@@ -22,6 +22,11 @@ export type DossierAVerifier = {
   prenom: string;
   nom: string;
   email: string;
+  /** Confirmée par le lien envoyé, ou non (tant qu'aucun envoi n'est branché). */
+  emailVerifie?: boolean;
+  /** Le numéro, pour le recouper avec la personne : non confirmé sans SMS. */
+  telephone?: string | null;
+  telephoneVerifie?: boolean;
   deposeeLe: Date;
   typeMime: TypeDePiece;
   tailleEnOctets: number;
@@ -52,6 +57,9 @@ export async function dossier(
             m.prenom,
             m.nom,
             m.email,
+            m.email_verifie_le is not null as "emailVerifie",
+            m.telephone,
+            m.telephone_verifie_le is not null as "telephoneVerifie",
             p.deposee_le    as "deposeeLe",
             p.type_mime     as "typeMime",
             p.taille_en_octets as "tailleEnOctets"

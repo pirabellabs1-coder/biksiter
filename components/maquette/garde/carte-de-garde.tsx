@@ -61,9 +61,9 @@ function notice(garde: GardeDeLaListe, prenom: string): string {
         ? 'La garde est terminée. Merci pour votre avis.'
         : 'La garde est terminée. Vous pouvez laisser un avis pendant quatorze jours.';
     case 'refuse':
-      return `${prenom} n’était pas disponible ce jour-là. Aucun engagement n’a été pris de part et d’autre.`;
+      return 'La demande n’a pas pu être acceptée. Vous pouvez chercher un autre bike sitter sur ce créneau.';
     case 'annule':
-      return 'La garde a été annulée. La place est de nouveau libre pour quelqu’un d’autre.';
+      return 'La garde a été annulée. Vous pouvez envoyer une nouvelle demande quand vous voulez.';
     case 'expire':
       return 'La demande a expiré sans réponse. Vous pouvez en envoyer une autre quand vous voulez.';
   }

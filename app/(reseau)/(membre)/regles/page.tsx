@@ -22,7 +22,7 @@ export default async function NosRegles() {
   ]);
   return (
     <>
-      <div className="page" id="contenu">
+      <main className="page" id="contenu">
         <header className="page-tete">
           <span className="kicker">NOS RÈGLES</span>
           <h1>Six règles, et elles ne se négocient pas.</h1>
@@ -97,7 +97,7 @@ export default async function NosRegles() {
             </p>
           </section>
         </div>
-      </div>
+      </main>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { dansUneTransaction, uneLigne } from '@/lib/bd/client';
+import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
 import { mettreUnSmsEnFile } from '@/lib/envois/file';
 import {
   CHIFFRES_DU_CODE,
@@ -142,4 +142,22 @@ export async function confirmerLeNumero(
 
     return { confirme: false, resultat };
   });
+}
+
+/**
+ * Enregistre le numéro sans code, quand aucune passerelle SMS n'est branchée.
+ * Il reste « non vérifié » : la date de vérification n'est posée que par un
+ * code reçu. La personne qui examine la pièce d'identité le voit.
+ */
+export async function enregistrerLeNumero(
+  membreId: string,
+  numero: string,
+): Promise<void> {
+  await interroger(
+    `update membre
+        set telephone = $2,
+            telephone_verifie_le = case when telephone = $2 then telephone_verifie_le end
+      where id = $1`,
+    [membreId, numero],
+  );
 }

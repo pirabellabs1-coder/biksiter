@@ -71,7 +71,7 @@ const DETAIL_DU_MOTIF: Readonly<Record<string, string>> = {
 /** Ce qui se passe ensuite, dit à la personne qui fait le geste. */
 const INTRODUCTIONS: Partial<Record<Geste, (prenom: string) => string>> = {
   refuser: (prenom) =>
-    `Un message part tout de suite à ${prenom}, qui peut s’adresser à un autre bike sitter. Refuser une demande n’a aucune conséquence pour vous.`,
+    `Un message part tout de suite à ${prenom}, qui peut s’adresser à un autre bike sitter. Vous pouvez refuser librement ; votre profil reste inchangé.`,
   annuler: (prenom) =>
     `Un message part tout de suite à ${prenom}, et la place se libère.`,
   absence: (prenom) =>
@@ -182,7 +182,7 @@ export default async function Motif({
         <ChoixDuMotif
           action={gesteAvecMotif.bind(null, id, geste)}
           motifs={motifs}
-          question="Pourquoi ?"
+          question={geste === 'refuser' ? 'Motif (facultatif)' : 'Pourquoi ?'}
           libellePrecision={`Un mot pour ${prenom} ?`}
           exemple="Facultatif, mais toujours apprécié."
           confirmer={confirmer}
@@ -208,16 +208,15 @@ export default async function Motif({
                     Plus de {SEUIL_DESISTEMENT_TARDIF_HEURES} heures avant le
                     dépôt
                   </b>
-                  , une annulation n’a aucune conséquence sur votre compte.
+                  , vous pouvez annuler librement.
                 </li>
                 <li>
                   <b>Moins de {SEUIL_DESISTEMENT_TARDIF_HEURES} heures avant</b>
-                  , elle est enregistrée sur la garde comme un désistement
+                  , l’annulation est notée sur la garde comme un désistement
                   tardif.
                 </li>
                 <li>
-                  <b>Rien n’apparaît sur votre profil</b> : un désistement
-                  répété se règle avec un modérateur, pas avec un compteur.
+                  <b>Votre profil reste inchangé</b> dans les deux cas.
                 </li>
               </ul>
             </section>

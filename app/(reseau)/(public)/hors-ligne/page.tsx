@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Hors connexion' };
 
 export default function HorsLigne() {
   return (
-    <div className="page page-etroite" id="contenu">
+    <main className="page page-etroite" id="contenu">
       <div className="bandeau-horsligne" role="status">
         <span className="bh-pastille" aria-hidden="true" />
         Vous êtes hors connexion
@@ -121,6 +121,6 @@ export default function HorsLigne() {
           <ReessayerLaConnexion />
         </div>
       </section>
-    </div>
+    </main>
   );
 }

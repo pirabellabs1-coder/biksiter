@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function APropos() {
   return (
     <>
-      <div className="page" id="contenu">
+      <main className="page" id="contenu">
         <header className="page-tete">
           <span className="kicker">L&apos;ASSOCIATION</span>
           <h1>Un réseau de voisins, pas une entreprise de consigne.</h1>
@@ -160,7 +160,7 @@ export default async function APropos() {
             </div>
           </section>
         </div>
-      </div>
+      </main>
     </>
   );
 }

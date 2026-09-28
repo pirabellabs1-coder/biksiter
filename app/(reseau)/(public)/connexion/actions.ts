@@ -12,6 +12,7 @@ import { phraseur } from '@/lib/i18n/traduction';
 import { membreAUnEmplacement } from '@/lib/depot/lieux';
 import { modeCourant } from '@/lib/mode';
 import { ACCUEIL_DES_MEMBRES, ACCUEIL_DU_BIKE_SITTER } from '@/lib/navigation';
+import { cheminDeRetour } from '@/lib/securite/retour';
 import {
   LONGUEUR_MAXIMALE_DU_MOT_DE_PASSE,
   ressembleAUnEmail,
@@ -123,8 +124,16 @@ export async function seConnecter(
     (await modeCourant()) === 'bike_sitter' &&
     (await membreAUnEmplacement(compte.id));
 
+  // La page demandée avant la connexion passe en premier : la personne
+  // retrouve sa recherche. Le chemin est revérifié ici, l'adresse de la page
+  // pouvant être fabriquée par n'importe qui.
+  const suite = cheminDeRetour(donnees.get('suite'));
+
   // `redirect` lève une exception de contrôle : rien ne l'entoure d'un try.
-  redirect(versLEspaceDuBikeSitter ? ACCUEIL_DU_BIKE_SITTER : ACCUEIL_DES_MEMBRES);
+  redirect(
+    suite ??
+      (versLEspaceDuBikeSitter ? ACCUEIL_DU_BIKE_SITTER : ACCUEIL_DES_MEMBRES),
+  );
 }
 
 export async function seDeconnecterEtRentrer(): Promise<void> {

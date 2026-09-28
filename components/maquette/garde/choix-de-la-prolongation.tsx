@@ -49,7 +49,7 @@ export function ChoixDeLaProlongation({
     <form action={envoyer}>
       <div className="champs">
         <label>
-          <span>Nouvelle heure de retrait</span>
+          <span>Nouvelle heure de reprise</span>
           <select
             value={choisi}
             onChange={(e) => setChoisi(e.currentTarget.value)}

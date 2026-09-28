@@ -238,6 +238,23 @@ export function telephoneVisible(etat: EtatDeGarde): boolean {
   return [...ETATS_ENGAGES, 'litige'].includes(etat);
 }
 
+/**
+ * Le numéro qui se partage pendant une garde : confirmé par SMS ; tant
+ * qu'aucune passerelle SMS n'est branchée, le numéro simplement enregistré,
+ * pour pouvoir se joindre le jour du dépôt. Le jour où une passerelle arrive,
+ * les numéros non confirmés doivent l'être avant d'être à nouveau partagés.
+ */
+export function telephonePartage(
+  etat: EtatDeGarde,
+  numero: { connu: boolean; verifie: boolean; smsPossible: boolean },
+): boolean {
+  return (
+    telephoneVisible(etat) &&
+    numero.connu &&
+    (numero.verifie || !numero.smsPossible)
+  );
+}
+
 /** On s'écrit dès la demande, et jusqu'à la fin du délai pour laisser un avis. */
 export function conversationOuverte(etat: EtatDeGarde, moment: Moment): boolean {
   if (['demande', ...ETATS_ENGAGES, 'litige'].includes(etat)) return true;

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { Avatar } from '@/components/app/avatar';
+import { BoutonDEnvoi } from '@/components/app/bouton-d-envoi';
 import { detailDeLaGarde, type DetailDeGarde } from '@/lib/depot/gardes';
 import { heureFrancaise } from '@/lib/regles/creneau';
 import {
@@ -27,7 +28,8 @@ function heure(instant: Date): string {
 
 function dureeEnHeures(garde: DetailDeGarde): number {
   return Math.round(
-    (new Date(garde.fin).getTime() - new Date(garde.debut).getTime()) / 3_600_000,
+    (new Date(garde.fin).getTime() - new Date(garde.debut).getTime()) /
+      3_600_000,
   );
 }
 
@@ -57,7 +59,10 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
   const close =
     ['refuse', 'annule', 'expire'].includes(garde.etat) &&
     !annuleeApresAcceptation;
-  if ((!encoreOuverte && !close) || (encoreOuverte && garde.role !== 'bike_sitter')) {
+  if (
+    (!encoreOuverte && !close) ||
+    (encoreOuverte && garde.role !== 'bike_sitter')
+  ) {
     redirect(`/gardes/${garde.id}`);
   }
   const prenom = garde.autre.prenom;
@@ -132,8 +137,8 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
             <section className="bloc">
               <h2>Trouver un autre Bike Sitter</h2>
               <p className="gris">
-                D’autres membres accueillent peut-être aux mêmes heures, près
-                de votre destination.
+                D’autres membres accueillent peut-être aux mêmes heures, près de
+                votre destination.
               </p>
               <div className="actions-fin">
                 <Link className="primary" href="/recherche">
@@ -150,7 +155,6 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
     );
   }
 
-
   if (garde.etat !== 'demande') {
     return (
       <main id="contenu" data-cote="sitter">
@@ -160,8 +164,8 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
           </div>
           <h1>Demande acceptée</h1>
           <p className="bs-intro">
-            {prenom} vient de recevoir votre réponse, avec votre adresse
-            exacte, jusqu’à la fin de la garde.
+            {prenom} vient de recevoir votre réponse, avec votre adresse exacte,
+            jusqu’à la fin de la garde.
           </p>
 
           <div className="dem-qui">
@@ -223,8 +227,8 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
     <main id="contenu" data-cote="sitter">
       <div className="dashboard-wrap" id="bsdemande">
         <div className="delai-bandeau" role="status">
-          Vous avez {restant} pour répondre. Sans réponse, la demande expire
-          et {prenom} en est informé.
+          Vous avez {restant} pour répondre. Sans réponse, la demande expire et{' '}
+          {prenom} reçoit une notification.
         </div>
 
         <h1>Nouvelle demande</h1>
@@ -296,9 +300,9 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
         </div>
 
         <p className="prog-note">
-          Votre adresse n’est communiquée à {prenom} qu’après votre
-          acceptation. Elle cesse de s’afficher {ADRESSE_APRES_REPRISE_HEURES}{' '}
-          heures après la reprise du vélo.
+          Votre adresse n’est communiquée à {prenom} qu’après votre acceptation.
+          Elle cesse de s’afficher {ADRESSE_APRES_REPRISE_HEURES} heures après
+          la reprise du vélo.
         </p>
 
         {/* La décision tient en deux boutons côte à côte, toujours à portée
@@ -311,14 +315,12 @@ export async function VueDeLaDemande({ reference }: { reference: string }) {
           <form action={gesteDirect}>
             <input type="hidden" name="id" value={garde.id} />
             <input type="hidden" name="geste" value="accepter" />
-            <button type="submit" className="primary">
-              Accepter la garde
-            </button>
+            <BoutonDEnvoi className="primary">Accepter la garde</BoutonDEnvoi>
           </form>
         </div>
         <p className="prog-note">
-          Refuser ne demande aucune justification et n’a aucune conséquence sur
-          votre profil.
+          Vous pouvez refuser sans donner de raison ; votre profil reste
+          inchangé.
         </p>
       </div>
     </main>

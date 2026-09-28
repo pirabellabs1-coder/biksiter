@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { baseConfiguree } from '@/lib/bd/client';
@@ -13,6 +13,7 @@ import {
 import { nombreDEmplacements } from '@/lib/depot/emplacements';
 import { ACCUEIL_DES_MEMBRES } from '@/lib/navigation';
 import type { Membre as MembreDesRegles } from '@/lib/regles/publication';
+import { cheminDeRetour } from '@/lib/securite/retour';
 
 export const NOM_DU_COOKIE = 'bike_sitters_session';
 
@@ -47,7 +48,14 @@ export async function membreConnecte(): Promise<MembreConnecte | null> {
 export async function exigerUnMembre(): Promise<MembreConnecte> {
   const membre = await membreConnecte();
   if (!membre) {
-    redirect('/bienvenue');
+    // La page demandée voyage jusqu'à la connexion : une recherche lancée
+    // avant de se connecter n'est pas perdue.
+    const suite = cheminDeRetour((await headers()).get('x-adresse'));
+    redirect(
+      suite && suite !== '/'
+        ? `/bienvenue?suite=${encodeURIComponent(suite)}`
+        : '/bienvenue',
+    );
   }
   return membre;
 }

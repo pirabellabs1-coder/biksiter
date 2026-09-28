@@ -160,8 +160,8 @@ export const PHRASES_DU_SITE: Record<'nl' | 'en', Record<string, string>> = {
       'Uw uitnodiging is het meest waard als u in dezelfde wijk woont als {prenom}: het is de dichtheid die de dienst bruikbaar maakt.',
     'Votre mot de passe est changé. Connectez-vous avec le nouveau : vos autres appareils ont été déconnectés.':
       'Uw wachtwoord is gewijzigd. Meld u aan met het nieuwe: uw andere toestellen zijn afgemeld.',
-    'Votre pièce a bien été reçue. Un administrateur la vérifie sous 24 heures, et vous serez prévenu du résultat.':
-      'Uw document is goed ontvangen. Een beheerder controleert het binnen 24 uur, en u krijgt bericht van het resultaat.',
+    'Votre pièce a bien été reçue. Une personne de l’association la vérifie sous 24 heures ; vous recevez une notification avec le résultat.':
+      'Uw document is goed ontvangen. Iemand van de vereniging controleert het binnen 24 uur; u krijgt een melding met het resultaat.',
     'Votre quartier': 'Uw wijk',
     'Vous seriez plutôt': 'U zou eerder zijn',
     'Vérification…': 'Bezig met controleren…',
@@ -742,8 +742,8 @@ export const PHRASES_DU_SITE: Record<'nl' | 'en', Record<string, string>> = {
       'Your invitation is most valuable if you live in the same neighbourhood as {prenom}: density is what makes the service usable.',
     'Votre mot de passe est changé. Connectez-vous avec le nouveau : vos autres appareils ont été déconnectés.':
       'Your password has been changed. Sign in with the new one: your other devices have been signed out.',
-    'Votre pièce a bien été reçue. Un administrateur la vérifie sous 24 heures, et vous serez prévenu du résultat.':
-      'Your document has been received. An administrator checks it within 24 hours, and you will be told the result.',
+    'Votre pièce a bien été reçue. Une personne de l’association la vérifie sous 24 heures ; vous recevez une notification avec le résultat.':
+      'Your document has been received. Someone from the association checks it within 24 hours; you will receive a notification with the result.',
     'Votre quartier': 'Your neighbourhood',
     'Vous seriez plutôt': 'You would rather be',
     'Vérification…': 'Checking…',

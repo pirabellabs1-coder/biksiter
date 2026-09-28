@@ -98,19 +98,21 @@ personne ; seule l’adresse est transmise, jamais le nom ni l’e-mail.
 
 ## Les courriels
 
-Rien n’est envoyé depuis une requête web. Un message est écrit dans la table
-`courriel` **dans la même transaction** que le changement qu’il annonce : il ne
-peut donc ni parler d’un stationnement qui n’a pas été enregistré, ni se perdre
-parce que le serveur de messagerie redémarrait. Un script draine la file :
+Un message est écrit dans la table `message_sortant` **dans la même
+transaction** que le changement qu’il annonce : il ne peut donc ni parler d’un
+stationnement qui n’a pas été enregistré, ni se perdre parce que le serveur de
+messagerie redémarrait. Il part juste après la réponse faite au membre
+(`lib/envois/expedition.ts`, via `after()`), et une tâche Vercel quotidienne
+(`/api/envois`, protégée par `CRON_SECRET`) reprend ceux qui ont échoué. Chaque
+message est réservé avant l’envoi : deux passages simultanés n’envoient jamais
+le même. Les adresses de démonstration et d’essai ne reçoivent jamais rien.
+
+La même file porte les SMS. Sans `SMTP_URL` (ou sans `SMS_URL`), rien ne part
+sur ce canal. Pour relire les messages en attente, sans rien envoyer :
 
 ```bash
 npm run bd:messages
 ```
-
-La même file porte les SMS. Sans `SMTP_URL` (ou sans `SMS_URL`), le script
-affiche les messages en attente sur ce canal au lieu de les
-expédier, et ne les marque pas comme envoyés — on relit ce qu’on écrit sans
-déranger personne.
 
 Les messages sont en texte brut : pas de HTML, donc pas de pixel de suivi et
 rien qui casse chez un destinataire sur trois. Une association qui demande à
@@ -363,7 +365,8 @@ derniers avis réellement écrits, les plus récents et non les meilleurs (règl
 
 - **L’envoi réel des SMS.** La file existe et le code y est déposé ; il manque
   un contrat chez un opérateur et l’adresse de sa passerelle (`SMS_URL`). Sans
-  elle, `npm run bd:messages` affiche le SMS au lieu de l’expédier.
+  elle, l’inscription enregistre le numéro sans code, et
+  `npm run bd:messages` montre les SMS en attente.
 
 ## Ce qui a été vérifié, et comment
 

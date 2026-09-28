@@ -4,6 +4,7 @@ import {
   DERNIERE_REPRISE_MINUTES,
   DERNIER_DEPOT_MINUTES,
   PREMIER_DEPOT_MINUTES,
+  creneauDansLesBornes,
   depotsPossibles,
   heureDuLendemain,
   heureFrancaise,
@@ -72,5 +73,58 @@ describe('l’écriture des heures', () => {
 
   test('les minutes au-delà de la journée retombent sur l’heure du lendemain', () => {
     expect(heureDuLendemain(25 * 60 + 30)).toBe('01:30');
+  });
+});
+
+describe('le créneau choisi dans le formulaire de demande', () => {
+  const jours = ['2026-10-02', '2026-10-03', '2026-10-04'];
+  const heures = ['09:00', '12:00', '16:00', '20:00'];
+  const creneau = {
+    jourDepot: '2026-10-02',
+    heureDepot: '09:00',
+    jourReprise: '2026-10-02',
+    heureReprise: '12:00',
+  };
+
+  test('une garde d’une journée au plus ramène la reprise au jour du dépôt', () => {
+    const choix = { ...creneau, jourReprise: '2026-10-03' };
+    expect(
+      creneauDansLesBornes(choix, { jours, heures, joursMaximum: 1 }).jourReprise,
+    ).toBe('2026-10-02');
+  });
+
+  test('avancer le dépôt au lendemain de la reprise ramène la reprise à ce jour, après le dépôt', () => {
+    const choix = {
+      jourDepot: '2026-10-03',
+      heureDepot: '16:00',
+      jourReprise: '2026-10-02',
+      heureReprise: '09:00',
+    };
+    expect(creneauDansLesBornes(choix, { jours, heures, joursMaximum: null })).toEqual({
+      jourDepot: '2026-10-03',
+      heureDepot: '16:00',
+      jourReprise: '2026-10-03',
+      heureReprise: '20:00',
+    });
+  });
+
+  test('un dépôt à la dernière heure d’une garde d’une journée recule d’un cran', () => {
+    const choix = { ...creneau, heureDepot: '20:00', heureReprise: '20:00' };
+    expect(creneauDansLesBornes(choix, { jours, heures, joursMaximum: 1 })).toMatchObject({
+      heureDepot: '16:00',
+      heureReprise: '20:00',
+    });
+  });
+
+  test('un dépôt à la dernière heure se reprend le lendemain quand plusieurs jours sont acceptés', () => {
+    const choix = { ...creneau, heureDepot: '20:00', heureReprise: '20:00' };
+    expect(creneauDansLesBornes(choix, { jours, heures, joursMaximum: 3 })).toMatchObject({
+      heureDepot: '20:00',
+      jourReprise: '2026-10-03',
+    });
+  });
+
+  test('un créneau déjà valable reste tel quel', () => {
+    expect(creneauDansLesBornes(creneau, { jours, heures, joursMaximum: 1 })).toEqual(creneau);
   });
 });

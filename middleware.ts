@@ -51,6 +51,9 @@ export function middleware(requete: NextRequest): NextResponse {
   // L'adresse de la page, pour savoir si la langue choisie s'y applique
   // (lib/i18n/espaces.ts).
   entetes.set('x-chemin', requete.nextUrl.pathname);
+  // L'adresse complète, requête comprise : c'est là qu'on ramène un visiteur
+  // après sa connexion (lib/session.ts).
+  entetes.set('x-adresse', requete.nextUrl.pathname + requete.nextUrl.search);
   entetes.set('Content-Security-Policy', csp);
 
   const reponse = NextResponse.next({ request: { headers: entetes } });

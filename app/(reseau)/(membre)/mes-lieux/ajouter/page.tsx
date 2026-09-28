@@ -23,8 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Les choix faits à l'étape précédente (« Votre espace ») arrivent dans
- * l'adresse. On ne garde que ceux qui figurent dans les listes fermées : une
- * valeur inconnue retombe sur le choix par défaut.
+ * l'adresse. On ne garde que ceux qui figurent dans les listes fermées. Rien
+ * n'est coché d'avance : le bike sitter décrit son lieu tel qu'il est, et une
+ * case oubliée se signale à l'envoi plutôt que de publier une réponse qu'il
+ * n'a pas donnée.
  */
 function choixDeLEtapePrecedente(parametres: Record<string, string | string[] | undefined>) {
   const un = (cle: string) => {
@@ -47,12 +49,12 @@ function choixDeLEtapePrecedente(parametres: Record<string, string | string[] | 
         ? type
         : '',
     acces:
-      acces && (ACCES as readonly string[]).includes(acces) ? acces : 'Plain-pied',
+      acces && (ACCES as readonly string[]).includes(acces) ? acces : '',
     capacite:
       Number.isInteger(capacite) && capacite >= 1 && capacite <= CAPACITE_MAXIMALE
         ? capacite
         : 2,
-    velos: velos.length > 0 ? velos : ['Ville', 'VTC', 'Électrique'],
+    velos,
   };
 }
 
@@ -90,9 +92,9 @@ export default async function AjouterUnLieu({
             adresse: '',
             quartier: '',
             acces: choix.acces,
-            verrouillage: 'cle',
-            intemperie: 'interieur',
-            ancrage: 'Ancrage mural',
+            verrouillage: '',
+            intemperie: '',
+            ancrage: '',
             capacite: choix.capacite,
             velos: choix.velos,
             services: [],

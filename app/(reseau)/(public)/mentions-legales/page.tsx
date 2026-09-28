@@ -8,7 +8,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MentionsLegales() {
   return (
-    <>      <div className="page page-etroite" id="contenu">
+    <>
+      <main className="page page-etroite" id="contenu">
         <header className="page-tete">
           <span className="kicker">MENTIONS LÉGALES</span>
           <h1>Conditions, données et cookies.</h1>
@@ -129,6 +130,7 @@ export default async function MentionsLegales() {
             d’accepter quoi que ce soit : il n’y a rien à accepter.
           </p>
         </section>
-      </div>    </>
+      </main>
+    </>
   );
 }

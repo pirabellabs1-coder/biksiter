@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  coordonneesSuffisantes,
   compteSupprimable,
   dureeDeValidite,
   erreurDeMotDePasse,
@@ -93,5 +94,47 @@ describe('le compte du membre', () => {
     ]) {
       expect(compteSupprimable(['termine', etat])).toBe(false);
     }
+  });
+});
+
+describe('les coordonnées avant la pièce d’identité', () => {
+  const base = {
+    emailVerifie: false,
+    telephoneVerifie: false,
+    telephoneConnu: false,
+    courrielPossible: true,
+    smsPossible: true,
+  };
+
+  test('avec les envois branchés, l’e-mail et le téléphone doivent être confirmés', () => {
+    expect(coordonneesSuffisantes(base)).toBe(false);
+    expect(
+      coordonneesSuffisantes({ ...base, emailVerifie: true, telephoneConnu: true }),
+    ).toBe(false);
+    expect(
+      coordonneesSuffisantes({
+        ...base,
+        emailVerifie: true,
+        telephoneVerifie: true,
+        telephoneConnu: true,
+      }),
+    ).toBe(true);
+  });
+
+  test('sans passerelle SMS, un numéro connu suffit : personne n’attend un code qui ne partira pas', () => {
+    const sansSms = { ...base, smsPossible: false, emailVerifie: true };
+    expect(coordonneesSuffisantes(sansSms)).toBe(false);
+    expect(coordonneesSuffisantes({ ...sansSms, telephoneConnu: true })).toBe(true);
+  });
+
+  test('sans service d’e-mail, l’adresse n’a pas à être confirmée pour avancer', () => {
+    expect(
+      coordonneesSuffisantes({
+        ...base,
+        courrielPossible: false,
+        telephoneVerifie: true,
+        telephoneConnu: true,
+      }),
+    ).toBe(true);
   });
 });

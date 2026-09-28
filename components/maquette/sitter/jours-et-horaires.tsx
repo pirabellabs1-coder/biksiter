@@ -135,9 +135,9 @@ export function JoursEtHoraires({
       <input type="hidden" name="fermetures" value={valeurs.fermetures} />
 
       <p className="prog-note">
-        Une garde qui dépasse ces horaires ne vous sera jamais proposée. Le
-        réseau plafonne à cinq heures ; trois est la valeur proposée par
-        défaut, à vous de l’ajuster.
+        Vous recevez seulement des demandes comprises dans ces horaires. Une
+        garde dure cinq heures au plus ; trois heures sont proposées par défaut,
+        et vous pouvez les ajuster.
       </p>
 
       {Object.values(etat.erreurs).map((erreur) => (

@@ -3,6 +3,8 @@ import Link from 'next/link';
 
 import { Icone } from '@/components/app/icone';
 import { textes } from '@/lib/i18n/langue';
+import { INSCRIPTION_SUR_INVITATION } from '@/lib/regles/modules';
+import { cheminDeRetour } from '@/lib/securite/retour';
 
 import { EcranDeCompte } from '../ecran-de-compte';
 
@@ -18,8 +20,16 @@ export async function generateMetadata(): Promise<Metadata> {
  * bike sitters ne sont visibles qu'une fois connecté, et la page explique
  * pourquoi avant de proposer de s'inscrire ou de se connecter.
  */
-export default async function Bienvenue() {
+export default async function Bienvenue({
+  searchParams,
+}: {
+  searchParams: Promise<{ suite?: string }>;
+}) {
   const { t, p } = await textes();
+  const suite = cheminDeRetour((await searchParams).suite);
+  const connexion = suite
+    ? `/connexion?suite=${encodeURIComponent(suite)}`
+    : '/connexion';
 
   return (
     <EcranDeCompte p={p}>
@@ -50,17 +60,19 @@ export default async function Bienvenue() {
           {p('Créer un compte')}
           <Icone nom="chevron" taille={20} />
         </Link>
-        <Link href="/connexion" className="bouton contour">
+        <Link href={connexion} className="bouton contour">
           {p('Se connecter')}
         </Link>
       </div>
 
-      <p className="petit texte-doux centre" style={{ margin: '14px 0 0' }}>
-        {t('g.needinvite')}{' '}
-        <Link href="/liste-attente" className="lien-souligne texte-vert">
-          {t('g.noinvite')}
-        </Link>
-      </p>
+      {INSCRIPTION_SUR_INVITATION ? (
+        <p className="petit texte-doux centre" style={{ margin: '14px 0 0' }}>
+          {t('g.needinvite')}{' '}
+          <Link href="/liste-attente" className="lien-souligne texte-vert">
+            {t('g.noinvite')}
+          </Link>
+        </p>
+      ) : null}
 
       <div className="carte" style={{ marginTop: 22 }}>
         <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>

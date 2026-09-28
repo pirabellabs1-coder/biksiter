@@ -13,6 +13,7 @@ import { crediterLaGarde } from '@/lib/depot/maillons';
 import { VERSION_DE_LA_PHOTO } from '@/lib/depot/photo-de-profil';
 import { notifier } from '@/lib/depot/notifications';
 import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { mettreEnFile } from '@/lib/envois/file';
 import { ETATS_QUI_OCCUPENT_UNE_PLACE, seChevauchent } from '@/lib/regles/capacite';
 import {
@@ -48,7 +49,7 @@ import {
   peutRepartirSansDeposer,
   peutSignalerSonArrivee,
   REFUS_D_UN_GESTE,
-  telephoneVisible,
+  telephonePartage,
   transitionPermise,
   type Acteur,
   type EtatDeGarde,
@@ -616,6 +617,7 @@ export async function detailDeLaGarde(
       autrePrenom: string;
       autreInitiale: string;
       autreTelephone: string | null;
+      autreTelephoneVerifie: boolean;
       autreGardes: number;
       autreVerifie: boolean;
       autreDepuis: Date;
@@ -633,7 +635,8 @@ export async function detailDeLaGarde(
             e.precisions, e.adresse_exacte as "adresseDuBikeSitter",
             v.nom as "veloNom", v.type as "veloType", v.couleur as "veloCouleur",
             autre.prenom as "autrePrenom", upper(left(autre.nom, 1)) as "autreInitiale",
-            case when autre.telephone_verifie_le is not null then autre.telephone end as "autreTelephone",
+            autre.telephone as "autreTelephone",
+            autre.telephone_verifie_le is not null as "autreTelephoneVerifie",
             (select count(*)::int from stationnement s2 join emplacement e2 on e2.id = s2.emplacement_id
               where s2.etat = 'termine' and (s2.cycliste_id = autre.id or e2.membre_id = autre.id)) as "autreGardes",
             (autre.verification = 'verifiee') as "autreVerifie",
@@ -714,7 +717,13 @@ export async function detailDeLaGarde(
       prenom: ligne.autrePrenom,
       initiale: ligne.autreInitiale,
       gardes: ligne.autreGardes,
-      telephone: telephoneVisible(ligne.etat) ? ligne.autreTelephone : null,
+      telephone: telephonePartage(ligne.etat, {
+        connu: Boolean(ligne.autreTelephone),
+        verifie: ligne.autreTelephoneVerifie,
+        smsPossible: canauxConfigures().sms,
+      })
+        ? ligne.autreTelephone
+        : null,
       verifie: ligne.autreVerifie,
       depuis: ligne.autreDepuis,
       photo: ligne.autrePhoto,

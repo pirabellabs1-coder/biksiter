@@ -53,7 +53,7 @@ export default async function Inscription({
 
   return (
     <>
-      <div className="page page-etroite" id="contenu">
+      <main className="page page-etroite" id="contenu">
         <header className="page-tete">
           <span className="kicker">INSCRIPTION</span>
           <h1>Créer votre compte</h1>
@@ -127,7 +127,7 @@ export default async function Inscription({
             </li>
           </ul>
         </section>
-      </div>
+      </main>
     </>
   );
 }

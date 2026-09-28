@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Avatar } from '@/components/app/avatar';
+import { BoutonDEnvoi } from '@/components/app/bouton-d-envoi';
 import { dateDeGarde, PastilleDEtat } from '@/components/app/garde';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { nomPublic } from '@/components/membre/elements';
@@ -16,6 +17,8 @@ import { enPoints } from '@/components/app/progression';
 import { demandeSuivante } from '@/lib/depot/accueil';
 import { amenagementsDeLaGarde } from '@/lib/depot/amenagements';
 import { detailDeLaGarde } from '@/lib/depot/gardes';
+import { etatDuTelephone } from '@/lib/depot/telephone';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { pointsDeLaGarde } from '@/lib/depot/progression';
 import { textes } from '@/lib/i18n/langue';
 import {
@@ -45,6 +48,7 @@ import {
   peutDeclarerLAbsence,
   phaseDuGeste,
   REFUS_D_UN_GESTE,
+  telephonePartage,
   type Phase,
   type RefusDUnGeste,
 } from '@/lib/regles/garde';
@@ -99,14 +103,23 @@ export default async function DetailDUneGarde({
     (indications.decision === 'acceptee' || indications.decision === 'refusee')
       ? indications.decision
       : null;
-  const [points, { retards, prolongation }, suivante] = await Promise.all([
+  const [points, { retards, prolongation }, suivante, monTelephone] = await Promise.all([
     garde.role === 'bike_sitter' && (garde.etat === 'termine' || garde.etat === 'litige')
       ? pointsDeLaGarde(garde.id, membre.id)
       : null,
     amenagementsDeLaGarde(garde.id),
     // Une demande traitée en appelle souvent une autre : on propose d'enchaîner.
     decision ? demandeSuivante(membre.id) : null,
+    decision === 'acceptee' ? etatDuTelephone(membre.id) : null,
   ]);
+  // L'encart d'acceptation dit exactement ce que l'autre reçoit.
+  const numeroPartage =
+    monTelephone !== null &&
+    telephonePartage(garde.etat, {
+      connu: monTelephone.telephone !== null,
+      verifie: monTelephone.verifieLe !== null,
+      smsPossible: canauxConfigures().sms,
+    });
 
   const maintenant = new Date();
   // Une garde close (refusée, annulée, expirée) ne montre que ce qui a eu
@@ -255,7 +268,7 @@ export default async function DetailDUneGarde({
             titre: p('Demande envoyée'),
             // Le vrai délai : vingt-quatre heures au plus, et jamais au-delà
             // de l'heure du dépôt — c'est ce délai-là que voit le bike sitter.
-            texte: p('{prenom} peut répondre pendant encore {delai}. Sans réponse, la demande expire et vous en êtes prévenu.', {
+            texte: p('{prenom} peut répondre pendant encore {delai}. Sans réponse, la demande expire et vous recevez une notification.', {
               prenom: autre.prenom,
               delai: delaiEnFrancais(minutesRestantes),
             }),
@@ -282,7 +295,7 @@ export default async function DetailDUneGarde({
             }
           : garde.etat === 'en_cours' || garde.etat === 'reprise_demandee'
             ? {
-                icone: 'verifie',
+                icone: 'velo',
                 titre: p('Garde en cours'),
                 texte:
                   moi === 'cycliste'
@@ -513,7 +526,9 @@ export default async function DetailDUneGarde({
               <Icone nom="coche" taille={22} />
               <span>
                 {decision === 'acceptee'
-                  ? p('Demande acceptée : {prenom} reçoit votre adresse et votre téléphone.', { prenom: autre.prenom })
+                  ? numeroPartage
+                    ? p('Demande acceptée : {prenom} reçoit votre adresse et votre numéro pour le dépôt.', { prenom: autre.prenom })
+                    : p('Demande acceptée : {prenom} reçoit votre adresse pour le dépôt.', { prenom: autre.prenom })
                   : p('Demande déclinée : {prenom} reçoit une notification.', { prenom: autre.prenom })}
                 {suivante ? (
                   <>
@@ -576,7 +591,7 @@ export default async function DetailDUneGarde({
               <span>
                 {garde.avis.deposeParLAutre
                   ? p('Les deux avis sont déposés : ils sont publiés.')
-                  : p("Avis enregistré. Invisible tant que {prenom} n'a pas déposé le sien.", {
+                  : p('Avis enregistré. Il sera publié dès que {prenom} aura laissé le sien.', {
                       prenom: autre.prenom,
                     })}
               </span>
@@ -718,7 +733,9 @@ export default async function DetailDUneGarde({
                       ? p('Adresse exacte communiquée après acceptation.')
                       : garde.etat === 'termine' || garde.etat === 'litige'
                         ? p('L’adresse n’est plus affichée une fois la garde terminée.')
-                        : p('L’adresse n’a pas été communiquée.')}
+                        : garde.evenements.some((e) => e.etape === 'accepte')
+                          ? p('L’adresse n’est plus affichée depuis l’annulation.')
+                          : p('L’adresse n’a pas été communiquée.')}
                   </span>
                 </>
               )}
@@ -919,7 +936,14 @@ export default async function DetailDUneGarde({
                   <span>
                     {evenement
                       ? `${horodatage(new Date(evenement.faitLe))}${
-                          evenement.acteur === 'systeme' ? ` · ${p('automatique')}` : ''
+                          // Le passage « en cours » ou « terminé » suit un code
+                          // saisi : seul ce que le réseau décide seul (une
+                          // expiration, une annulation) est dit automatique.
+                          evenement.acteur === 'systeme' &&
+                          etape !== 'en_cours' &&
+                          etape !== 'termine'
+                            ? ` · ${p('automatique')}`
+                            : ''
                         }`
                       : etape === 'reprise_demandee' && !fait
                         ? p('Prévue à {heure}', { heure: heureABruxelles(garde.fin) })
@@ -1016,9 +1040,7 @@ export default async function DetailDUneGarde({
               <form key={transition.geste} action={gesteDirect}>
                 <input type="hidden" name="id" value={garde.id} />
                 <input type="hidden" name="geste" value={transition.geste} />
-                <button type="submit" className={classe}>
-                  {libelle}
-                </button>
+                <BoutonDEnvoi className={classe}>{libelle}</BoutonDEnvoi>
               </form>
             );
           })}

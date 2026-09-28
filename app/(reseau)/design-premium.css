@@ -1637,10 +1637,15 @@ body:has(.en-tete-moderation) {
   letter-spacing: 0;
 }
 .app-membre .champs.lecture b {
+  /* Une valeur longue (la remarque d'un constat, une adresse web) passe à
+     la ligne dans sa colonne : sans cela, elle élargissait la ligne et
+     débordait de l'écran pendant la récupération du vélo. */
+  min-width: 0;
   margin: 0;
   font-size: 15px;
   font-weight: 600;
   text-align: right;
+  overflow-wrap: anywhere;
 }
 .lien-profil {
   display: inline-block;
@@ -3255,10 +3260,23 @@ button.bulle-photo {
   border-color: var(--alert, #c0432c);
   box-shadow: 0 0 0 3px rgba(192, 67, 44, 0.18);
 }
+/* Un champ garde sinon la largeur de ses vingt caractères par défaut (plus
+   de 320 px à cette taille de police) : sur un petit téléphone, il poussait
+   toute la page de récupération hors de l'écran. */
+.code-box2 #code-de-remise {
+  box-sizing: border-box;
+  max-width: 100%;
+}
 @media (max-width: 560px) {
   .code-box2 #code-de-remise {
-    flex: 1;
+    /* Assez large pour lire les six chiffres ; sinon le bouton passe
+       dessous (la rangée va à la ligne). */
+    flex: 1 1 150px;
+    min-width: 0;
     width: auto;
+  }
+  .code-box2 .code-row .primary {
+    flex: 1 1 100%;
   }
 }
 
@@ -3538,4 +3556,256 @@ button.photo-dossier.photo-piece {
   .fiche-detail > .actions-de-garde {
     grid-row: span 5;
   }
+}
+
+/* -----------------------------------------------------------------------------
+   41. L'accueil du site : une seule grille, de l'en-tête au pied
+   Chaque section avait sa marge (en-tête à 72 px, étapes à 160, points à 210,
+   questions à 307, pied à 130 sur un écran de 1 440 px) : l'œil lisait des
+   blocs posés les uns sous les autres. Tout s'aligne désormais sur la grille
+   du pied de page — 1 180 px de contenu au plus, une marge de 20 à 40 px.
+   -------------------------------------------------------------------------- */
+:root {
+  --site-largeur: 1180px;
+  --site-marge: clamp(20px, 4vw, 40px);
+  --site-bord: max(var(--site-marge), calc((100% - var(--site-largeur)) / 2));
+}
+.cadre-public .topbar {
+  padding-inline: var(--site-bord);
+}
+.pied .pied-bas {
+  box-sizing: border-box;
+  max-width: 1260px;
+  margin-inline: auto;
+  padding-inline: var(--site-marge);
+}
+#accueil > .section,
+#accueil > .hero {
+  padding-inline: var(--site-bord);
+}
+#accueil .hero-grid,
+#accueil .search-card,
+#accueil .trust-strip,
+#accueil .parcours {
+  max-width: none;
+}
+#accueil > .become {
+  margin-inline: var(--site-bord);
+}
+
+/* Le plan du hero : « Votre destination » en toutes lettres sur une pastille
+   sombre — deux règles de la maquette se contredisaient et l'écrivaient en
+   blanc sur blanc. La carte « Identité vérifiée » reste dans le cadre. */
+#accueil .plan .ici {
+  flex-direction: row;
+  padding: 9px 14px 9px 12px;
+}
+#accueil .plan .ici b {
+  padding: 0;
+  background: none;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+#accueil .floating-card.card-two {
+  right: 18px;
+  bottom: 18px;
+  max-width: calc(100% - 36px);
+}
+#accueil .floating-card.card-two i {
+  display: grid;
+  place-items: center;
+}
+
+/* Les six étapes : le zigzag reste, sans cartes étirées à vide ni titre
+   décalé de son texte. */
+#accueil .parcours-carte {
+  height: auto;
+}
+#accueil .parcours-tete h2,
+#accueil .parcours-tete .parcours-intro {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* Les points : le texte suit la grille, les quatre repères en dessous. */
+#accueil .pts-int {
+  max-width: none;
+  margin: 0;
+  padding-inline: 0;
+}
+#accueil .pts-int > h2,
+#accueil .pts-int > .pts-intro,
+#accueil .pts-int > .pts-note {
+  max-width: 640px;
+}
+
+/* Les questions : le titre à gauche, les réponses à droite, sur ordinateur. */
+#accueil .faq {
+  max-width: none;
+  margin: 0;
+}
+@media (min-width: 900px) {
+  #accueil .faq {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: 48px;
+    align-items: start;
+  }
+  #accueil .faq > h2 {
+    margin: 0;
+    position: sticky;
+    top: 110px;
+  }
+}
+#accueil .accordions summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#accueil .accordions summary::after {
+  float: none;
+  flex: none;
+  line-height: 1;
+}
+
+/* La recherche de l'accueil : le bouton « Autour de moi » se range au bout
+   du champ, et les trois libellés s'alignent sur la même ligne. */
+#accueil .search-card .cell-txt {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+}
+#accueil .search-card .cell-lab {
+  grid-column: 1 / -1;
+}
+#accueil .search-card .autour {
+  margin: 0;
+}
+@media (min-width: 900px) {
+  #accueil .hero-brand-visual {
+    justify-items: end;
+  }
+}
+
+/* Les visuels de l'accueil : l'illustration de la sécurité prend sa place
+   dans son cadre, les étapes montrent le haut de leur image, les coches
+   sont des icônes. */
+#accueil .parcours-carte img {
+  object-position: center top;
+}
+#accueil .security-visual .visuel-securite {
+  width: auto;
+  height: min(420px, 78%);
+  border-radius: 26px;
+}
+#accueil .safe-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#accueil .floating-card.card-two i svg {
+  display: block;
+}
+
+/* Sur téléphone, les quatre garanties et les quatre repères des points se
+   lisent en deux colonnes : empilés, ils faisaient quatre écrans de cartes. */
+@media (max-width: 599px) {
+  #accueil .trust-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  #accueil .trust-strip span {
+    align-items: flex-start;
+    padding: 12px;
+    font-size: 12.5px;
+    line-height: 1.3;
+  }
+  #accueil .pts-grille {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  #accueil .pts-carte {
+    padding: 16px 14px;
+  }
+  #accueil .pts-carte b {
+    font-size: 20px;
+  }
+  #accueil .pts-carte span {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+}
+/* Le dégradé qui fond le bas du hero dans la page passe sous les garanties :
+   il en voilait le second rang. */
+#accueil .trust-strip {
+  position: relative;
+  z-index: 1;
+}
+
+/* Menu du jour et de l'heure ouvert : le formulaire ne doit plus former un
+   plan à part. Son flou d'arrière-plan et son z-index enfermaient le panneau
+   (position fixe) sous le voile de la page — sur téléphone, on ne pouvait
+   plus choisir d'heure, et le panneau s'ouvrait en haut au lieu d'en bas. */
+.search-card:has(.qm-menu:not([hidden])) {
+  z-index: auto;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* Le libellé de date en tête du menu (« 28 sept. ») n'est pas un séparateur
+   vertical : la règle générique `.sep` le réduisait à un pixel de large, sur
+   fond gris. */
+.qm-menu .sep {
+  width: auto;
+  height: auto;
+  margin: 0;
+  background: none;
+}
+
+/* La coche de la carte « Identité vérifiée » : la règle qui étire le fond de
+   plan (`.plan svg`) la gonflait à toute la carte. */
+#accueil .plan .floating-card svg {
+  position: static;
+  inset: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 0;
+}
+
+/* Entre 901 et 1 200 px, la maquette masquait la navigation de l'en-tête
+   alors que le menu hamburger n'apparaît que sous 900 px : on n'avait plus
+   aucun lien. Les quatre liens tiennent sur la ligne. */
+@media (min-width: 901px) and (max-width: 1200px) {
+  .cadre-public .topbar > nav {
+    display: flex;
+  }
+}
+
+/* Le focus des questions est vert, comme partout : le bleu est réservé à ce
+   qui protège (règle 6). */
+.accordions summary:focus-visible {
+  outline: 3px solid var(--vert, #017628);
+  outline-offset: 2px;
+}
+
+/* Filet de sécurité : dans l'application, un mot plus long que sa ligne
+   (une adresse web collée dans une remarque, un code sans espace) passe à la
+   ligne plutôt que d'élargir l'écran. Sans effet sur un texte ordinaire. */
+.app-membre {
+  overflow-wrap: break-word;
+}
+
+/* Une identité vérifiée protège : sa coche est bleue, jamais verte (règle 6). */
+.suivi li.fait.protege:not(:has(.suivi-point))::before {
+  background-color: var(--verified);
+  border-color: var(--verified);
+}
+
+/* Deux chiffres seulement (le profil d'un autre membre) : deux colonnes
+   pleines plutôt qu'une troisième vide. */
+.prog-stats:has(> :nth-child(2):last-child) {
+  grid-template-columns: repeat(2, 1fr);
 }

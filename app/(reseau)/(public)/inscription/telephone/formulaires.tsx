@@ -8,6 +8,7 @@ import { BORD_EN_ERREUR, EncartDErreurs } from '../../ecran-de-compte';
 import {
   confirmerLeCode,
   demanderUnCode,
+  enregistrerMonNumero,
   type EtatDuCode,
   type EtatDuNumero,
 } from './actions';
@@ -212,5 +213,60 @@ function CasesDuCode({
         />
       ))}
     </div>
+  );
+}
+
+/**
+ * Le numéro sans code, quand aucune passerelle SMS n'est branchée : on
+ * l'enregistre et on passe à la pièce d'identité.
+ */
+export function FormulaireDuNumeroSansCode({
+  numeroConnu,
+  libelles,
+}: {
+  numeroConnu: string | null;
+  libelles: { numero: string; enregistrer: string; envoi: string };
+}) {
+  const [etat, envoyer, enCours] = useActionState(
+    enregistrerMonNumero,
+    NUMERO_VIERGE,
+  );
+  const numero = etat.statut === 'vierge' ? (numeroConnu ?? '') : etat.numero;
+
+  return (
+    <form action={envoyer} noValidate className="pile">
+      <label
+        className="champ-app"
+        style={etat.statut === 'erreur' ? BORD_EN_ERREUR : undefined}
+      >
+        <Icone nom="telephone" taille={22} />
+        <span className="lecteur">{libelles.numero}</span>
+        <input
+          key={numero}
+          name="telephone"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          placeholder="+32 470 12 34 56"
+          required
+          defaultValue={numero}
+          aria-invalid={etat.statut === 'erreur' ? true : undefined}
+          aria-describedby={
+            etat.statut === 'erreur' ? 'erreur-numero' : undefined
+          }
+        />
+      </label>
+      {etat.statut === 'erreur' ? (
+        <EncartDErreurs id="erreur-numero" erreurs={[etat.erreur]} />
+      ) : null}
+      <button
+        type="submit"
+        className="bouton plein"
+        disabled={enCours}
+        aria-busy={enCours || undefined}
+      >
+        {enCours ? libelles.envoi : libelles.enregistrer}
+      </button>
+    </form>
   );
 }

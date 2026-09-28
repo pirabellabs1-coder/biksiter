@@ -40,7 +40,7 @@ export function textesDuFormulaireDeDemande(
     dureeAcceptee: p('Durée acceptée'),
     disponibilites: p('Disponibilités'),
     placesRestantes: p('Places restantes'),
-    gratuit: p('La garde est entièrement gratuite : aucun paiement entre les membres.'),
+    gratuit: p('La garde est entièrement gratuite, du dépôt à la reprise.'),
     envoyer: p('Envoyer la demande'),
     envoi: p('Envoi…'),
     sur: p('sur'),

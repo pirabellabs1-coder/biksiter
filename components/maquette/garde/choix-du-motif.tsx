@@ -94,6 +94,13 @@ export function ChoixDuMotif({
         </p>
       ) : null}
 
+      {choisi === '' ? (
+        <p className="prog-note">
+          {motifFacultatif
+            ? 'Le motif est facultatif : vous pouvez décliner sans rien préciser.'
+            : 'Choisissez un motif pour continuer.'}
+        </p>
+      ) : null}
       <div className="actions-fin">
         <button
           type="submit"
@@ -106,13 +113,6 @@ export function ChoixDuMotif({
           {libelleRetour}
         </Link>
       </div>
-      {choisi === '' ? (
-        <p className="prog-note">
-          {motifFacultatif
-            ? 'Le motif est facultatif : vous pouvez décliner sans rien préciser.'
-            : 'Choisissez un motif pour continuer.'}
-        </p>
-      ) : null}
     </form>
   );
 }

@@ -349,3 +349,63 @@
     font-size: 24px;
   }
 }
+
+/* Les rubriques, en cartes sobres ; les premiers sujets en liste. */
+.blog-rubrique-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: rgba(1, 118, 40, 0.1);
+  color: var(--green, #017628);
+}
+.blog-sujets {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 8px var(--site-marge, 24px) 48px;
+}
+.blog-sujets h2 {
+  margin: 0 0 16px;
+  font-size: clamp(22px, 2.4vw, 28px);
+}
+.blog-sujets ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.blog-sujets li {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line, #dbe2dc);
+  border-radius: 16px;
+  background: #fff;
+}
+.blog-sujets li > span:last-child {
+  color: var(--muted, #627168);
+  font-size: 14.5px;
+}
+
+/* Les quatre rubriques tiennent sur une rangée sur ordinateur ; l'étiquette
+   d'un sujet garde la largeur de son texte. */
+@media (min-width: 1000px) {
+  .blog-grille {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.blog-sujets .blog-etiquette {
+  justify-self: start;
+}
+.blog-sujets {
+  max-width: 1120px;
+  padding-inline: 0;
+}
+@media (max-width: 1160px) {
+  .blog-sujets {
+    padding-inline: var(--site-marge, 20px);
+  }
+}

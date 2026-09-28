@@ -1,26 +1,27 @@
 import type { Metadata } from 'next';
-import { Manrope, Source_Serif_4 } from 'next/font/google';
-import Link from 'next/link';
+import { Source_Serif_4 } from 'next/font/google';
 
-import { textes } from '@/lib/i18n/langue';
+import { EnTete } from '@/components/maquette/en-tete';
+import { PageIntrouvable } from '@/components/maquette/page-introuvable';
+import { Pied } from '@/components/maquette/pied';
+import { langueCourante } from '@/lib/i18n/langue';
+import { membreConnecte } from '@/lib/session';
 
 import './(reseau)/systeme.css';
+import './(reseau)/maquettes.css';
+import './(reseau)/maquette-167.css';
+import './(reseau)/maquette-liens.css';
+import './(reseau)/hero-et-menu.css';
+import './(reseau)/ux-ameliorations.css';
+import './(reseau)/design-premium.css';
 
 /**
  * La réponse aux adresses qui n'existent pas.
  *
- * Tant que deux racines coexistent, une adresse inconnue n'appartient à
- * aucune : cette page porte donc son propre document.
+ * Une adresse inconnue n'appartient à aucune racine : cette page porte donc
+ * son propre document. Elle reprend les feuilles, l'en-tête et le pied du
+ * site, pour qu'on sache toujours où l'on est et comment repartir.
  */
-const manrope = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--police-manrope',
-  display: 'swap',
-});
-
-// Police variable : l'axe de taille optique (opsz) exige de ne pas fixer les
-// graisses, que la police variable couvre toutes.
 const sourceSerif = Source_Serif_4({
   subsets: ['latin'],
   axes: ['opsz'],
@@ -28,45 +29,25 @@ const sourceSerif = Source_Serif_4({
   display: 'swap',
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: `${p('Cette page est introuvable.')} · Bike Sitters` };
-}
+export const metadata: Metadata = {
+  title: 'Page introuvable · Bike Sitters',
+};
 
-export default async function PageIntrouvable() {
-  const { langue, p } = await textes();
+export default async function PageIntrouvableGlobale() {
+  const [langue, membre] = await Promise.all([
+    langueCourante(),
+    membreConnecte(),
+  ]);
 
   return (
-    <html
-      lang={langue}
-      className={`${manrope.variable} ${sourceSerif.variable}`}
-    >
+    <html lang={langue} className={sourceSerif.variable}>
       <body>
-        <div className="site">
-          <main className="screen">
-            <nav className="nav" aria-label={p('Navigation principale')}>
-              <Link href="/" className="brand">
-                Bike Sitters
-              </Link>
-            </nav>
-            <div className="empty">
-              <span className="big" aria-hidden="true">
-                ?
-              </span>
-              <h1
-                className="titre-de-carte"
-                style={{ fontSize: 'inherit', fontWeight: 400 }}
-              >
-                {p('Cette page est introuvable.')}
-              </h1>
-              {p('Le lien est peut-être ancien, ou l’adresse a changé.')}
-            </div>
-            <div className="pad" style={{ maxWidth: 420, margin: '0 auto' }}>
-              <Link href="/" className="btn primary">
-                {p('Revenir à l’accueil')}
-              </Link>
-            </div>
-          </main>
+        <div className="cadre-public">
+          <EnTete membre={membre} />
+          <div className="site">
+            <PageIntrouvable membre={Boolean(membre)} />
+          </div>
+          <Pied membre={membre} />
         </div>
       </body>
     </html>

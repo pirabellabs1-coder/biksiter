@@ -36,14 +36,24 @@ export function Pied({
           <h2>Le service</h2>
           <Link href="/comment-ca-marche">Comment ça marche</Link>
           <Link href="/securite">Sécurité</Link>
-          <Link href="/progression/regles">Système de points</Link>
-          <Link href="/devenir-bike-sitter">Devenir Bike Sitter</Link>
-          <Link href="/aide">Questions fréquentes</Link>
+          {/* Un visiteur va vers les pages publiques qui en parlent : les
+              écrans du compte le renverraient vers l'accueil des membres. */}
+          <Link href={connecte ? '/progression/regles' : '/#points'}>
+            Système de points
+          </Link>
+          <Link
+            href={connecte ? '/devenir-bike-sitter' : '/comment-ca-marche#bike-sitter'}
+          >
+            Devenir Bike Sitter
+          </Link>
+          <Link href="/faq">Questions fréquentes</Link>
         </nav>
         <nav aria-label="L’association">
           <h2>L’association</h2>
           <Link href="/a-propos">Qui nous sommes</Link>
-          <Link href="/regles">Nos règles</Link>
+          <Link href={connecte ? '/regles' : '/conditions-generales'}>
+            Nos règles
+          </Link>
           <Link href="/contact">Nous écrire</Link>
           <Link href="/plan-du-site">Plan du site</Link>
           <Link href="/mentions-legales">Mentions légales</Link>
@@ -70,7 +80,7 @@ export function Pied({
             <h2>Votre espace</h2>
             <Link href="/connexion">Se connecter</Link>
             <Link href="/inscription">S’inscrire</Link>
-            <Link href="/devenir-bike-sitter">Devenir Bike Sitter</Link>
+            <Link href="/comment-ca-marche#bike-sitter">Devenir Bike Sitter</Link>
           </nav>
         )}
         <div className="pied-aide">
@@ -84,9 +94,9 @@ export function Pied({
       <div className="pied-bas">
         <p>Bruxelles · Association sans but lucratif</p>
         <p>
-          <Link href="/mentions-legales">Conditions</Link> ·{' '}
-          <Link href="/mentions-legales">Confidentialité</Link> ·{' '}
-          <Link href="/mentions-legales">Cookies</Link>
+          <Link href="/conditions-generales">Conditions</Link> ·{' '}
+          <Link href="/confidentialite">Confidentialité</Link> ·{' '}
+          <Link href="/mentions-legales">Mentions légales</Link>
         </p>
       </div>
     </footer>

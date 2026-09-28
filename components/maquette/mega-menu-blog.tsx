@@ -3,6 +3,46 @@
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState } from 'react';
 
+import { Icone, type NomDIcone } from '@/components/app/icone';
+
+const RUBRIQUES: readonly {
+  ancre: string;
+  titre: string;
+  texte: string;
+  icone: NomDIcone;
+}[] = [
+  {
+    ancre: 'vie-du-reseau',
+    titre: 'Vie du réseau',
+    texte: 'Quartiers, nouveautés, retours des membres',
+    icone: 'utilisateurs',
+  },
+  {
+    ancre: 'conseils',
+    titre: 'Conseils',
+    texte: 'Préparer une garde, choisir un antivol',
+    icone: 'cadenas',
+  },
+  {
+    ancre: 'portraits',
+    titre: 'Portraits',
+    texte: 'Cyclistes et bike sitters racontent',
+    icone: 'profil',
+  },
+  {
+    ancre: 'bruxelles-a-velo',
+    titre: 'Bruxelles à vélo',
+    texte: 'Itinéraires, saisons, bonnes adresses',
+    icone: 'velo',
+  },
+];
+
+const SUJETS: readonly (readonly [string, string])[] = [
+  ['Vie du réseau', 'Pourquoi un réseau d’entraide pour garder les vélos'],
+  ['Conseils', 'Préparer son vélo avant une garde'],
+  ['Portraits', 'Une première garde, racontée par un bike sitter'],
+];
+
 /**
  * Le méga menu du blog.
  *
@@ -25,7 +65,12 @@ export function MegaMenuBlog() {
     if (!ouvert) return;
 
     function auClavier(evenement: KeyboardEvent) {
-      if (evenement.key === 'Escape') setOuvert(false);
+      if (evenement.key !== 'Escape') return;
+      setOuvert(false);
+      // Le focus revient au bouton « Blog » plutôt que de tomber sur la page.
+      conteneurRef.current
+        ?.querySelector<HTMLButtonElement>('.mega-declencheur')
+        ?.focus();
     }
 
     function auClic(evenement: MouseEvent) {
@@ -81,7 +126,6 @@ export function MegaMenuBlog() {
       <div
         id={idPanneau}
         className="mega-panneau"
-        role="menu"
         aria-label="Sections du blog"
         hidden={!ouvert}
       >
@@ -89,107 +133,58 @@ export function MegaMenuBlog() {
           <div className="mega-col rubriques">
             <h3>Rubriques</h3>
             <ul>
-              <li>
-                <Link href="/blog#vie-du-reseau" role="menuitem">
-                  <span className="pastille" aria-hidden="true">
-                    ✦
-                  </span>
-                  <span>
-                    <b>Vie du réseau</b>
-                    <em>Chroniques, événements, chiffres</em>
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog#conseils" role="menuitem">
-                  <span className="pastille" aria-hidden="true">
-                    ✿
-                  </span>
-                  <span>
-                    <b>Conseils</b>
-                    <em>Préparer une garde, choisir un cadenas</em>
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog#portraits" role="menuitem">
-                  <span className="pastille" aria-hidden="true">
-                    ☺
-                  </span>
-                  <span>
-                    <b>Portraits</b>
-                    <em>Bike sitters et cyclistes du quartier</em>
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog#bruxelles-a-velo" role="menuitem">
-                  <span className="pastille" aria-hidden="true">
-                    ⌂
-                  </span>
-                  <span>
-                    <b>Bruxelles à vélo</b>
-                    <em>Itinéraires, quartiers, saisons</em>
-                  </span>
-                </Link>
-              </li>
+              {RUBRIQUES.map((rubrique) => (
+                <li key={rubrique.ancre}>
+                  <Link href={`/blog#${rubrique.ancre}`}>
+                    <span className="pastille" aria-hidden="true">
+                      <Icone nom={rubrique.icone} taille={16} strokeWidth={2} />
+                    </span>
+                    <span>
+                      <b>{rubrique.titre}</b>
+                      <em>{rubrique.texte}</em>
+                    </span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="mega-col recents">
-            <h3>Derniers articles</h3>
+            <h3>Premiers sujets</h3>
             <ul>
-              <li>
-                <Link href="/blog" role="menuitem">
-                  <em>Portrait</em>
-                  <b>Une première garde place Flagey</b>
-                  <span>3 min de lecture</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" role="menuitem">
-                  <em>Conseils</em>
-                  <b>Préparer son vélo avant une garde</b>
-                  <span>4 min de lecture</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" role="menuitem">
-                  <em>Vie du réseau</em>
-                  <b>Dix quartiers, dix accueils différents</b>
-                  <span>6 min de lecture</span>
-                </Link>
-              </li>
+              {SUJETS.map(([rubrique, titre]) => (
+                <li key={titre}>
+                  <Link href="/blog#titre-sujets">
+                    <em>{rubrique}</em>
+                    <b>{titre}</b>
+                    <span>En préparation</span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <Link
-            href="/blog"
-            className="mega-col alaune"
-            role="menuitem"
-          >
-            <span className="alaune-etiquette">À la une</span>
+          <Link href="/blog" className="mega-col alaune">
+            <span className="alaune-etiquette">Bientôt</span>
             <div className="alaune-visuel" aria-hidden="true">
               <span className="alaune-degrade" />
               <span className="alaune-glyphe">Bs</span>
             </div>
-            <h4>Pourquoi un réseau plutôt qu’une application de plus.</h4>
+            <h4>Le journal du réseau arrive bientôt.</h4>
             <p>
-              Le manifeste du projet, en cinq minutes de lecture — ce qu’on
-              construit et ce qu’on refuse de construire.
+              Une chronique du réseau, des conseils pratiques et des portraits
+              de cyclistes et de bike sitters.
             </p>
-            <span className="alaune-lire">
-              Lire l’article →
-            </span>
+            <span className="alaune-lire">Découvrir les rubriques</span>
           </Link>
         </div>
 
         <div className="mega-pied">
           <Link href="/blog" className="mega-tout">
-            Voir tous les articles →
+            Voir le journal
           </Link>
           <span className="mega-note">
-            Un billet par semaine, rédigé par l’équipe.
+            Les premiers billets paraîtront ici.
           </span>
         </div>
       </div>

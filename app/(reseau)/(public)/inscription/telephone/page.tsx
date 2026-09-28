@@ -4,12 +4,18 @@ import Link from 'next/link';
 import { Icone } from '@/components/app/icone';
 import { etatDuCompte } from '@/lib/depot/comptes';
 import { etatDuTelephone } from '@/lib/depot/telephone';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { textes } from '@/lib/i18n/langue';
+import { coordonneesSuffisantes } from '@/lib/regles/comptes';
 import { exigerUnMembre } from '@/lib/session';
 
 import { EcranDeCompte, EtapesDeLInscription } from '../../ecran-de-compte';
 import { renvoyerLeLien } from './actions';
-import { FormulaireDuCode, FormulaireDuNumero } from './formulaires';
+import {
+  FormulaireDuCode,
+  FormulaireDuNumero,
+  FormulaireDuNumeroSansCode,
+} from './formulaires';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
@@ -20,11 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Telephone({
   searchParams,
 }: {
-  searchParams: Promise<{ lien?: string; email?: string }>;
+  searchParams: Promise<{ lien?: string; email?: string; numero?: string }>;
 }) {
   const membre = await exigerUnMembre();
   const { p } = await textes();
-  const { lien, email } = await searchParams;
+  const { lien, email, numero } = await searchParams;
 
   const [compte, telephone] = await Promise.all([
     etatDuCompte(membre.id),
@@ -32,6 +38,19 @@ export default async function Telephone({
   ]);
   const telephoneVerifie = telephone.verifieLe !== null;
   const emailVerifie = Boolean(compte?.emailVerifieLe);
+  // Une confirmation qui dépend d'un envoi n'est demandée que si l'envoi est
+  // branché : sans passerelle SMS, le numéro s'enregistre sans code.
+  const canaux = canauxConfigures();
+  const numeroEnregistre = !canaux.sms && telephone.telephone !== null;
+  // Sans SMS, rien ne confirme le numéro : il doit rester corrigeable.
+  const corrigerLeNumero = numeroEnregistre && numero === 'modifier';
+  const peutContinuer = coordonneesSuffisantes({
+    emailVerifie,
+    telephoneVerifie,
+    telephoneConnu: telephone.telephone !== null,
+    courrielPossible: canaux.courriel,
+    smsPossible: canaux.sms,
+  });
 
   const verifie = (
     <span className="pastille bleu">
@@ -40,6 +59,8 @@ export default async function Telephone({
     </span>
   );
   const aFaire = <span className="pastille ambre">{p('À faire')}</span>;
+  const enregistre = <span className="pastille gris">{p('Enregistré')}</span>;
+  const plusTard = <span className="pastille gris">{p('Plus tard')}</span>;
 
   return (
     <EcranDeCompte p={p} retour="/">
@@ -66,7 +87,7 @@ export default async function Telephone({
             <strong>{p('E-mail')}</strong>
             <span className="tronque">{compte?.email}</span>
           </span>
-          {emailVerifie ? verifie : aFaire}
+          {emailVerifie ? verifie : canaux.courriel ? aFaire : plusTard}
         </li>
         <li className="ligne ligne-info">
           <span className="ligne-icone" aria-hidden="true">
@@ -74,11 +95,16 @@ export default async function Telephone({
           </span>
           <span className="ligne-texte">
             <strong>{p('Téléphone')}</strong>
-            {telephoneVerifie && telephone.telephone ? (
+            {(telephoneVerifie || numeroEnregistre) && telephone.telephone ? (
               <span className="tronque">{telephone.telephone}</span>
             ) : null}
+            {numeroEnregistre && !corrigerLeNumero ? (
+              <Link href="/inscription/telephone?numero=modifier" className="lien-texte">
+                {p('Modifier mon numéro')}
+              </Link>
+            ) : null}
           </span>
-          {telephoneVerifie ? verifie : aFaire}
+          {telephoneVerifie ? verifie : numeroEnregistre ? enregistre : aFaire}
         </li>
         <li className="ligne ligne-info">
           <span className="ligne-icone" aria-hidden="true">
@@ -92,7 +118,7 @@ export default async function Telephone({
         </li>
       </ul>
 
-      {emailVerifie ? null : (
+      {emailVerifie || !canaux.courriel ? null : (
         <div
           className={email === 'lien-perime' ? 'encart rouge' : 'encart ambre'}
           style={{ marginTop: 12 }}
@@ -130,16 +156,16 @@ export default async function Telephone({
         </div>
       )}
 
-      {telephoneVerifie ? (
-        emailVerifie ? (
-          <div className="boutons" style={{ marginTop: 16 }}>
-            <Link href="/inscription/identite" className="bouton plein">
-              {p('Continuer')}
-              <Icone nom="chevron" taille={20} />
-            </Link>
-          </div>
-        ) : null
-      ) : (
+      {peutContinuer ? (
+        <div className="boutons" style={{ marginTop: 16 }}>
+          <Link href="/inscription/identite" className="bouton plein">
+            {p('Continuer')}
+            <Icone nom="chevron" taille={20} />
+          </Link>
+        </div>
+      ) : null}
+
+      {telephoneVerifie || (numeroEnregistre && !corrigerLeNumero) ? null : (
         <section
           className="carte pile"
           style={{ marginTop: 12 }}
@@ -156,27 +182,40 @@ export default async function Telephone({
               'Il sert à vous joindre le jour de la garde : le bike sitter le voit une fois votre demande acceptée, et à ce moment-là seulement.',
             )}
           </p>
-          <FormulaireDuNumero
-            numeroConnu={telephone.telephone}
-            codeDejaEnvoye={telephone.codeEnvoyeLe !== null}
-            libelles={{
-              numero: p('Numéro de téléphone'),
-              recevoir: p('Recevoir le code par SMS'),
-              renvoyer: p('Renvoyer un code'),
-              envoi: p('Envoi…'),
-            }}
-          />
-          <FormulaireDuCode
-            libelles={{
-              code: p('Code reçu par SMS'),
-              chiffre: p('Chiffre'),
-              aide: p(
-                'Le code arrive en quelques secondes et reste valable dix minutes.',
-              ),
-              continuer: p('Continuer'),
-              verification: p('Vérification…'),
-            }}
-          />
+          {canaux.sms ? (
+            <>
+              <FormulaireDuNumero
+                numeroConnu={telephone.telephone}
+                codeDejaEnvoye={telephone.codeEnvoyeLe !== null}
+                libelles={{
+                  numero: p('Numéro de téléphone'),
+                  recevoir: p('Recevoir le code par SMS'),
+                  renvoyer: p('Renvoyer un code'),
+                  envoi: p('Envoi…'),
+                }}
+              />
+              <FormulaireDuCode
+                libelles={{
+                  code: p('Code reçu par SMS'),
+                  chiffre: p('Chiffre'),
+                  aide: p(
+                    'Le code arrive en quelques secondes et reste valable dix minutes.',
+                  ),
+                  continuer: p('Continuer'),
+                  verification: p('Vérification…'),
+                }}
+              />
+            </>
+          ) : (
+            <FormulaireDuNumeroSansCode
+              numeroConnu={telephone.telephone}
+              libelles={{
+                numero: p('Numéro de téléphone'),
+                enregistrer: p('Enregistrer mon numéro'),
+                envoi: p('Enregistrement…'),
+              }}
+            />
+          )}
         </section>
       )}
     </EcranDeCompte>

@@ -104,6 +104,7 @@ export function SaisieDuCode({
           autoComplete="one-time-code"
           // Le code se dicte en deux groupes de trois : il s'écrit de même.
           maxLength={CHIFFRES_DU_CODE_DE_REMISE + 1}
+          size={CHIFFRES_DU_CODE_DE_REMISE + 1}
           placeholder="000 000"
           aria-invalid={etat.erreur ? true : undefined}
           aria-describedby="code-de-remise-aide"

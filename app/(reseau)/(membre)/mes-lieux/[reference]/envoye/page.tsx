@@ -30,7 +30,9 @@ export default async function EmplacementEnLigne({
     <main id="contenu">
       <div className="dashboard-wrap" id="bsenvoye">
         <h1>
-          {lieu.publie ? 'Votre emplacement est en ligne' : 'Votre emplacement est prêt'}
+          {lieu.publie
+            ? 'Votre emplacement est en ligne'
+            : 'Votre emplacement est prêt'}
         </h1>
         <p className="bs-intro">
           {lieu.publie
@@ -42,7 +44,13 @@ export default async function EmplacementEnLigne({
             (règle 2) est la seule validation humaine ; ensuite, la
             publication est immédiate. */}
         <ol className="suivi">
-          <li className={classeDeLEtape(lieu.identiteVerifiee, true)}>
+          <li
+            className={
+              lieu.identiteVerifiee
+                ? 'fait protege'
+                : classeDeLEtape(false, true)
+            }
+          >
             <b>
               {lieu.identiteVerifiee
                 ? 'Identité vérifiée'
@@ -76,12 +84,15 @@ export default async function EmplacementEnLigne({
 
         {lieu.nombreDePhotos === 0 ? (
           <p className="prog-note">
-            Ajoutez quelques photos de l’emplacement : les cyclistes
-            choisissent plus volontiers un lieu qu’ils peuvent voir.
+            Ajoutez quelques photos de l’emplacement : les cyclistes choisissent
+            plus volontiers un lieu qu’ils peuvent voir.
           </p>
         ) : null}
         {lieu.nombreDePhotos === 0 ? (
-          <Link className="primary bs-cta" href={`/mes-lieux/${reference}/photos`}>
+          <Link
+            className="primary bs-cta"
+            href={`/mes-lieux/${reference}/photos`}
+          >
             Ajouter les photos
           </Link>
         ) : !lieu.identiteVerifiee ? (

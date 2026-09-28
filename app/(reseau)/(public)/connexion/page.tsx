@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { cheminDeRetour } from '@/lib/securite/retour';
 import { FormulaireDeConnexion } from '@/components/maquette/compte/formulaire-de-connexion';
 import { textes } from '@/lib/i18n/langue';
 import { ACCUEIL_DES_MEMBRES } from '@/lib/navigation';
@@ -15,17 +16,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Connexion({
   searchParams,
 }: {
-  searchParams: Promise<{ motDePasse?: string; email?: string }>;
+  searchParams: Promise<{ motDePasse?: string; email?: string; suite?: string }>;
 }) {
+  const { motDePasse, email, suite } = await searchParams;
   if (await membreConnecte()) {
-    redirect(ACCUEIL_DES_MEMBRES);
+    redirect(cheminDeRetour(suite) ?? ACCUEIL_DES_MEMBRES);
   }
-
-  const { motDePasse, email } = await searchParams;
 
   return (
     <>
-      <div className="page page-etroite" id="contenu">
+      <main className="page page-etroite" id="contenu">
         <header className="page-tete">
           <span className="kicker">CONNEXION</span>
           <h1>Content de vous revoir.</h1>
@@ -53,7 +53,7 @@ export default async function Connexion({
           </p>
         ) : null}
 
-        <FormulaireDeConnexion />
+        <FormulaireDeConnexion suite={cheminDeRetour(suite)} />
 
         <section className="bloc">
           <h2>Pas encore membre ?</h2>
@@ -71,7 +71,7 @@ export default async function Connexion({
             </Link>
           </div>
         </section>
-      </div>
+      </main>
     </>
   );
 }

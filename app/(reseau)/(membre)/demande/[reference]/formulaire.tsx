@@ -4,6 +4,11 @@ import Link from 'next/link';
 import { useActionState, useEffect, useState, useTransition } from 'react';
 
 import { Icone } from '@/components/app/icone';
+import {
+  creneauDansLesBornes,
+  heureFrancaise,
+  joursDeReprisePermis,
+} from '@/lib/regles/creneau';
 
 import type { ChampsDeDemande, EtatDeLEnvoi, VerificationDeDemande } from './actions';
 
@@ -59,6 +64,7 @@ export function FormulaireDeDemande({
   joursDeDepot,
   joursDeRetour,
   heures,
+  joursMaximum,
   velos,
   initial,
   verificationInitiale,
@@ -81,6 +87,11 @@ export function FormulaireDeDemande({
   joursDeDepot: readonly { valeur: string; libelle: string }[];
   joursDeRetour: readonly { valeur: string; libelle: string }[];
   heures: readonly string[];
+  /**
+   * Le nombre de journées que le bike sitter accepte (une seule : la
+   * récupération se fait le jour même), ou null s'il est à convenir.
+   */
+  joursMaximum: number | null;
   velos: readonly Velo[];
   initial: {
     jourDepot: string;
@@ -92,7 +103,14 @@ export function FormulaireDeDemande({
   verificationInitiale: VerificationDeDemande;
   textes: TextesDuFormulaire;
 }) {
-  const [champs, setChamps] = useState(initial);
+  const bornes = {
+    jours: joursDeRetour.map((jour) => jour.valeur),
+    heures,
+    joursMaximum,
+  };
+  // Un créneau arrivé par l'adresse (ou une durée acceptée qui a baissé
+  // depuis) est ramené dans ce que les listes proposent.
+  const [champs, setChamps] = useState(() => creneauDansLesBornes(initial, bornes));
   const [message, setMessage] = useState(messageInitial);
   const [champsEnvoyes, setChampsEnvoyes] = useState<typeof champs | null>(null);
   const [verification, setVerification] = useState(verificationInitiale);
@@ -112,7 +130,11 @@ export function FormulaireDeDemande({
     (nom: keyof typeof champs) =>
     (evenement: { currentTarget: { value: string } }) => {
       const valeur = evenement.currentTarget.value;
-      setChamps((precedents) => ({ ...precedents, [nom]: valeur }));
+      // La reprise suit toujours le dépôt, dans la durée acceptée : un
+      // changement qui la placerait avant, ou trop loin, la ramène.
+      setChamps((precedents) =>
+        creneauDansLesBornes({ ...precedents, [nom]: valeur }, bornes),
+      );
     };
 
   const indexDepot = joursDeRetour.findIndex((j) => j.valeur === champs.jourDepot);
@@ -132,6 +154,17 @@ export function FormulaireDeDemande({
     etat.motifs.length > 0 && champsEnvoyes === champs ? etat.motifs : verification.motifs;
   const libelle = (valeur: string) =>
     joursDeRetour.find((j) => j.valeur === valeur)?.libelle ?? valeur;
+  // Les heures de reprise possibles : après le dépôt s'il s'agit du même jour.
+  const heuresDeReprise =
+    champs.jourReprise === champs.jourDepot
+      ? heures.filter((heure) => heure > champs.heureDepot)
+      : heures;
+  // Les jours de reprise possibles : du jour du dépôt jusqu'à la durée que le
+  // bike sitter accepte.
+  const permis = joursDeReprisePermis(bornes.jours, champs.jourDepot, joursMaximum);
+  const retoursPossibles = joursDeRetour.filter((jour) => permis.includes(jour.valeur));
+  // Sans lendemain possible, la dernière heure n'a pas de reprise après elle.
+  const heuresDeDepot = permis.length > 1 ? heures : heures.slice(0, -1);
   const veloChoisi = velos.find((v) => v.id === champs.veloId);
 
   return (
@@ -156,8 +189,10 @@ export function FormulaireDeDemande({
           <span className="champ-empile">
             <small>{textes.debut}</small>
             <select name="de" value={champs.heureDepot} onChange={changer('heureDepot')}>
-              {heures.map((heure) => (
-                <option key={heure}>{heure}</option>
+              {heuresDeDepot.map((heure) => (
+                <option key={heure} value={heure}>
+                  {heureFrancaise(heure)}
+                </option>
               ))}
             </select>
           </span>
@@ -167,8 +202,10 @@ export function FormulaireDeDemande({
           <span className="champ-empile">
             <small>{textes.fin}</small>
             <select name="a" value={champs.heureReprise} onChange={changer('heureReprise')}>
-              {heures.map((heure) => (
-                <option key={heure}>{heure}</option>
+              {heuresDeReprise.map((heure) => (
+                <option key={heure} value={heure}>
+                  {heureFrancaise(heure)}
+                </option>
               ))}
             </select>
           </span>
@@ -183,13 +220,11 @@ export function FormulaireDeDemande({
             value={champs.jourReprise}
             onChange={changer('jourReprise')}
           >
-            {joursDeRetour
-              .filter((jour) => jour.valeur >= champs.jourDepot)
-              .map((jour) => (
-                <option key={jour.valeur} value={jour.valeur}>
-                  {jour.valeur === champs.jourDepot ? textes.memeJour : jour.libelle}
-                </option>
-              ))}
+            {retoursPossibles.map((jour) => (
+              <option key={jour.valeur} value={jour.valeur}>
+                {jour.valeur === champs.jourDepot ? textes.memeJour : jour.libelle}
+              </option>
+            ))}
           </select>
         </span>
       </label>
@@ -303,9 +338,9 @@ export function FormulaireDeDemande({
           <span className="ligne-texte">
             <span>{textes.dateEtHoraires}</span>
             <strong>
-              {libelle(champs.jourDepot)} · {champs.heureDepot} →{' '}
+              {libelle(champs.jourDepot)} · {heureFrancaise(champs.heureDepot)} →{' '}
               {champs.jourReprise !== champs.jourDepot ? `${libelle(champs.jourReprise)} ` : ''}
-              {champs.heureReprise}
+              {heureFrancaise(champs.heureReprise)}
             </strong>
             <span>{duree}</span>
           </span>

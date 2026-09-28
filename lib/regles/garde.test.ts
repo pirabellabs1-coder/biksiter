@@ -18,6 +18,7 @@ import {
   gestesPossibles,
   peutDeclarerLAbsence,
   peutRepartirSansDeposer,
+  telephonePartage,
   telephoneVisible,
   transitionPermise,
   motifObligatoire,
@@ -114,6 +115,22 @@ describe('le déroulé d’une garde', () => {
     expect(telephoneVisible('accepte')).toBe(true);
     expect(telephoneVisible('termine')).toBe(false);
     expect(telephoneVisible('litige')).toBe(true);
+  });
+
+  test('un numéro confirmé par SMS se partage pendant une garde acceptée', () => {
+    const numero = { connu: true, verifie: true, smsPossible: true };
+    expect(telephonePartage('accepte', numero)).toBe(true);
+    expect(telephonePartage('demande', numero)).toBe(false);
+    expect(telephonePartage('termine', numero)).toBe(false);
+  });
+
+  test('sans passerelle SMS, le numéro enregistré se partage ; avec une passerelle, il doit être confirmé', () => {
+    const enregistre = { connu: true, verifie: false };
+    expect(telephonePartage('accepte', { ...enregistre, smsPossible: false })).toBe(true);
+    expect(telephonePartage('accepte', { ...enregistre, smsPossible: true })).toBe(false);
+    expect(
+      telephonePartage('accepte', { connu: false, verifie: false, smsPossible: false }),
+    ).toBe(false);
   });
 
   test('une annulation à moins de deux heures du dépôt est un désistement tardif', () => {

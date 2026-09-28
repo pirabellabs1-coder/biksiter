@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Icone } from '@/components/app/icone';
 import { Recherche } from '@/components/maquette/recherche';
 import { POINTS_PAR_GARDE, POINTS_PAR_JOUR_SUPPLEMENTAIRE } from '@/lib/regles/maillons';
+import { membreConnecte } from '@/lib/session';
 
 /**
  * L'accueil du site public.
@@ -17,28 +18,28 @@ const ETAPES = [
     rang: '01',
     titre: 'Cherchez',
     texte: 'Indiquez votre destination et vos horaires.',
-    image: '/images/step-01.png',
+    image: '/images/step-01.webp',
     alt: 'Une cycliste regarde une carte sur son téléphone, épingle sur la destination et heure de dépôt affichée.',
   },
   {
     rang: '02',
     titre: 'Choisissez',
     texte: 'Comparez les bike sitters proches et leurs emplacements.',
-    image: '/images/step-02.png',
+    image: '/images/step-02.webp',
     alt: 'Trois cartes de Bike Sitters proches avec leurs notes et leurs distances, tenues par un Bike Sitter.',
   },
   {
     rang: '03',
     titre: 'Demandez',
     texte: 'Envoyez une demande. Le Bike Sitter reste libre d’accepter.',
-    image: '/images/step-03.png',
+    image: '/images/step-03.webp',
     alt: 'Une cycliste envoie une demande depuis son téléphone ; le Bike Sitter la reçoit en face, sur le sien.',
   },
   {
     rang: '04',
     titre: 'Déposez',
     texte: 'Code, photos et constat rapide avant la remise en main propre.',
-    image: '/images/step-04.png',
+    image: '/images/step-04.webp',
     alt: 'Un dépôt devant une porte verte, entre deux plantes en pot.',
   },
   {
@@ -46,14 +47,14 @@ const ETAPES = [
     titre: 'Profitez',
     texte:
       'Restaurant, rendez-vous ou shopping : faites ce que vous avez prévu.',
-    image: '/images/step-05.png',
+    image: '/images/step-05.webp',
     alt: 'Une cycliste attablée à une terrasse, boisson en main pendant la garde.',
   },
   {
     rang: '06',
     titre: 'Reprenez',
     texte: 'Contrôlez au retour : nouvelles photos et garde terminée.',
-    image: '/images/step-06.png',
+    image: '/images/step-06.webp',
     alt: 'Un cycliste reprend son vélo devant la maison, garde terminée.',
   },
 ] as const;
@@ -62,12 +63,12 @@ const QUESTIONS = [
   {
     question: 'Le Bike Sitter peut-il refuser ma demande ?',
     reponse:
-      'Oui. Une demande n’est confirmée qu’après son acceptation. Vous recevez alors les informations nécessaires au dépôt.',
+      'Oui : chaque bike sitter choisit les demandes qu’il accepte. Dès qu’il accepte la vôtre, vous recevez son adresse et tout ce qu’il faut pour le dépôt.',
   },
   {
     question: 'L’adresse du Bike Sitter est-elle publique ?',
     reponse:
-      'Non. Seule une zone approximative est visible avant la confirmation de la garde.',
+      'Avant la confirmation, vous voyez une zone approximative. L’adresse exacte vous est communiquée dès que la garde est acceptée.',
   },
   {
     question: 'Que se passe-t-il si je suis en retard ?',
@@ -77,11 +78,15 @@ const QUESTIONS = [
   {
     question: 'Quels vélos peuvent être gardés ?',
     reponse:
-      'Vélos de ville, électriques, cargo, route, VTT et pliants, selon la capacité indiquée par chaque Bike Sitter.',
+      'Vélos de ville, de route, VTT, VTC, gravel, pliants, électriques, cargo, longtail, tandems, vélos d’enfant et vélos avec remorque, selon ce que chaque bike sitter accepte.',
   },
 ] as const;
 
 export default async function Accueil() {
+  // Un visiteur suit les liens vers les pages publiques : les écrans du
+  // compte le renverraient vers l'accueil des membres, sans explication.
+  const connecte = Boolean(await membreConnecte());
+
   return (
     <>
       {/* Le lien d'évitement est posé par la mise en page publique ; ici on
@@ -140,7 +145,9 @@ export default async function Accueil() {
                 <span className="min m2">7 min</span>
                 <span className="min m3">9 min</span>
                 <div className="floating-card card-two">
-                  <i>✓</i>
+                  <i aria-hidden="true">
+                    <Icone nom="coche" taille={16} strokeWidth={2.6} />
+                  </i>
                   <div>
                     <b>Identité vérifiée</b>
                     <span>Remise en main propre</span>
@@ -179,8 +186,8 @@ export default async function Accueil() {
             </p>
             <h2>Une demande en quelques étapes</h2>
             <p className="parcours-intro">
-              En seulement 6 étapes, vous pouvez trouver un Bike Sitter de
-              confiance pour vos trajets, vos courses ou vos déplacements.
+              De la recherche à la reprise de votre vélo, six étapes simples,
+              guidées pas à pas.
             </p>
           </div>
 
@@ -215,7 +222,8 @@ export default async function Accueil() {
           <div>
             <h2>La ville reste à vous.</h2>
             <p>
-              Pas de catégories à choisir. Indiquez simplement où vous allez.
+              Un déjeuner, un concert, un rendez-vous : indiquez simplement où
+              vous allez, un bike sitter proche garde votre vélo.
             </p>
           </div>
           <div className="moment-grid">
@@ -339,7 +347,10 @@ export default async function Accueil() {
               alt="Un vélo rangé dans un emplacement privé fermé, le bike sitter présent sur place"
               src="/images/maquette-img-11.webp"
             />
-            <div className="safe-pill">✓ Garde confirmée</div>
+            <div className="safe-pill">
+              <Icone nom="coche" taille={16} strokeWidth={2.6} />
+              Garde confirmée
+            </div>
             <span className="visuel-marque">
               <span className="brand-mark" aria-hidden="true" />
               Bike Sitters
@@ -351,7 +362,8 @@ export default async function Accueil() {
             </h2>
             <p>
               Bike Sitters organise une garde entre personnes identifiées.
-              L’adresse exacte n’est communiquée qu’après acceptation.
+              L’adresse exacte vous est communiquée dès que la garde est
+              acceptée.
             </p>
             <ul>
               <li>
@@ -391,7 +403,10 @@ export default async function Accueil() {
               par un commerce du quartier.
             </p>
           </div>
-          <Link className="white" href="/devenir-bike-sitter">
+          <Link
+            className="white"
+            href={connecte ? '/devenir-bike-sitter' : '/comment-ca-marche#bike-sitter'}
+          >
             Découvrir le rôle
           </Link>
         </section>
@@ -399,9 +414,7 @@ export default async function Accueil() {
         <section className="section points-pub" id="points">
           <div className="pts-int">
             <span className="kicker">LE SYSTÈME DE POINTS</span>
-            <h2>
-              Garder un vélo ne rapporte pas d’argent. Ça rapporte autre chose.
-            </h2>
+            <h2>Chaque garde menée à terme vous rapporte des points.</h2>
             <p className="pts-intro">
               La garde est entièrement gratuite pour le cycliste. Le bike
               sitter, lui, reçoit des points à chaque garde menée à terme, et
@@ -430,13 +443,19 @@ export default async function Accueil() {
               </div>
             </div>
             <p className="pts-note">
-              Les points n’ont aucune valeur monétaire, ne s’échangent pas entre
-              membres et ne se revendent pas : ils servent à remercier, chez
-              les commerces du quartier.
+              Les points sont une façon de remercier : ils s’utilisent chez les
+              commerces du quartier qui soutiennent le réseau, et restent
+              personnels.
             </p>
-            <Link className="outline" href="/catalogue">
-              Voir le catalogue
-            </Link>
+            {connecte ? (
+              <Link className="outline" href="/catalogue">
+                Voir le catalogue
+              </Link>
+            ) : (
+              <Link className="outline" href="/inscription">
+                Créer mon compte
+              </Link>
+            )}
           </div>
         </section>
 

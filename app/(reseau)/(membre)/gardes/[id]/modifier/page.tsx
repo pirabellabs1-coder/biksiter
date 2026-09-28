@@ -11,6 +11,7 @@ import { textes } from '@/lib/i18n/langue';
 import { AVIS_POUR_AFFICHER_UNE_NOTE } from '@/lib/regles/avis-de-garde';
 import {
   ajouterJours,
+  A_CONVENIR,
   DUREES_MAX_JOURS,
   JOURS_ABREGES,
   libelleDesHoraires,
@@ -93,6 +94,9 @@ export default async function ModifierLaDemande({
             quartier: emplacement.quartier,
           }}
           capacite={emplacement.capacite}
+          joursMaximum={
+            emplacement.dureeMaxJours === A_CONVENIR ? null : emplacement.dureeMaxJours
+          }
           dureeAcceptee={
             emplacement.dureeMaxJours > 1
               ? `${p('Jusqu’à {n} h dans la journée', { n: emplacement.dureeMaxHeures })} · ${p(DUREES_MAX_JOURS[emplacement.dureeMaxJours] ?? '')}`

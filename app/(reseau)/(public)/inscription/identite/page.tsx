@@ -6,6 +6,8 @@ import { Icone } from '@/components/app/icone';
 import { etatDuCompte } from '@/lib/depot/comptes';
 import { textes } from '@/lib/i18n/langue';
 import { ACCUEIL_DES_MEMBRES } from '@/lib/navigation';
+import { canauxConfigures } from '@/lib/envois/canaux';
+import { coordonneesSuffisantes } from '@/lib/regles/comptes';
 import { exigerUnMembre } from '@/lib/session';
 
 import { EcranDeCompte, EtapesDeLInscription } from '../../ecran-de-compte';
@@ -21,9 +23,16 @@ export default async function Identite() {
   const membre = await exigerUnMembre();
   const { p } = await textes();
   const compte = await etatDuCompte(membre.id);
+  const canaux = canauxConfigures();
   if (
     membre.verification !== 'verifiee' &&
-    (!compte?.emailVerifieLe || !compte.telephoneVerifieLe)
+    !coordonneesSuffisantes({
+      emailVerifie: Boolean(compte?.emailVerifieLe),
+      telephoneVerifie: Boolean(compte?.telephoneVerifieLe),
+      telephoneConnu: Boolean(compte?.telephone),
+      courrielPossible: canaux.courriel,
+      smsPossible: canaux.sms,
+    })
   ) {
     redirect('/inscription/telephone');
   }
@@ -52,7 +61,7 @@ export default async function Identite() {
               <Icone nom="horloge" taille={20} />
               <span>
                 {p(
-                  'Votre pièce a bien été reçue. Un administrateur la vérifie sous 24 heures, et vous serez prévenu du résultat.',
+                  'Votre pièce a bien été reçue. Une personne de l’association la vérifie sous 24 heures ; vous recevez une notification avec le résultat.',
                 )}
               </span>
             </div>

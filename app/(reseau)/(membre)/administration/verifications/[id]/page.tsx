@@ -71,6 +71,34 @@ export default async function ExaminerUnePiece({
           <h3>
             {aVerifier.prenom} {aVerifier.nom}
           </h3>
+          {/* Les coordonnées, pour les recouper avec la pièce : sans passerelle
+              SMS, le numéro n'a pas été confirmé par code. */}
+          <dl className="infos serre">
+            <div className="info">
+              <dt>{p('E-mail')}</dt>
+              <dd>
+                <b>{aVerifier.email}</b>
+                <span>
+                  {aVerifier.emailVerifie
+                    ? p('Confirmé par lien')
+                    : p('Pas encore confirmé')}
+                </span>
+              </dd>
+            </div>
+            <div className="info">
+              <dt>{p('Téléphone')}</dt>
+              <dd>
+                <b>{aVerifier.telephone ?? p('Non renseigné')}</b>
+                {aVerifier.telephone ? (
+                  <span>
+                    {aVerifier.telephoneVerifie
+                      ? p('Confirmé par SMS')
+                      : p('Enregistré sans code SMS')}
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+          </dl>
           <p className="gris">
             {p(
               'La pièce n’est visible ici que le temps de la décision. Elle est déchiffrée à la volée et n’est mise en cache nulle part.',

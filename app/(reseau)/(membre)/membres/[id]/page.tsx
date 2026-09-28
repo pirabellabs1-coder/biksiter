@@ -127,12 +127,14 @@ export default async function ProfilBikeSitter({
               {gardesRealisees > 1 ? 's' : ''}
             </span>
           </div>
-          <div>
-            <b>
-              {tauxDeReponse === null ? '—' : `${tauxDeReponse} %`}
-            </b>
-            <span>taux de réponse</span>
-          </div>
+          {/* Le taux de réponse n'est montré qu'au membre lui-même : pour les
+              autres, un tiret sans explication laissait croire à un manque. */}
+          {tauxDeReponse === null ? null : (
+            <div>
+              <b>{`${tauxDeReponse} %`}</b>
+              <span>taux de réponse</span>
+            </div>
+          )}
           <div>
             <b>{note}</b>
             <span>note moyenne</span>

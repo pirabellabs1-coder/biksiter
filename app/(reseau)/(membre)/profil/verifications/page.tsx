@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { etatDuCompte } from '@/lib/depot/comptes';
 import { dernierRefusDIdentite } from '@/lib/depot/moderation';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { textes } from '@/lib/i18n/langue';
 import { exigerUnMembre } from '@/lib/session';
 
@@ -21,29 +22,47 @@ export default async function MesVerifications() {
   ]);
   if (!compte) return null;
   const identiteRefusee = compte.verification === 'refusee' && refus !== null;
+  // Sans service d'envoi branché, une confirmation par e-mail ou par SMS ne
+  // peut pas arriver : on ne la présente pas comme une chose à faire.
+  const canaux = canauxConfigures();
 
   const lignes: {
     icone: NomDIcone;
     titre: string;
     detail: string;
-    etat: 'verifie' | 'examen' | 'refuse' | 'a_faire';
+    etat: 'verifie' | 'examen' | 'refuse' | 'a_faire' | 'enregistre' | 'plus_tard';
     lien: string;
   }[] = [
     {
       icone: 'envoyer',
       titre: p('E-mail'),
       detail: p('Confirmé par lien'),
-      etat: compte.emailVerifieLe ? 'verifie' : 'a_faire',
+      etat: compte.emailVerifieLe
+        ? 'verifie'
+        : canaux.courriel
+          ? 'a_faire'
+          : 'plus_tard',
       lien: '/confirmer-mon-email',
     },
     {
       icone: 'telephone',
       titre: p('Téléphone'),
-      detail: p(
-        'Confirmé par SMS · communiqué à l’autre personne pendant une garde acceptée, et à elle seule',
-      ),
-      etat: compte.telephoneVerifieLe ? 'verifie' : 'a_faire',
-      lien: '/inscription/telephone',
+      detail: canaux.sms
+        ? p(
+            'Confirmé par SMS · communiqué à l’autre personne pendant une garde acceptée, et à elle seule',
+          )
+        : p(
+            'Communiqué à l’autre personne pendant une garde acceptée, et à elle seule',
+          ),
+      etat: compte.telephoneVerifieLe
+        ? 'verifie'
+        : !canaux.sms && compte.telephone
+          ? 'enregistre'
+          : 'a_faire',
+      lien:
+        !canaux.sms && compte.telephone
+          ? '/inscription/telephone?numero=modifier'
+          : '/inscription/telephone',
     },
     {
       icone: 'profil',
@@ -86,6 +105,10 @@ export default async function MesVerifications() {
                   <Icone nom="verifie" taille={14} />
                   {p('Vérifié')}
                 </span>
+              ) : ligne.etat === 'enregistre' ? (
+                <span className="pastille gris">{p('Enregistré')}</span>
+              ) : ligne.etat === 'plus_tard' ? (
+                <span className="pastille gris">{p('Plus tard')}</span>
               ) : ligne.etat === 'examen' ? (
                 <span className="pastille ambre">
                   <Icone nom="horloge" taille={14} />

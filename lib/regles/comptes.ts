@@ -126,3 +126,24 @@ export function compteSupprimable(etatsDesGardes: readonly string[]): boolean {
     (ETATS_QUI_RETIENNENT_UN_COMPTE as readonly string[]).includes(etat),
   );
 }
+
+/**
+ * Les coordonnées suffisent-elles pour passer à la pièce d'identité ?
+ *
+ * Une vérification qui dépend d'un envoi (le lien par e-mail, le code par
+ * SMS) n'est exigée que si cet envoi est possible : tant qu'aucun service
+ * n'est branché, on ne bloque personne devant un message qui ne partira
+ * jamais. Le numéro, lui, doit au moins être connu : la personne qui vérifie
+ * la pièce le voit, et c'est lui qui sert le jour de la garde.
+ */
+export function coordonneesSuffisantes(c: {
+  emailVerifie: boolean;
+  telephoneVerifie: boolean;
+  telephoneConnu: boolean;
+  courrielPossible: boolean;
+  smsPossible: boolean;
+}): boolean {
+  const email = c.emailVerifie || !c.courrielPossible;
+  const telephone = c.telephoneVerifie || (!c.smsPossible && c.telephoneConnu);
+  return email && telephone;
+}

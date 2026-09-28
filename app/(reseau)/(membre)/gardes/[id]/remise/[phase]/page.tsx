@@ -9,10 +9,7 @@ import {
   ETATS_DU_VELO,
   titreDeLaPhoto,
 } from '@/lib/regles/constat';
-import {
-  ESSAIS_PAR_CODE,
-  VALIDITE_CODE_HEURES,
-} from '@/lib/regles/remise';
+import { ESSAIS_PAR_CODE, VALIDITE_CODE_HEURES } from '@/lib/regles/remise';
 import { exigerUnMembre } from '@/lib/session';
 import { dePrenom } from '@/lib/texte/elision';
 
@@ -56,7 +53,11 @@ export default async function RemiseDuVelo({
   const aLaPorte = (
     <PersonneALaPorte
       personne={garde.autre}
-      role={garde.role === 'cycliste' ? 'Votre bike sitter' : 'Cycliste de cette garde'}
+      role={
+        garde.role === 'cycliste'
+          ? 'Votre bike sitter'
+          : 'Cycliste de cette garde'
+      }
     />
   );
   const angles = constat
@@ -80,11 +81,13 @@ export default async function RemiseDuVelo({
           </h1>
           {aLaPorte}
           <p className="bs-intro">
-            Lisez ce code à voix haute à {prenom}, au moment où vous remettez
-            le vélo. En le saisissant, {prenom} confirme la remise.
+            Lisez ce code à voix haute à {prenom}, au moment où vous remettez le
+            vélo. En le saisissant, {prenom} confirme la remise.
           </p>
 
-          <div className={code.expire ? 'code-a-dicter expire' : 'code-a-dicter'}>
+          <div
+            className={code.expire ? 'code-a-dicter expire' : 'code-a-dicter'}
+          >
             <p className="code-chiffres">
               {/* Deux groupes de trois : c'est ainsi qu'on le dicte. Assez
                   grand pour être lu à bout de bras, dans une cave. Le
@@ -152,13 +155,9 @@ export default async function RemiseDuVelo({
         <ol className="fil-etapes">
           <li className="fait">Vérification</li>
           <li className="fait">Photos</li>
-          <li className="on">
-            {phase === 'depot' ? 'Dépôt' : 'Récupération'}
-          </li>
+          <li className="on">{phase === 'depot' ? 'Dépôt' : 'Récupération'}</li>
         </ol>
-        <h1>
-          {phase === 'depot' ? 'Recevoir le vélo' : 'Récupérer mon vélo'}
-        </h1>
+        <h1>{phase === 'depot' ? 'Recevoir le vélo' : 'Récupérer mon vélo'}</h1>
         {aLaPorte}
         <p className="bs-intro">
           Deux constats horodatés : celui du dépôt et celui du retour. Une fois
@@ -195,7 +194,11 @@ export default async function RemiseDuVelo({
           </div>
           {constat.note ? (
             <div>
-              <span>Remarque {dePrenom(prenom)}</span>
+              <span>
+                {garde.role === AUTEUR_DU_CONSTAT[phase]
+                  ? 'Votre remarque'
+                  : `Remarque ${dePrenom(prenom)}`}
+              </span>
               <b>{constat.note}</b>
             </div>
           ) : null}

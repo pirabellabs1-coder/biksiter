@@ -815,6 +815,7 @@ export type MonProfil = {
   membreDepuis: number;
   identiteVerifiee: boolean;
   verification: string;
+  telephoneConnu: boolean;
   telephoneVerifie: boolean;
   emailVerifie: boolean;
   gardes: number;
@@ -829,6 +830,7 @@ export async function monProfil(membreId: string): Promise<MonProfil | null> {
     `select m.prenom, upper(left(m.nom, 1)) as initiale,
             extract(year from m.cree_le)::int as "membreDepuis",
             m.verification = 'verifiee' as "identiteVerifiee", m.verification,
+            m.telephone is not null as "telephoneConnu",
             m.telephone_verifie_le is not null as "telephoneVerifie",
             m.email_verifie_le is not null as "emailVerifie",
             (select count(*)::int from stationnement s join emplacement e on e.id = s.emplacement_id

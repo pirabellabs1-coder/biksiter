@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
-import { FormulaireDuVelo } from '@/components/maquette/compte/formulaire-du-velo';
-import { statistiquesDuBikeSitter } from '@/lib/depot/lieux';
+import { Icone } from '@/components/app/icone';
 import { velosDuMembre } from '@/lib/depot/membre-espace';
-import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import { textes } from '@/lib/i18n/langue';
-import { modeCourant } from '@/lib/mode';
 import { exigerUnMembre } from '@/lib/session';
 
 import { supprimerUnVelo } from '../actions';
@@ -15,81 +13,89 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: p('Mon vélo') };
 }
 
+/**
+ * Les vélos du membre. Un seul parcours pour en ajouter un
+ * (/profil/velos/ajouter) : deux formulaires différents pour le même vélo
+ * laissaient hésiter sur celui qui comptait.
+ */
 export default async function MonVelo({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const membre = await exigerUnMembre();
-  const _mode = await modeCourant();
-  const [velos, _nonLues, _stats] = await Promise.all([
-    velosDuMembre(membre.id),
-    nombreDeNotificationsNonLues(membre.id),
-    statistiquesDuBikeSitter(membre.id),
-  ]);
+  const velos = await velosDuMembre(membre.id);
   const { velo } = await searchParams;
 
   return (
-    <>
-      <div className="page page-etroite" id="contenu">
-        <header className="page-tete">
-          <span className="kicker">MON VÉLO</span>
-          <h1>Décrivez votre vélo.</h1>
-          <p>
-            Facultatif, et utile. Le Bike Sitter sait ce qu’il accueille, et en
-            cas de litige le constat part d’une description faite avant la
-            garde, pas après.
-          </p>
-        </header>
+    <main className="page page-etroite" id="contenu">
+      <header className="page-tete">
+        <span className="kicker">MON VÉLO</span>
+        <h1>Vos vélos</h1>
+        <p>
+          Le vélo enregistré vous est proposé à chaque demande : votre bike
+          sitter sait à l’avance ce qu’il accueille.
+        </p>
+      </header>
 
-        {velo === 'ajoute' ? (
-          <p className="mention" role="status">
-            Vélo enregistré — il sera proposé à chaque demande.
-          </p>
-        ) : null}
-        {velo === 'retire' ? (
-          <p className="mention" role="status">
-            Vélo supprimé.
-          </p>
-        ) : null}
-        {velo === 'engage' ? (
-          <p className="msg-erreur" role="alert">
-            Ce vélo est engagé dans une garde en cours : il pourra être
-            supprimé une fois la garde close.
-          </p>
-        ) : null}
+      {velo === 'ajoute' ? (
+        <div className="encart" role="status" style={{ marginBottom: 16 }}>
+          <Icone nom="coche" taille={20} />
+          <span>Vélo enregistré. Il vous sera proposé à chaque demande.</span>
+        </div>
+      ) : null}
+      {velo === 'retire' ? (
+        <div className="encart" role="status" style={{ marginBottom: 16 }}>
+          <Icone nom="coche" taille={20} />
+          <span>Vélo retiré de votre liste.</span>
+        </div>
+      ) : null}
+      {velo === 'engage' ? (
+        <p className="msg-erreur" role="alert">
+          Ce vélo est engagé dans une garde en cours : vous pourrez le retirer
+          une fois la garde terminée.
+        </p>
+      ) : null}
 
-        {/* La maquette ne décrit qu'un vélo ; un membre peut en enregistrer
-            plusieurs, et doit pouvoir en retirer un. */}
-        {velos.length > 0 ? (
-          <section className="bloc">
-            <h2>Vos vélos</h2>
-            <ul className="verifs">
-              {velos.map((v) => (
-                <li key={v.id}>
-                  <span className="vi" aria-hidden="true">
-                    ✓
+      {velos.length > 0 ? (
+        <section className="bloc">
+          <ul className="verifs">
+            {velos.map((v) => (
+              <li key={v.id}>
+                <span className="vi" aria-hidden="true">
+                  <Icone nom="velo" taille={18} />
+                </span>
+                <div>
+                  <b>{v.nom}</b>
+                  <span>
+                    {[v.type, v.marque, v.couleur].filter(Boolean).join(' · ')}
                   </span>
-                  <div>
-                    <b>{v.nom}</b>
-                    <span>
-                      {[v.type, v.marque, v.couleur].filter(Boolean).join(' · ')}
-                    </span>
-                  </div>
-                  <form action={supprimerUnVelo}>
-                    <input type="hidden" name="id" value={v.id} />
-                    <button type="submit" className="lien">
-                      Retirer
-                    </button>
-                  </form>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+                </div>
+                <form action={supprimerUnVelo}>
+                  <input type="hidden" name="id" value={v.id} />
+                  <button type="submit" className="lien">
+                    Retirer
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <p className="prog-note">
+          Aucun vélo enregistré pour l’instant. Ajoutez celui que vous souhaitez
+          confier ; son type, sa couleur et sa marque suffisent.
+        </p>
+      )}
 
-        <FormulaireDuVelo />
+      <div className="actions-fin">
+        <Link className="primary" href="/profil/velos/ajouter">
+          Ajouter un vélo
+        </Link>
+        <Link className="outline" href="/profil">
+          Revenir à mon compte
+        </Link>
       </div>
-    </>
+    </main>
   );
 }

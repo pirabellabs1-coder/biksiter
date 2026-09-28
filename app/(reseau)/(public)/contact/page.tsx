@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Contact() {
   return (
     <>
-      <div className="page" id="contenu">
+      <main className="page" id="contenu">
         <header className="page-tete">
           <span className="kicker">NOUS ÉCRIRE</span>
           <h1>Une question, un problème, une envie d&apos;aider ?</h1>
@@ -55,7 +55,7 @@ export default async function Contact() {
             </p>
           </aside>
         </div>
-      </div>
+      </main>
     </>
   );
 }

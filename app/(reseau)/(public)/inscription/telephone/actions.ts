@@ -4,11 +4,18 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { etatDuCompte, renvoyerLaConfirmation } from '@/lib/depot/comptes';
-import { confirmerLeNumero, envoyerUnCode } from '@/lib/depot/telephone';
+import {
+  confirmerLeNumero,
+  enregistrerLeNumero,
+  envoyerUnCode,
+  etatDuTelephone,
+} from '@/lib/depot/telephone';
 import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { texte } from '@/lib/formulaires/etat';
 import { langueCourante } from '@/lib/i18n/langue';
 import { phraseur } from '@/lib/i18n/traduction';
+import { coordonneesSuffisantes } from '@/lib/regles/comptes';
 import {
   CODES_SMS_PAR_HEURE,
   CODES_SMS_PAR_JOUR,
@@ -32,6 +39,64 @@ async function traducteur() {
 }
 
 /**
+ * Où aller une fois une coordonnée confirmée : la pièce d'identité si tout ce
+ * qui peut être vérifié l'est, sinon cette étape, qui dit ce qui manque.
+ */
+async function suiteDeLInscription(membreId: string): Promise<string> {
+  const [compte, telephone] = await Promise.all([
+    etatDuCompte(membreId),
+    etatDuTelephone(membreId),
+  ]);
+  const canaux = canauxConfigures();
+  return coordonneesSuffisantes({
+    emailVerifie: Boolean(compte?.emailVerifieLe),
+    telephoneVerifie: telephone.verifieLe !== null,
+    telephoneConnu: telephone.telephone !== null,
+    courrielPossible: canaux.courriel,
+    smsPossible: canaux.sms,
+  })
+    ? '/inscription/identite'
+    : '/inscription/telephone';
+}
+
+/**
+ * Sans passerelle SMS, le numéro s'enregistre sans code : personne n'attend
+ * un SMS qui ne partirait pas. Il reste non vérifié, et la personne qui
+ * examine la pièce d'identité le voit.
+ */
+export async function enregistrerMonNumero(
+  _precedent: EtatDuNumero,
+  donnees: FormData,
+): Promise<EtatDuNumero> {
+  const membre = await exigerUnMembre();
+  const p = await traducteur();
+  const saisie = texte(donnees, 'telephone').slice(0, 30);
+  if (canauxConfigures().sms) {
+    return {
+      statut: 'erreur',
+      numero: saisie,
+      erreur: p('Demandez un code par SMS pour confirmer votre numéro.'),
+    };
+  }
+  const lecture = lireLeNumero(saisie);
+  if (!lecture.valide) {
+    return {
+      statut: 'erreur',
+      numero: saisie,
+      erreur:
+        lecture.motif === 'pas_un_mobile'
+          ? p(
+              'Indiquez un numéro de mobile : c’est lui qui sert à vous joindre le jour de la garde.',
+            )
+          : p('Ce numéro n’est pas lisible. Exemple : 0470 12 34 56.'),
+    };
+  }
+  await enregistrerLeNumero(membre.id, lecture.numero);
+  revalidatePath('/inscription/telephone');
+  redirect(await suiteDeLInscription(membre.id));
+}
+
+/**
  * Le SMS est le seul usage du téléphone : vérifier qu'on joint bien la
  * personne. Les rappels passent par courriel.
  */
@@ -42,6 +107,17 @@ export async function demanderUnCode(
   const membre = await exigerUnMembre();
   const p = await traducteur();
   const saisie = texte(donnees, 'telephone').slice(0, 30);
+  // Sans passerelle, un code ne partirait jamais : il attendrait dans la
+  // file et partirait d'un coup le jour où une passerelle serait branchée.
+  if (!canauxConfigures().sms) {
+    return {
+      statut: 'erreur',
+      numero: saisie,
+      erreur: p(
+        'La confirmation par SMS n’est pas encore disponible : enregistrez simplement votre numéro.',
+      ),
+    };
+  }
   const lecture = lireLeNumero(saisie);
 
   if (!lecture.valide) {
@@ -136,14 +212,9 @@ export async function confirmerLeCode(
   const confirmation = await confirmerLeNumero(membre.id, saisie);
 
   if (confirmation.confirme) {
-    const compte = await etatDuCompte(membre.id);
     // La pièce d'identité vient après l'adresse confirmée : tant qu'elle ne
     // l'est pas, on reste sur cette étape, qui dit ce qui manque.
-    redirect(
-      compte?.emailVerifieLe
-        ? '/inscription/identite'
-        : '/inscription/telephone',
-    );
+    redirect(await suiteDeLInscription(membre.id));
   }
 
   if (confirmation.resultat === null) {

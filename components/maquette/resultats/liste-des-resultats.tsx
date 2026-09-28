@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { Avatar } from '@/components/app/avatar';
 import { Icone } from '@/components/app/icone';
@@ -107,11 +107,22 @@ export function ListeDesResultats({
   const [vue, setVue] = useState<'liste' | 'carte'>('liste');
   const [voletOuvert, setVoletOuvert] = useState(false);
   // Le formulaire de recherche, rouvert tel qu'on l'a laissé : c'est là
-  // qu'on change de lieu, de jour ou d'heures.
-  const [modifier, setModifier] = useState(false);
+  // qu'on change de lieu, de jour ou d'heures. Il remplace la barre au lieu
+  // de s'y ajouter, reprend la destination tapée, et se referme de lui-même
+  // quand la nouvelle recherche arrive (la requête a changé).
+  const champDuLieu = useRef<HTMLInputElement>(null);
+  const [modification, setModification] = useState<{
+    pour: string;
+    destination: string;
+  } | null>(null);
+  const modifier = modification?.pour === requete;
   const ouvrirLaModification = () => {
     setVoletOuvert(false);
-    setModifier(true);
+    setModification({
+      pour: requete,
+      destination:
+        champDuLieu.current?.value.trim() || rechercheInitiale.destination,
+    });
     window.scrollTo({ top: 0 });
   };
   const [apercu, setApercu] = useState<string | null>(null);
@@ -191,13 +202,14 @@ export function ListeDesResultats({
   return (
     <>
       <div className="rech-barre">
-        <div className="rb-int">
+        <div className="rb-int" hidden={modifier}>
           <form className="rb-carte" action="/recherche" method="get">
             <label className="rb-cell rb-lieu">
               <span className="rb-lab">Votre destination</span>
               <input
                 type="text"
                 id="whereR"
+                ref={champDuLieu}
                 name="lieu"
                 defaultValue={lieu}
                 aria-label="Destination"
@@ -240,12 +252,18 @@ export function ListeDesResultats({
               <button
                 type="button"
                 className="lien"
-                onClick={() => setModifier(false)}
+                onClick={() => setModification(null)}
               >
                 Fermer
               </button>
             </div>
-            <Recherche initiale={rechercheInitiale} />
+            <Recherche
+              initiale={{
+                ...rechercheInitiale,
+                destination:
+                  modification?.destination ?? rechercheInitiale.destination,
+              }}
+            />
           </section>
         ) : null}
         <div className="chips-rapides" role="group" aria-label="Filtres rapides">

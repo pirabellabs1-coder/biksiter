@@ -107,7 +107,7 @@ export default async function MonCompte({
           initiale={profil.initiale}
           email={membre.email}
           telephone={
-            profil.telephoneVerifie ? '+32 4·· ·· ·· ··' : 'Non renseigné'
+            profil.telephoneConnu ? '+32 4·· ·· ·· ··' : 'Non renseigné'
           }
           modifiable={nomModifiable(profil.verification)}
         />

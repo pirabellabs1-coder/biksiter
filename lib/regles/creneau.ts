@@ -335,3 +335,71 @@ export function libelleDuCreneau(creneau: Creneau): {
   }
   return { texte: '{jour} {de} → {jourFin} {a} ({jours} jours)', valeurs };
 }
+
+export type ChoixDuCreneau = {
+  jourDepot: string;
+  heureDepot: string;
+  jourReprise: string;
+  heureReprise: string;
+};
+
+/**
+ * Les jours de reprise que le formulaire propose : du jour du dépôt jusqu'au
+ * nombre de journées que le bike sitter accepte (null : à convenir).
+ */
+export function joursDeReprisePermis(
+  jours: readonly string[],
+  jourDepot: string,
+  joursMaximum: number | null,
+): string[] {
+  return jours
+    .filter((jour) => jour >= jourDepot)
+    .slice(0, joursMaximum ?? jours.length);
+}
+
+/**
+ * Ramène un créneau dans ce que le formulaire propose. Le jour de reprise se
+ * borne d'abord — c'est lui qui décide des heures possibles —, puis l'heure :
+ * le même jour, la reprise vient après le dépôt. Sans cela, une liste pourrait
+ * afficher une valeur et le formulaire en envoyer une autre.
+ */
+export function creneauDansLesBornes<T extends ChoixDuCreneau>(
+  choix: T,
+  bornes: {
+    jours: readonly string[];
+    heures: readonly string[];
+    joursMaximum: number | null;
+  },
+): T {
+  const { jours, heures, joursMaximum } = bornes;
+  const permis = joursDeReprisePermis(jours, choix.jourDepot, joursMaximum);
+  const dernier = permis.at(-1) ?? choix.jourDepot;
+
+  // Un dépôt à la dernière heure n'a de reprise possible que le lendemain.
+  let heureDepot = choix.heureDepot;
+  const derniereHeure = heures.at(-1);
+  if (permis.length <= 1 && heureDepot === derniereHeure && heures.length > 1) {
+    heureDepot = heures.at(-2) ?? heureDepot;
+  }
+
+  let jourReprise =
+    choix.jourReprise < choix.jourDepot
+      ? choix.jourDepot
+      : choix.jourReprise > dernier
+        ? dernier
+        : choix.jourReprise;
+  let heureReprise = choix.heureReprise;
+  if (jourReprise === choix.jourDepot && heureReprise <= heureDepot) {
+    const suivante = heures.find((heure) => heure > heureDepot);
+    if (suivante) heureReprise = suivante;
+    else if (permis[1]) jourReprise = permis[1];
+  }
+  if (
+    heureDepot === choix.heureDepot &&
+    jourReprise === choix.jourReprise &&
+    heureReprise === choix.heureReprise
+  ) {
+    return choix;
+  }
+  return { ...choix, heureDepot, jourReprise, heureReprise };
+}

@@ -21,7 +21,9 @@ const ONGLETS: readonly { cle: string; titre: string; etats: readonly EtatDeGard
   // peut encore être chez le bike sitter.
   { cle: 'acceptees', titre: 'Acceptées', etats: ['accepte', 'arrivee', 'en_cours', 'reprise_demandee', 'litige'] },
   { cle: 'terminees', titre: 'Terminées', etats: ['termine'] },
-  { cle: 'refusees', titre: 'Refusées', etats: ['refuse', 'expire', 'annule'] },
+  // Une annulation n'est pas un refus : l'onglet réunit ce qui n'a pas eu
+  // lieu, sans dire qui l'a décidé.
+  { cle: 'refusees', titre: 'Sans suite', etats: ['refuse', 'expire', 'annule'] },
 ];
 
 /** Ce que dit un onglet vide : chacun a sa raison de l'être. */
@@ -39,8 +41,8 @@ const VIDE_DE_L_ONGLET: Record<string, readonly [string, string]> = {
     'Chaque garde menée à son terme s’ajoute ici, avec les points qu’elle vous a rapportés.',
   ],
   refusees: [
-    'Aucune demande refusée ou expirée.',
-    'Les demandes déclinées, annulées ou restées sans réponse s’afficheraient ici.',
+    'Aucune demande sans suite.',
+    'Les demandes déclinées, annulées ou restées sans réponse se rangent ici.',
   ],
 };
 

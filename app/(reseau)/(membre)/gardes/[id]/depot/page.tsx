@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { creneau, heure } from '@/components/maquette/garde/dates';
+import { BoutonDEnvoi } from '@/components/app/bouton-d-envoi';
 import { PersonneALaPorte } from '@/components/maquette/garde/personne-a-la-porte';
 import { codeDeLaRemise, detailDeLaGarde } from '@/lib/depot/gardes';
 import { PHOTOS_DU_CONSTAT } from '@/lib/regles/constat';
@@ -171,9 +172,9 @@ export default async function DeposerLeVelo({
               <form action={gesteDirect}>
                 <input type="hidden" name="id" value={id} />
                 <input type="hidden" name="geste" value="arriver" />
-                <button type="submit" className="primary">
+                <BoutonDEnvoi className="primary">
                   Je suis devant la porte
-                </button>
+                </BoutonDEnvoi>
               </form>
             ) : (
               <button type="button" className="primary" disabled>

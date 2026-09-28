@@ -48,3 +48,6 @@ next-env.d.ts
 /stich/
 
 .vercel
+
+# Scripts de recette : locaux, jamais versionnés.
+/scripts/qa/

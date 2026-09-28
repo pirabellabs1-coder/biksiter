@@ -6,6 +6,8 @@ import { interroger } from '@/lib/bd/client';
 
 import type { Message } from '@/lib/courriel/modeles';
 
+import { planifierLExpedition } from './expedition';
+
 /**
  * Dépose un courriel dans la file sortante.
  *
@@ -14,8 +16,8 @@ import type { Message } from '@/lib/courriel/modeles';
  * n'aurait finalement pas été enregistré, ni se perdre si le serveur de
  * messagerie était indisponible au moment du clic.
  *
- * Aucune requête web n'attend un serveur SMTP : c'est un script qui draine
- * cette table.
+ * Aucune requête web n'attend un serveur SMTP : le message part juste après
+ * la réponse (lib/envois/expedition.ts), et reste dans la file s'il échoue.
  */
 export async function mettreEnFile(
   destinataire: string,
@@ -36,45 +38,10 @@ export async function mettreEnFile(
 
   if (options.client) {
     await options.client.query(requete, valeurs);
-    return;
+  } else {
+    await interroger(requete, valeurs);
   }
-
-  await interroger(requete, valeurs);
-}
-
-export type CourrielEnAttente = {
-  id: string;
-  destinataire: string;
-  sujet: string;
-  corps: string;
-  tentatives: number;
-};
-
-export async function courrielsEnAttente(
-  combien: number,
-): Promise<CourrielEnAttente[]> {
-  return interroger<CourrielEnAttente>(
-    `select id, destinataire, sujet, corps, tentatives
-       from message_sortant
-      where canal = 'courriel' and envoye_le is null
-      order by cree_le
-      limit $1`,
-    [combien],
-  );
-}
-
-export async function marquerEnvoye(id: string): Promise<void> {
-  await interroger('update message_sortant set envoye_le = now() where id = $1', [id]);
-}
-
-export async function marquerEchec(id: string, erreur: string): Promise<void> {
-  await interroger(
-    `update message_sortant
-        set tentatives = tentatives + 1,
-            derniere_erreur = $2
-      where id = $1`,
-    [id, erreur.slice(0, 500)],
-  );
+  planifierLExpedition();
 }
 
 /**
@@ -98,8 +65,8 @@ export async function mettreUnSmsEnFile(
 
   if (options.client) {
     await options.client.query(requete, valeurs);
-    return;
+  } else {
+    await interroger(requete, valeurs);
   }
-
-  await interroger(requete, valeurs);
+  planifierLExpedition();
 }

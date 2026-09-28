@@ -44,9 +44,22 @@ export default async function EspaceBikeSitter() {
     ? await lieuDuMembre(membre.id, lieux[0].reference)
     : null;
 
-  const demandes = gardes.filter(
-    (garde) => garde.role === 'bike_sitter' && garde.etat === 'demande',
-  );
+  // La plus pressée d'abord : celle dont le délai de réponse finit le plus tôt.
+  const demandes = gardes
+    .filter((garde) => garde.role === 'bike_sitter' && garde.etat === 'demande')
+    .sort(
+      (a, b) =>
+        minutesPourRepondre(
+          new Date(a.demandeLe),
+          new Date(a.debut),
+          maintenant,
+        ) -
+        minutesPourRepondre(
+          new Date(b.demandeLe),
+          new Date(b.debut),
+          maintenant,
+        ),
+    );
   const prochaine = gardes
     .filter(
       (garde) =>

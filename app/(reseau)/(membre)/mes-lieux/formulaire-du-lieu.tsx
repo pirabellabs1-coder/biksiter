@@ -153,6 +153,9 @@ export function FormulaireDuLieu({
       <fieldset className="sans-cadre">
         {etape(textes.acces)}
         <select name="acces" className="champ-simple" defaultValue={valeurs.acces} required>
+          <option value="" disabled>
+            —
+          </option>
           {options.acces.map(([valeur, libelle]) => (
             <option key={valeur} value={valeur}>
               {libelle}

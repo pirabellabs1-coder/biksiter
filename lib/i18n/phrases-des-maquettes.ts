@@ -251,7 +251,7 @@ export const PHRASES_DES_MAQUETTES: Record<'nl' | 'en', Record<string, string>> 
     "Lieu de garde": "Oppasplek",
     "Adresse exacte communiquée après acceptation.": "Exact adres gedeeld na aanvaarding.",
     "Date et horaires": "Datum en tijden",
-    "La garde est entièrement gratuite : aucun paiement entre les membres.": "De oppasbeurt is volledig gratis: er wordt niets betaald tussen leden.",
+    "La garde est entièrement gratuite, du dépôt à la reprise.": "De oppasbeurt is volledig gratis, van het afzetten tot het ophalen.",
 
     // La fiche d'un lieu
     "Bike Sitter": "Bike Sitter",
@@ -1604,7 +1604,7 @@ export const PHRASES_DES_MAQUETTES: Record<'nl' | 'en', Record<string, string>> 
     "Lieu de garde": "Place",
     "Adresse exacte communiquée après acceptation.": "Exact address shared after acceptance.",
     "Date et horaires": "Date and times",
-    "La garde est entièrement gratuite : aucun paiement entre les membres.": "The stay is completely free: no payment between members.",
+    "La garde est entièrement gratuite, du dépôt à la reprise.": "The stay is completely free, from drop-off to pick-up.",
 
     // La fiche d'un lieu
     "Bike Sitter": "Bike Sitter",
