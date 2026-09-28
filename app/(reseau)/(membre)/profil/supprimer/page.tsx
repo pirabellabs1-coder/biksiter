@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { compteSupprimableMaintenant } from '@/lib/depot/mon-compte';
 import { textes } from '@/lib/i18n/langue';
@@ -20,7 +19,6 @@ export default async function SupprimerMonCompte() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Supprimer mon compte')}</h1>
         <div className="encart rouge" style={{ margin: '14px 0 12px' }}>

@@ -100,3 +100,48 @@ export async function identifiantDeLEmplacement(
   );
   return ligne?.id ?? null;
 }
+
+/**
+ * La photo jointe à un message.
+ *
+ * Même garantie que pour les emplacements : on ré-encode, donc on retire les
+ * métadonnées EXIF (coordonnées GPS comprises, règle 4). Une photo par message.
+ */
+export async function ajouterUnePhotoDeMessage(
+  messageId: string,
+  original: Buffer,
+): Promise<void> {
+  const nettoyee = await nettoyerLaPhoto(original);
+  await interroger(
+    `insert into photo_message
+       (message_id, contenu, type_mime, largeur, hauteur)
+     values ($1, $2, 'image/webp', $3, $4)`,
+    [messageId, nettoyee.contenu, nettoyee.largeur, nettoyee.hauteur],
+  );
+}
+
+/**
+ * Le contenu d'une photo de message, servi au seul membre de la conversation.
+ *
+ * On vérifie que le message appartient bien au stationnement demandé et que le
+ * membre est l'un des deux participants : une photo ne fuit pas d'une
+ * conversation à l'autre.
+ */
+export async function lireUnePhotoDeMessage(
+  membreId: string,
+  stationnementId: string,
+  messageId: string,
+): Promise<Buffer | null> {
+  const ligne = await uneLigne<{ contenu: Buffer }>(
+    `select pm.contenu
+       from photo_message pm
+       join message m on m.id = pm.message_id
+       join stationnement s on s.id = m.stationnement_id
+       join emplacement e on e.id = s.emplacement_id
+      where pm.message_id = $1
+        and m.stationnement_id = $2
+        and (s.cycliste_id = $3 or e.membre_id = $3)`,
+    [messageId, stationnementId, membreId],
+  );
+  return ligne?.contenu ?? null;
+}

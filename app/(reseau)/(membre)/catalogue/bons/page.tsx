@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { mesBons } from '@/lib/depot/catalogue';
 import { textes } from '@/lib/i18n/langue';
@@ -20,7 +19,6 @@ export default async function MesBons() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/catalogue" />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Mes bons')}</h1>
         <p className="sous-titre">{p('Retrouvez ici les avantages que vous avez échangés, à présenter chez le partenaire concerné.')}</p>

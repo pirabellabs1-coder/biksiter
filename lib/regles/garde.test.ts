@@ -5,7 +5,9 @@ import {
   ONGLETS_DES_GARDES,
   ongletDeLEtat,
   codeDuRefus,
+  delaiEnFrancais,
   demandeExpiree,
+  minutesPourRepondre,
   peutSignalerSonArrivee,
   REFUS_D_UN_GESTE,
   blocageCoupeLaConversation,
@@ -18,6 +20,8 @@ import {
   peutRepartirSansDeposer,
   telephoneVisible,
   transitionPermise,
+  motifObligatoire,
+  motifsProposes,
 } from './garde';
 
 const minutes = (n: number) => n * 60 * 1000;
@@ -186,5 +190,48 @@ describe('le déroulé d’une garde', () => {
       expect(onglets).toHaveLength(1);
       expect(ongletDeLEtat(etat)).toBe(onglets[0]!.cle);
     }
+  });
+
+  test('le délai pour répondre à une demande s’arrête à l’heure du dépôt', () => {
+    const DEMANDE = new Date('2026-09-21T08:00:00Z');
+    const DEBUT = new Date('2026-09-21T12:00:00Z');
+    const MAINTENANT = new Date('2026-09-21T10:12:00Z');
+    // Vingt-quatre heures depuis la demande dépasseraient le dépôt : c'est le
+    // dépôt qui borne le délai.
+    expect(minutesPourRepondre(DEMANDE, DEBUT, MAINTENANT)).toBe(108);
+    expect(minutesPourRepondre(DEMANDE, DEBUT, DEBUT)).toBe(0);
+  });
+
+  test('un délai de réponse se lit en heures et en minutes', () => {
+    expect(delaiEnFrancais(108)).toBe('1 h 48');
+    expect(delaiEnFrancais(45)).toBe('45 min');
+    expect(delaiEnFrancais(120)).toBe('2 h');
+  });
+});
+
+describe('le motif d’un geste', () => {
+  test('décliner une demande ne demande aucune justification', () => {
+    expect(motifObligatoire('refuser')).toBe(false);
+  });
+
+  test('annuler, signaler ou déclarer une absence demandent un motif', () => {
+    expect(motifObligatoire('annuler')).toBe(true);
+    expect(motifObligatoire('signaler')).toBe(true);
+    expect(motifObligatoire('absence')).toBe(true);
+  });
+});
+
+describe('les motifs d’un signalement de garde', () => {
+  test('le bike sitter ne se voit pas proposer de se plaindre de son propre lieu', () => {
+    const motifs = motifsProposes('signaler', 'bike_sitter');
+    expect(motifs).not.toContain("Le lieu ne correspond pas à l'annonce");
+    expect(motifs).not.toContain("Le vélo n'a pas été restitué");
+    expect(motifs).toContain("Le vélo n'a pas été récupéré");
+  });
+
+  test('le cycliste peut signaler un lieu différent de la fiche', () => {
+    expect(motifsProposes('signaler', 'cycliste')).toContain(
+      "Le lieu ne correspond pas à l'annonce",
+    );
   });
 });

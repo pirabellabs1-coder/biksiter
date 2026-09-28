@@ -4,13 +4,14 @@ import { randomBytes } from 'node:crypto';
 
 import { interroger, uneLigne } from '@/lib/bd/client';
 import { AVIS_POUR_AFFICHER_UNE_NOTE } from '@/lib/regles/avis-de-garde';
+import type { Horaires } from '@/lib/regles/creneau';
 import {
   motifsDesDisponibilites,
   type DisponibilitesDuLieu,
 } from '@/lib/regles/disponibilites-du-lieu';
 
 import { prevenirLesAlertesPour } from './alertes';
-import { AVIS_PUBLIE } from './reseau';
+import { AVIS_PUBLIE, horairesDe } from './reseau';
 
 /**
  * Le côté bike sitter d'un membre : ce que ses lieux accueillent, et la
@@ -104,6 +105,8 @@ export type LieuDeLaListe = {
   enPause: boolean;
   joursDAccueil: number;
   nombreDePhotos: number;
+  /** Le rang de la première photo, pour la vignette ; null sans photo. */
+  premierePhoto: number | null;
   vues: number;
   gardes: number;
   demandesEnAttente: number;
@@ -114,6 +117,7 @@ export async function mesLieux(membreId: string): Promise<LieuDeLaListe[]> {
     `select e.reference, e.type, e.quartier, e.capacite, e.publie, e.en_pause as "enPause",
             cardinality(e.jours_d_accueil) as "joursDAccueil",
             (select count(*)::int from photo_emplacement ph where ph.emplacement_id = e.id) as "nombreDePhotos",
+            (select min(ph.rang)::int from photo_emplacement ph where ph.emplacement_id = e.id) as "premierePhoto",
             e.vues,
             (select count(*)::int from stationnement s where s.emplacement_id = e.id and s.etat = 'termine') as gardes,
             (select count(*)::int from stationnement s where s.emplacement_id = e.id and s.etat = 'demande') as "demandesEnAttente"
@@ -251,4 +255,74 @@ export function referenceDeLieu(quartier: string, prenom: string): string {
       .replace(/^-|-$/g, '');
   const suffixe = randomBytes(3).toString('hex').slice(0, 4);
   return `${sansAccent(quartier)}-${sansAccent(prenom)}-${suffixe}`.slice(0, 60);
+}
+
+/**
+ * Le membre a-t-il au moins un emplacement ?
+ *
+ * Sert à la barre du bas : la maquette remplace l'entrée « Bike Sitter » par
+ * « Devenir BS » tant qu'aucun emplacement n'existe (`body[data-sitter]`).
+ */
+export async function membreAUnEmplacement(membreId: string): Promise<boolean> {
+  const [ligne] = await interroger<{ existe: boolean }>(
+    'select exists(select 1 from emplacement where membre_id = $1) as existe',
+    [membreId],
+  );
+  return ligne?.existe ?? false;
+}
+
+/**
+ * La fin de la disponibilité immédiate du membre, si elle est encore ouverte.
+ * Elle vaut pour tous ses emplacements publiés à la fois.
+ */
+export async function disponibiliteImmediateDuMembre(
+  membreId: string,
+): Promise<Date | null> {
+  const ligne = await uneLigne<{ jusqua: Date | null }>(
+    `select max(disponible_jusqu_a) as jusqua
+       from emplacement
+      where membre_id = $1 and publie and disponible_jusqu_a > now()`,
+    [membreId],
+  );
+  return ligne?.jusqua ?? null;
+}
+
+/** Les horaires d'accueil des emplacements publiés du membre. */
+export async function horairesDeMesLieuxPublies(
+  membreId: string,
+): Promise<Horaires[]> {
+  const lignes = await interroger<{
+    jours: number[];
+    ouverture: string | null;
+    fermeture: string | null;
+    parJour: Record<string, { de: string; a: string }> | null;
+    fermetures: string[];
+  }>(
+    `select e.jours_d_accueil::int[] as jours,
+            to_char(e.heure_d_ouverture, 'HH24:MI') as ouverture,
+            to_char(e.heure_de_fermeture, 'HH24:MI') as fermeture,
+            e.horaires_par_jour as "parJour",
+            array(select to_char(d, 'YYYY-MM-DD') from unnest(e.fermetures) d) as fermetures
+       from emplacement e
+      where e.membre_id = $1 and e.publie`,
+    [membreId],
+  );
+  return lignes.map((ligne) => horairesDe({ ...ligne, parJour: ligne.parJour ?? {} }));
+}
+
+/**
+ * Ouvre (jusqu'à `jusquA`) ou ferme la disponibilité immédiate du membre sur
+ * ses emplacements publiés. Renvoie le nombre d'emplacements concernés.
+ */
+export async function changerLaDisponibiliteImmediate(
+  membreId: string,
+  jusquA: Date | null,
+): Promise<number> {
+  const lignes = await interroger<{ id: string }>(
+    `update emplacement set disponible_jusqu_a = $2
+      where membre_id = $1 and publie
+      returning id`,
+    [membreId, jusquA],
+  );
+  return lignes.length;
 }

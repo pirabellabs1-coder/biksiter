@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { textes } from '@/lib/i18n/langue';
 import { exigerUnMembre } from '@/lib/session';
@@ -31,7 +30,6 @@ export default async function UrgenceEtVol() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/aide" />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Urgence et vol')}</h1>
         <p className="sous-titre">

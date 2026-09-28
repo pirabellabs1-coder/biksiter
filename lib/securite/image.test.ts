@@ -2,9 +2,11 @@ import { describe, expect, test } from 'vitest';
 import sharp from 'sharp';
 
 import {
+  COTE_D_UNE_PHOTO_DE_PROFIL,
   contientDesCoordonnees,
   metadonneesDe,
   nettoyerLaPhoto,
+  nettoyerLaPhotoDeProfil,
 } from './image';
 
 /**
@@ -103,5 +105,32 @@ describe('le nettoyage normalise aussi le format et la taille', () => {
 
     const nettoyee = await nettoyerLaPhoto(petite);
     expect(nettoyee.largeur).toBe(300);
+  });
+});
+
+describe('une photo de profil', () => {
+  test('une photo de profil ne garde aucune métadonnée, GPS compris', async () => {
+    const nettoyee = await nettoyerLaPhotoDeProfil(await photoAvecGps());
+    const metadonnees = await metadonneesDe(nettoyee.contenu);
+    expect(metadonnees.exif).toBe(false);
+    expect(metadonnees.format).toBe('webp');
+    expect(nettoyee.contenu.toString('latin1')).not.toContain('BikeSitters');
+  });
+
+  test('une photo de profil est recadrée en carré', async () => {
+    const nettoyee = await nettoyerLaPhotoDeProfil(await photoAvecGps());
+    expect(nettoyee.largeur).toBe(COTE_D_UNE_PHOTO_DE_PROFIL);
+    expect(nettoyee.hauteur).toBe(COTE_D_UNE_PHOTO_DE_PROFIL);
+  });
+});
+
+describe('seules les photos sont lues', () => {
+  const svg = Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40"/></svg>',
+  );
+
+  test('une image SVG est refusée, même déguisée en photo', async () => {
+    await expect(nettoyerLaPhoto(svg)).rejects.toThrow();
+    await expect(nettoyerLaPhotoDeProfil(svg)).rejects.toThrow();
   });
 });

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { NavigationDAdministration } from '@/components/app/administration';
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
+import { EnTeteDeModeration } from '@/components/maquette/moderation/en-tete-de-moderation';
+import { OngletsDeModeration } from '@/components/maquette/moderation/onglets';
 import { candidaturesEnAttente, dossiersAVerifier } from '@/lib/depot/moderation';
 import { textes } from '@/lib/i18n/langue';
 import { jourAffiche } from '@/lib/regles/creneau';
@@ -15,7 +14,7 @@ import { classerUneCandidature } from '../actions';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Vérifications') };
+  return { title: p('Vérifications d’identité') };
 }
 
 export default async function Verifications({
@@ -23,7 +22,7 @@ export default async function Verifications({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
-  await exigerUnModerateur();
+  const moderateur = await exigerUnModerateur();
   const { p } = await textes();
   const [{ decision }, dossiers, candidatures] = await Promise.all([
     searchParams,
@@ -31,90 +30,130 @@ export default async function Verifications({
     candidaturesEnAttente(),
   ]);
   const maintenant = new Date();
+  const initiales = `${moderateur.prenom.at(0) ?? ''}${moderateur.nom.at(0) ?? ''}`.toUpperCase();
 
   return (
     <main id="contenu">
-      <EnTete p={p} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Vérifications d’identité')}</h1>
-        <p className="sous-titre">
-          {p('Chaque pièce d’identité est examinée par un membre de l’équipe puis supprimée dès que la décision est prise.')}
-        </p>
-        <NavigationDAdministration p={p} actif="verifications" />
+      <EnTeteDeModeration initiales={initiales} />
+      <div className="page">
+        <header className="page-tete">
+          <span className="kicker">FILE D’IDENTITÉ</span>
+          <h1>{p('Vérifications d’identité')}</h1>
+          <p>
+            {p(
+              'Chaque pièce d’identité est examinée par une personne de l’équipe, puis supprimée dès que la décision a été enregistrée.',
+            )}
+          </p>
+        </header>
+
+        <OngletsDeModeration p={p} actif="verifications" />
 
         {decision ? (
-          <div className="encart" role="status" style={{ marginBottom: 12 }}>
-            <Icone nom="coche" taille={22} />
-            <span>
+          <article className="mod-carte" role="status">
+            <div className="mod-tete">
+              <span className="mod-etat">{p('Décision enregistrée')}</span>
+            </div>
+            <p className="gris">
               {decision === 'verifiee'
-                ? p('Identité vérifiée. La pièce est supprimée et le membre est prévenu.')
-                : p('Refus enregistré. La pièce est supprimée et le membre reçoit le motif.')}
-            </span>
-          </div>
+                ? p(
+                    'Identité vérifiée. La pièce a été supprimée et le membre est prévenu.',
+                  )
+                : p(
+                    'Refus enregistré. La pièce a été supprimée et le membre a reçu le motif.',
+                  )}
+            </p>
+          </article>
         ) : null}
 
-        {dossiers.length === 0 ? (
-          <div className="carte vide-liste">
-            <Icone nom="verifie" taille={30} className="texte-vert" />
-            <strong>{p('Aucune pièce en attente.')}</strong>
+        <article className="mod-carte">
+          <div className="mod-tete">
+            <span className="mod-etat">
+              {p('Dossiers d’identité à examiner')}
+            </span>
+            <span className="gris">
+              {p('{n} en attente', { n: dossiers.length })}
+            </span>
           </div>
-        ) : (
-          <ul className="liste" style={{ listStyle: 'none', padding: 0 }}>
-            {dossiers.map((dossier) => {
-              const restants = joursAvantSuppression(new Date(dossier.deposeeLe), maintenant);
-              return (
-                <li key={dossier.membreId}>
-                  <Link href={`/administration/verifications/${dossier.membreId}`} className="ligne">
-                    <span className="avatar-app" aria-hidden="true">
-                      {dossier.prenom.charAt(0)}
-                    </span>
-                    <span className="ligne-texte">
-                      <strong>
-                        {dossier.prenom} {dossier.nom}
-                      </strong>
-                      <span>
-                        {p('Déposée le {date}', { date: jourAffiche(jourABruxelles(new Date(dossier.deposeeLe))) })}
-                      </span>
-                    </span>
-                    <span className="pastille ambre">
+          {dossiers.length === 0 ? (
+            <p className="vide-onglet">
+              {p('Aucune pièce en attente pour le moment.')}
+            </p>
+          ) : (
+            <ul className="liste-nette">
+              {dossiers.map((dossier) => {
+                const restants = joursAvantSuppression(
+                  new Date(dossier.deposeeLe),
+                  maintenant,
+                );
+                return (
+                  <li key={dossier.membreId}>
+                    <b>
+                      <Link href={`/administration/verifications/${dossier.membreId}`}>
+                        {dossier.prenom} {dossier.nom.at(0) ?? ''}.
+                      </Link>
+                    </b>
+                    <span>
+                      {p('Déposée le {date}', {
+                        date: jourAffiche(jourABruxelles(new Date(dossier.deposeeLe))),
+                      })}
+                      {' · '}
                       {restants === 0
-                        ? p('Supprimée aujourd’hui')
-                        : p('Supprimée dans {n} j', { n: restants })}
+                        ? p('supprimée aujourd’hui')
+                        : p('supprimée dans {n} j', { n: restants })}
                     </span>
-                    <Icone nom="chevron" taille={20} className="texte-leger" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </article>
 
         {candidatures.length > 0 ? (
-          <>
-            <h2 className="titre-section">{p('Candidatures reçues par le site')}</h2>
-            <ul className="liste" style={{ listStyle: 'none', padding: 0 }}>
+          <article className="mod-carte">
+            <div className="mod-tete">
+              <span className="mod-etat">
+                {p('Candidatures reçues par le site')}
+              </span>
+              <span className="gris">
+                {p('{n} à examiner', { n: candidatures.length })}
+              </span>
+            </div>
+            <p className="gris">
+              {p(
+                'Ces personnes ont écrit depuis le site pour proposer un emplacement. Elles seront recontactées par l’équipe pour la suite.',
+              )}
+            </p>
+            <ul className="liste-nette">
               {candidatures.map((candidature) => (
-                <li key={candidature.id} className="ligne ligne-info">
-                  <span className="ligne-texte">
-                    <strong>
-                      {candidature.prenom} · {p(candidature.type)}
-                    </strong>
-                    <span>
-                      {[candidature.quartier, p('{n} vélo(s)', { n: candidature.capacite })]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </span>
+                <li key={candidature.id}>
+                  <b>
+                    {candidature.prenom} · {p(candidature.type)}
+                  </b>
+                  <span>
+                    {[
+                      candidature.quartier,
+                      p(candidature.capacite > 1 ? '{n} vélos' : '{n} vélo', { n: candidature.capacite }),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </span>
-                  <form action={classerUneCandidature}>
-                    <input type="hidden" name="candidature" value={candidature.id} />
-                    <button type="submit" className="bouton contour" style={{ minHeight: 38 }}>
+                  <form
+                    action={classerUneCandidature}
+                    style={{ marginTop: 6 }}
+                  >
+                    <input
+                      type="hidden"
+                      name="candidature"
+                      value={candidature.id}
+                    />
+                    <button type="submit" className="outline">
                       {p('Classer')}
                     </button>
                   </form>
                 </li>
               ))}
             </ul>
-          </>
+          </article>
         ) : null}
       </div>
     </main>

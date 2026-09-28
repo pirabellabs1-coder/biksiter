@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { Avatar } from '@/components/app/avatar';
 import { ListeDesConversations } from '@/components/app/conversations';
-import { EnTete } from '@/components/app/en-tete';
 import { dateDeGarde, PastilleDEtat } from '@/components/app/garde';
 import { Icone } from '@/components/app/icone';
-import { nomPublic, Presence } from '@/components/membre/elements';
+import { PhotoAgrandissable } from '@/components/app/photo-agrandissable';
+import { nomPublic } from '@/components/membre/elements';
 import {
   conversation,
   conversationEcrivable,
@@ -17,6 +18,7 @@ import { jourAffiche } from '@/lib/regles/creneau';
 import { heureABruxelles, jourABruxelles } from '@/lib/temps';
 import { exigerUnMembre } from '@/lib/session';
 
+import { FinDuFil } from './fin-du-fil';
 import { FormulaireDeMessage } from './formulaire';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,15 +48,6 @@ export default async function Conversation({
       id="contenu"
       className={ecrivable ? 'avec-barre-d-action' : undefined}
     >
-      <EnTete p={p} retour="/messages" cloche={false}>
-        <Link
-          href={`/signaler/membre/${garde.autreId}`}
-          className="entete-bouton"
-          aria-label={p('Signaler {nom}', { nom })}
-        >
-          <Icone nom="drapeau" taille={22} />
-        </Link>
-      </EnTete>
       <div className="ecran-app ecran-large">
         <div className="messagerie">
           {/* Sur ordinateur, la liste reste à gauche de la conversation. */}
@@ -70,14 +63,18 @@ export default async function Conversation({
           </aside>
           <section className="messagerie-conversation" aria-label={nom}>
             <div className="personne-conversation">
-              <span className="avatar-app" aria-hidden="true">
-                {garde.autrePrenom.charAt(0)}
-              </span>
+              <Avatar
+                membreId={garde.autreId}
+                prenom={garde.autrePrenom}
+                version={garde.autrePhoto}
+                taille={44}
+              />
               <span className="ligne-texte">
                 <strong>{nom}</strong>
-                <span>
-                  <Presence p={p} vuLe={garde.autreVuLe} avecLibelle />
-                </span>
+                {/* Pas d'« en ligne » : le réseau a écarté le temps réel pour
+                    ne pas créer une attente de réponse que des bénévoles ne
+                    tiennent pas. */}
+                <span>{p('Les réponses arrivent quand chacun est disponible.')}</span>
               </span>
             </div>
             <Link
@@ -109,7 +106,14 @@ export default async function Conversation({
                       key={m.id}
                       className={m.deMoi ? 'bulle moi' : 'bulle autre'}
                     >
-                      {m.corps}
+                      {m.aUnePhoto ? (
+                        <PhotoAgrandissable
+                          src={`/messages/${garde.id}/photo/${m.id}`}
+                          alt={p('Photo envoyée')}
+                          fermer={p('Fermer la photo')}
+                        />
+                      ) : null}
+                      {m.corps ? <span className="bulle-texte">{m.corps}</span> : null}
                       <span className="bulle-heure">
                         {jourABruxelles(quand) === jourABruxelles()
                           ? heureABruxelles(quand)
@@ -119,6 +123,7 @@ export default async function Conversation({
                   );
                 })
               )}
+              <FinDuFil nombreDeMessages={messages.length} />
             </div>
             {!ecrivable ? (
               <div className="encart gris">
@@ -135,6 +140,8 @@ export default async function Conversation({
                   placeholder: p('Écrire un message…'),
                   envoyer: p('Envoyer'),
                   libelle: p('Message'),
+                  joindre: p('Joindre une photo'),
+                  retirer: p('Retirer la photo'),
                 }}
               />
             ) : null}

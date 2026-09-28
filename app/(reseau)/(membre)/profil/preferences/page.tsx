@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { TRANQUILLITE_PAR_DEFAUT, tranquilliteDuMembre } from '@/lib/depot/notifications';
 import { textes } from '@/lib/i18n/langue';
@@ -29,7 +28,6 @@ export default async function Preferences({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Préférences de communication')}</h1>
         <p className="sous-titre">{p('Vous choisissez les moments où le réseau vous informe et le canal utilisé.')}</p>

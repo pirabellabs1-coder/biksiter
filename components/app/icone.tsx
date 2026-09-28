@@ -133,6 +133,8 @@ const TRACES = {
   ),
   filtre: <path d="M4 5h16l-6 7v6l-4 2v-8L4 5Z" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  moins: <path d="M5 12h14" />,
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   coche: <path d="m5 12 5 5 9-10" />,
   croix: <path d="M6 6l12 12M18 6 6 18" />,
   position: <path d="M3 11 21 3l-8 18-2-8-8-2Z" />,

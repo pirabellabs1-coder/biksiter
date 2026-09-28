@@ -63,7 +63,7 @@ export function FormulaireDePhotos({
               <strong>{titre}</strong>
               <span>{conseil}</span>
               <span className="bouton contour petit">
-                <Icone nom={existe || apercu ? 'reglages' : 'plus'} taille={16} />
+                <Icone nom={existe || apercu ? 'photo' : 'plus'} taille={16} />
                 {existe || apercu ? textes.remplacer : textes.choisir}
               </span>
             </span>

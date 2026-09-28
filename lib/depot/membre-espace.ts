@@ -2,6 +2,8 @@ import 'server-only';
 
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
 import { messageRecu } from '@/lib/courriel/modeles';
+import { nettoyerLaPhoto } from '@/lib/securite/image';
+import { VERSION_DE_LA_PHOTO } from '@/lib/depot/photo-de-profil';
 import { notifier } from '@/lib/depot/notifications';
 import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
 import { mettreEnFile } from '@/lib/envois/file';
@@ -11,6 +13,7 @@ import {
   onPeutEncoreDeposer,
   type SensDeLAvis,
 } from '@/lib/regles/avis-de-garde';
+import { motifDeSignalementValable } from '@/lib/regles/signalements';
 import {
   blocageCoupeLaConversation,
   conversationOuverte,
@@ -146,8 +149,12 @@ export type Conversation = {
   autrePrenom: string;
   autreInitiale: string;
   autreVuLe: Date | null;
+  /** La version de sa photo de profil, ou null s'il n'en a pas. */
+  autrePhoto: string | null;
   dernierMessage: string | null;
   dernierMessageLe: Date | null;
+  /** Le dernier message n'est qu'une photo (ou en porte une). */
+  dernierMessagePhoto?: boolean;
   nonLu?: boolean;
 };
 
@@ -168,7 +175,9 @@ export async function conversationsDuMembre(
     `select s.id, s.etat, s.debut, s.fin,
             autre.id as "autreId", autre.prenom as "autrePrenom",
             upper(left(autre.nom, 1)) as "autreInitiale", autre.vu_le as "autreVuLe",
+            ${VERSION_DE_LA_PHOTO('autre')} as "autrePhoto",
             dernier.corps as "dernierMessage", dernier.ecrit_le as "dernierMessageLe",
+            dernier.photo as "dernierMessagePhoto",
             exists (select 1 from notification n
                      where n.membre_id = $1 and n.lien = '/messages/' || s.id
                        and n.lue_le is null and n.visible_le <= now()) as "nonLu"
@@ -176,7 +185,9 @@ export async function conversationsDuMembre(
        join emplacement e on e.id = s.emplacement_id
        join membre autre on autre.id = case when s.cycliste_id = $1 then e.membre_id else s.cycliste_id end
        left join lateral (
-         select corps, ecrit_le from message m
+         select corps, ecrit_le,
+                exists (select 1 from photo_message pm where pm.message_id = m.id) as photo
+           from message m
           where m.stationnement_id = s.id order by ecrit_le desc limit 1
        ) dernier on true
       where (s.cycliste_id = $1 or e.membre_id = $1)
@@ -193,6 +204,7 @@ export type MessageDeConversation = {
   deMoi: boolean;
   corps: string;
   ecritLe: Date;
+  aUnePhoto: boolean;
 };
 
 export async function conversation(
@@ -207,6 +219,7 @@ export async function conversation(
     `select s.id, s.etat, s.debut, s.fin, s.repris_le as "reprisLe",
             autre.id as "autreId", autre.prenom as "autrePrenom",
             upper(left(autre.nom, 1)) as "autreInitiale", autre.vu_le as "autreVuLe",
+            ${VERSION_DE_LA_PHOTO('autre')} as "autrePhoto",
             null as "dernierMessage", null as "dernierMessageLe",
             ${BLOCAGE_ENTRE} as bloquee
        from stationnement s
@@ -218,8 +231,11 @@ export async function conversation(
   if (!garde) return null;
   const [messages] = await Promise.all([
     interroger<MessageDeConversation>(
-      `select id, auteur_id = $2 as "deMoi", corps, ecrit_le as "ecritLe"
-         from message where stationnement_id = $1 order by ecrit_le`,
+      `select m.id, m.auteur_id = $2 as "deMoi", m.corps, m.ecrit_le as "ecritLe",
+              pm.message_id is not null as "aUnePhoto"
+         from message m
+         left join photo_message pm on pm.message_id = m.id
+        where m.stationnement_id = $1 order by m.ecrit_le`,
       [gardeId, membreId],
     ),
     // Lire la conversation vaut lecture de sa notification : sans cela, le
@@ -256,17 +272,74 @@ export async function ecrireUnMessage(
   membreId: string,
   gardeId: string,
   corps: string,
+  photo?: Buffer | null,
 ): Promise<ResultatSimple> {
   const texte = corps.trim();
-  if (!texte) return { ok: false, texte: 'Écrivez votre message.' };
   if (texte.length > 2000) {
     return {
       ok: false,
       texte: 'Un message peut contenir jusqu’à 2000 caractères.',
     };
   }
-  if (!/^[0-9a-f-]{36}$/.test(gardeId)) {
+  const aUnePhoto = photo != null && photo.length > 0;
+  if (!texte && !aUnePhoto) {
+    return { ok: false, texte: 'Écrivez un message ou joignez une photo.' };
+  }
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(gardeId)
+  ) {
     return { ok: false, texte: 'Cette conversation ne vous concerne pas.' };
+  }
+  // On ré-encode la photo avant d'ouvrir la transaction : le nettoyage (qui
+  // retire les métadonnées EXIF, règle 4) n'a pas à tenir la connexion. Mais
+  // d'abord, on vérifie que la conversation est la sienne et que la limite
+  // n'est pas atteinte : décoder une image coûte, on ne le fait pas pour rien.
+  let photoNettoyee: Awaited<ReturnType<typeof nettoyerLaPhoto>> | null = null;
+  if (aUnePhoto) {
+    const participant = await uneLigne<{
+      etat: EtatDeGarde;
+      repris_le: Date | null;
+      bloquee: boolean;
+    }>(
+      `select s.etat, s.repris_le, ${BLOCAGE_ENTRE} as bloquee
+         from stationnement s
+         join emplacement e on e.id = s.emplacement_id
+         join membre autre on autre.id = case when s.cycliste_id = $2 then e.membre_id else s.cycliste_id end
+        where s.id = $1 and (s.cycliste_id = $2 or e.membre_id = $2)`,
+      [gardeId, membreId],
+    );
+    if (!participant) {
+      return { ok: false, texte: 'Cette conversation ne vous concerne pas.' };
+    }
+    // Une conversation close ou bloquée refuse la photo avant qu'on la
+    // décode : sinon on pourrait faire travailler le serveur sans fin.
+    if (
+      !conversationEcrivable({
+        etat: participant.etat,
+        reprisLe: participant.repris_le,
+        bloquee: participant.bloquee,
+      })
+    ) {
+      return {
+        ok: false,
+        texte: 'Cette conversation ne reçoit plus de messages.',
+      };
+    }
+    if (await limiteDejaAtteinte(MESSAGES_PAR_HEURE, membreId)) {
+      return {
+        ok: false,
+        texte:
+          'Vous avez écrit beaucoup de messages en peu de temps. Vous pourrez continuer dans un moment.',
+      };
+    }
+    try {
+      photoNettoyee = await nettoyerLaPhoto(photo as Buffer);
+    } catch {
+      return {
+        ok: false,
+        texte: 'Cette photo n’a pas pu être lue. Essayez une autre image.',
+      };
+    }
   }
   return dansUneTransaction(async (client) => {
     const { rows } = await client.query<{
@@ -312,10 +385,25 @@ export async function ecrireUnMessage(
       };
     }
     await noterUneTentative('message_envoye', membreId, client);
-    await client.query(
-      'insert into message (stationnement_id, auteur_id, corps) values ($1, $2, $3)',
+    const { rows: inseres } = await client.query<{ id: string }>(
+      `insert into message (stationnement_id, auteur_id, corps)
+       values ($1, $2, $3) returning id`,
       [gardeId, membreId, texte],
     );
+    const messageId = inseres[0]?.id;
+    if (photoNettoyee && messageId) {
+      await client.query(
+        `insert into photo_message
+           (message_id, contenu, type_mime, largeur, hauteur)
+         values ($1, $2, 'image/webp', $3, $4)`,
+        [
+          messageId,
+          photoNettoyee.contenu,
+          photoNettoyee.largeur,
+          photoNettoyee.hauteur,
+        ],
+      );
+    }
 
     // Une seule notification tant que la précédente n'a pas été lue : dix
     // messages d'affilée ne font pas dix sonneries.
@@ -336,7 +424,7 @@ export async function ecrireUnMessage(
           prenomDuDestinataire: garde.autre_prenom,
           prenomDeLAuteur: garde.mon_prenom,
           quartier: garde.quartier,
-          corps: texte,
+          corps: texte || 'Photo envoyée',
         }),
         { client, aPropos: `stationnement ${gardeId}` },
       );
@@ -544,6 +632,8 @@ export type ProfilPublic = {
   }[];
   avis: AvisAffiche[];
   bloque: boolean;
+  /** La version de sa photo de profil, ou null s'il n'en a pas. */
+  photo: string | null;
 };
 
 /**
@@ -560,6 +650,7 @@ export async function profilPublic(
     Omit<ProfilPublic, 'emplacements' | 'avis'> & { visible: boolean }
   >(
     `select m.id, m.prenom, upper(left(m.nom, 1)) as initiale,
+            ${VERSION_DE_LA_PHOTO('m')} as photo,
             extract(year from m.cree_le)::int as "membreDepuis", m.vu_le as "vuLe",
             m.verification = 'verifiee' as "identiteVerifiee",
             m.telephone_verifie_le is not null as "telephoneVerifie",
@@ -635,8 +726,10 @@ export async function signaler(
     details: string;
   },
 ): Promise<ResultatSimple> {
-  const motif = signalement.motif.trim().slice(0, 120);
-  if (!motif) return { ok: false, texte: 'Choisissez un motif.' };
+  const motif = signalement.motif.trim();
+  if (!motifDeSignalementValable(signalement.cibleType, motif)) {
+    return { ok: false, texte: 'Choisissez un motif.' };
+  }
   const cible = await cibleDuSignalement(
     membreId,
     signalement.cibleType,
@@ -684,10 +777,26 @@ export async function cibleDuSignalement(
   cible: string,
 ): Promise<CibleDuSignalement | null> {
   if (type === 'membre') {
-    if (cible === membreId) return null;
+    if (cible === membreId || !/^[0-9a-f-]{36}$/.test(cible)) return null;
     const profil = await profilPublic(membreId, cible);
-    return profil && profil !== 'refuse'
-      ? { type, nom: `${profil.prenom} ${profil.initiale}.` }
+    if (profil && profil !== 'refuse') {
+      return { type, nom: `${profil.prenom} ${profil.initiale}.` };
+    }
+    // Un blocage ne doit pas faire taire la personne bloquée : quelqu'un
+    // qui insulte puis bloque reste signalable par celle avec qui il a
+    // partagé une demande ou une garde.
+    const partage = await uneLigne<{ prenom: string; initiale: string }>(
+      `select m.prenom, upper(left(m.nom, 1)) as initiale
+         from membre m
+        where m.id = $2
+          and exists (select 1 from stationnement s
+                        join emplacement e on e.id = s.emplacement_id
+                       where (s.cycliste_id = $1 and e.membre_id = m.id)
+                          or (s.cycliste_id = m.id and e.membre_id = $1))`,
+      [membreId, cible],
+    );
+    return partage
+      ? { type, nom: `${partage.prenom} ${partage.initiale}.` }
       : null;
   }
   if (!/^[a-z0-9-]{3,60}$/.test(cible)) return null;

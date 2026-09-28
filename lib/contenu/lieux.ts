@@ -62,3 +62,23 @@ export function trouverUnLieu(texte: string): Lieu | null {
     null
   );
 }
+
+/**
+ * Le lieu connu le plus proche d'une position. Sert à « Autour de moi » : la
+ * position reste dans le navigateur, seul le nom du quartier en sort.
+ */
+export function lieuLePlusProche(latitude: number, longitude: number): Lieu {
+  // À l'échelle de Bruxelles, une distance à plat suffit, en corrigeant la
+  // longitude par le cosinus de la latitude.
+  const k = Math.cos((latitude * Math.PI) / 180);
+  let meilleur = LIEUX[0] ?? LIEU_PAR_DEFAUT;
+  let ecart = Number.POSITIVE_INFINITY;
+  for (const lieu of LIEUX) {
+    const d = (lieu.latitude - latitude) ** 2 + ((lieu.longitude - longitude) * k) ** 2;
+    if (d < ecart) {
+      ecart = d;
+      meilleur = lieu;
+    }
+  }
+  return meilleur;
+}

@@ -76,6 +76,7 @@ describe('prolonger une garde', () => {
       fermetures: [],
     },
     dureeMaxJours: 7,
+    dureeMaxHeures: 5,
   };
 
   test('la nouvelle fin doit être plus tardive, et d’une semaine au plus', () => {
@@ -108,6 +109,26 @@ describe('prolonger une garde', () => {
       nouvelleFinRefusee(horaires, a('2026-09-22T16:00:00Z'), {
         ...lieu,
         dureeMaxJours: 2,
+      }),
+    ).toBe('duree_du_lieu');
+  });
+
+  test('sur une journée, une prolongation ne dépasse pas les heures d’affilée du lieu', () => {
+    // La garde dure 4 h (14 h – 18 h à Bruxelles) ; le lieu en accueille 5.
+    expect(
+      nouvelleFinRefusee(horaires, a('2026-09-20T17:00:00Z'), lieu),
+    ).toBeNull();
+    expect(nouvelleFinRefusee(horaires, a('2026-09-20T17:30:00Z'), lieu)).toBe(
+      'duree_du_lieu',
+    );
+  });
+
+  test('une garde qui atteint déjà les heures d’affilée du lieu ne se prolonge pas le jour même', () => {
+    // 4 h de garde, un lieu qui n'en accueille que 3 (réglage abaissé depuis).
+    expect(
+      nouvelleFinRefusee(horaires, a('2026-09-20T16:30:00Z'), {
+        ...lieu,
+        dureeMaxHeures: 3,
       }),
     ).toBe('duree_du_lieu');
   });

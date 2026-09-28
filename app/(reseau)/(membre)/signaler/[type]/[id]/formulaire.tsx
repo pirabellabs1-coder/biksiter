@@ -5,9 +5,12 @@ import { startTransition, useActionState, type FormEvent } from 'react';
 
 import { Icone } from '@/components/app/icone';
 
-import { envoyerUnSignalement, type EtatSimple } from '../../../profil/actions';
+import {
+  envoyerUnSignalement,
+  type EtatDuSignalement,
+} from '../../../profil/actions';
 
-const VIDE: EtatSimple = { erreur: null };
+const VIDE: EtatDuSignalement = { erreur: null };
 
 /**
  * L'envoi passe par le formulaire sans le réinitialiser : le motif choisi et
@@ -32,6 +35,8 @@ export function FormulaireDeSignalement({
     envoyer: string;
     envoi: string;
     annuler: string;
+    envoye: string;
+    revenir: string;
   };
 }) {
   const [etat, envoyer, enCours] = useActionState(envoyerUnSignalement, VIDE);
@@ -42,6 +47,20 @@ export function FormulaireDeSignalement({
     startTransition(() => envoyer(donnees));
   }
 
+  if (etat.envoye) {
+    return (
+      <div className="pile">
+        <div className="encart" role="status">
+          <Icone nom="coche" taille={22} />
+          <span>{textes.envoye}</span>
+        </div>
+        <Link href={retour} className="bouton plein">
+          {textes.revenir}
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <form action={envoyer} onSubmit={soumettre} className="pile">
       <input type="hidden" name="cible" value={type} />
@@ -50,13 +69,15 @@ export function FormulaireDeSignalement({
       <fieldset className="sans-cadre">
         <legend className="titre-section">{textes.motif}</legend>
         <div className="liste">
-          {motifs.map(([valeur, libelle], rang) => (
+          {/* Aucun motif coché d'avance : un signalement dit ce que la
+              personne a vécu, pas un choix par défaut. */}
+          {motifs.map(([valeur, libelle]) => (
             <label key={valeur} className="ligne" style={{ margin: 0 }}>
               <input
                 type="radio"
                 name="motif"
                 value={valeur}
-                defaultChecked={rang === 0}
+                required
                 className="radio-app"
                 style={{ minHeight: 0, padding: 0 }}
               />

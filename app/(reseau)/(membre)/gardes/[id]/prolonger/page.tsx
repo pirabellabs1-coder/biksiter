@@ -1,30 +1,29 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
-import { dateDeGarde } from '@/components/app/garde';
-import { Icone } from '@/components/app/icone';
-import { amenagementsDeLaGarde } from '@/lib/depot/amenagements';
-import { detailDeLaGarde } from '@/lib/depot/gardes';
-import { textes } from '@/lib/i18n/langue';
 import {
-  LONGUEUR_D_UN_MOT_D_ACCOMPAGNEMENT,
-  PROLONGATION_MAXIMALE_JOURS,
-  prolongationPossible,
-} from '@/lib/regles/amenagements';
-import { HEURES } from '@/lib/recherche-courante';
-import { heureABruxelles, jourABruxelles } from '@/lib/temps';
+  ChoixDeLaProlongation,
+  type CreneauDeProlongation,
+} from '@/components/maquette/garde/choix-de-la-prolongation';
+import { duree, heure } from '@/components/maquette/garde/dates';
+import {
+  amenagementsDeLaGarde,
+  finsDeProlongationAcceptees,
+} from '@/lib/depot/amenagements';
+import { detailDeLaGarde } from '@/lib/depot/gardes';
+import { prolongationPossible } from '@/lib/regles/amenagements';
+import { jourABruxelles } from '@/lib/temps';
 import { exigerUnMembre } from '@/lib/session';
 
 import { demanderLaProlongation } from '../amenagements';
-import { FormulaireDeProlongation } from './formulaire';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Prolonger la garde') };
-}
+export const metadata: Metadata = { title: 'Prolonger la garde' };
 
 const HEURE = 60 * 60 * 1000;
+
+/** Cinq heures de plus au maximum : au-delà, on repasse par une autre garde. */
+const HEURES_PROPOSEES = 5;
 
 export default async function ProlongerLaGarde({
   params,
@@ -32,7 +31,6 @@ export default async function ProlongerLaGarde({
   params: Promise<{ id: string }>;
 }) {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
   const { id } = await params;
   const garde = await detailDeLaGarde(membre.id, id);
   if (!garde) notFound();
@@ -45,52 +43,79 @@ export default async function ProlongerLaGarde({
     redirect(`/gardes/${id}`);
   }
 
-  // Une heure de plus par défaut, arrondie au quart d'heure.
-  const proposee = new Date(Math.ceil((garde.fin.getTime() + HEURE) / (15 * 60 * 1000)) * 15 * 60 * 1000);
-  const heureProposee = heureABruxelles(proposee);
+  // D'heure en heure après l'horaire convenu, comme dans les maquettes, en
+  // ne gardant que les heures où le lieu accueille encore le vélo.
+  const envisagees = Array.from(
+    { length: HEURES_PROPOSEES },
+    (_, rang) => new Date(garde.fin.getTime() + (rang + 1) * HEURE),
+  );
+  const acceptees = await finsDeProlongationAcceptees(garde, envisagees);
+
+  const creneaux: CreneauDeProlongation[] = acceptees.map((fin) => {
+    const jour = jourABruxelles(fin);
+    const h = heure(fin);
+    const enPlus = Math.round((fin.getTime() - garde.fin.getTime()) / HEURE);
+    return {
+      valeur: `${jour}T${h}`,
+      jour,
+      heure: h.replace('h', ':'),
+      libelle: `${h}  ·  +${enPlus} h`,
+    };
+  });
+
+  const prenom = garde.autre.prenom;
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
-      <div className="ecran-app ecran-parcours">
-        <h1 className="titre-ecran">{p('Prolonger la garde')}</h1>
-        <p className="sous-titre">
-          {p('Besoin de plus de temps ? Demandez une prolongation à {prenom}.', {
-            prenom: garde.autre.prenom,
-          })}
+      <div className="dashboard-wrap">
+        <span className="kicker">
+          {garde.etat === 'en_cours' ? 'GARDE EN COURS' : 'GARDE À VENIR'}
+        </span>
+        <h1>Prolonger la garde</h1>
+        <p className="bs-intro">
+          La reprise est prévue à {heure(garde.fin)}. Si vous avez besoin de
+          plus de temps, demandez une prolongation : {prenom} reçoit votre
+          demande et vous répond depuis son espace.
         </p>
 
-        <div className="encart solde-encart" style={{ marginBottom: 12 }}>
-          <Icone nom="calendrier" taille={28} />
-          <span>
-            <span className="petit">{p('Horaire actuel')}</span>
-            <strong style={{ fontSize: 17 }}>{dateDeGarde(p, garde.debut, garde.fin)}</strong>
-          </span>
+        <div className="champs lecture">
+          <div>
+            <span>Horaire convenu</span>
+            <b>
+              {heure(garde.debut)} → {heure(garde.fin)}
+            </b>
+          </div>
+          <div>
+            <span>Durée comptée</span>
+            <b>{duree(garde.debut, garde.fin)}</b>
+          </div>
         </div>
 
-        <FormulaireDeProlongation
-          action={demanderLaProlongation.bind(null, garde.id)}
-          heures={HEURES}
-          jourParDefaut={jourABruxelles(proposee)}
-          heureParDefaut={HEURES.includes(heureProposee) ? heureProposee : '18:00'}
-          jourMinimal={jourABruxelles(garde.fin)}
-          jourMaximal={jourABruxelles(
-            new Date(garde.fin.getTime() + PROLONGATION_MAXIMALE_JOURS * 24 * HEURE),
-          )}
-          longueur={LONGUEUR_D_UN_MOT_D_ACCOMPAGNEMENT}
-          textes={{
-            nouvelleFin: p('Nouvelle fin de garde'),
-            jour: p('Jour'),
-            heure: p('Heure'),
-            motif: p('Motif de la prolongation (facultatif)'),
-            exemple: p('Ex. : mon train a du retard, je repasse demain matin.'),
-            information: p('{prenom} doit accepter la prolongation. Jusque-là, la garde se termine à l’heure prévue.', {
-              prenom: garde.autre.prenom,
-            }),
-            envoyer: p('Envoyer la demande'),
-            envoi: p('Envoi…'),
-          }}
-        />
+        {creneaux.length > 0 ? (
+          <ChoixDeLaProlongation
+            action={demanderLaProlongation.bind(null, garde.id)}
+            creneaux={creneaux}
+            prenom={prenom}
+            heureConvenue={heure(garde.fin)}
+            retour={`/gardes/${id}`}
+          />
+        ) : (
+          <>
+            <p className="bs-intro">
+              Le lieu n’accueille pas de vélo plus tard aujourd’hui, ou la
+              garde a déjà atteint la durée que {prenom} propose. Pour
+              convenir d’autre chose, écrivez-lui un message.
+            </p>
+            <div className="deux-boutons">
+              <Link className="primary" href={`/messages/${garde.id}`}>
+                Écrire à {prenom}
+              </Link>
+              <Link className="outline" href={`/gardes/${id}`}>
+                Revenir à la garde
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </main>
   );

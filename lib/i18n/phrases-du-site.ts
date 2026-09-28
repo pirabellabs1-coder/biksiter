@@ -28,8 +28,10 @@ export const PHRASES_DU_SITE: Record<'nl' | 'en', Record<string, string>> = {
     'Aucun code en attente : demandez-en un nouveau.':
       'Er is geen code in afwachting: vraag een nieuwe aan.',
     'Bike sitter': 'Bike sitter',
-    'Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, par exemple MANO-4K29.':
-      'Deze uitnodigingscode bestaat niet of is al gebruikt. Controleer of hij exact is overgenomen, bijvoorbeeld MANO-4K29.',
+    'Plusieurs inscriptions n’ont pas abouti depuis cette connexion aujourd’hui. Vous pourrez réessayer demain, ou nous écrire si vous avez besoin d’aide.':
+      'Vanaf deze verbinding zijn vandaag meerdere inschrijvingen mislukt. U kunt het morgen opnieuw proberen, of ons schrijven als u hulp nodig hebt.',
+    'Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, par exemple MANO-4K29PB.':
+      'Deze uitnodigingscode bestaat niet of is al gebruikt. Controleer of hij exact is overgenomen, bijvoorbeeld MANO-4K29PB.',
     'Ce code n’est plus valable : demandez-en un nouveau.':
       'Deze code is niet meer geldig: vraag een nieuwe aan.',
     'Ce format n’est pas accepté. Envoyez une photo (JPEG, PNG, WebP) ou un PDF.':
@@ -607,8 +609,10 @@ export const PHRASES_DU_SITE: Record<'nl' | 'en', Record<string, string>> = {
     'Aucun code en attente : demandez-en un nouveau.':
       'No code is pending: request a new one.',
     'Bike sitter': 'Bike sitter',
-    'Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, par exemple MANO-4K29.':
-      'This invitation code does not exist or has already been used. Check that it is copied exactly, for example MANO-4K29.',
+    'Plusieurs inscriptions n’ont pas abouti depuis cette connexion aujourd’hui. Vous pourrez réessayer demain, ou nous écrire si vous avez besoin d’aide.':
+      'Several sign-ups from this connection did not go through today. You can try again tomorrow, or write to us if you need help.',
+    'Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, par exemple MANO-4K29PB.':
+      'This invitation code does not exist or has already been used. Check that it is copied exactly, for example MANO-4K29PB.',
     'Ce code n’est plus valable : demandez-en un nouveau.':
       'This code is no longer valid: request a new one.',
     'Ce format n’est pas accepté. Envoyez une photo (JPEG, PNG, WebP) ou un PDF.':

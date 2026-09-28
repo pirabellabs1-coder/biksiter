@@ -2,7 +2,9 @@ import { describe, expect, test } from 'vitest';
 
 import {
   CORRECTION_MAXIMALE,
+  emailMasque,
   estUneIssueDeLitige,
+  etatApresClassement,
   motifDeModerationValide,
   prioriteDuLitige,
   refusDeCorrection,
@@ -72,5 +74,24 @@ describe('les statistiques de l’administration', () => {
   test('le taux de finalisation compte les gardes menées à terme', () => {
     expect(tauxDeFinalisation(49, 1)).toBe(98);
     expect(tauxDeFinalisation(0, 0)).toBeNull();
+  });
+});
+
+describe('classer un litige', () => {
+  test('un litige classé rend la garde à son cours, là où en est le vélo', () => {
+    expect(etatApresClassement({ depose: true, repris: false })).toBe('en_cours');
+    expect(etatApresClassement({ depose: false, repris: false })).toBe('accepte');
+  });
+
+  test('un vélo déjà repris ne fait pas reprendre la garde', () => {
+    expect(etatApresClassement({ depose: true, repris: true })).toBeNull();
+  });
+});
+
+describe('les adresses dans les listes de la modération', () => {
+  test('une adresse e-mail est à demi masquée dans une liste', () => {
+    expect(emailMasque('jeanne.dupont@exemple.be')).toBe('je•••@exemple.be');
+    expect(emailMasque('a@b.be')).toBe('a•••@b.be');
+    expect(emailMasque('sans-arobase')).toBe('•••');
   });
 });

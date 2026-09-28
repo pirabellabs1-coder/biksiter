@@ -121,6 +121,13 @@ export async function trancherLeLitige(
       ),
     };
   }
+  if (resultat === 'velo_deja_rendu') {
+    return {
+      erreur: await traduire(
+        'Le vélo a déjà été rendu : la garde ne peut plus reprendre. Choisissez de la clore.',
+      ),
+    };
+  }
   if (resultat === 'deja_tranche') {
     return {
       erreur: await traduire(
@@ -238,5 +245,7 @@ export async function enregistrerLOffre(
   if (!identifiant) return { erreur: await traduire('Cet avantage n’existe plus.') };
   revalidatePath('/administration/catalogue');
   revalidatePath('/catalogue');
-  redirect('/administration/catalogue?enregistre=1');
+  redirect(
+    `/administration/catalogue?enregistre=${donnees.get('active') === 'oui' ? 'visible' : 'masque'}`,
+  );
 }

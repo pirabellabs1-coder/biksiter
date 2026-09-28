@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { enPoints } from '@/components/app/progression';
 import { soldeDuMembre } from '@/lib/depot/maillons';
@@ -39,7 +38,6 @@ export default async function HistoriqueDesPoints({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/progression" />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Historique des points')}</h1>
 

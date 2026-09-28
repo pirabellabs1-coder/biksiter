@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { identiteDuMembre } from '@/lib/depot/mon-compte';
 import { textes } from '@/lib/i18n/langue';
@@ -53,7 +52,6 @@ export default async function ModifierMonProfil() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Modifier mes informations')}</h1>
         <p className="sous-titre">

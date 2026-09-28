@@ -24,6 +24,8 @@ export type Notification = {
   visibleLe: Date;
   differee: boolean;
   lue: boolean;
+  /** Ce qui ne peut pas attendre : un code refusé, une annulation tardive. */
+  urgente: boolean;
 };
 
 export async function notifier(
@@ -73,7 +75,8 @@ export async function notificationsDuMembre(
     `select id, texte, valeurs, lien,
             visible_le as "visibleLe",
             visible_le > creee_le + interval '1 minute' as differee,
-            lue_le is not null as lue
+            lue_le is not null as lue,
+            urgente
        from notification
       where membre_id = $1 and visible_le <= now()
       order by visible_le desc

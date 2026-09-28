@@ -340,7 +340,7 @@ export function FormulaireDeDemande({
           <Icone nom="alerte" taille={22} />
           <span>
             {motifs.map((motif) => (
-              <span key={motif} className="motif">
+              <span key={motif} className="raison-du-refus">
                 {motif}
               </span>
             ))}

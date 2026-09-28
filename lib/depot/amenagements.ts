@@ -196,6 +196,44 @@ export async function annoncerUnRetardDe(
   return resultat;
 }
 
+/**
+ * Parmi les fins envisagées, celles que le lieu accepte : l'écran ne propose
+ * que des heures qu'on peut réellement demander, plutôt que d'en refuser une
+ * après coup.
+ */
+export async function finsDeProlongationAcceptees(
+  garde: { id: string; debut: Date; fin: Date },
+  envisagees: readonly Date[],
+): Promise<Date[]> {
+  const lieu = await uneLigne<{
+    jours: number[];
+    ouverture: string | null;
+    fermeture: string | null;
+    parJour: Record<string, { de: string; a: string }> | null;
+    fermetures: string[];
+    dureeMaxJours: number;
+    dureeMaxHeures: number;
+  }>(
+    `select e.jours_d_accueil::int[] as jours,
+            to_char(e.heure_d_ouverture, 'HH24:MI') as ouverture,
+            to_char(e.heure_de_fermeture, 'HH24:MI') as fermeture,
+            e.horaires_par_jour as "parJour",
+            array(select to_char(d, 'YYYY-MM-DD') from unnest(e.fermetures) d) as fermetures,
+            e.duree_max_jours as "dureeMaxJours",
+            e.duree_max_heures as "dureeMaxHeures"
+       from stationnement s join emplacement e on e.id = s.emplacement_id
+      where s.id = $1`,
+    [garde.id],
+  );
+  if (!lieu) return [];
+  const limites = {
+    horaires: horairesDe({ ...lieu, parJour: lieu.parJour ?? {} }),
+    dureeMaxJours: lieu.dureeMaxJours,
+    dureeMaxHeures: lieu.dureeMaxHeures,
+  };
+  return envisagees.filter((fin) => !nouvelleFinRefusee(garde, fin, limites));
+}
+
 export async function demanderUneProlongation(
   membreId: string,
   gardeId: string,
@@ -228,6 +266,7 @@ export async function demanderUneProlongation(
       parJour: Record<string, { de: string; a: string }> | null;
       fermetures: string[];
       dureeMaxJours: number;
+      dureeMaxHeures: number;
     }>(
       `select exists (select 1 from blocage b
                        where (b.membre_id = $2 and b.bloque_id = e.membre_id)
@@ -237,7 +276,8 @@ export async function demanderUneProlongation(
               to_char(e.heure_de_fermeture, 'HH24:MI') as fermeture,
               e.horaires_par_jour as "parJour",
               array(select to_char(d, 'YYYY-MM-DD') from unnest(e.fermetures) d) as fermetures,
-              e.duree_max_jours as "dureeMaxJours"
+              e.duree_max_jours as "dureeMaxJours",
+              e.duree_max_heures as "dureeMaxHeures"
          from emplacement e where e.id = $1`,
       [g.emplacement_id, membreId],
     );
@@ -249,6 +289,7 @@ export async function demanderUneProlongation(
     const refusDeFin = nouvelleFinRefusee({ debut: new Date(g.debut), fin }, nouvelleFin, {
       horaires: horairesDe({ ...lieu, parJour: lieu.parJour ?? {} }),
       dureeMaxJours: lieu.dureeMaxJours,
+      dureeMaxHeures: lieu.dureeMaxHeures,
     });
     if (refusDeFin) return refus(TEXTE_DU_REFUS_DE_PROLONGATION[refusDeFin]);
 

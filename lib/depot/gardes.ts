@@ -10,6 +10,7 @@ import {
   desistement,
 } from '@/lib/courriel/modeles';
 import { crediterLaGarde } from '@/lib/depot/maillons';
+import { VERSION_DE_LA_PHOTO } from '@/lib/depot/photo-de-profil';
 import { notifier } from '@/lib/depot/notifications';
 import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
 import { mettreEnFile } from '@/lib/envois/file';
@@ -39,7 +40,7 @@ import {
 import {
   adresseVisible,
   demandeExpiree,
-  demandeUnMotif,
+  motifObligatoire,
   DETENTEUR_DU_CODE,
   estUnDesistementTardif,
   EXPIRATION_D_UNE_DEMANDE_HEURES,
@@ -168,6 +169,9 @@ export async function motifsPourUneDemande(
   demande: Omit<NouvelleDemande, 'message'>,
   remplace: string | null = null,
 ): Promise<{ motifs: Motif[]; placesLibres: number } | null> {
+  // Une demande dont l'heure est passée ne doit plus bloquer la suivante :
+  // l'expiration s'applique ici, pas seulement à l'affichage.
+  await expirerLesDemandes();
   const [membre, emplacement, velo] = await Promise.all([
     uneLigne<MembreDemandeur>(
       `select id, prenom, verification = 'verifiee' as verifie, suspendu
@@ -544,6 +548,12 @@ export type DetailDeGarde = {
     initiale: string;
     gardes: number;
     telephone: string | null;
+    /** Règle 2 : le bleu « vérifié » ne s'affiche que si un humain a validé. */
+    verifie: boolean;
+    /** Depuis quand la personne est membre — « membre depuis juin 2026 ». */
+    depuis: Date;
+    /** La version de sa photo de profil, ou null s'il n'en a pas. */
+    photo: string | null;
   };
   emplacement: {
     reference: string;
@@ -559,6 +569,26 @@ export type DetailDeGarde = {
   photosVisibles: boolean;
   avis: { deposeParMoi: boolean; deposeParLAutre: boolean };
 };
+
+/**
+ * Le rôle du membre dans une garde, sans charger tout le détail : le cadre des
+ * écrans de la garde s'en sert pour garder le bon côté (en-tête et barre du
+ * bas) d'une page à l'autre.
+ */
+export async function roleDansLaGarde(
+  membreId: string,
+  id: string,
+): Promise<'cycliste' | 'bike_sitter' | null> {
+  if (!IDENTIFIANT.test(id)) return null;
+  const ligne = await uneLigne<{ role: 'cycliste' | 'bike_sitter' | null }>(
+    `select case when s.cycliste_id = $1 then 'cycliste'
+                 when e.membre_id = $1 then 'bike_sitter' end as role
+       from stationnement s join emplacement e on e.id = s.emplacement_id
+      where s.id = $2`,
+    [membreId, id],
+  );
+  return ligne?.role ?? null;
+}
 
 export async function detailDeLaGarde(
   membreId: string,
@@ -587,6 +617,9 @@ export async function detailDeLaGarde(
       autreInitiale: string;
       autreTelephone: string | null;
       autreGardes: number;
+      autreVerifie: boolean;
+      autreDepuis: Date;
+      autrePhoto: string | null;
     }
   >(
     `select s.id, s.etat, s.debut, s.fin, s.demande_le as "demandeLe",
@@ -602,7 +635,10 @@ export async function detailDeLaGarde(
             autre.prenom as "autrePrenom", upper(left(autre.nom, 1)) as "autreInitiale",
             case when autre.telephone_verifie_le is not null then autre.telephone end as "autreTelephone",
             (select count(*)::int from stationnement s2 join emplacement e2 on e2.id = s2.emplacement_id
-              where s2.etat = 'termine' and (s2.cycliste_id = autre.id or e2.membre_id = autre.id)) as "autreGardes"
+              where s2.etat = 'termine' and (s2.cycliste_id = autre.id or e2.membre_id = autre.id)) as "autreGardes",
+            (autre.verification = 'verifiee') as "autreVerifie",
+            autre.cree_le as "autreDepuis",
+            ${VERSION_DE_LA_PHOTO('autre')} as "autrePhoto"
        from stationnement s
        join emplacement e on e.id = s.emplacement_id
        left join velo v on v.id = s.velo_id
@@ -679,6 +715,9 @@ export async function detailDeLaGarde(
       initiale: ligne.autreInitiale,
       gardes: ligne.autreGardes,
       telephone: telephoneVisible(ligne.etat) ? ligne.autreTelephone : null,
+      verifie: ligne.autreVerifie,
+      depuis: ligne.autreDepuis,
+      photo: ligne.autrePhoto,
     },
     emplacement: {
       reference: ligne.reference,
@@ -800,7 +839,7 @@ export async function effectuerUnGeste(
     }
 
     const motif = (motifSaisi ?? '').trim().slice(0, 600) || null;
-    if (demandeUnMotif(geste) && !motif) return refus('Choisissez un motif.');
+    if (motifObligatoire(geste) && !motif) return refus('Choisissez un motif.');
 
     const maintenant = new Date();
     const debut = new Date(g.debut);
@@ -991,7 +1030,7 @@ export async function effectuerUnGeste(
       case 'personne_n_ouvre':
         await notifier(client, g.bike_sitter_id, {
           texte:
-            "{prenom} s'est présenté et n'a pas pu vous joindre. Il est reparti avec son vélo, et la place est de nouveau libre.",
+            "Personne n'a ouvert à l'arrivée de {prenom} : le vélo repart avec son propriétaire, la garde est close et la place est de nouveau libre.",
           valeurs: { prenom: monPrenom },
           lien,
           urgente: true,
@@ -999,7 +1038,7 @@ export async function effectuerUnGeste(
         break;
       case 'arriver':
         await notifier(client, g.bike_sitter_id, {
-          texte: '{prenom} est arrivé devant chez vous avec son vélo.',
+          texte: '{prenom} est devant chez vous avec son vélo.',
           valeurs: { prenom: monPrenom },
           lien,
           urgente: true,

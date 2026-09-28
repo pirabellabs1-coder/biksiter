@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { comptesBloques } from '@/lib/depot/mon-compte';
 import { textes } from '@/lib/i18n/langue';
@@ -20,7 +19,6 @@ export default async function ComptesBloques() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/confidentialite" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Membres bloqués')}</h1>
         <p className="sous-titre">

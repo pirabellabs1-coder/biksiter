@@ -1,6 +1,12 @@
 'use client';
 
-import { useActionState, useState, type ReactNode } from 'react';
+import {
+  startTransition,
+  useActionState,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 
 import { Icone } from './icone';
 
@@ -10,6 +16,12 @@ type EtatDUneDecision = { erreur: string | null };
  * Une décision de modération : un choix, un motif, un bouton. Le choix et le
  * motif sont tenus ici, pour qu'un refus du serveur n'efface pas ce qui a été
  * écrit.
+ *
+ * Aucun choix n'est coché d'avance : une décision se prend, elle ne se
+ * valide pas par défaut. Et l'envoi ne passe pas par la réinitialisation
+ * automatique du formulaire : après une erreur, React remettait les boutons
+ * radio sur leur valeur initiale alors que l'écran affichait encore l'autre
+ * choix — un refus pouvait repartir en approbation.
  */
 export function FormulaireDeDecision({
   action,
@@ -18,6 +30,8 @@ export function FormulaireDeDecision({
   champsCaches = {},
   avant,
   confirmation,
+  confirmationInutilePour = [],
+  danger = false,
   textes,
 }: {
   action: (
@@ -31,6 +45,10 @@ export function FormulaireDeDecision({
   avant?: ReactNode;
   /** Une case à cocher qui engage la personne (« le vélo a été rendu »). */
   confirmation?: string;
+  /** Les choix pour lesquels cette case n'a pas de sens (la garde continue). */
+  confirmationInutilePour?: readonly string[];
+  /** Vrai quand l'envoi lui-même est lourd de conséquences (suspendre). */
+  danger?: boolean;
   textes: {
     legende?: string;
     motif: string;
@@ -40,13 +58,26 @@ export function FormulaireDeDecision({
   };
 }) {
   const [etat, envoyer, enCours] = useActionState(action, { erreur: null });
-  const [choisi, setChoisi] = useState(choix[0]?.[0] ?? '');
+  const [choisi, setChoisi] = useState(
+    choix.length === 1 ? (choix[0]?.[0] ?? '') : '',
+  );
   const [motif, setMotif] = useState('');
   const [confirme, setConfirme] = useState(false);
-  const lourd = choix.find(([valeur]) => valeur === choisi)?.[3] ?? false;
+  const lourd =
+    danger || (choix.find(([valeur]) => valeur === choisi)?.[3] ?? false);
+  const choixAttendu = choix.length > 0 && choisi === '';
+
+  function soumettre(evenement: FormEvent<HTMLFormElement>) {
+    evenement.preventDefault();
+    if (choixAttendu) return;
+    const donnees = new FormData(evenement.currentTarget);
+    startTransition(() => envoyer(donnees));
+  }
 
   return (
-    <form action={envoyer} className="pile">
+    // `action` reste posé : avant l'hydratation, le formulaire part tout de
+    // même vers l'action serveur (jamais en GET, motif dans l'URL).
+    <form action={envoyer} onSubmit={soumettre} className="pile">
       {Object.entries(champsCaches).map(([nom, valeur]) => (
         <input key={nom} type="hidden" name={nom} value={valeur} />
       ))}
@@ -93,7 +124,7 @@ export function FormulaireDeDecision({
         ) : null}
       </label>
 
-      {confirmation ? (
+      {confirmation && !confirmationInutilePour.includes(choisi) ? (
         <label className="check">
           <input
             type="checkbox"
@@ -116,10 +147,13 @@ export function FormulaireDeDecision({
       <button
         type="submit"
         className={lourd ? 'bouton danger' : 'bouton plein'}
-        disabled={enCours}
+        disabled={enCours || choixAttendu}
       >
         {enCours ? textes.envoi : textes.confirmer}
       </button>
+      {choixAttendu ? (
+        <p className="aide-champ">Choisissez d’abord une décision.</p>
+      ) : null}
     </form>
   );
 }

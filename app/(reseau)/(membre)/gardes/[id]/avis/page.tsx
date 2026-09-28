@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
+import { Avatar } from '@/components/app/avatar';
+import { creneau } from '@/components/maquette/garde/dates';
+import { NoteEtPointsForts } from '@/components/maquette/garde/note-et-points-forts';
+import { nombreDEmplacements } from '@/lib/depot/emplacements';
 import { detailDeLaGarde } from '@/lib/depot/gardes';
-import { textes } from '@/lib/i18n/langue';
+import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import {
   CRITERES,
   DELAI_POUR_DEPOSER_JOURS,
@@ -12,12 +14,9 @@ import {
 } from '@/lib/regles/avis-de-garde';
 import { exigerUnMembre } from '@/lib/session';
 
-import { FormulaireDAvis } from './formulaire';
+import { publierLAvis } from '../actions';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Avis') };
-}
+export const metadata: Metadata = { title: 'Avis' };
 
 export default async function Avis({
   params,
@@ -25,29 +24,32 @@ export default async function Avis({
   params: Promise<{ id: string }>;
 }) {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
   const { id } = await params;
   const garde = await detailDeLaGarde(membre.id, id);
   if (!garde) notFound();
-  if (garde.etat !== 'termine' || garde.avis.deposeParMoi)
+  if (garde.etat !== 'termine' || garde.avis.deposeParMoi) {
     redirect(`/gardes/${id}`);
+  }
+
+  const [_nonLues, _emplacements] = await Promise.all([
+    nombreDeNotificationsNonLues(membre.id),
+    nombreDEmplacements(membre.id),
+  ]);
 
   const fin =
     garde.evenements.find((e) => e.etape === 'termine')?.faitLe ?? garde.fin;
+  const prenom = garde.autre.prenom;
+
   if (!onPeutEncoreDeposer(new Date(fin), new Date())) {
     return (
       <main id="contenu">
-        <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
-        <div className="ecran-app ecran-parcours">
-          <div className="carte vide-liste">
-            <Icone nom="etoile" taille={30} />
-            <strong>{p('Le délai pour publier un avis est dépassé.')}</strong>
-            <span>
-              {p('Il court pendant {n} jours après la fin de la garde.', {
-                n: DELAI_POUR_DEPOSER_JOURS,
-              })}
-            </span>
-          </div>
+        <div className="dashboard-wrap">
+          <span className="kicker">GARDE TERMINÉE</span>
+          <h1>Le délai pour publier un avis est passé</h1>
+          <p className="bs-intro">
+            Il court pendant {DELAI_POUR_DEPOSER_JOURS} jours après la fin de
+            la garde. La garde reste consultable dans « Terminées ».
+          </p>
         </div>
       </main>
     );
@@ -60,49 +62,37 @@ export default async function Avis({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
-      <div className="ecran-app ecran-parcours">
-      <h1 className="titre-ecran">{p('Comment s’est passée la garde ?')}</h1>
-      <p className="sous-titre">
-        {p('Partagez votre expérience avec {prenom} pour aider la communauté.', {
-          prenom: garde.autre.prenom,
-        })}
-      </p>
-      <div className="carte personne-de-garde">
-        <span className="avatar-app" aria-hidden="true">
-          {garde.autre.prenom.charAt(0)}
-        </span>
-        <span className="ligne-texte">
-          <strong>
-            {garde.autre.prenom} {garde.autre.initiale}.
-          </strong>
-          <span>
-            {garde.role === 'cycliste' ? p('Votre Bike Sitter') : p('Cycliste')}
-          </span>
-        </span>
-        <Icone nom="velo" taille={30} className="texte-vert" />
-      </div>
-      <FormulaireDAvis
-        id={id}
-        criteres={CRITERES[sens].map((c) => [c, p(c)] as const)}
-        textes={{
-          note: p('Votre note'),
-          detail: p('Dans le détail (facultatif)'),
-          question: p('Votre avis (facultatif)'),
-          placeholder: p(
-            "Ce qui s'est bien passé, ce qui pourrait aider le prochain cycliste…",
-          ),
-          generale: p('Note générale'),
-          sur: p('sur 5'),
-          bandeau: p(
-            "Votre avis reste invisible tant que {prenom} n'a pas déposé le sien. Publication automatique après 7 jours.",
-            { prenom: garde.autre.prenom },
-          ),
-          obligatoire: p('Une note générale peut être attribuée à cette garde.'),
-          publier: p('Publier mon avis'),
-          envoi: p('Envoi…'),
-        }}
-      />
+      <div className="dashboard-wrap">
+        <span className="kicker">GARDE TERMINÉE</span>
+        <h1>Comment s’est passée la garde ?</h1>
+        <p className="bs-intro">
+          {garde.role === 'cycliste'
+            ? `Votre avis aide les prochains cyclistes à choisir leur bike sitter. Il est facultatif, et ${prenom} pourra y répondre.`
+            : `Votre avis aide les prochains bike sitters à savoir à qui ils ouvrent leur porte. Il est facultatif, et ${prenom} pourra y répondre.`}
+        </p>
+
+        <div className="dem-qui">
+          <Avatar
+            membreId={garde.autre.id}
+            prenom={prenom}
+            version={garde.autre.photo}
+            taille={56}
+          />
+          <div>
+            <b>
+              {prenom} {garde.autre.initiale}.
+            </b>
+            <p>
+              {garde.emplacement.type} · {creneau(garde.debut, garde.fin)}
+            </p>
+          </div>
+        </div>
+
+        <NoteEtPointsForts
+          action={publierLAvis.bind(null, id)}
+          criteres={CRITERES[sens]}
+          retour={`/gardes/${id}`}
+        />
       </div>
     </main>
   );

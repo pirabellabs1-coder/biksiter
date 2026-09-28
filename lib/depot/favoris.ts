@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
+import { VERSION_DE_LA_PHOTO } from '@/lib/depot/photo-de-profil';
 import { AVIS_POUR_AFFICHER_UNE_NOTE } from '@/lib/regles/avis-de-garde';
 import { decisionDeFavori, type DecisionDeFavori } from '@/lib/regles/favoris';
 
@@ -86,6 +87,9 @@ export async function basculerLeFavori(
 
 export type Favori = {
   reference: string;
+  bikeSitterId: string;
+  /** La version de sa photo de profil, ou null s'il n'en a pas. */
+  photo: string | null;
   prenom: string;
   initialeDuNom: string;
   type: string;
@@ -101,6 +105,8 @@ export type Favori = {
 export async function mesFavoris(membreId: string): Promise<Favori[]> {
   const lignes = await interroger<Favori>(
     `select v.reference,
+            v.bike_sitter_id as "bikeSitterId",
+            ${VERSION_DE_LA_PHOTO('m')} as photo,
             v.prenom_du_bike_sitter as prenom,
             upper(left(m.nom, 1)) as "initialeDuNom",
             v.type, v.quartier,

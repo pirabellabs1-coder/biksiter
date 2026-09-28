@@ -1,481 +1,457 @@
 import Link from 'next/link';
 
 import { Icone } from '@/components/app/icone';
-import { EnTeteDuSite } from '@/components/site/en-tete-du-site';
-import { ParcoursIllustre } from '@/components/site/parcours-illustre';
-import { PiedPublic } from '@/components/site/pied-public';
-import { TelephoneAccueil } from '@/components/site/telephone-accueil';
-import { TelephoneResultats } from '@/components/site/telephone-resultats';
-import {
-  chiffresDeLaCommunaute,
-  zonesOuvertes,
-} from '@/lib/depot/reseau-public';
-import { textes } from '@/lib/i18n/langue';
-import { EXPIRATION_D_UNE_DEMANDE_HEURES } from '@/lib/regles/garde';
-import { INSCRIPTION_SUR_INVITATION } from '@/lib/regles/modules';
-import { CHIFFRES_DU_CODE_DE_REMISE } from '@/lib/regles/remise';
+import { Recherche } from '@/components/maquette/recherche';
+import { POINTS_PAR_GARDE, POINTS_PAR_JOUR_SUPPLEMENTAIRE } from '@/lib/regles/maillons';
 
 /**
  * L'accueil du site public.
  *
- * Pensé comme une vitrine éditoriale : un visuel plein cadre au-dessus du
- * fil de la page, un récit qui déroule (comment ça marche, ce qui protège,
- * l'association, un dernier appel), et les chiffres du réseau lus en base
- * — jamais inventés.
+ * La mise en page suit les maquettes définitives : la promesse et le champ de
+ * recherche d'abord, puis le déroulement d'une garde, les moments de la ville,
+ * ce qui protège, l'appel à devenir bike sitter, les points, et les questions.
  */
+
+const ETAPES = [
+  {
+    rang: '01',
+    titre: 'Cherchez',
+    texte: 'Indiquez votre destination et vos horaires.',
+    image: '/images/step-01.png',
+    alt: 'Une cycliste regarde une carte sur son téléphone, épingle sur la destination et heure de dépôt affichée.',
+  },
+  {
+    rang: '02',
+    titre: 'Choisissez',
+    texte: 'Comparez les bike sitters proches et leurs emplacements.',
+    image: '/images/step-02.png',
+    alt: 'Trois cartes de Bike Sitters proches avec leurs notes et leurs distances, tenues par un Bike Sitter.',
+  },
+  {
+    rang: '03',
+    titre: 'Demandez',
+    texte: 'Envoyez une demande. Le Bike Sitter reste libre d’accepter.',
+    image: '/images/step-03.png',
+    alt: 'Une cycliste envoie une demande depuis son téléphone ; le Bike Sitter la reçoit en face, sur le sien.',
+  },
+  {
+    rang: '04',
+    titre: 'Déposez',
+    texte: 'Code, photos et constat rapide avant la remise en main propre.',
+    image: '/images/step-04.png',
+    alt: 'Un dépôt devant une porte verte, entre deux plantes en pot.',
+  },
+  {
+    rang: '05',
+    titre: 'Profitez',
+    texte:
+      'Restaurant, rendez-vous ou shopping : faites ce que vous avez prévu.',
+    image: '/images/step-05.png',
+    alt: 'Une cycliste attablée à une terrasse, boisson en main pendant la garde.',
+  },
+  {
+    rang: '06',
+    titre: 'Reprenez',
+    texte: 'Contrôlez au retour : nouvelles photos et garde terminée.',
+    image: '/images/step-06.png',
+    alt: 'Un cycliste reprend son vélo devant la maison, garde terminée.',
+  },
+] as const;
+
+const QUESTIONS = [
+  {
+    question: 'Le Bike Sitter peut-il refuser ma demande ?',
+    reponse:
+      'Oui. Une demande n’est confirmée qu’après son acceptation. Vous recevez alors les informations nécessaires au dépôt.',
+  },
+  {
+    question: 'L’adresse du Bike Sitter est-elle publique ?',
+    reponse:
+      'Non. Seule une zone approximative est visible avant la confirmation de la garde.',
+  },
+  {
+    question: 'Que se passe-t-il si je suis en retard ?',
+    reponse:
+      'Prévenez depuis la messagerie de la garde. Le Bike Sitter peut accepter une prolongation selon sa disponibilité.',
+  },
+  {
+    question: 'Quels vélos peuvent être gardés ?',
+    reponse:
+      'Vélos de ville, électriques, cargo, route, VTT et pliants, selon la capacité indiquée par chaque Bike Sitter.',
+  },
+] as const;
+
 export default async function Accueil() {
-  const lesTextes = await textes();
-  const { p } = lesTextes;
-  const [zones, chiffres] = await Promise.all([
-    zonesOuvertes(),
-    chiffresDeLaCommunaute(),
-  ]);
-  const reseauOuvert = chiffres.emplacements > 0;
-
-  // Le nombre d'heures de la fenêtre de réponse et la longueur du code sont
-  // repris dans le parcours illustré (composant client) via les phrases
-  // localisées ; on les référence ici pour que la valeur reste centralisée.
-  void EXPIRATION_D_UNE_DEMANDE_HEURES;
-  void CHIFFRES_DU_CODE_DE_REMISE;
-
   return (
     <>
-      <EnTeteDuSite p={p} />
-
-      <main id="contenu" className="site-premium">
-        {/* Hero en deux colonnes : le texte à gauche, la photo à droite. */}
-        <section className="heros-duo" aria-labelledby="titre-accueil">
-          <div className="contenu-public heros-duo-grille">
-            <div className="heros-duo-texte">
-              <p className="heros-duo-surtitre">
-                <span className="point-vivant" aria-hidden="true" />
-                {p('Réseau d’entraide entre cyclistes · Bruxelles')}
-              </p>
-              <h1 id="titre-accueil" className="heros-duo-titre">
-                {p('Un endroit sûr pour votre vélo, ')}
-                <em>{p('près de chez vous.')}</em>
+      {/* Le lien d'évitement est posé par la mise en page publique ; ici on
+          n'en pose que la cible. */}
+      <span id="contenu" tabIndex={-1} />
+      <main id="accueil">
+        <section className="hero">
+          <div className="hero-grid">
+            <div className="hero-copy">
+              <div className="eyebrow">
+                <span /> Une garde humaine, près de votre destination
+              </div>
+              <h1>
+                Allez où vous voulez à vélo.
+                <br />
+                Sans le laisser dans la rue.
               </h1>
-              <p className="heros-duo-chapeau">
-                {p(
-                  'Bike Sitters met en relation les cyclistes bruxellois avec des particuliers qui accueillent gratuitement leur vélo dans un espace privé — le temps d’une course, d’un rendez-vous ou d’un week-end.',
-                )}
-              </p>
-              <div className="heros-duo-actions">
-                <Link href="/bienvenue" className="bouton plein grand">
-                  {p('Rejoindre le réseau')}
-                  <Icone nom="chevron" taille={22} />
-                </Link>
-                <Link href="/comment-ca-marche" className="bouton contour grand">
-                  {p('Comment ça marche')}
-                </Link>
-              </div>
-              {INSCRIPTION_SUR_INVITATION ? (
-                <p className="heros-duo-note">
-                  {p(
-                    'Pendant le lancement, on entre sur invitation d’un membre.',
-                  )}{' '}
-                  <Link href="/liste-attente" className="lien-souligne">
-                    {p('Rejoindre la liste d’attente')}
-                  </Link>
-                </p>
-              ) : null}
-              <ul className="heros-duo-garanties">
-                {[
-                  p('Entièrement gratuit'),
-                  p('Membres vérifiés'),
-                  p('Espace privé et fermé'),
-                ].map((garantie) => (
-                  <li key={garantie}>
-                    <Icone nom="coche" taille={17} strokeWidth={2.6} />
-                    {garantie}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="heros-duo-visuel">
-              <TelephoneAccueil p={p} />
-              {/* Deux pastilles posées à côté du téléphone : ce qui rassure. */}
-              <div className="heros-duo-pastille heros-duo-pastille-haut">
-                <span className="heros-duo-pastille-icone bleu">
-                  <Icone nom="verifie" taille={20} />
-                </span>
-                <span>
-                  <strong>{p('Identité vérifiée')}</strong>
-                  <small>{p('par une personne de l’association')}</small>
-                </span>
-              </div>
-              <div className="heros-duo-pastille heros-duo-pastille-bas">
-                <span className="heros-duo-pastille-icone vert">
-                  <Icone nom="cle" taille={20} />
-                </span>
-                <span>
-                  <strong>{p('Remise sécurisée')}</strong>
-                  <small>{p('par un code communiqué oralement')}</small>
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Parcours illustré : six vignettes qui apparaissent au scroll. */}
-        <section
-          className="section-editoriale bande-parcours"
-          aria-labelledby="titre-parcours"
-        >
-          <div className="contenu-public">
-            <div className="entete-editoriale">
-              <p className="surtitre-editorial">{p('Comment ça marche')}</p>
-              <h2 id="titre-parcours" className="titre-editorial">
-                {p('Une garde en six étapes.')}
-              </h2>
-              <p className="chapeau-editorial">
-                {p(
-                  'De la recherche d’un emplacement à la reprise de votre vélo, tout se déroule depuis votre espace membre. Vous êtes accompagné à chaque étape.',
-                )}
-              </p>
-            </div>
-            <ParcoursIllustre
-              etapes={[
-                {
-                  titre: p('Rechercher un emplacement'),
-                  texte: p(
-                    'Vous indiquez votre destination, la date et le vélo que vous souhaitez confier. Les emplacements disponibles vous sont proposés à proximité.',
-                  ),
-                },
-                {
-                  titre: p('Choisir un bike sitter'),
-                  texte: p(
-                    'Chaque fiche présente l’espace d’accueil, les horaires, les types de vélos acceptés et les avis des cyclistes précédents.',
-                  ),
-                },
-                {
-                  titre: p('Envoyer votre demande'),
-                  texte: p(
-                    'Vous envoyez une demande depuis la fiche. Le bike sitter dispose de quelques heures pour vous répondre.',
-                  ),
-                },
-                {
-                  titre: p('Déposer votre vélo'),
-                  texte: p(
-                    'À la porte, quelques photos suffisent à noter l’état du vélo. Vous communiquez ensuite un code à six chiffres pour marquer le début de la garde.',
-                  ),
-                },
-                {
-                  titre: p('Profiter de votre journée'),
-                  texte: p(
-                    'Votre vélo est en sécurité, vous êtes libre. Vous pouvez suivre l’avancement de la garde depuis votre espace à tout moment.',
-                  ),
-                },
-                {
-                  titre: p('Récupérer votre vélo'),
-                  texte: p(
-                    'Au retour, un nouveau constat photo termine la garde. Vous pouvez ensuite laisser un mot au bike sitter.',
-                  ),
-                },
-              ]}
-            />
-          </div>
-        </section>
-
-        {/* Section « Faites garder votre vélo » : trois arguments à gauche,
-            téléphone qui montre la vue liste à droite. */}
-        <section
-          className="section-vitrine"
-          aria-labelledby="titre-vitrine"
-        >
-          <div className="contenu-public section-vitrine-grille">
-            <div className="section-vitrine-texte">
-              <p className="surtitre-editorial">{p('L’application')}</p>
-              <h2 id="titre-vitrine" className="titre-editorial">
-                {p('Faites accueillir votre vélo par un particulier de confiance.')}
-              </h2>
-              <ul className="vitrine-avantages">
-                <li>
-                  <span className="vitrine-icone">
-                    <Icone nom="cle" taille={22} />
-                  </span>
-                  <div>
-                    <strong>{p('Un accès simple')}</strong>
-                    <p>
-                      {p(
-                        'Vous parcourez les emplacements proposés à proximité de votre destination directement depuis l’application, et envoyez votre demande en quelques minutes.',
-                      )}
-                    </p>
-                  </div>
-                </li>
-                <li>
-                  <span className="vitrine-icone">
-                    <Icone nom="cadenas" taille={22} />
-                  </span>
-                  <div>
-                    <strong>{p('Un espace privé')}</strong>
-                    <p>
-                      {p(
-                        'Chaque emplacement est un espace fermé et à l’abri, proposé par un membre dont l’identité a été vérifiée par l’association.',
-                      )}
-                    </p>
-                  </div>
-                </li>
-                <li>
-                  <span className="vitrine-icone">
-                    <Icone nom="horloge" taille={22} />
-                  </span>
-                  <div>
-                    <strong>{p('Une durée à votre rythme')}</strong>
-                    <p>
-                      {p(
-                        'La garde peut aller de quelques heures à plusieurs jours. Vous choisissez librement la durée qui vous convient.',
-                      )}
-                    </p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            <div className="section-vitrine-visuel">
-              <TelephoneResultats p={p} />
-            </div>
-          </div>
-        </section>
-
-        {/* Éditorial 2 colonnes, image à gauche : espace privé. */}
-        <section
-          className="section-editoriale sombre"
-          aria-labelledby="titre-espace"
-        >
-          <div className="contenu-public duo-editorial">
-            <div className="duo-image">
-              <img
-                src="/images/accueil-espace-prive.jpg"
-                alt=""
-                loading="lazy"
-              />
-            </div>
-            <div className="duo-texte">
-              <p className="surtitre-editorial">{p('Un espace privé')}</p>
-              <h2 id="titre-espace" className="titre-editorial">
-                {p('Votre vélo est accueilli dans un espace fermé.')}
-              </h2>
               <p>
-                {p(
-                  'Chaque emplacement proposé sur Bike Sitters est un espace privé, appartenant au bike sitter et non partagé avec les autres résidents de l’immeuble. Les quatorze types d’espaces acceptés répondent tous à cette règle.',
-                )}
+                Un Bike Sitter proche de votre destination garde votre vélo dans
+                un emplacement privé fermé, puis vous le remet en main propre.
               </p>
-              <ul className="liste-a-puces">
-                <li>{p('Garage privé fermé ou box individuel')}</li>
-                <li>{p('Cave privative, pièce dédiée ou débarras')}</li>
-                <li>{p('Cour, jardin, terrasse ou véranda close')}</li>
-              </ul>
-              <Link
-                href="/securite"
-                className="bouton plein bouton-editorial"
+            </div>
+            <div className="hero-brand-visual">
+              <div
+                className="plan"
+                role="img"
+                aria-label="Plan de quartier : trois Bike Sitters à quatre, sept et neuf minutes à pied de votre destination"
               >
-                {p('Voir les protections')}
-                <Icone nom="chevron" taille={20} />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Éditorial 2 colonnes, image à droite : vérification humaine. */}
-        <section
-          className="section-editoriale"
-          aria-labelledby="titre-verification"
-        >
-          <div className="contenu-public duo-editorial inverse">
-            <div className="duo-texte">
-              <p className="surtitre-editorial">
-                {p('Une vérification humaine')}
-              </p>
-              <h2 id="titre-verification" className="titre-editorial">
-                {p('Chaque dossier est examiné par l’association.')}
-              </h2>
-              <p>
-                {p(
-                  'Avant qu’un membre puisse proposer ou réserver un emplacement, son identité et son espace d’accueil sont vérifiés par une personne de l’association. Cette étape prend en général quarante-huit heures.',
-                )}
-              </p>
-              <ul className="liste-a-puces">
-                <li>{p('Vérification de la pièce d’identité, qui est ensuite supprimée')}</li>
-                <li>{p('L’adresse exacte n’est communiquée qu’après acceptation d’une demande')}</li>
-                <li>
-                  {p(
-                    'Le vélo change de mains à l’aide d’un code à six chiffres, communiqué oralement',
-                  )}
-                </li>
-              </ul>
-              <Link
-                href="/comment-ca-marche"
-                className="bouton plein bouton-editorial"
-              >
-                {p('Comment ça marche')}
-                <Icone nom="chevron" taille={20} />
-              </Link>
-            </div>
-            <div className="duo-image">
-              <img
-                src="/images/accueil-verification.jpg"
-                alt=""
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Chiffres serif géants. */}
-        {reseauOuvert ? (
-          <section className="chiffres-serif" aria-label={p('Le réseau')}>
-            <div className="contenu-public">
-              <p className="surtitre-editorial centre">
-                {p('Le réseau aujourd’hui')}
-              </p>
-              <dl className="chiffres-serif-grille">
-                <div>
-                  <dd>{zones.length}</dd>
-                  <dt>
-                    {p(
-                      zones.length > 1
-                        ? 'zones ouvertes à Bruxelles'
-                        : 'zone ouverte à Bruxelles',
-                    )}
-                  </dt>
+                <svg
+                  viewBox="0 0 420 420"
+                  aria-hidden="true"
+                  preserveAspectRatio="xMidYMid slice"
+                >
+                  <g
+                    stroke="rgba(9,45,26,.09)"
+                    strokeWidth="1.5"
+                    fill="none"
+                  >
+                    <path d="M0 104 H420 M0 226 H420 M0 336 H420 M86 0 V420 M206 0 V420 M312 0 V420" />
+                  </g>
+                  <path
+                    d="M-20 300 L200 120 L440 260"
+                    stroke="rgba(36,107,253,.12)"
+                    strokeWidth="26"
+                    fill="none"
+                  />
+                  <circle cx="146" cy="158" r="62" fill="rgba(1,118,40,.13)" />
+                  <circle cx="292" cy="150" r="52" fill="rgba(1,118,40,.10)" />
+                  <circle cx="168" cy="306" r="58" fill="rgba(1,118,40,.11)" />
+                </svg>
+                <span className="ici">
+                  <i />
+                  <b>Votre destination</b>
+                </span>
+                <span className="min m1">4 min</span>
+                <span className="min m2">7 min</span>
+                <span className="min m3">9 min</span>
+                <div className="floating-card card-two">
+                  <i>✓</i>
+                  <div>
+                    <b>Identité vérifiée</b>
+                    <span>Remise en main propre</span>
+                  </div>
                 </div>
-                <div>
-                  <dd>{chiffres.emplacements}</dd>
-                  <dt>
-                    {p(
-                      chiffres.emplacements > 1
-                        ? 'emplacements ouverts'
-                        : 'emplacement ouvert',
-                    )}
-                  </dt>
-                </div>
-                <div>
-                  <dd>{chiffres.stationnementsTermines}</dd>
-                  <dt>
-                    {p(
-                      chiffres.stationnementsTermines > 1
-                        ? 'gardes menées'
-                        : 'garde menée',
-                    )}
-                  </dt>
-                </div>
-                <div>
-                  <dd className="chiffre-monetaire">0&nbsp;€</dd>
-                  <dt>{p('le coût d’une garde, pour les deux membres')}</dt>
-                </div>
-              </dl>
-            </div>
-          </section>
-        ) : null}
-
-        {/* L'association — pas de fausse photo de fondateur : illustration. */}
-        <section
-          className="section-editoriale sombre"
-          aria-labelledby="titre-association"
-        >
-          <div className="contenu-public duo-editorial">
-            <div className="duo-illustration" aria-hidden="true">
-              <IllustrationAssociation />
-            </div>
-            <div className="duo-texte">
-              <p className="surtitre-editorial">{p('L’association')}</p>
-              <h2 id="titre-association" className="titre-editorial">
-                {p('Une association bruxelloise, sans but lucratif.')}
-              </h2>
-              <p>
-                {p(
-                  'Bike Sitters est une association en cours de constitution, portée par des cyclistes de Bruxelles. Son fonctionnement repose sur le bénévolat et les dons volontaires. Le service reste entièrement gratuit pour tous les membres.',
-                )}
-              </p>
-              <div className="duo-actions">
-                <Link href="/a-propos" className="bouton plein bouton-editorial">
-                  {p('À propos de l’association')}
-                  <Icone nom="chevron" taille={20} />
-                </Link>
-                <Link href="/soutenir" className="bouton contour bouton-editorial">
-                  {p('Nous soutenir')}
-                </Link>
               </div>
             </div>
           </div>
+
+          <Recherche />
+
+          <div className="trust-strip">
+            <span>
+              <Icone nom="cadenas" taille={16} strokeWidth={2} />
+              <b>Emplacement privé et fermé</b>
+            </span>
+            <span>
+              <Icone nom="cle" taille={16} strokeWidth={2} />
+              <b>Remise en main propre</b>
+            </span>
+            <span className="verified">
+              <Icone nom="bouclier" taille={16} strokeWidth={2} />
+              <b>Identité vérifiée</b>
+            </span>
+            <span>
+              <Icone nom="photo" taille={16} strokeWidth={2} />
+              <b>Photos au dépôt et au retour</b>
+            </span>
+          </div>
         </section>
 
-        {/* CTA final plein cadre. */}
-        <section className="cta-final" aria-labelledby="titre-cta-final">
-          <div className="contenu-public cta-final-corps">
-            <h2 id="titre-cta-final" className="cta-final-titre">
-              {p('Rejoindre Bike Sitters.')}
-            </h2>
-            <p className="cta-final-chapeau">
-              {p(
-                'Un compte unique vous permet de confier votre vélo à d’autres membres ou d’en accueillir un chez vous. Vous choisissez librement quand et à qui ouvrir votre espace.',
-              )}
+        <section className="section how" id="fonctionnement">
+          <div className="parcours-tete">
+            <p className="parcours-pastille">
+              <span>Comment ça marche ?</span>
             </p>
-            <div className="cta-final-actions">
-              <Link href="/bienvenue" className="bouton plein grand">
-                {p('Rejoindre le réseau')}
-                <Icone nom="chevron" taille={22} />
-              </Link>
-              <Link href="/faq" className="bouton contour clair">
-                {p('Questions fréquentes')}
-              </Link>
+            <h2>Une demande en quelques étapes</h2>
+            <p className="parcours-intro">
+              En seulement 6 étapes, vous pouvez trouver un Bike Sitter de
+              confiance pour vos trajets, vos courses ou vos déplacements.
+            </p>
+          </div>
+
+          <ol className="parcours">
+            {ETAPES.map((etape) => (
+              <li key={etape.rang} className="parcours-etape">
+                <span className="parcours-num" aria-hidden="true">
+                  {etape.rang}
+                </span>
+                <article className="parcours-carte">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    width={384}
+                    height={216}
+                    loading="lazy"
+                    alt={etape.alt}
+                    src={etape.image}
+                  />
+                  <h3>
+                    <span className="vh">Étape {etape.rang} — </span>
+                    {etape.titre}
+                  </h3>
+                  <p>{etape.texte}</p>
+                </article>
+                <span className="parcours-fleche" aria-hidden="true" />
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="section moments">
+          <div>
+            <h2>La ville reste à vous.</h2>
+            <p>
+              Pas de catégories à choisir. Indiquez simplement où vous allez.
+            </p>
+          </div>
+          <div className="moment-grid">
+            <article className="moment">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="moment-photo"
+                loading="lazy"
+                alt="Une terrasse de café, un vélo garé derrière"
+                src="/images/maquette-img-7.webp"
+              />
+              <div className="moment-txt">
+                <svg
+                  className="moment-glyphe"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 9h11v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9Z" />
+                  <path d="M15 10h2.2a2.5 2.5 0 0 1 0 5H15" />
+                  <path d="M6.5 6V3.5M10 6V3.5M13.5 6V3.5" />
+                </svg>
+                <b>Un déjeuner</b>
+                <span>Le vélo à quelques minutes à pied</span>
+              </div>
+            </article>
+            <article className="moment">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="moment-photo"
+                loading="lazy"
+                alt="Une spectatrice de dos devant une scène éclairée"
+                src="/images/maquette-img-8.webp"
+              />
+              <div className="moment-txt">
+                <svg
+                  className="moment-glyphe"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 18V6l10-2v12" />
+                  <circle cx="6.5" cy="18" r="2.5" />
+                  <circle cx="16.5" cy="16" r="2.5" />
+                </svg>
+                <b>Un concert</b>
+                <span>Sans chercher un arceau toute la soirée</span>
+              </div>
+            </article>
+            <article className="moment">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="moment-photo"
+                loading="lazy"
+                alt="Deux personnes en réunion autour d’une table"
+                src="/images/maquette-img-9.webp"
+              />
+              <div className="moment-txt">
+                <svg
+                  className="moment-glyphe"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="5" width="18" height="11" rx="2" />
+                  <path d="M2 20h20" />
+                </svg>
+                <b>Une réunion</b>
+                <span>L’esprit libre pendant votre rendez-vous</span>
+              </div>
+            </article>
+            <article className="moment">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="moment-photo"
+                loading="lazy"
+                alt="Une passante avec ses sacs dans une rue commerçante"
+                src="/images/maquette-img-10.webp"
+              />
+              <div className="moment-txt">
+                <svg
+                  className="moment-glyphe"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 8h12l-1 12H7L6 8Z" />
+                  <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+                </svg>
+                <b>Des courses</b>
+                <span>Votre vélo et ses accessoires à l’abri</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section className="section security" id="securite">
+          <div className="security-visual">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="visuel-securite"
+              width={160}
+              height={374}
+              loading="lazy"
+              alt="Un vélo rangé dans un emplacement privé fermé, le bike sitter présent sur place"
+              src="/images/maquette-img-11.webp"
+            />
+            <div className="safe-pill">✓ Garde confirmée</div>
+            <span className="visuel-marque">
+              <span className="brand-mark" aria-hidden="true" />
+              Bike Sitters
+            </span>
+          </div>
+          <div className="security-copy">
+            <h2>
+              Une personne. Un emplacement fermé. Une remise en main propre.
+            </h2>
+            <p>
+              Bike Sitters organise une garde entre personnes identifiées.
+              L’adresse exacte n’est communiquée qu’après acceptation.
+            </p>
+            <ul>
+              <li>
+                <b>Identité vérifiée</b>
+                <span>
+                  Chaque membre est vérifié par une personne de l’association
+                  avant sa première garde.
+                </span>
+              </li>
+              <li>
+                <b>État du vélo documenté</b>
+                <span>Photos au dépôt et au retour.</span>
+              </li>
+              <li>
+                <b>Codes de remise uniques</b>
+                <span>Chaque étape est confirmée par les deux membres.</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="become" id="devenir">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="visuel-devenir"
+            width={381}
+            height={400}
+            loading="lazy"
+            alt="Un Bike Sitter reçoit un vélo sur le pas de sa porte"
+            src="/images/maquette-img-12.webp"
+          />
+          <div>
+            <h2>Devenez Bike Sitter.</h2>
+            <p>
+              Gardez ponctuellement un vélo chez vous. Chaque garde menée à
+              terme vous donne des points, échangeables contre un geste offert
+              par un commerce du quartier.
+            </p>
+          </div>
+          <Link className="white" href="/devenir-bike-sitter">
+            Découvrir le rôle
+          </Link>
+        </section>
+
+        <section className="section points-pub" id="points">
+          <div className="pts-int">
+            <span className="kicker">LE SYSTÈME DE POINTS</span>
+            <h2>
+              Garder un vélo ne rapporte pas d’argent. Ça rapporte autre chose.
+            </h2>
+            <p className="pts-intro">
+              La garde est entièrement gratuite pour le cycliste. Le bike
+              sitter, lui, reçoit des points à chaque garde menée à terme, et
+              les utilise chez les commerces du quartier qui soutiennent le
+              réseau.
+            </p>
+            <div className="pts-grille">
+              <div className="pts-carte">
+                <b>{POINTS_PAR_GARDE} points</b>
+                <span>pour chaque garde menée à terme</span>
+              </div>
+              <div className="pts-carte">
+                <b>+{POINTS_PAR_JOUR_SUPPLEMENTAIRE} point</b>
+                <span>par jour entamé au-delà du premier</span>
+              </div>
+              <div className="pts-carte">
+                <b>Gratuit</b>
+                <span>pour le cycliste, à chaque garde</span>
+              </div>
+              <div className="pts-carte">
+                <b>× 2</b>
+                <span>
+                  pour un vélo qui prend plus de place : cargo, longtail,
+                  tandem ou avec remorque
+                </span>
+              </div>
             </div>
+            <p className="pts-note">
+              Les points n’ont aucune valeur monétaire, ne s’échangent pas entre
+              membres et ne se revendent pas : ils servent à remercier, chez
+              les commerces du quartier.
+            </p>
+            <Link className="outline" href="/catalogue">
+              Voir le catalogue
+            </Link>
+          </div>
+        </section>
+
+        <section className="section faq" id="faq">
+          <h2>Avant votre première garde.</h2>
+          <div className="accordions">
+            {QUESTIONS.map((entree) => (
+              <details key={entree.question}>
+                <summary>{entree.question}</summary>
+                <p>{entree.reponse}</p>
+              </details>
+            ))}
           </div>
         </section>
       </main>
-
-      <PiedPublic {...lesTextes} />
     </>
-  );
-}
-
-/**
- * Une illustration SVG pour représenter l'association : pas de fausse photo
- * de fondateur (l'ASBL n'a pas encore de visage à afficher — voir la règle
- * `ASSOCIATION.fondateur = null`).
- */
-function IllustrationAssociation() {
-  return (
-    <svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="ciel" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#e8f5ec" />
-          <stop offset="1" stopColor="#c9e4d3" />
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="480" height="480" fill="url(#ciel)" rx="24" />
-      {/* Maison, garage, vélo — trois formes qui disent Bruxelles. */}
-      <g fill="#017628">
-        <path d="M120 300 L120 220 L200 160 L280 220 L280 300 Z" opacity="0.15" />
-        <path d="M280 300 L280 240 L340 200 L400 240 L400 300 Z" opacity="0.2" />
-      </g>
-      <g fill="none" stroke="#017628" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round">
-        <path d="M60 300 L60 210 L200 120 L340 210 L340 300" />
-        <rect x="150" y="240" width="60" height="60" />
-        <path d="M340 300 L340 250 L410 210 L410 300" />
-      </g>
-      {/* Vélo devant. */}
-      <g fill="none" stroke="#0b190f" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="180" cy="380" r="34" />
-        <circle cx="300" cy="380" r="34" />
-        <path d="M180 380 L230 320 L280 380 M230 320 L260 320 L300 380" />
-        <path d="M230 320 L240 300 L260 300" />
-        <path d="M180 380 L200 340" />
-      </g>
-      {/* Petit écusson bleu de vérification. */}
-      <g transform="translate(346 90)">
-        <path d="M0 8 L26 0 L52 8 L52 32 C52 46 40 58 26 62 C12 58 0 46 0 32 Z" fill="#1677E8" />
-        <path
-          d="M14 30 L22 38 L38 22"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
-    </svg>
   );
 }

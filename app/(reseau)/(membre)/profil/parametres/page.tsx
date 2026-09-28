@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { choisirLeMode } from '@/app/(reseau)/(membre)/mode/actions';
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { monProfil } from '@/lib/depot/membre-espace';
-import { NOMS_DES_LANGUES, textes } from '@/lib/i18n/langue';
+import { textes } from '@/lib/i18n/langue';
 import { modeCourant } from '@/lib/mode';
 import { exigerUnMembre } from '@/lib/session';
 
@@ -18,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Parametres() {
   const membre = await exigerUnMembre();
-  const { p, langue } = await textes();
+  const { p } = await textes();
   const [profil, mode] = await Promise.all([monProfil(membre.id), modeCourant()]);
   if (!profil) return null;
 
@@ -27,7 +26,6 @@ export default async function Parametres() {
     ['verifie', p('Vérification'), '/profil/verifications'],
     ['velo', p('Mes vélos'), '/profil/velos'],
     ['cloche', p('Notifications'), '/profil/preferences'],
-    ['globe', p('Langue : {langue}', { langue: NOMS_DES_LANGUES[langue] }), '/profil/langue'],
     ['utilisateurs', p('Accessibilité'), '/profil/accessibilite'],
     ['bouclier', p('Confidentialité et sécurité'), '/profil/confidentialite'],
     ['aide', p('Centre d’aide'), '/aide'],
@@ -38,7 +36,6 @@ export default async function Parametres() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Paramètres')}</h1>
 

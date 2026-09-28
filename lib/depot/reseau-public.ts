@@ -110,3 +110,23 @@ export function chiffresDeLaCommunaute(): Promise<ChiffresDeLaCommunaute> {
     { emplacements: 0, stationnementsTermines: 0 },
   );
 }
+
+/**
+ * Combien de bike sitters distincts ont un emplacement publié.
+ *
+ * L'écran d'invitation annonçait « 14 sur 20 » en dur. On compte les
+ * personnes, pas les emplacements : quelqu'un qui en propose deux ne rend pas
+ * le quartier deux fois plus dense.
+ */
+export function nombreDeBikeSitters(): Promise<number> {
+  return siLaBaseRepond(
+    async () => {
+      const [ligne] = await interroger<{ combien: number }>(
+        `select count(distinct membre_id)::int as combien
+           from emplacement where publie`,
+      );
+      return ligne?.combien ?? 0;
+    },
+    0,
+  );
+}

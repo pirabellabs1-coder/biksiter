@@ -65,7 +65,9 @@ export async function gesteDirect(donnees: FormData): Promise<void> {
       ? `${lienDeLaGarde(id)}/constat/reprise`
       : geste === 'arriver'
         ? `${lienDeLaGarde(id)}/constat/depot`
-        : lienDeLaGarde(id),
+        : geste === 'accepter'
+          ? `${lienDeLaGarde(id)}?decision=acceptee`
+          : lienDeLaGarde(id),
   );
 }
 
@@ -84,8 +86,17 @@ export async function gesteAvecMotif(
   const precision = String(donnees.get('precision') ?? '')
     .trim()
     .slice(0, 400);
-  if (!choisi) return { erreur: p('Sélectionnez un motif.') };
-  const motif = precision ? `${choisi} — ${precision}` : choisi;
+  // Décliner une demande ne demande aucune justification : pour un refus, le
+  // motif est facultatif. Les autres gestes (annulation, signalement…) en
+  // gardent un, parce que l'autre personne en a besoin pour comprendre.
+  if (!choisi && geste !== 'refuser') {
+    return { erreur: p('Sélectionnez un motif.') };
+  }
+  const motif = choisi
+    ? precision
+      ? `${choisi} — ${precision}`
+      : choisi
+    : precision || null;
 
   const resultat = await effectuerUnGeste(membre.id, id, geste, motif);
   if (!resultat.ok) {
@@ -93,7 +104,11 @@ export async function gesteAvecMotif(
     return { erreur: p(m!.texte, m!.valeurs) };
   }
   revalidatePath(lienDeLaGarde(id));
-  redirect(lienDeLaGarde(id));
+  redirect(
+    geste === 'refuser'
+      ? `${lienDeLaGarde(id)}?decision=refusee`
+      : lienDeLaGarde(id),
+  );
 }
 
 export async function nouveauCode(donnees: FormData): Promise<void> {

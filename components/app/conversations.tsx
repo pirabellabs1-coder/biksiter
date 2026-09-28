@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Avatar } from '@/components/app/avatar';
 import { nomPublic } from '@/components/membre/elements';
 import type { conversationsDuMembre } from '@/lib/depot/membre-espace';
 import type { Textes } from '@/lib/i18n/langue';
@@ -37,13 +38,19 @@ export function ListeDesConversations({
             className="ligne conversation"
             aria-current={c.id === active ? 'page' : undefined}
           >
-            <span className="avatar-app" aria-hidden="true">
-              {c.autrePrenom.charAt(0)}
-            </span>
+            <Avatar
+              membreId={c.autreId}
+              prenom={c.autrePrenom}
+              version={c.autrePhoto}
+              taille={40}
+            />
             <span className="ligne-texte">
               <strong>{nomPublic(c.autrePrenom, c.autreInitiale)}</strong>
               <span className="tronque">
-                {c.dernierMessage ?? p('Nouvelle conversation')}
+                {c.dernierMessage ||
+                  (c.dernierMessagePhoto
+                    ? p('Photo')
+                    : p('Nouvelle conversation'))}
               </span>
             </span>
             <span className="ligne-fin colonne">

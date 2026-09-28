@@ -1,0 +1,206 @@
+/* =============================================================================
+   « Une demande en quelques étapes »
+
+   Les six étapes ne se lisent plus en grille régulière mais en zigzag : la
+   colonne de droite descend d'un demi-pas, et des traits pointillés mènent
+   d'une carte à la suivante. Le regard suit le parcours dans l'ordre, ce
+   qu'une grille alignée ne donnait pas.
+   ========================================================================== */
+
+.parcours-tete {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 64px;
+}
+
+.parcours-pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Les deux tirets de part et d'autre de la pastille. */
+.parcours-pastille::before,
+.parcours-pastille::after {
+  content: '';
+  width: 34px;
+  height: 2px;
+  background: var(--green);
+  opacity: 0.55;
+}
+
+.parcours-pastille span {
+  background: var(--sage);
+  border-radius: 999px;
+  padding: 8px 20px;
+}
+
+.parcours-tete h2 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: clamp(32px, 4.2vw, 54px);
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+  margin: 22px 0 18px;
+}
+
+.parcours-intro {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.parcours {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 1120px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px 86px;
+}
+
+/* La colonne de droite descend : c'est ce décalage qui fait le zigzag. */
+.parcours > li:nth-child(even) {
+  margin-top: 86px;
+}
+
+.parcours-etape {
+  position: relative;
+}
+
+.parcours-carte {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+  padding-bottom: 28px;
+  box-shadow: 0 18px 45px rgba(9, 50, 28, 0.06);
+  height: 100%;
+}
+
+.parcours-carte img {
+  display: block;
+  width: 100%;
+  height: 216px;
+  object-fit: cover;
+}
+
+.parcours-carte h3 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 25px;
+  letter-spacing: -0.02em;
+  margin: 24px 28px 10px;
+}
+
+.parcours-carte p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 28px;
+}
+
+.parcours-num {
+  position: absolute;
+  top: -20px;
+  left: -22px;
+  z-index: 2;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: 0 10px 26px rgba(0, 130, 59, 0.3);
+}
+
+/*
+ * Les traits pointillés.
+ *
+ * Purement décoratifs : l'ordre est déjà porté par la numérotation et par
+ * l'ordre du document. Ils disparaissent dès que les cartes s'empilent, où
+ * ils ne relieraient plus rien.
+ */
+.parcours-fleche {
+  position: absolute;
+  border-top: 2px dashed rgba(0, 130, 59, 0.42);
+  pointer-events: none;
+}
+
+/* D'une carte de gauche vers la carte de droite, un demi-pas plus bas. */
+.parcours > li:nth-child(odd) .parcours-fleche {
+  top: 30%;
+  left: calc(100% + 6px);
+  width: 74px;
+  transform: rotate(24deg);
+}
+
+/* De la carte de droite vers la carte de gauche de la rangée suivante. */
+.parcours > li:nth-child(even) .parcours-fleche {
+  top: calc(100% + 26px);
+  right: calc(100% + 6px);
+  width: 74px;
+  transform: rotate(24deg);
+}
+
+.parcours-fleche::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: -6px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid rgba(0, 130, 59, 0.42);
+  border-right: 2px solid rgba(0, 130, 59, 0.42);
+  transform: rotate(45deg);
+}
+
+.parcours > li:nth-child(even) .parcours-fleche::after {
+  right: auto;
+  left: -2px;
+  transform: rotate(-135deg);
+}
+
+/* La dernière étape ne mène nulle part. */
+.parcours > li:last-child .parcours-fleche {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .parcours {
+    grid-template-columns: 1fr;
+    gap: 46px;
+  }
+
+  .parcours > li:nth-child(even) {
+    margin-top: 0;
+  }
+
+  .parcours-fleche {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .parcours-tete {
+    margin-bottom: 44px;
+  }
+
+  .parcours-num {
+    left: -10px;
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
+
+  .parcours-carte img {
+    height: 178px;
+  }
+}

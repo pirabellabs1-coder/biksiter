@@ -2,148 +2,196 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
-import { EtapesDuDepot } from '@/components/app/depot';
-import { Icone, type NomDIcone } from '@/components/app/icone';
-import { detailDeLaGarde } from '@/lib/depot/gardes';
-import { monProfil } from '@/lib/depot/membre-espace';
-import { textes } from '@/lib/i18n/langue';
-import { ARRIVEE_AVANT_L_HEURE_MINUTES, peutSignalerSonArrivee } from '@/lib/regles/garde';
-import { heureABruxelles } from '@/lib/temps';
+import { creneau, heure } from '@/components/maquette/garde/dates';
+import { PersonneALaPorte } from '@/components/maquette/garde/personne-a-la-porte';
+import { codeDeLaRemise, detailDeLaGarde } from '@/lib/depot/gardes';
+import { PHOTOS_DU_CONSTAT } from '@/lib/regles/constat';
+import {
+  ARRIVEE_AVANT_L_HEURE_MINUTES,
+  peutSignalerSonArrivee,
+} from '@/lib/regles/garde';
+import {
+  CHIFFRES_DU_CODE_DE_REMISE,
+  VALIDITE_CODE_HEURES,
+} from '@/lib/regles/remise';
 import { exigerUnMembre } from '@/lib/session';
 
 import { gesteDirect } from '../actions';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Préparer le dépôt') };
-}
+export const metadata: Metadata = { title: 'Déposer le vélo' };
+
+/** Les quatre angles du constat de dépôt, dans l'ordre des maquettes. */
 
 /**
- * Première étape du dépôt sécurisé : ce qu'il faut avoir en tête avant de
- * sonner. Le cycliste signale son arrivée ici, puis photographie son vélo.
+ * Le dépôt du vélo, côté cycliste : les photos, le code à dicter, et ce qu'on
+ * confirme en partant.
+ *
+ * Règle 5 — au dépôt, c'est le cycliste qui remet le vélo : il détient le code
+ * et le lit à voix haute au bike sitter, en deux groupes de trois chiffres.
  */
-export default async function PreparerLeDepot({ params }: { params: Promise<{ id: string }> }) {
+export default async function DeposerLeVelo({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
   const { id } = await params;
-  const [garde, profil] = await Promise.all([detailDeLaGarde(membre.id, id), monProfil(membre.id)]);
+  const garde = await detailDeLaGarde(membre.id, id);
   if (!garde) notFound();
-  if (garde.role !== 'cycliste' || (garde.etat !== 'accepte' && garde.etat !== 'arrivee')) {
+  if (
+    garde.role !== 'cycliste' ||
+    (garde.etat !== 'accepte' && garde.etat !== 'arrivee')
+  ) {
     redirect(`/gardes/${id}`);
   }
 
-  const arrive = garde.etat === 'arrivee';
-  const photosPrises = Boolean(garde.constats.depot);
-  const electrique = garde.typeVelo === 'Électrique';
-  const arriveePossible = peutSignalerSonArrivee(garde.debut, garde.fin, new Date());
+  const code = await codeDeLaRemise(membre.id, id, 'depot');
 
-  // Le dernier champ dit si la ligne parle d'identité vérifiée : elle prend alors le bleu.
-  const points: [NomDIcone, string, string, boolean, boolean?][] = [
-    [
-      'verifie',
-      p('Votre identité'),
-      profil?.identiteVerifiee
-        ? p('Votre identité est vérifiée : {prenom} le voit sur votre profil.', { prenom: garde.autre.prenom })
-        : p('Votre identité n’est pas encore vérifiée.'),
-      Boolean(profil?.identiteVerifiee),
-      Boolean(profil?.identiteVerifiee),
-    ],
-    [
-      'epingle',
-      p('Votre arrivée'),
-      arrive
-        ? p('{prenom} sait que vous êtes devant la porte.', { prenom: garde.autre.prenom })
-        : p('Signalez votre arrivée une fois devant la porte, à partir de {heure}.', {
-            heure: heureABruxelles(new Date(garde.debut.getTime() - ARRIVEE_AVANT_L_HEURE_MINUTES * 60_000)),
-          }),
-      arrive,
-    ],
-    [
-      'photo',
-      p('Photos du vélo'),
-      p('Le constat consiste à photographier votre vélo sous plusieurs angles, en indiquant les éventuels défauts.'),
-      photosPrises,
-    ],
-    ...(electrique
-      ? [
-          [
-            'batterie',
-            p('État de la batterie'),
-            p('La batterie doit être examinée pour vérifier qu’elle ne présente ni gonflement, ni chaleur excessive, ni signe de dommage.'),
-            photosPrises,
-          ] as [NomDIcone, string, string, boolean],
-        ]
-      : []),
-  ];
+  const prenom = garde.autre.prenom;
+  const photosPrises = Boolean(garde.constats.depot);
+  const arrive = garde.etat === 'arrivee';
+  const arriveePossible = peutSignalerSonArrivee(
+    garde.debut,
+    garde.fin,
+    new Date(),
+  );
+  const chiffres = code?.role === 'detenteur' ? code.chiffres : null;
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
-      <div className="ecran-app ecran-parcours">
-        <EtapesDuDepot p={p} etape={1} />
-        <h1 className="titre-ecran">{p('Préparer le dépôt')}</h1>
-        <p className="sous-titre">{p('Voici quelques points à vérifier avant de confier votre vélo au bike sitter.')}</p>
+      <div className="page page-etroite">
+        <header className="page-tete">
+          <span className="kicker">DÉPÔT DU VÉLO</span>
+          <h1>Vous y êtes.</h1>
+          <p>
+            Chez {prenom} {garde.autre.initiale}. ·{' '}
+            {creneau(garde.debut, garde.fin)} ·{' '}
+            {garde.emplacement.type}. L’adresse complète et le téléphone sont
+            dans la garde.
+          </p>
+          <PersonneALaPorte personne={garde.autre} role="Votre bike sitter" />
+        </header>
 
-        <ul className="pile" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {points.map(([icone, titre, texte, fait, verifie]) => (
-            <li key={titre} className="carte ligne ligne-info" style={{ alignItems: 'center' }}>
-              <span className={verifie ? 'ligne-icone texte-verifie' : 'ligne-icone'} aria-hidden="true">
-                <Icone nom={icone} taille={24} />
-              </span>
-              <span className="ligne-texte">
-                <strong>{titre}</strong>
-                <span>{texte}</span>
-              </span>
-              {fait ? (
-                <span className={verifie ? 'rond-etat bleu' : 'rond-etat'} style={{ width: 28, height: 28, boxShadow: 'none' }}>
-                  <Icone nom="coche" taille={16} strokeWidth={3} />
-                  <span className="lecteur">{p('Fait')}</span>
-                </span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
+        <ol className="jalons">
+          <li className={photosPrises ? 'fait' : undefined} aria-current={photosPrises ? undefined : 'step'}>
+            <b>1</b>Photos du vélo
+          </li>
+          <li className={chiffres ? 'fait' : undefined}>
+            <b>2</b>Code de remise
+          </li>
+          <li>
+            <b>3</b>Confirmation
+          </li>
+        </ol>
 
-        {electrique ? (
-          <Link href="/regles/batteries" className="encart lien-encart">
-            <Icone nom="batterie" taille={22} />
-            <span>{p('Ce qu’il faut vérifier sur la batterie')}</span>
-            <Icone nom="chevron" taille={20} />
-          </Link>
-        ) : null}
+        <section className="bloc">
+          <h2>Photos du vélo</h2>
+          <p className="gris">
+            Deux photos suffisent, côté gauche et côté droit ; deux autres sont
+            possibles pour l’avant et pour un défaut déjà présent. Elles servent
+            de référence si une question se pose plus tard.
+          </p>
+          <div className="photos-constat">
+            {PHOTOS_DU_CONSTAT.map((photo) => (
+              <Link
+                key={photo.rang}
+                className={photosPrises ? 'photo-case pleine' : 'photo-case'}
+                href={`/gardes/${id}/constat/depot`}
+              >
+                {photosPrises ? `${photo.titre} ✓` : `+ ${photo.titre}`}
+              </Link>
+            ))}
+          </div>
+          <p className="gris">
+            {photosPrises
+              ? 'Les photos sont enregistrées. Il reste à échanger le code avec votre bike sitter pour lui confier le vélo.'
+              : 'Les photos et la remarque sur l’état du vélo se prennent à l’écran suivant, devant la porte.'}
+          </p>
+        </section>
 
-        <div className="encart" style={{ marginTop: 12 }}>
-          <Icone nom="info" taille={20} />
-          <span>{p('Ces informations contribuent à la sécurité de la garde pour les deux membres.')}</span>
-        </div>
-
-        <div className="boutons" style={{ marginTop: 16 }}>
-          {arrive ? (
-            <Link href={`/gardes/${id}/${photosPrises ? 'remise' : 'constat'}/depot`} className="bouton plein">
-              {p('Continuer')}
-              <Icone nom="chevron" taille={20} />
-            </Link>
-          ) : arriveePossible ? (
-            <form action={gesteDirect}>
-              <input type="hidden" name="id" value={id} />
-              <input type="hidden" name="geste" value="arriver" />
-              <button type="submit" className="bouton plein" style={{ width: '100%' }}>
-                <Icone nom="epingle" taille={20} />
-                {p('Je suis devant la porte')}
-              </button>
-            </form>
-          ) : (
+        <section className="bloc">
+          <h2>Code de remise</h2>
+          {chiffres ? (
             <>
-              <button type="button" className="bouton plein" disabled>
-                {p('Je suis devant la porte')}
-              </button>
-              <p className="petit texte-doux centre" style={{ margin: 0 }}>
-                {p('Votre arrivée pourra être signalée à partir de trente minutes avant l’heure prévue du dépôt.')}
+              <p className="gris">
+                Vous donnez {CHIFFRES_DU_CODE_DE_REMISE} chiffres à {prenom}.
+                C’est ce code qui ouvre la garde : sans lui, rien n’est
+                enregistré.
               </p>
+              <div className="code-a-dicter">
+                <p className="code-chiffres">
+                  {/* Lu chiffre par chiffre, pas « cent vingt-trois ». */}
+                  <span className="lecteur">
+                    Code de remise : {chiffres.split('').join(' ')}
+                  </span>
+                  <span aria-hidden="true">{chiffres.slice(0, 3)}</span>
+                  <span aria-hidden="true">{chiffres.slice(3)}</span>
+                </p>
+                <p className="code-aide">
+                  Dictez-le en deux groupes de trois. Il reste valable{' '}
+                  {VALIDITE_CODE_HEURES} heures et ne sert qu’une fois.
+                </p>
+              </div>
             </>
+          ) : (
+            <p className="gris">
+              Le code apparaîtra ici une fois le vélo photographié devant la
+              porte. Vous le lirez à {prenom}, qui le saisira sur son écran.
+            </p>
           )}
-        </div>
+        </section>
+
+        <section className="bloc">
+          <h2>Ce que vous confirmez</h2>
+          <ul className="liste-nette">
+            <li>
+              Vous remettez le vélo <b>en main propre</b> à {prenom}.
+            </li>
+            <li>
+              Le vélo est rangé dans un <b>emplacement fermé</b>, à son domicile.
+            </li>
+            <li>
+              Vous repassez avant <b>{heure(garde.fin)}</b>, ou vous prolongez
+              depuis la garde.
+            </li>
+          </ul>
+          <div className="actions-fin">
+            {arrive ? (
+              <Link
+                className="primary"
+                href={
+                  photosPrises
+                    ? `/gardes/${id}/remise/depot`
+                    : `/gardes/${id}/constat/depot`
+                }
+              >
+                {photosPrises ? 'Afficher mon code de dépôt' : 'Photographier le vélo'}
+              </Link>
+            ) : arriveePossible ? (
+              <form action={gesteDirect}>
+                <input type="hidden" name="id" value={id} />
+                <input type="hidden" name="geste" value="arriver" />
+                <button type="submit" className="primary">
+                  Je suis devant la porte
+                </button>
+              </form>
+            ) : (
+              <button type="button" className="primary" disabled>
+                Je suis devant la porte
+              </button>
+            )}
+            <Link className="outline" href={`/gardes/${id}/solutions`}>
+              Un problème ?
+            </Link>
+          </div>
+          {!arrive && !arriveePossible ? (
+            <p className="gris">
+              Votre arrivée pourra être signalée à partir de{' '}
+              {ARRIVEE_AVANT_L_HEURE_MINUTES} minutes avant l’heure prévue du
+              dépôt.
+            </p>
+          ) : null}
+        </section>
       </div>
     </main>
   );

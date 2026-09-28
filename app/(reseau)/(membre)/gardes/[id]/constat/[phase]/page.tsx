@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import { EtapesDuDepot } from '@/components/app/depot';
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { detailDeLaGarde } from '@/lib/depot/gardes';
 import { textes } from '@/lib/i18n/langue';
@@ -56,7 +55,6 @@ export default async function Constat({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <EtapesDuDepot p={p} etape={phase === 'depot' ? 2 : 4} />
         <h1 className="titre-ecran">
@@ -73,15 +71,14 @@ export default async function Constat({
 
         {phase === 'reprise' ? (
           <div className="carte checklist" style={{ marginBottom: 16 }}>
-            <strong>{p('Checklist retour')}</strong>
-            <ul>
+            <strong>{p('À vérifier avant de repartir')}</strong>
+            {/* Des numéros, pas des coches : rien n'est encore fait quand
+                l'écran s'ouvre. */}
+            <ol className="checklist-a-faire">
               {checklistRetour.map((point) => (
-                <li key={point}>
-                  <Icone nom="coche" taille={18} />
-                  {point}
-                </li>
+                <li key={point}>{point}</li>
               ))}
-            </ul>
+            </ol>
             {depot ? (
               <>
                 <p className="petit texte-doux" style={{ margin: '12px 0 0' }}>

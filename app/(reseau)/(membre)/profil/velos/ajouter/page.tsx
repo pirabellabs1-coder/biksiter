@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { EnTete } from '@/components/app/en-tete';
 import { textes } from '@/lib/i18n/langue';
 import { TYPES_VELO } from '@/lib/regles/velos';
 
@@ -15,7 +14,6 @@ export default async function AjouterUnVelo() {
   const { p } = await textes();
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/velos" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Ajouter un vélo')}</h1>
         <p className="sous-titre">

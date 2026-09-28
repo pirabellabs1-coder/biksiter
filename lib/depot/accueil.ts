@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { interroger, uneLigne } from '@/lib/bd/client';
+import { VERSION_DE_LA_PHOTO } from '@/lib/depot/photo-de-profil';
 import { jourDeLaSemaine } from '@/lib/regles/creneau';
 import type { EtatDeGarde } from '@/lib/regles/garde';
 import { jourABruxelles } from '@/lib/temps';
@@ -13,16 +14,19 @@ import { soldeDuMembre } from './maillons';
  * ou, côté bike sitter, la demande qui attend et les chiffres du mois.
  */
 
-const ETATS_A_VENIR = ['demande', 'accepte', 'arrivee', 'en_cours', 'reprise_demandee'];
+const ETATS_A_VENIR = ['demande', 'accepte', 'arrivee', 'en_cours', 'reprise_demandee', 'litige'];
 
 export type ProchaineGarde = {
   id: string;
   etat: EtatDeGarde;
   debut: Date;
   fin: Date;
+  autreId: string;
   autrePrenom: string;
   autreInitiale: string;
   autreVerifie: boolean;
+  /** La version de sa photo de profil, ou null s'il n'en a pas. */
+  autrePhoto: string | null;
   typeDEmplacement: string;
   quartier: string;
   reference: string;
@@ -33,8 +37,10 @@ export type ProchaineGarde = {
 
 const COLONNES_DE_GARDE = `
   s.id, s.etat, s.debut, s.fin, s.type_velo as "typeVelo",
+  autre.id as "autreId",
   autre.prenom as "autrePrenom", upper(left(autre.nom, 1)) as "autreInitiale",
   autre.verification = 'verifiee' as "autreVerifie",
+  ${VERSION_DE_LA_PHOTO('autre')} as "autrePhoto",
   e.type as "typeDEmplacement", e.quartier, e.reference,
   exists (select 1 from photo_emplacement ph where ph.emplacement_id = e.id) as "aUnePhoto",
   v.nom as "veloNom"`;
@@ -108,7 +114,7 @@ export async function accueilDuBikeSitter(
          join membre autre on autre.id = s.cycliste_id
          left join velo v on v.id = s.velo_id
         where e.membre_id = $1
-          and s.etat in ('accepte', 'arrivee', 'en_cours', 'reprise_demandee')
+          and s.etat in ('accepte', 'arrivee', 'en_cours', 'reprise_demandee', 'litige')
         order by s.debut
         limit 1`,
       [membreId],
@@ -128,6 +134,8 @@ export async function accueilDuBikeSitter(
 export type GardeDeLaListe = ProchaineGarde & {
   role: 'cycliste' | 'bike_sitter';
   demandeLe: Date;
+  /** Vrai quand le membre a déjà laissé son avis sur cette garde. */
+  avisDonne: boolean;
 };
 
 /** Toutes les gardes du membre, des deux côtés, pour « Mes gardes ». */
@@ -137,7 +145,11 @@ export async function gardesDuMembre(
   await expirerLesDemandes();
   return interroger<GardeDeLaListe>(
     `select ${COLONNES_DE_GARDE}, s.demande_le as "demandeLe",
-            case when s.cycliste_id = $1 then 'cycliste' else 'bike_sitter' end as role
+            case when s.cycliste_id = $1 then 'cycliste' else 'bike_sitter' end as role,
+            exists (
+              select 1 from avis_sur_une_garde a
+               where a.stationnement_id = s.id and a.auteur_id = $1
+            ) as "avisDonne"
        from stationnement s
        join emplacement e on e.id = s.emplacement_id
        join membre autre on autre.id = case when s.cycliste_id = $1 then e.membre_id else s.cycliste_id end
@@ -156,4 +168,21 @@ export async function nombreDeVelos(membreId: string): Promise<number> {
     [membreId],
   );
   return ligne?.combien ?? 0;
+}
+
+/**
+ * La plus ancienne demande qui attend encore une réponse du bike sitter :
+ * après en avoir traité une, on lui propose d'enchaîner.
+ */
+export async function demandeSuivante(membreId: string): Promise<string | null> {
+  const ligne = await uneLigne<{ id: string }>(
+    `select s.id
+       from stationnement s
+       join emplacement e on e.id = s.emplacement_id
+      where e.membre_id = $1 and s.etat = 'demande'
+      order by s.demande_le
+      limit 1`,
+    [membreId],
+  );
+  return ligne?.id ?? null;
 }

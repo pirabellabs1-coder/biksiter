@@ -1,190 +1,233 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
-import { Icone, type NomDIcone } from '@/components/app/icone';
-import { Anneau } from '@/components/app/progression';
-import { nombreDEmplacements } from '@/lib/depot/emplacements';
+import { Icone } from '@/components/app/icone';
+import { statistiquesDuBikeSitter } from '@/lib/depot/lieux';
 import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
-import { progressionDuMembre } from '@/lib/depot/progression';
+import { classement, progressionDuMembre } from '@/lib/depot/progression';
 import { textes } from '@/lib/i18n/langue';
-import { POINTS_PAR_GARDE } from '@/lib/regles/maillons';
-import { niveauPour, objectifsEnCours } from '@/lib/regles/progression';
+import { modeCourant } from '@/lib/mode';
+import {
+  etatDesBadges,
+  niveauPour,
+  PERIODES_DU_CLASSEMENT,
+  type PeriodeDuClassement,
+} from '@/lib/regles/progression';
 import { exigerUnMembre } from '@/lib/session';
+
+import { basculerMonClassement } from './actions';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Ma progression') };
+  return { title: p('Progression et points') };
 }
 
-export default async function Progression() {
+/** Les écrans des points, reliés d'ici plutôt que perdus dans le site. */
+const LIENS_DES_POINTS: readonly (readonly [string, string, string])[] = [
+  ['/progression/badges', 'Tous les badges', 'Ceux que vous avez, et comment obtenir les autres'],
+  ['/progression/objectifs', 'Vos objectifs', 'Le prochain niveau et ce qui y mène'],
+  ['/progression/historique', 'Historique des points', 'Chaque garde terminée et ce qu’elle a rapporté'],
+  ['/classement', 'Top Bike Sitters', 'Le classement du jour, de la semaine et du mois'],
+  ['/progression/regles', 'Comment fonctionnent les points', 'Ce qui en rapporte, et quand'],
+];
+
+const TITRE_DE_LA_PERIODE: Record<PeriodeDuClassement, string> = {
+  jour: 'Aujourd’hui',
+  semaine: 'Cette semaine',
+  mois: 'Ce mois',
+};
+
+export default async function Progression({
+  searchParams,
+}: {
+  searchParams: Promise<{ periode?: string }>;
+}) {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
-  const [progression, lieux, nonLues] = await Promise.all([
+  const _mode = await modeCourant();
+  const demandee = (await searchParams).periode;
+  const periode: PeriodeDuClassement =
+    PERIODES_DU_CLASSEMENT.find((p) => p.cle === demandee)?.cle ?? 'jour';
+
+  const [progression, _nonLues, stats] = await Promise.all([
     progressionDuMembre(membre.id),
-    nombreDEmplacements(membre.id),
     nombreDeNotificationsNonLues(membre.id),
+    statistiquesDuBikeSitter(membre.id),
   ]);
-
-  // Faire garder son vélo ne rapporte ni ne coûte de points : sans lieu ni
-  // garde accueillie, l'écran présente la démarche plutôt qu'un compteur à zéro.
-  if (lieux === 0 && progression.activite.gardesTerminees === 0) {
-    return (
-      <main id="contenu">
-        <EnTete p={p} notificationsNonLues={nonLues} />
-        <div className="ecran-app">
-          <h1 className="titre-ecran">{p('Ma progression')}</h1>
-          <div className="carte vide-liste">
-            <Icone nom="trophee" taille={34} className="texte-vert" />
-            <strong>{p('Les points récompensent les gardes')}</strong>
-            <span className="texte-doux">
-              {p(
-                'Chaque garde menée à terme chez vous rapporte au moins {n} points, à échanger contre des avantages.',
-                { n: POINTS_PAR_GARDE },
-              )}
-            </span>
-          </div>
-          <div className="boutons" style={{ marginTop: 16 }}>
-            <Link href="/devenir-bike-sitter" className="bouton plein">
-              {p('Devenir Bike Sitter')}
-              <Icone nom="chevron" taille={20} />
-            </Link>
-            <Link href="/progression/regles" className="bouton discret">
-              {p('Comment fonctionnent les points ?')}
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   const niveau = niveauPour(progression.pointsGagnes);
-  const prochain = objectifsEnCours(progression.activite)[0] ?? null;
-  const liens: [NomDIcone, string, string, string][] = [
-    [
-      'trophee',
-      p('Mes badges'),
-      '/progression/badges',
-      p('Ce que vos gardes ont débloqué'),
-    ],
-    [
-      'progression',
-      p('Top Bike Sitters'),
-      '/classement',
-      p('Le classement du jour, de la semaine et du mois'),
-    ],
-    [
-      'cadeau',
-      p('Avantages'),
-      '/catalogue',
-      p('{n} points disponibles', { n: progression.solde.acquis }),
-    ],
-    [
-      'document',
-      p('Historique des points'),
-      '/progression/historique',
-      p('Gagnés, utilisés et en attente'),
-    ],
-  ];
+  const badges = etatDesBadges(progression.activite);
+  const inscrit = progression.apparaitAuClassement;
+  // On ne charge le classement que si on y figure : l'écran ne montre pas une
+  // liste à quelqu'un qui n'a pas choisi d'en faire partie.
+  const table = inscrit ? await classement(periode, membre.id) : null;
 
   return (
-    <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Ma progression')}</h1>
-        <span className="pastille niveau-pastille">
-          <Icone nom="etoile" taille={15} plein />
-          {p(niveau.actuel.titre)}
-        </span>
+    <>
+      <main className="dashboard-wrap" id="contenu">
+        <span className="kicker">VOTRE PROGRESSION</span>
+        <h1>{niveau.actuel.titre}</h1>
 
-        <div className="colonnes colonnes-egales">
-          <section
-            className="colonne panneau-progression"
-            aria-label={p('Mes points')}
-          >
-            <Anneau avancement={niveau.avancement}>
-              <strong>{progression.pointsGagnes}</strong>
-              <span>{p('points')}</span>
-              <small>
-                {niveau.suivant
-                  ? p('Plus que {n} points', { n: niveau.manquants })
-                  : p('Vous avez atteint le plus haut niveau.')}
-              </small>
-            </Anneau>
+        <div className="prog-carte">
+          <p className="prog-solde">
+            <span>{progression.pointsGagnes}</span> points
+          </p>
+          <p className="prog-sous">
+            {progression.activite.gardesTerminees} garde
+            {progression.activite.gardesTerminees > 1 ? 's' : ''} terminée
+            {progression.activite.gardesTerminees > 1 ? 's' : ''}
+          </p>
+          <div className="jauge">
+            <span style={{ width: `${Math.round(niveau.avancement * 100)}%` }} />
+          </div>
+          <p className="prog-reste">
+            {niveau.suivant
+              ? `Plus que ${niveau.manquants} points avant « ${niveau.suivant.titre} »`
+              : 'Vous avez atteint le plus haut niveau.'}
+          </p>
+        </div>
 
-            <div className="tuiles">
-              <span className="tuile">
-                <strong>{progression.activite.gardesTerminees}</strong>
-                <span>{p('gardes')}</span>
-                <Icone nom="velo" taille={20} className="texte-vert" />
-              </span>
-              <span className="tuile">
-                <strong>{progression.cyclistesAides}</strong>
-                <span>{p('cyclistes aidés')}</span>
-                <Icone nom="utilisateurs" taille={20} className="texte-vert" />
-              </span>
-              <span className="tuile">
-                <strong>
-                  {progression.noteMoyenne !== null
-                    ? progression.noteMoyenne.toLocaleString('fr-BE', {
-                        maximumFractionDigits: 1,
-                      })
-                    : '—'}
-                </strong>
-                <span>{p('avis moyen')}</span>
-                <Icone nom="etoile" taille={20} plein className="texte-vert" />
-              </span>
+        <div className="prog-stats">
+          <div>
+            <b>{progression.cyclistesAides}</b>
+            <span>
+              cycliste{progression.cyclistesAides > 1 ? 's' : ''} aidé{progression.cyclistesAides > 1 ? 's' : ''}
+            </span>
+          </div>
+          {/* La maquette comptait les heures de garde ; le dépôt ne les tient
+              pas encore, il tient les gardes accueillies. */}
+          <div>
+            <b>{stats.gardesMenees}</b>
+            <span>
+              garde{stats.gardesMenees > 1 ? 's' : ''} accueillie{stats.gardesMenees > 1 ? 's' : ''}
+            </span>
+          </div>
+          <div>
+            <b>
+              {progression.noteMoyenne !== null
+                ? progression.noteMoyenne.toLocaleString('fr-BE', {
+                    maximumFractionDigits: 1,
+                  })
+                : '—'}
+            </b>
+            <span>note moyenne</span>
+          </div>
+        </div>
+
+        <h2 className="prog-titre">Vos badges</h2>
+        <div className="badges">
+          {badges.map((badge) => (
+            <div className={badge.obtenu ? 'badge on' : 'badge'} key={badge.cle}>
+              <b>{badge.titre}</b>
+              <span>{badge.description}</span>
+              {badge.obtenu ? (
+                <em>Obtenu</em>
+              ) : (
+                <em className="att">
+                  {badge.avancement} / {badge.objectif}
+                </em>
+              )}
             </div>
-          </section>
+          ))}
+        </div>
 
-          <section className="colonne">
-            {prochain ? (
-              <Link href="/progression/objectifs" className="carte objectif">
-                <span className="ligne-icone" aria-hidden="true">
-                  <Icone nom="trophee" taille={26} />
-                </span>
-                <span className="ligne-texte">
-                  <strong>{p('Prochain objectif')}</strong>
-                  <span>{p(prochain.description)}</span>
-                </span>
-                <span className="objectif-compte">
-                  {prochain.avancement} / {prochain.objectif}
-                </span>
-                <span className="jauge" aria-hidden="true">
-                  <span
-                    style={{
-                      width: `${(prochain.avancement / prochain.objectif) * 100}%`,
-                    }}
-                  />
-                </span>
-              </Link>
-            ) : null}
+        <h2 className="prog-titre">Le classement</h2>
+        <div className="prog-carte prog-classement">
+          <p>
+            {inscrit
+              ? 'Vous apparaissez dans le classement des Bike Sitters.'
+              : 'Vous pouvez y apparaître si vous le souhaitez, et vous retirer à tout moment.'}
+          </p>
+          <p className="prog-note">
+            Seuls ceux qui le souhaitent y apparaissent. Votre adresse n’y
+            figure jamais, et votre solde exact reste privé.
+          </p>
+          <form action={basculerMonClassement}>
+            <input
+              type="hidden"
+              name="apparaitre"
+              value={inscrit ? 'non' : 'oui'}
+            />
+            <input type="hidden" name="periode" value={periode} />
+            <button type="submit" className={inscrit ? 'outline' : 'primary'}>
+              {inscrit ? 'Ne plus y apparaître' : 'Participer au classement'}
+            </button>
+          </form>
+        </div>
 
-            <div className="liste" style={{ marginTop: 12 }}>
-              {liens.map(([icone, titre, href, detail]) => (
-                <Link key={href} href={href} className="ligne">
-                  <span className="ligne-icone" aria-hidden="true">
-                    <Icone nom={icone} taille={24} />
-                  </span>
-                  <span className="ligne-texte">
-                    <strong>{titre}</strong>
-                    <span>{detail}</span>
-                  </span>
-                  <Icone nom="chevron" taille={20} className="texte-leger" />
+        {table ? (
+          <div>
+            {/* Les mêmes segments que « Top Bike Sitters » : des liens, qui
+                tiennent sans JavaScript. */}
+            <nav className="segments" aria-label="Période du classement">
+              {PERIODES_DU_CLASSEMENT.map(({ cle }) => (
+                <Link
+                  key={cle}
+                  href={cle === 'jour' ? '/progression' : `/progression?periode=${cle}`}
+                  aria-current={cle === periode ? 'page' : undefined}
+                >
+                  {TITRE_DE_LA_PERIODE[cle]}
                 </Link>
               ))}
-            </div>
+            </nav>
+            <ol className="rang-liste">
+              {table.lignes.map((ligne) => (
+                <li
+                  key={`${ligne.rang}-${ligne.prenom}-${ligne.initiale}`}
+                  className={ligne.estMoi ? 'moi' : undefined}
+                >
+                  <span className="rang">{ligne.rang}</span>
+                  <span className="ini" aria-hidden="true">
+                    {`${ligne.prenom.charAt(0)}${ligne.initiale}`.toUpperCase()}
+                  </span>
+                  <span className="qui">
+                    <b>
+                      {ligne.estMoi
+                        ? 'Vous'
+                        : `${ligne.prenom} ${ligne.initiale}.`}
+                    </b>
+                    <span>
+                      {niveauPour(ligne.points).actuel.titre}
+                      {ligne.verifie ? ' · identité vérifiée' : ''}
+                    </span>
+                  </span>
+                  <span className="chiffre">
+                    {ligne.gardes} garde{ligne.gardes > 1 ? 's' : ''}
+                    {ligne.note !== null
+                      ? ` · ${ligne.note.toLocaleString('fr-BE', {
+                          maximumFractionDigits: 1,
+                        })}`
+                      : ''}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            {table.lignes.length === 0 ? (
+              <p className="prog-note">
+                Personne n’a encore terminé de garde sur cette période.
+              </p>
+            ) : null}
+            <p className="prog-note">
+              Le classement tient compte des gardes menées à terme, des avis et
+              des annulations. Il ne récompense pas le volume seul. Aucune
+              adresse n’y apparaît, et les soldes de points restent privés.
+            </p>
+          </div>
+        ) : null}
 
-            <Link href="/progression/regles" className="encart lien-encart">
-              <Icone nom="velo" taille={26} />
-              <span>
-                {p('Chaque garde réalisée vous fait gagner des points !')}
-              </span>
-              <Icone nom="chevron" taille={20} />
-            </Link>
-          </section>
-        </div>
-      </div>
-    </main>
+        <h2 className="prog-titre">Aller plus loin</h2>
+        <ul className="groupe sans-icone" role="list">
+          {LIENS_DES_POINTS.map(([href, titre, detail]) => (
+            <li key={href}>
+              <Link href={href} className="rangee">
+                <span className="rangee-texte">
+                  <strong>{titre}</strong>
+                  <span>{detail}</span>
+                </span>
+                <Icone nom="chevron" taille={18} className="rangee-chevron" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </main>
+    </>
   );
 }

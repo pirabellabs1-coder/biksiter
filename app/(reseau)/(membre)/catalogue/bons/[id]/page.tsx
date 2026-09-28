@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { bonDuMembre } from '@/lib/depot/catalogue';
 import { textes } from '@/lib/i18n/langue';
@@ -29,7 +28,6 @@ export default async function UnBon({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/catalogue/bons" cloche={false} />
       <div className="ecran-app centre-vertical">
         {nouveau ? (
           <>

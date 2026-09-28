@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { basculerLeClassement } from '@/app/(reseau)/(membre)/classement/actions';
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { apparaitAuClassement } from '@/lib/depot/progression';
 import { textes } from '@/lib/i18n/langue';
@@ -25,7 +24,6 @@ export default async function Confidentialite() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Confidentialité et sécurité')}</h1>
         <p className="sous-titre">{p('Vous choisissez ici ce que les autres membres peuvent voir de votre profil.')}</p>

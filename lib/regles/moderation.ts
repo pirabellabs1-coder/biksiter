@@ -41,6 +41,12 @@ export function refusDeCorrection(
 
 export const ISSUES_D_UN_LITIGE = [
   {
+    cle: 'poursuivre',
+    titre: 'Classer, la garde continue',
+    description:
+      'Le problème est réglé et le vélo reste chez le Bike Sitter : la garde reprend son cours, jusqu’à la reprise avec le code.',
+  },
+  {
     cle: 'terminer_avec_points',
     titre: 'Clore la garde, points accordés',
     description:
@@ -64,6 +70,20 @@ export type IssueDUnLitige = (typeof ISSUES_D_UN_LITIGE)[number]['cle'];
 
 export function estUneIssueDeLitige(valeur: unknown): valeur is IssueDUnLitige {
   return ISSUES_D_UN_LITIGE.some((issue) => issue.cle === valeur);
+}
+
+/**
+ * Où reprend une garde dont le litige est classé : là où en est le vélo.
+ * Déposé et pas encore repris, il est en garde ; jamais déposé, la garde
+ * attend encore son dépôt. Un vélo déjà repris ne se « poursuit » pas : la
+ * garde se clôt.
+ */
+export function etatApresClassement(velo: {
+  depose: boolean;
+  repris: boolean;
+}): 'en_cours' | 'accepte' | null {
+  if (velo.repris) return null;
+  return velo.depose ? 'en_cours' : 'accepte';
 }
 
 export type PrioriteDUnLitige = 'haute' | 'moyenne';
@@ -122,4 +142,16 @@ export function tauxDeFinalisation(
 ): number | null {
   const total = terminees + interrompues;
   return total > 0 ? Math.round((terminees / total) * 100) : null;
+}
+
+/**
+ * Une adresse e-mail à demi masquée, pour les listes de la modération :
+ * assez pour distinguer deux homonymes, pas de quoi recopier une liste
+ * d'adresses. L'adresse complète reste sur la fiche du membre.
+ */
+export function emailMasque(email: string): string {
+  const arobase = email.lastIndexOf('@');
+  if (arobase <= 0) return '•••';
+  const local = email.slice(0, arobase);
+  return `${local.slice(0, Math.min(2, local.length))}•••${email.slice(arobase)}`;
 }

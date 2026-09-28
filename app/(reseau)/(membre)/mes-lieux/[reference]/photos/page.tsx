@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { photosDeLEmplacement } from '@/lib/depot/photos';
 import { lieuDuMembre } from '@/lib/depot/lieux';
@@ -10,12 +9,16 @@ import { textes } from '@/lib/i18n/langue';
 import { exigerUnMembre } from '@/lib/session';
 
 import { envoyerLesPhotosDuLieu, retirerUnePhotoDuLieu } from '../../actions';
+import { RetirerLaPhoto } from './retirer';
 import { FormulaireDePhotos } from './formulaire';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
   return { title: p('Photos du lieu') };
 }
+
+/** Ce que montre chaque photo, dans l'ordre des cases du formulaire. */
+const TITRES_DES_PHOTOS = ['Entrée du lieu', 'Intérieur du lieu', 'Point d’attache'];
 
 export default async function PhotosDuLieu({
   params,
@@ -34,7 +37,6 @@ export default async function PhotosDuLieu({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={nouveau ? '/mes-lieux' : `/mes-lieux/${reference}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         {nouveau ? (
           <div className="etapes-app">
@@ -47,7 +49,7 @@ export default async function PhotosDuLieu({
         ) : null}
         <h1 className="titre-ecran">{p('Photos du lieu')}</h1>
         <p className="sous-titre">
-          {p('Les photos de votre emplacement aident les cyclistes à visualiser où leur vélo sera accueilli. Merci d’éviter toute information sensible (documents, plaques, etc.).')}
+          {p('Les photos de votre emplacement aident les cyclistes à voir où leur vélo sera accueilli.')}
         </p>
 
         <FormulaireDePhotos
@@ -67,34 +69,39 @@ export default async function PhotosDuLieu({
           }}
         />
 
+        {/* Juste sous le bouton principal : c'est là qu'on cherche une autre
+            issue quand on n'a pas de photo sous la main. */}
+        {nouveau ? (
+          <Link href={`/mes-lieux/${reference}/disponibilites?nouveau=1`} className="bouton discret">
+            {p('Ajouter les photos plus tard')}
+          </Link>
+        ) : null}
+
         {photos.length > 0 ? (
           <div className="pile" style={{ marginTop: 12 }}>
-            {photos.map((photo) => (
-              <form key={photo.rang} action={retirerUnePhotoDuLieu}>
-                <input type="hidden" name="reference" value={reference} />
-                <input type="hidden" name="rang" value={photo.rang} />
-                <button type="submit" className="bouton discret texte-rouge">
-                  <Icone nom="corbeille" taille={18} />
-                  {p('Retirer la photo {n}', { n: photo.rang + 1 })}
-                </button>
-              </form>
-            ))}
+            {photos.map((photo) => {
+              const titre = TITRES_DES_PHOTOS[photo.rang] ?? p('Photo {n}', { n: photo.rang + 1 });
+              return (
+                <RetirerLaPhoto
+                  key={photo.rang}
+                  action={retirerUnePhotoDuLieu}
+                  reference={reference}
+                  rang={photo.rang}
+                  libelle={p('Retirer « {titre} »', { titre: p(titre) })}
+                  confirmation={p('Retirer cette photo ? Elle disparaît aussitôt de votre fiche.')}
+                />
+              );
+            })}
           </div>
         ) : null}
 
-        <div className="encart bleu" style={{ marginTop: 12 }}>
+        <div className="encart gris" style={{ marginTop: 12 }}>
           <Icone nom="info" taille={22} />
           <span>
-            <strong>{p('Conseils de confidentialité')}</strong>
-            {p('Ne montrez ni numéro de rue, ni plaque d’immatriculation, ni visage. Les coordonnées GPS des photos sont retirées automatiquement.')}
+            <strong>{p('Protéger votre adresse')}</strong>
+            {p('Cadrez l’emplacement lui-même : un numéro de rue, une plaque ou un visage n’apportent rien aux cyclistes. Les coordonnées GPS des photos sont retirées automatiquement.')}
           </span>
         </div>
-
-        {nouveau ? (
-          <Link href={`/mes-lieux/${reference}/disponibilites?nouveau=1`} className="bouton discret">
-            {p('Passer cette étape')}
-          </Link>
-        ) : null}
       </div>
     </main>
   );

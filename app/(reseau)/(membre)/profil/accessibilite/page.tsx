@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { reglagesDAffichage } from '@/lib/affichage';
 import { textes } from '@/lib/i18n/langue';
@@ -31,7 +30,6 @@ export default async function Accessibilite({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/parametres" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Accessibilité')}</h1>
         <p className="sous-titre">

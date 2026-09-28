@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
-import { notificationsDuMembre, type Notification } from '@/lib/depot/notifications';
-import { textes } from '@/lib/i18n/langue';
-import { ecartEnJours, jourAffiche } from '@/lib/regles/creneau';
-import { heureABruxelles, jourABruxelles } from '@/lib/temps';
+import {
+  notificationsDuMembre,
+  type Notification,
+} from '@/lib/depot/notifications';
+import { textes, type Textes } from '@/lib/i18n/langue';
+import { jourAffiche } from '@/lib/regles/creneau';
 import { exigerUnMembre } from '@/lib/session';
+import { heureABruxelles, jourABruxelles } from '@/lib/temps';
 
 import { toutLire } from './actions';
 
@@ -16,150 +18,117 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: p('Notifications') };
 }
 
-const FILTRES = [
-  ['toutes', 'Toutes'],
-  ['gardes', 'Gardes'],
-  ['communaute', 'Communauté'],
-  ['systeme', 'Système'],
-] as const;
-
-type Filtre = (typeof FILTRES)[number][0];
-
-/** Le lien d'une notification dit de quoi elle parle. */
-function natureDe(n: Notification): Exclude<Filtre, 'toutes'> {
-  if (n.lien?.startsWith('/gardes')) return 'gardes';
-  if (
-    n.lien?.startsWith('/messages') ||
-    n.lien?.startsWith('/membres') ||
-    n.lien?.startsWith('/profil/avis')
-  ) {
-    return 'communaute';
-  }
-  return 'systeme';
-}
-
-function iconeDe(n: Notification): NomDIcone {
-  if (n.lien?.startsWith('/messages')) return 'messages';
-  if (n.lien?.startsWith('/gardes')) return 'calendrier';
-  if (n.lien?.startsWith('/progression') || n.lien?.startsWith('/classement')) return 'trophee';
-  if (n.lien?.includes('avis')) return 'etoile';
-  if (n.lien?.startsWith('/profil/alertes') || n.lien?.startsWith('/recherche')) return 'recherche';
+/**
+ * L'icône d'une notification, choisie par ce qu'elle concerne. Une notification
+ * urgente (un code refusé, une garde annulée au dernier moment) prend le corail.
+ */
+function iconeDe(notification: Notification): NomDIcone {
+  const lien = notification.lien ?? '';
+  if (lien.startsWith('/messages')) return 'messages';
+  if (lien.includes('avis')) return 'etoile';
+  if (lien.startsWith('/progression') || lien.startsWith('/catalogue')) return 'cadeau';
+  if (lien.startsWith('/demande')) return 'demandes';
+  if (lien.startsWith('/gardes')) return 'velo';
+  if (lien.startsWith('/profil')) return 'bouclier';
   return 'cloche';
 }
 
-export default async function Notifications({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | undefined>>;
-}) {
+/** « il y a 12 min », « hier », « il y a 3 jours » : la maquette parle en écart. */
+function ilYA(p: Textes['p'], quand: Date): string {
+  const minutes = Math.max(0, Math.round((Date.now() - quand.getTime()) / 60000));
+  if (minutes < 60) return p('il y a {n} min', { n: minutes });
+  const heures = Math.round(minutes / 60);
+  if (heures < 24) return p('il y a {n} h', { n: heures });
+  const jours = Math.round(heures / 24);
+  if (jours === 1) return p('hier');
+  if (jours < 7) return p('il y a {n} jours', { n: jours });
+  return jourAffiche(jourABruxelles(quand));
+}
+
+export default async function Notifications() {
   const membre = await exigerUnMembre();
   const { p } = await textes();
-  const { filtre: demande } = await searchParams;
-  const filtre: Filtre = FILTRES.some(([cle]) => cle === demande)
-    ? (demande as Filtre)
-    : 'toutes';
-  const toutes = await notificationsDuMembre(membre.id);
-  const notifications =
-    filtre === 'toutes' ? toutes : toutes.filter((n) => natureDe(n) === filtre);
-  const nonLues = toutes.some((n) => !n.lue);
-
-  const aujourdhui = jourABruxelles();
-  const groupes: [string, Notification[]][] = [
-    [p('Aujourd’hui'), []],
-    [p('Cette semaine'), []],
-    [p('Plus tôt'), []],
-  ];
-  for (const n of notifications) {
-    const ecart = ecartEnJours(jourABruxelles(new Date(n.visibleLe)), aujourdhui);
-    groupes[ecart === 0 ? 0 : ecart < 7 ? 1 : 2]![1].push(n);
-  }
+  const notifications = await notificationsDuMembre(membre.id);
+  const nonLues = notifications.filter((n) => !n.lue).length;
 
   return (
-    <main id="contenu">
-      <EnTete p={p} retour="/accueil" cloche={false}>
-        <Link
-          href="/profil/preferences"
-          className="entete-bouton"
-          aria-label={p('Préférences de notification')}
-        >
-          <Icone nom="reglages" taille={22} />
-        </Link>
-      </EnTete>
-      <div className="ecran-app ecran-large">
-        <div className="titre-avec-action">
-          <h1 className="titre-ecran">{p('Notifications')}</h1>
-          {nonLues ? (
-            <form action={toutLire}>
-              <button type="submit" className="bouton discret petit">
-                {p('Tout marquer comme lu')}
-              </button>
-            </form>
-          ) : null}
+    <main id="contenu" className="ecran">
+      <header className="ecran-tete">
+        <h1>Notifications</h1>
+        <p className="ecran-intro">
+          {nonLues > 0
+            ? `${nonLues} nouvelle${nonLues > 1 ? 's' : ''} depuis votre dernière visite.`
+            : 'Vous êtes à jour.'}
+        </p>
+      </header>
+
+      {nonLues > 0 ? (
+        <form action={toutLire} className="notifs-actions">
+          <button type="submit" className="lien">
+            Tout marquer comme lu
+          </button>
+        </form>
+      ) : null}
+
+      {notifications.length === 0 ? (
+        <div className="etat-vide">
+          <span className="ev-i" aria-hidden="true">
+            <Icone nom="cloche" taille={26} />
+          </span>
+          <h2>Rien de neuf</h2>
+          <p>
+            Les demandes, les réponses et les messages de vos gardes
+            arriveront ici.
+          </p>
         </div>
+      ) : (
+        <ul className="groupe notifs-liste" role="list">
+          {notifications.map((notification) => {
+            const quand = new Date(notification.visibleLe);
+            return (
+              <li key={notification.id}>
+                <Link
+                  href={`/notifications/${notification.id}`}
+                  className={[
+                    'rangee',
+                    'notification',
+                    notification.lue ? '' : 'non-lue',
+                    notification.urgente ? 'urgente' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  prefetch={false}
+                >
+                  <span className="rangee-icone" aria-hidden="true">
+                    <Icone nom={iconeDe(notification)} taille={18} strokeWidth={2} />
+                  </span>
+                  <span className="rangee-texte">
+                    <strong>
+                      {notification.lue ? null : (
+                        <span className="lecteur">Non lue : </span>
+                      )}
+                      {p(notification.texte, notification.valeurs)}
+                    </strong>
+                    <span>
+                      {notification.differee
+                        ? `${ilYA(p, quand)} · reçue pendant vos heures de calme`
+                        : `${ilYA(p, quand)} · ${heureABruxelles(quand)}`}
+                    </span>
+                  </span>
+                  {notification.lue ? null : (
+                    <span className="point-non-lu" aria-hidden="true" />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-        <nav className="puces" aria-label={p('Filtrer les notifications')}>
-          {FILTRES.map(([cle, libelle]) => (
-            <Link
-              key={cle}
-              href={cle === 'toutes' ? '/notifications' : `/notifications?filtre=${cle}`}
-              className={cle === filtre ? 'puce active' : 'puce'}
-              aria-current={cle === filtre ? 'page' : undefined}
-            >
-              {p(libelle)}
-            </Link>
-          ))}
-        </nav>
-
-        {notifications.length === 0 ? (
-          <div className="carte vide-liste" style={{ marginTop: 14 }}>
-            <Icone nom="cloche" taille={30} />
-            <strong>{p('Aucune notification.')}</strong>
-            <span>{p('Vous retrouverez ici les demandes, les messages et les mises à jour de vos gardes.')}</span>
-          </div>
-        ) : (
-          groupes.map(([titre, liste]) =>
-            liste.length === 0 ? null : (
-              <section key={titre}>
-                <h2 className="titre-section">{titre}</h2>
-                <div className="pile">
-                  {liste.map((n) => {
-                    const quand = new Date(n.visibleLe);
-                    return (
-                      <Link
-                        key={n.id}
-                        href={`/notifications/${n.id}`}
-                        className={n.lue ? 'carte notification' : 'carte notification non-lue'}
-                        prefetch={false}
-                      >
-                        <span className="ligne-icone fond-vert">
-                          <Icone nom={iconeDe(n)} taille={22} />
-                        </span>
-                        <span className="ligne-texte">
-                          <strong>
-                            {!n.lue ? <span className="lecteur">{p('Non lue')} : </span> : null}
-                            {p(n.texte, n.valeurs)}
-                          </strong>
-                          {n.differee ? (
-                            <span>{p('Reçue pendant vos heures de calme')}</span>
-                          ) : null}
-                        </span>
-                        <span className="ligne-fin colonne">
-                          <span className="petit">
-                            {jourABruxelles(quand) === aujourdhui
-                              ? heureABruxelles(quand)
-                              : jourAffiche(jourABruxelles(quand)).slice(0, 5)}
-                          </span>
-                          {!n.lue ? <span className="point-vert" aria-hidden="true" /> : null}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            ),
-          )
-        )}
-      </div>
+      <p className="prog-note">
+        Les notifications de garde arrivent aussi par e-mail. Le reste se
+        consulte ici.
+      </p>
     </main>
   );
 }

@@ -6,6 +6,7 @@ import type { Textes } from '@/lib/i18n/langue';
 import { TON_DE_L_ETAT, type EtatDeGarde } from '@/lib/regles/garde';
 import { heureABruxelles, jourABruxelles } from '@/lib/temps';
 
+import { Avatar } from './avatar';
 import { Icone, type NomDIcone } from './icone';
 
 /** Règle 6 : la teinte dit le sens, l'icône et le texte le disent aussi. */
@@ -72,15 +73,30 @@ export function CarteDeGarde({
   t,
   p,
   garde,
+  href = `/gardes/${garde.id}`,
+  vignette = 'lieu',
 }: {
   t: Textes['t'];
   p: Textes['p'];
   garde: ProchaineGarde;
+  href?: string;
+  /**
+   * Le bike sitter connaît son propre lieu : sur ses demandes, la vignette
+   * montre plutôt l'initiale du cycliste.
+   */
+  vignette?: 'lieu' | 'personne';
 }) {
   return (
-    <Link href={`/gardes/${garde.id}`} className="carte carte-de-garde">
-      <div className="vignette-app">
-        {garde.aUnePhoto ? (
+    <Link href={href} className="carte carte-de-garde">
+      <div className={vignette === 'personne' ? 'vignette-app vignette-personne' : 'vignette-app'}>
+        {vignette === 'personne' ? (
+          <Avatar
+            membreId={garde.autreId}
+            prenom={garde.autrePrenom}
+            version={garde.autrePhoto}
+            taille={64}
+          />
+        ) : garde.aUnePhoto ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={`/emplacements/${garde.reference}/photo/0`} alt="" />
         ) : (
@@ -90,9 +106,15 @@ export function CarteDeGarde({
       <div className="carte-de-garde-corps">
         <strong>{dateDeGarde(p, garde.debut, garde.fin)}</strong>
         <span className="carte-de-garde-personne">
-          <span className="avatar-app mini" aria-hidden="true">
-            {garde.autrePrenom.charAt(0)}
-          </span>
+          {/* Le visage est déjà dans la vignette : pas de seconde initiale. */}
+          {vignette === 'personne' ? null : (
+            <Avatar
+              membreId={garde.autreId}
+              prenom={garde.autrePrenom}
+              version={garde.autrePhoto}
+              taille={22}
+            />
+          )}
           {garde.autrePrenom} {garde.autreInitiale}.
           {garde.autreVerifie ? (
             <Icone

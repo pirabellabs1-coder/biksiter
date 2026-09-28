@@ -1,0 +1,351 @@
+/* =============================================================================
+   La page /blog.
+
+   Une entête calme, un article à la une posé en carte pleine largeur, une
+   grille d'articles ensuite, et un bloc « lettre » en bas. Aucune illustration
+   photographique n'est requise : les vignettes sont des blocs de couleur avec
+   un pictogramme de deux lettres, sobre et cohérent.
+   ========================================================================== */
+
+.page-blog {
+  background:
+    radial-gradient(
+      1200px 720px at 82% 12%,
+      rgba(22, 136, 237, 0.08),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 540px at 8% 0%,
+      rgba(0, 130, 59, 0.1),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #f7fbf8 0%, #ffffff 60%);
+  padding: 72px max(5vw, 24px) 120px;
+}
+
+.blog-tete {
+  max-width: 900px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+.blog-tete h1 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: clamp(36px, 5vw, 62px);
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+  margin: 22px 0 20px;
+  color: #0a2417;
+}
+
+.blog-intro {
+  max-width: 640px;
+  margin: 0 auto 26px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.blog-rubriques {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.blog-rubrique {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.blog-rubrique > span[aria-hidden] {
+  color: var(--green);
+}
+
+/* --- À la une -------------------------------------------------------------- */
+
+.blog-alaune {
+  max-width: 1120px;
+  margin: 0 auto 56px;
+}
+
+.blog-alaune-carte {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  min-height: 340px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(4, 60, 30, 0.08);
+}
+
+.blog-alaune-visuel {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.blog-alaune-visuel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.28), transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(6, 30, 18, 0.32), transparent 60%);
+}
+
+.blog-alaune-visuel > span {
+  position: relative;
+  font-family: var(--police-manrope), sans-serif;
+  font-size: clamp(64px, 8vw, 120px);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.blog-alaune-texte {
+  padding: 44px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.blog-etiquette {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #eef8f1;
+  color: var(--green);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+
+.blog-alaune-texte h2 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: clamp(28px, 3.4vw, 42px);
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+  margin: 4px 0 0;
+  color: #0a2417;
+}
+
+.blog-alaune-texte p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.blog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.blog-meta > span[aria-hidden] {
+  opacity: 0.5;
+}
+
+.blog-lire {
+  margin-top: 6px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* --- Grille --------------------------------------------------------------- */
+
+.blog-grille {
+  max-width: 1120px;
+  margin: 0 auto 80px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.blog-carte {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 30px rgba(4, 60, 30, 0.06);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.blog-carte:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 42px rgba(4, 60, 30, 0.12);
+}
+
+.blog-carte-visuel {
+  position: relative;
+  height: 170px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.blog-carte-visuel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.28), transparent 55%),
+    radial-gradient(circle at 80% 70%, rgba(6, 30, 18, 0.32), transparent 60%);
+}
+
+.blog-carte-visuel > span {
+  position: relative;
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 54px;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.blog-carte-int {
+  padding: 22px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.blog-carte h3 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 4px 0 0;
+  color: #0a2417;
+}
+
+.blog-carte p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  flex: 1;
+}
+
+.blog-carte .blog-meta {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* --- Bloc lettre --------------------------------------------------------- */
+
+.blog-lettre {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.blog-lettre-int {
+  background: linear-gradient(160deg, #eef8f1 0%, #dcecdf 100%);
+  border-radius: 26px;
+  padding: 40px 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  border: 1px solid rgba(0, 130, 59, 0.12);
+}
+
+.blog-lettre h2 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: clamp(24px, 2.8vw, 32px);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin: 12px 0 8px;
+  color: #0a2417;
+}
+
+.blog-lettre p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.blog-lettre .primary {
+  text-decoration: none;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0, 130, 59, 0.22);
+}
+
+.blog-lettre .primary:hover {
+  background: #005f20;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .page-blog {
+    padding: 56px 20px 90px;
+  }
+
+  .blog-alaune-carte {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .blog-alaune-visuel {
+    min-height: 200px;
+  }
+
+  .blog-alaune-texte {
+    padding: 28px;
+  }
+
+  .blog-grille {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .blog-lettre-int {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 32px 26px;
+    text-align: left;
+  }
+}
+
+@media (max-width: 560px) {
+  .blog-tete h1 {
+    font-size: 32px;
+  }
+
+  .blog-intro {
+    font-size: 16px;
+  }
+
+  .blog-grille {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-alaune-texte h2 {
+    font-size: 24px;
+  }
+}

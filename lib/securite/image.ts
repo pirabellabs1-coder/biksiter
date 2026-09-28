@@ -27,7 +27,25 @@ export type PhotoNettoyee = {
 /** Cinquante mégapixels : bien au-delà d'un appareil photo de téléphone. */
 export const PIXELS_MAXIMAUX = 50_000_000;
 
+/**
+ * Les formats qu'un appareil photo produit. `sharp` en lit bien d'autres
+ * (SVG, TIFF, GIF…) : ceux-là n'ont rien à faire ici, et un SVG se décode à
+ * grand coût.
+ */
+const FORMATS_LUS = ['jpeg', 'png', 'webp', 'heif'] as const;
+
+/** Refuse, avant tout décodage, ce qui n'est pas une photo. */
+async function verifierLeFormat(original: Buffer): Promise<void> {
+  const { format } = await sharp(original, {
+    limitInputPixels: PIXELS_MAXIMAUX,
+  }).metadata();
+  if (!format || !(FORMATS_LUS as readonly string[]).includes(format)) {
+    throw new Error('Format de photo non accepté.');
+  }
+}
+
 export async function nettoyerLaPhoto(original: Buffer): Promise<PhotoNettoyee> {
+  await verifierLeFormat(original);
   // Une image très compressée de seize mille pixels de côté tient en quelques
   // mégaoctets mais sature la mémoire au décodage : on refuse avant.
   const resultat = await sharp(original, { limitInputPixels: PIXELS_MAXIMAUX })
@@ -35,6 +53,36 @@ export async function nettoyerLaPhoto(original: Buffer): Promise<PhotoNettoyee> 
     // jette : sans lui, une photo prise en portrait s'afficherait couchée.
     .rotate()
     .resize({ width: LARGEUR_MAXIMALE, withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toBuffer({ resolveWithObject: true });
+
+  return {
+    contenu: resultat.data,
+    largeur: resultat.info.width,
+    hauteur: resultat.info.height,
+  };
+}
+
+/** Le côté d'une photo de profil : assez pour un écran Retina, pas plus. */
+export const COTE_D_UNE_PHOTO_DE_PROFIL = 512;
+
+/**
+ * Le nettoyage d'une photo de profil : les mêmes garanties que pour les autres
+ * photos (orientation appliquée, métadonnées jetées), recadrée en carré sur
+ * ce qui attire l'œil — le plus souvent un visage.
+ */
+export async function nettoyerLaPhotoDeProfil(
+  original: Buffer,
+): Promise<PhotoNettoyee> {
+  await verifierLeFormat(original);
+  const resultat = await sharp(original, { limitInputPixels: PIXELS_MAXIMAUX })
+    .rotate()
+    .resize({
+      width: COTE_D_UNE_PHOTO_DE_PROFIL,
+      height: COTE_D_UNE_PHOTO_DE_PROFIL,
+      fit: 'cover',
+      position: sharp.strategy.attention,
+    })
     .webp({ quality: 82 })
     .toBuffer({ resolveWithObject: true });
 

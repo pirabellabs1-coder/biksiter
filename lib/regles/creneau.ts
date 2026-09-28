@@ -15,6 +15,84 @@ export const HORIZON_JOURS = 7;
  */
 export const DUREE_MINIMALE_MINUTES = 60;
 
+/**
+ * Le dépôt se choisit au quart d'heure — 10:00, 10:15, 10:30 — parce qu'on
+ * arrive quand on arrive. C'est la durée qui se compte en heures entières,
+ * pas l'heure d'arrivée.
+ */
+export const PAS_DU_DEPOT_MINUTES = 15;
+
+/** Personne ne dépose avant six heures du matin. */
+export const PREMIER_DEPOT_MINUTES = 6 * 60;
+
+/** Ni après vingt-deux heures. */
+export const DERNIER_DEPOT_MINUTES = 22 * 60;
+
+/**
+ * Jusqu'où les reprises peuvent aller : six heures le lendemain matin, compté
+ * depuis minuit du jour du dépôt. Au-delà, c'est une garde de plusieurs jours,
+ * qui se demande autrement.
+ */
+export const DERNIERE_REPRISE_MINUTES = 30 * 60;
+
+/**
+ * Les heures de dépôt proposées un jour donné, par quart d'heure.
+ *
+ * Le jour même, on n'offre pas un créneau déjà passé : on part du quart
+ * d'heure suivant, jamais de « maintenant ».
+ */
+export function depotsPossibles(
+  cestAujourdhui: boolean,
+  minutesCourantes: number,
+): number[] {
+  const debut = cestAujourdhui
+    ? Math.max(
+        PREMIER_DEPOT_MINUTES,
+        Math.ceil(minutesCourantes / PAS_DU_DEPOT_MINUTES) *
+          PAS_DU_DEPOT_MINUTES,
+      )
+    : PREMIER_DEPOT_MINUTES;
+
+  const creneaux: number[] = [];
+  for (let m = debut; m <= DERNIER_DEPOT_MINUTES; m += PAS_DU_DEPOT_MINUTES) {
+    creneaux.push(m);
+  }
+  return creneaux;
+}
+
+/**
+ * Les reprises possibles pour un dépôt donné : une heure après, puis d'heure
+ * en heure. Les valeurs dépassent 24 h quand la reprise tombe le lendemain.
+ */
+export function reprisesPossibles(depotMinutes: number): number[] {
+  const reprises: number[] = [];
+  for (
+    let m = depotMinutes + DUREE_MINIMALE_MINUTES;
+    m <= DERNIERE_REPRISE_MINUTES;
+    m += 60
+  ) {
+    reprises.push(m);
+  }
+  return reprises;
+}
+
+/** « 14:30 » à partir de minutes qui peuvent dépasser la journée. */
+export function heureDuLendemain(minutes: number): string {
+  const h = Math.floor(minutes / 60) % 24;
+  return `${String(h).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+/** L'heure se lit « 14h00 » partout : listes, résumés, récapitulatifs. */
+export function heureFrancaise(heure: string): string {
+  return heure.replace(':', 'h');
+}
+
+/** Au-delà de minuit, l'heure seule ne suffit plus. */
+export function libelleDeLaReprise(minutes: number): string {
+  const heure = heureFrancaise(heureDuLendemain(minutes));
+  return minutes >= 24 * 60 ? `${heure} (demain)` : heure;
+}
+
 export type HoraireDUnJour = { de: string; a: string };
 
 export type Horaires = {
@@ -171,7 +249,8 @@ export function libelleDesHoraires(
         ? { de: horaires.ouverture, a: horaires.fermeture }
         : null);
     if (!heures) continue;
-    const cle = `${heures.de} → ${heures.a}`;
+    // Les heures s'écrivent comme partout ailleurs à l'écran : « 08h00 – 21h00 ».
+    const cle = `${heureFrancaise(heures.de)} – ${heureFrancaise(heures.a)}`;
     groupes.set(cle, [...(groupes.get(cle) ?? []), abrege(jour)]);
   }
   return [...groupes.entries()]
@@ -179,13 +258,23 @@ export function libelleDesHoraires(
     .join('   ');
 }
 
-/** La durée acceptée à l'intérieur d'une journée. */
+/**
+ * La durée d'affilée qu'un bike sitter accepte, en heures.
+ *
+ * Le réseau plafonne à cinq heures ; trois est la valeur proposée par défaut.
+ * Au-delà, la garde se demande autrement — c'est ce que dit l'écran des
+ * disponibilités, et c'est ce que porte cette liste.
+ */
 export const DUREES_MAX_HEURES: Readonly<Record<number, string>> = {
-  1: "Jusqu'à 1 heure — le temps d'un café",
-  3: "Jusqu'à 3 heures — un restaurant, un cinéma",
-  8: "Jusqu'à 8 heures — une journée de travail",
-  24: 'La journée entière',
+  1: '1 heure',
+  2: '2 heures',
+  3: '3 heures',
+  4: '4 heures',
+  5: '5 heures',
 };
+
+/** Ce qu'on propose quand le bike sitter n'a rien choisi. */
+export const DUREE_MAX_PAR_DEFAUT_HEURES = 3;
 
 /** Au-delà d'une journée, la modération ouvre le multi-jours. */
 export const DUREES_MAX_JOURS: Readonly<Record<number, string>> = {

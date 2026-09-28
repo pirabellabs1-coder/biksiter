@@ -1,25 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-import { Icone } from '@/components/app/icone';
 import { adresseIpDuVisiteur } from '@/lib/adresse-ip';
 import { baseConfiguree } from '@/lib/bd/client';
 import { invitationPresentee } from '@/lib/depot/membres';
+import { nombreDeBikeSitters } from '@/lib/depot/reseau-public';
 import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
-import { textes } from '@/lib/i18n/langue';
 import { CONSULTATIONS_D_INVITATION } from '@/lib/regles/limites';
 import { INSCRIPTION_SUR_INVITATION } from '@/lib/regles/modules';
-
 import {
-  BORD_EN_ERREUR,
-  EcranDeCompte,
-  EncartDErreurs,
-} from '../ecran-de-compte';
+  BIKE_SITTERS_POUR_OUVRIR,
+  avancementDeLOuverture,
+} from '@/lib/regles/ouverture';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Rejoindre le réseau') };
-}
+export const metadata: Metadata = { title: 'Rejoindre le réseau' };
 
 /**
  * L'entrée dans le réseau, par le code d'une invitation.
@@ -33,48 +28,13 @@ export default async function Invitation({
 }: {
   searchParams: Promise<{ code?: string }>;
 }) {
-  const { p } = await textes();
   const code = ((await searchParams).code ?? '').trim().toUpperCase();
 
+  // Quand le réseau est ouvert, l'écran « accès fermé » n'a plus de sens :
+  // l'inscription se fait directement, le code suivant s'il y en a un.
   if (!INSCRIPTION_SUR_INVITATION) {
-    return (
-      <EcranDeCompte p={p} retour="/bienvenue">
-        <h1 className="titre-ecran">{p('Rejoindre le réseau')}</h1>
-        <div className="encart" style={{ margin: '10px 0 12px' }}>
-          <Icone nom="info" taille={20} />
-          <span>
-            {p(
-              'Le réseau est ouvert : vous pouvez créer un compte sans invitation.',
-            )}
-          </span>
-        </div>
-        <p className="sous-titre">
-          {p(
-            "La vérification d'identité reste obligatoire, et votre compte est activé après validation. Si vous avez reçu une invitation, renseignez-la : votre parrain sera prévenu de votre arrivée.",
-          )}
-        </p>
-        <form action="/inscription" method="get" className="pile">
-          <label className="champ-app">
-            <Icone nom="cle" taille={22} />
-            <span className="champ-empile">
-              <small>{p("Code d'invitation (facultatif)")}</small>
-              <input
-                name="code"
-                defaultValue={code}
-                placeholder="MANO-4K29"
-                autoComplete="off"
-                autoCapitalize="characters"
-                spellCheck={false}
-                style={{ minHeight: 26 }}
-              />
-            </span>
-          </label>
-          <button type="submit" className="bouton plein">
-            {p('Créer mon compte')}
-            <Icone nom="chevron" taille={20} />
-          </button>
-        </form>
-      </EcranDeCompte>
+    redirect(
+      code ? `/inscription?code=${encodeURIComponent(code)}` : '/inscription',
     );
   }
 
@@ -88,122 +48,148 @@ export default async function Invitation({
       invitant = await invitationPresentee(code);
     }
   }
-  const codeRefuse = Boolean(code) && !invitant;
+  const codeRefuse = Boolean(code) && !invitant && !tropDEssais;
+
+  // La jauge de lancement dit où en est le quartier, pour de vrai.
+  const bikeSitters = await nombreDeBikeSitters();
+  const avancement = avancementDeLOuverture(bikeSitters);
 
   return (
-    <EcranDeCompte p={p} retour="/bienvenue">
-      <h1 className="titre-ecran">{p('Rejoindre le réseau')}</h1>
-      <div className="encart ambre" style={{ margin: '10px 0 14px' }}>
-        <Icone nom="epingle" taille={20} />
-        <span>
-          {p(
-            "Le réseau ouvre quartier par quartier. On y entre aujourd'hui sur invitation d'un membre.",
-          )}
-        </span>
-      </div>
+    <div className="page page-etroite" id="contenu">
+      <header className="page-tete">
+        <span className="kicker">ACCÈS FERMÉ</span>
+        <h1>On n’entre que sur invitation.</h1>
+        <p>
+          Pendant les deux premiers mois, chaque nouveau membre est invité par
+          quelqu’un qui est déjà là. Ce n’est pas une liste d’attente
+          marketing : c’est la seule façon de savoir qui garde les vélos du
+          quartier.
+        </p>
+      </header>
 
-      <form action="/invitation" method="get" className="pile">
-        <label
-          className="champ-app"
-          style={codeRefuse ? BORD_EN_ERREUR : undefined}
-        >
-          <Icone nom="cle" taille={22} />
-          <span className="champ-empile">
-            <small>{p("Code d'invitation")}</small>
+      <section className="bloc">
+        <h2>Pourquoi fermé</h2>
+        <ul className="liste-nette">
+          <li>
+            <b>Parce qu’on se porte garant.</b> Celui qui invite répond un peu
+            de la personne qu’il fait entrer. Ça change tout sur la confiance.
+          </li>
+          <li>
+            <b>Parce que la densité prime.</b> Vingt Bike Sitters dans un rayon
+            de six cents mètres valent mieux que deux cents dispersés dans la
+            ville.
+          </li>
+          <li>
+            <b>Parce qu’on visite chaque emplacement.</b> À vingt candidatures
+            par semaine, c’est possible. À deux cents, non.
+          </li>
+        </ul>
+      </section>
+
+      <section className="bloc">
+        <h2>Vous avez un code</h2>
+        <form className="deux-ligne" action="/invitation" method="get">
+          <label className="champ">
+            <span>Code d’invitation</span>
             <input
+              type="text"
               name="code"
               defaultValue={code}
-              placeholder="MANO-4K29"
+              placeholder="FLAGEY-7K2M"
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
               aria-invalid={codeRefuse || undefined}
-              aria-describedby={codeRefuse ? 'code-erreur' : undefined}
-              style={{ minHeight: 26 }}
+              aria-describedby={
+                codeRefuse || tropDEssais ? 'code-erreur' : undefined
+              }
+              required
             />
-          </span>
-        </label>
+          </label>
+          <button type="submit" className="bleu">
+            Vérifier le code
+          </button>
+        </form>
 
         {tropDEssais ? (
-          <EncartDErreurs
-            id="code-erreur"
-            erreurs={[
-              p(
-                'Beaucoup de codes ont été essayés depuis cette connexion. Vous pourrez réessayer dans une heure.',
-              ),
-            ]}
-          />
+          <p className="notice" id="code-erreur" role="alert">
+            Beaucoup de codes ont été essayés depuis cette connexion. Vous
+            pourrez réessayer dans une heure.
+          </p>
         ) : codeRefuse ? (
-          <EncartDErreurs
-            id="code-erreur"
-            erreurs={[
-              p(
-                'Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, par exemple MANO-4K29.',
-              ),
-            ]}
-          />
+          <p className="notice" id="code-erreur" role="alert">
+            Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez
+            qu’il est recopié tel quel, par exemple FLAGEY-7K2M.
+          </p>
         ) : null}
 
-        {/* Une fois l'invitation reconnue, la suite est un lien : le champ
-            reste modifiable, et Entrée relit un autre code. */}
-        {invitant ? null : (
-          <button type="submit" className="bouton plein">
-            {p('Continuer')}
-            <Icone nom="chevron" taille={20} />
-          </button>
-        )}
-      </form>
+        {invitant ? (
+          <div className="actions-fin">
+            <Link
+              className="bleu"
+              href={`/inscription?code=${encodeURIComponent(code)}`}
+            >
+              {invitant.prenom} vous invite : continuer
+            </Link>
+          </div>
+        ) : null}
 
-      {invitant ? (
-        <div className="pile" style={{ marginTop: 12 }}>
-          <div className="carte carte-profil">
-            <span className="avatar-app" aria-hidden="true">
-              {invitant.prenom.charAt(0).toUpperCase()}
-            </span>
-            <span className="ligne-texte">
-              <strong>
-                {p('{prenom} vous invite', { prenom: invitant.prenom })}
-              </strong>
-              <span className="petit texte-doux">
-                {invitant.quartier
-                  ? p('bike sitter à {quartier} · membre depuis {annee}', {
-                      quartier: invitant.quartier,
-                      annee: invitant.depuis,
-                    })
-                  : p('membre depuis {annee}', { annee: invitant.depuis })}
-              </span>
-              {invitant.identiteVerifiee ? (
-                <span className="pastille bleu">
-                  <Icone nom="verifie" taille={14} />
-                  {p('Identité vérifiée')}
-                </span>
-              ) : null}
-            </span>
-          </div>
-          <div className="encart">
-            <Icone nom="info" taille={20} />
-            <span>
-              {p(
-                'Votre invitation a le plus de valeur si vous êtes du même quartier que {prenom} : c’est la densité qui rend le service utilisable.',
-                { prenom: invitant.prenom },
-              )}
-            </span>
-          </div>
-          <Link
-            href={`/inscription?code=${encodeURIComponent(code)}`}
-            className="bouton plein"
-          >
-            {p('Continuer')}
-            <Icone nom="chevron" taille={20} />
+        <p className="notice">
+          Un code ressemble à FLAGEY-7K2M. Il vous a été envoyé par la personne
+          qui vous invite, et il ne sert qu’une fois.
+        </p>
+      </section>
+
+      <section className="bloc">
+        <h2>Vous n’en avez pas</h2>
+        <p>
+          Laissez votre adresse : vous serez prévenu à l’ouverture de votre
+          quartier, et pas avant. Aucune autre utilisation, aucun autre envoi.
+        </p>
+        <form className="deux-ligne" action="/liste-attente" method="get">
+          <label className="champ">
+            <span>Adresse e-mail</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="vous@exemple.be"
+              autoComplete="email"
+              required
+            />
+          </label>
+          <button type="submit" className="outline">
+            Me prévenir
+          </button>
+        </form>
+        <div className="jauge-invit">
+          <span style={{ width: `${avancement}%` }} />
+        </div>
+        <p className="mention">
+          <b>
+            {bikeSitters} Bike Sitter{bikeSitters > 1 ? 's' : ''} sur{' '}
+            {BIKE_SITTERS_POUR_OUVRIR}
+          </b>{' '}
+          dans le rayon de lancement. Les invitations côté cycliste s’ouvriront
+          au {BIKE_SITTERS_POUR_OUVRIR}ᵉ.
+        </p>
+      </section>
+
+      <section className="bloc">
+        <h2>Vous pouvez entrer autrement</h2>
+        <p>
+          Une candidature de Bike Sitter n’a pas besoin de code : si vous avez
+          un garage, une cave ou une cour fermée dans le quartier, vous êtes
+          exactement ce qui manque.
+        </p>
+        <div className="actions-fin">
+          <Link className="bleu" href="/devenir-bike-sitter">
+            Proposer un emplacement
+          </Link>
+          <Link className="outline" href="/a-propos">
+            Qui nous sommes
           </Link>
         </div>
-      ) : null}
-
-      <div className="boutons" style={{ marginTop: 10 }}>
-        <Link href="/liste-attente" className="bouton contour">
-          {p("Je n'ai pas d'invitation")}
-        </Link>
-      </div>
-    </EcranDeCompte>
+      </section>
+    </div>
   );
 }

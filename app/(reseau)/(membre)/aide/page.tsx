@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { RubriquesDeQuestions } from '@/components/app/questions';
 import { RUBRIQUES_D_AIDE } from '@/lib/contenu/aide';
@@ -27,7 +26,6 @@ export default async function CentreDAide({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil" />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Centre d’aide')}</h1>
         <p className="sous-titre">

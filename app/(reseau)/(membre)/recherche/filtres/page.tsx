@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { textes } from '@/lib/i18n/langue';
 import { DISTANCES } from '@/lib/regles/distance';
@@ -32,7 +31,7 @@ export default async function FiltresDeRecherche({
   const { p } = await textes();
   const recherche = lireLaRecherche(await searchParams);
   const f = recherche.filtres;
-  const query = parametresDeLaRecherche(recherche).toString();
+  const _query = parametresDeLaRecherche(recherche).toString();
   const sansFiltre = parametresDeLaRecherche(recherche, {
     filtres: SANS_FILTRE,
   }).toString();
@@ -45,9 +44,7 @@ export default async function FiltresDeRecherche({
   ];
 
   return (
-    <main id="contenu">
-      <EnTete p={p} retour={`/recherche?${query}`} cloche={false} />
-      <form action="/recherche" method="get" className="ecran-app ecran-parcours">
+    <main id="contenu">      <form action="/recherche" method="get" className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Filtres de recherche')}</h1>
         <p className="sous-titre">
           {p('Consultez les emplacements disponibles à proximité de votre destination.')}

@@ -45,3 +45,17 @@ export function maturiteDUnQuartier(bikeSitters: number): MaturiteDUnQuartier {
 export function bikeSittersManquants(bikeSitters: number): number {
   return Math.max(0, BIKE_SITTERS_POUR_OUVRIR - bikeSitters);
 }
+
+
+/**
+ * L'avancement d'un quartier vers son ouverture, en pour cent du seuil.
+ *
+ * Sert à la jauge de l'écran d'invitation : elle disait « 70 % » en dur,
+ * ce qu'aucune donnée ne soutenait.
+ */
+export function avancementDeLOuverture(bikeSitters: number): number {
+  return Math.min(
+    100,
+    Math.round((bikeSitters / BIKE_SITTERS_POUR_OUVRIR) * 100),
+  );
+}

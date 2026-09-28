@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { FormulaireDInscription } from '@/components/maquette/compte/formulaire-d-inscription';
+import { adresseIpDuVisiteur } from '@/lib/adresse-ip';
 import { baseConfiguree } from '@/lib/bd/client';
 import { invitationPresentee } from '@/lib/depot/membres';
+import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
 import { textes } from '@/lib/i18n/langue';
+import { CONSULTATIONS_D_INVITATION } from '@/lib/regles/limites';
 import { INSCRIPTION_SUR_INVITATION } from '@/lib/regles/modules';
 import { membreConnecte } from '@/lib/session';
-
-import { EcranDeCompte, EtapesDeLInscription } from '../ecran-de-compte';
-import { FormulaireDInscription } from './formulaire';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
@@ -26,57 +26,108 @@ export default async function Inscription({
     redirect('/inscription/telephone');
   }
 
-  const { p } = await textes();
   const code = ((await searchParams).code ?? '').trim().toUpperCase();
-
-  // Pendant le lancement, on n'arrive ici qu'avec une invitation valable :
-  // sans elle, l'écran d'invitation explique ce qui manque.
-  if (INSCRIPTION_SUR_INVITATION && baseConfiguree()) {
-    const invitation = code ? await invitationPresentee(code) : null;
-    if (!invitation) {
-      redirect(
-        code ? `/invitation?code=${encodeURIComponent(code)}` : '/invitation',
-      );
+  // Un code dans l'adresse dit qui invite : chaque consultation compte, pour
+  // qu'on ne puisse pas essayer des codes au hasard jusqu'à en trouver un.
+  let invitation: Awaited<ReturnType<typeof invitationPresentee>> = null;
+  let tropDEssais = false;
+  if (code && baseConfiguree()) {
+    const adresse = await adresseIpDuVisiteur();
+    tropDEssais = await limiteDejaAtteinte(CONSULTATIONS_D_INVITATION, adresse);
+    if (!tropDEssais) {
+      await noterUneTentative('consultation_invitation', adresse);
+      invitation = await invitationPresentee(code);
     }
   }
 
-  const retour = code
-    ? `/invitation?code=${encodeURIComponent(code)}`
-    : '/invitation';
+  // Pendant le lancement, on n'arrive ici qu'avec une invitation valable :
+  // sans elle, l'écran d'invitation explique ce qui manque.
+  if (INSCRIPTION_SUR_INVITATION && baseConfiguree() && !invitation) {
+    redirect(
+      code ? `/invitation?code=${encodeURIComponent(code)}` : '/invitation',
+    );
+  }
+  // Un lien dont le code a déjà servi ne pré-remplit rien : le code serait
+  // refusé à l'envoi, après que tout a été saisi.
+  const codeValable = invitation ? code : '';
 
   return (
-    <EcranDeCompte p={p} retour={retour}>
-      <EtapesDeLInscription p={p} etape={1} titre={p('Compte')} />
-      <h1 className="titre-ecran">{p('Créer votre compte')}</h1>
-      <p className="sous-titre">
-        {p(
-          "Vous rejoignez le réseau comme membre. Vous cherchez une place quand vous en avez besoin, et vous devenez bike sitter si vous décidez d'en proposer une — même personne, même compte.",
-        )}
-      </p>
+    <>
+      <div className="page page-etroite" id="contenu">
+        <header className="page-tete">
+          <span className="kicker">INSCRIPTION</span>
+          <h1>Créer votre compte</h1>
+          <p>
+            Trois minutes, et vous pouvez chercher un Bike Sitter. Devenir Bike
+            Sitter vous-même se fait plus tard, quand vous le voulez.
+          </p>
+        </header>
 
-      <FormulaireDInscription
-        code={code}
-        libelles={{
-          prenom: p('Prénom'),
-          nom: p('Nom'),
-          email: p('E-mail'),
-          motDePasse: p('Mot de passe'),
-          motDePasseAide: p('8 caractères minimum'),
-          conditionsAvant: p('En continuant, vous acceptez les'),
-          cgu: p('CGU'),
-          conditionsEntre: p('et la'),
-          confidentialite: p('politique de confidentialité'),
-          continuer: p('Continuer'),
-          enCours: p('Création…'),
-        }}
-      />
+        {invitation ? (
+          <div className="invitation-recue">
+            <span className="invitation-initiale" aria-hidden="true">
+              {invitation.prenom.slice(0, 1)}
+            </span>
+            <p>
+              <strong>{invitation.prenom} vous invite sur Bike Sitters.</strong>
+              <span>
+                Membre depuis {invitation.depuis}
+                {invitation.quartier ? ` · ${invitation.quartier}` : ''}
+              </span>
+            </p>
+            {invitation.identiteVerifiee ? (
+              <span className="tag ver">Identité vérifiée</span>
+            ) : null}
+          </div>
+        ) : tropDEssais ? (
+          <p className="encart-doux">
+            Plusieurs codes ont été essayés depuis cette connexion. Vous pouvez
+            créer votre compte sans code, ou revenir avec votre lien dans une
+            heure.
+          </p>
+        ) : code ? (
+          <p className="encart-doux">
+            Ce lien d’invitation a déjà servi, ou il n’est plus valable. Vous
+            pouvez tout de même créer votre compte : l’inscription est ouverte
+            à tous.
+          </p>
+        ) : null}
 
-      <p className="centre texte-doux" style={{ margin: '20px 0 0', fontSize: 15 }}>
-        {p('Déjà un compte ?')}{' '}
-        <Link href="/connexion" className="lien-souligne texte-vert">
-          {p('Se connecter')}
-        </Link>
-      </p>
-    </EcranDeCompte>
+        <ol className="jalons">
+          <li className="fait">
+            <b>1</b>Votre compte
+          </li>
+          <li>
+            <b>2</b>Votre téléphone
+          </li>
+          <li>
+            <b>3</b>Votre identité
+          </li>
+        </ol>
+
+        <FormulaireDInscription
+          code={codeValable}
+          codeObligatoire={INSCRIPTION_SUR_INVITATION}
+        />
+
+        <section className="bloc">
+          <h2>Ensuite</h2>
+          <ul className="liste-nette">
+            <li>
+              <b>Un code par SMS</b> confirme votre numéro. Il reste privé.
+            </li>
+            <li>
+              <b>Une pièce d’identité</b> est vérifiée par une personne de
+              l’association avant votre première garde. Elle est supprimée
+              aussitôt : seul le résultat « vérifié » est conservé.
+            </li>
+            <li>
+              <b>C’est tout.</b> Le service est gratuit : aucun moyen de
+              paiement n’est demandé.
+            </li>
+          </ul>
+        </section>
+      </div>
+    </>
   );
 }

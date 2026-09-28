@@ -1345,6 +1345,21 @@ export const PHRASES_DES_MAQUETTES: Record<'nl' | 'en', Record<string, string>> 
     "association sans but lucratif": "vereniging zonder winstoogmerk",
     "zone ouverte à Bruxelles": "zone open in Brussel",
     "zones ouvertes à Bruxelles": "zones open in Brussel",
+    // Les titres des pages du compte, de la messagerie et des pages
+    // institutionnelles refaites d'après les maquettes définitives
+    "Messagerie": "Berichten",
+    "Mon vélo": "Mijn fiets",
+    "Progression et points": "Voortgang en punten",
+    "Inviter un membre": "Een lid uitnodigen",
+    "Nos règles": "Onze regels",
+    "Qui nous sommes": "Wie we zijn",
+    "Nous écrire": "Schrijf ons",
+    "Mentions légales": "Juridische informatie",
+    "Plan du site": "Sitemap",
+    "il y a {n} min": "{n} min geleden",
+    "il y a {n} h": "{n} u geleden",
+    "hier": "gisteren",
+    "il y a {n} jours": "{n} dagen geleden",
   },
   en: {
     // Les onglets
@@ -2683,5 +2698,20 @@ export const PHRASES_DES_MAQUETTES: Record<'nl' | 'en', Record<string, string>> 
     "association sans but lucratif": "non-profit association",
     "zone ouverte à Bruxelles": "zone open in Brussels",
     "zones ouvertes à Bruxelles": "zones open in Brussels",
+    // Les titres des pages du compte, de la messagerie et des pages
+    // institutionnelles refaites d'après les maquettes définitives
+    "Messagerie": "Messages",
+    "Mon vélo": "My bike",
+    "Progression et points": "Progress and points",
+    "Inviter un membre": "Invite a member",
+    "Nos règles": "Our rules",
+    "Qui nous sommes": "Who we are",
+    "Nous écrire": "Write to us",
+    "Mentions légales": "Legal information",
+    "Plan du site": "Sitemap",
+    "il y a {n} min": "{n} min ago",
+    "il y a {n} h": "{n} h ago",
+    "hier": "yesterday",
+    "il y a {n} jours": "{n} days ago",
   },
 };

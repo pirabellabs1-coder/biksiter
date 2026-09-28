@@ -1,123 +1,134 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
-import { mesLieux, type LieuDeLaListe } from '@/lib/depot/lieux';
+import { Confirmation } from '@/components/maquette/confirmation';
+import { mesLieux } from '@/lib/depot/lieux';
 import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
-import { textes } from '@/lib/i18n/langue';
 import { EMPLACEMENTS_PAR_MEMBRE } from '@/lib/regles/emplacements';
 import { exigerUnMembre } from '@/lib/session';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Mes lieux de garde') };
-}
+export const metadata: Metadata = { title: 'Mes emplacements' };
 
-type P = Awaited<ReturnType<typeof textes>>['p'];
-
-/** Règle 6 : actif en vert, brouillon et pause en ambre, avec leur nom en toutes lettres. */
-function EtatDuLieu({ p, lieu }: { p: P; lieu: LieuDeLaListe }) {
-  if (lieu.publie) return <span className="pastille">{p('Actif')}</span>;
-  if (lieu.enPause) return <span className="pastille ambre">{p('En pause')}</span>;
-  if (lieu.joursDAccueil === 0) return <span className="pastille ambre">{p('Brouillon')}</span>;
-  return <span className="pastille ambre">{p('En attente de vérification')}</span>;
-}
-
-export default async function MesLieux({
+/**
+ * Les emplacements du membre (l'onglet « Dispos » y mène). Sans emplacement,
+ * on va droit au formulaire qui en décrit un.
+ */
+export default async function VotreEspace({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
+  const { retire, nouveau } = await searchParams;
   const membre = await exigerUnMembre();
-  const { p } = await textes();
-  const { retire } = await searchParams;
-  const [lieux, nonLues] = await Promise.all([
+  const [lieux, _nonLues] = await Promise.all([
     mesLieux(membre.id),
     nombreDeNotificationsNonLues(membre.id),
   ]);
+  const complet = lieux.length >= EMPLACEMENTS_PAR_MEMBRE;
+
+  if (nouveau && !complet) redirect('/mes-lieux/ajouter');
+  if (lieux.length > 0) {
+    return (
+      <main id="contenu" className="ecran" data-cote="sitter">
+        {retire ? (
+          <Confirmation texte="Emplacement retiré : il n’apparaît plus dans les recherches." />
+        ) : null}
+        <header className="ecran-tete">
+          <h1>Mes emplacements</h1>
+          <p className="ecran-intro">
+            Vos lieux d’accueil : leurs horaires, leurs photos, leur état.
+          </p>
+        </header>
+
+        <ul className="groupe" role="list">
+          {lieux.map((existant) => (
+            <li key={existant.reference}>
+              <Link
+                href={`/mes-lieux/${existant.reference}`}
+                className="rangee"
+              >
+                {existant.premierePhoto !== null ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    className="vignette-lieu"
+                    src={`/emplacements/${existant.reference}/photo/${existant.premierePhoto}`}
+                    alt=""
+                    width={48}
+                    height={48}
+                  />
+                ) : (
+                  <span className="rangee-icone" aria-hidden="true">
+                    <Icone nom="maison" taille={18} strokeWidth={2} />
+                  </span>
+                )}
+                <span className="rangee-texte">
+                  <strong>{existant.type}</strong>
+                  <span>
+                    {existant.quartier} · {existant.capacite} place
+                    {existant.capacite > 1 ? 's' : ''} ·{' '}
+                    {existant.nombreDePhotos === 0
+                      ? 'sans photo'
+                      : `${existant.nombreDePhotos} photo${existant.nombreDePhotos > 1 ? 's' : ''}`}
+                  </span>
+                  <span>
+                    {existant.joursDAccueil === 7
+                      ? 'Tous les jours'
+                      : existant.joursDAccueil === 0
+                        ? 'Aucun jour d’accueil'
+                        : `${existant.joursDAccueil} jour${existant.joursDAccueil > 1 ? 's' : ''} d’accueil par semaine`}
+                  </span>
+                </span>
+                <span
+                  className={
+                    existant.publie ? 'status' : 'status status-attente'
+                  }
+                >
+                  {existant.publie
+                    ? 'En ligne'
+                    : existant.enPause
+                      ? 'En pause'
+                      : 'En préparation'}
+                </span>
+                <Icone nom="chevron" taille={18} className="rangee-chevron" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {complet ? (
+          <p className="prog-note">
+            Vous proposez {EMPLACEMENTS_PAR_MEMBRE} emplacements, le maximum par
+            membre. Vous pouvez les modifier à tout moment.
+          </p>
+        ) : (
+          <Link className="outline bouton-ajout" href="/mes-lieux?nouveau=1">
+            <Icone nom="plus" taille={18} strokeWidth={2.2} />
+            Proposer un autre emplacement
+          </Link>
+        )}
+      </main>
+    );
+  }
+
+  // Sans emplacement, le parcours commence directement par la description
+  // complète du lieu : une étape préalable reposait les mêmes questions.
+  if (!retire) redirect('/mes-lieux/ajouter');
 
   return (
-    <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Mes lieux de garde')}</h1>
-        <p className="sous-titre">
-          {p('Retrouvez ici les emplacements que vous proposez à la communauté Bike Sitters.')}
+    <main id="contenu" className="ecran" data-cote="sitter">
+      <Confirmation texte="Emplacement retiré : il n’apparaît plus dans les recherches." />
+      <header className="ecran-tete">
+        <h1>Mes emplacements</h1>
+        <p className="ecran-intro">
+          Vous pouvez proposer un emplacement à tout moment : un garage, une
+          cave ou une cour fermée suffit.
         </p>
-
-        {retire ? (
-          <div className="encart" role="status" style={{ marginBottom: 12 }}>
-            <Icone nom="coche" taille={22} />
-            <span>{p('Le lieu est retiré.')}</span>
-          </div>
-        ) : null}
-
-        <div className="pile grille-lieux">
-          {lieux.map((lieu) => (
-            <Link key={lieu.reference} href={`/mes-lieux/${lieu.reference}`} className="carte carte-lieu">
-              <span className="carte-lieu-photo">
-                {lieu.nombreDePhotos > 0 ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/emplacements/${lieu.reference}/photo/0`} alt="" />
-                ) : (
-                  <Icone nom="maison" taille={40} />
-                )}
-                <span className="carte-lieu-etat">
-                  <EtatDuLieu p={p} lieu={lieu} />
-                </span>
-              </span>
-              <span className="carte-lieu-corps">
-                <strong>{p(lieu.type)}</strong>
-                <span className="carte-de-garde-detail">
-                  <Icone nom="epingle" taille={16} />
-                  {lieu.quartier}
-                </span>
-                <span className="faits-du-lieu">
-                  <span>
-                    <Icone nom="velo" taille={18} />
-                    {lieu.capacite > 1
-                      ? p('{n} vélos', { n: lieu.capacite })
-                      : p('Un vélo')}
-                  </span>
-                  <span>
-                    <Icone nom="calendrier" taille={18} />
-                    {lieu.joursDAccueil > 0
-                      ? p('{n} jours par semaine', { n: lieu.joursDAccueil })
-                      : p('Disponibilités à régler')}
-                  </span>
-                  {lieu.demandesEnAttente > 0 ? (
-                    <span>
-                      <Icone nom="demandes" taille={18} />
-                      {p('{n} demande(s)', { n: lieu.demandesEnAttente })}
-                    </span>
-                  ) : null}
-                </span>
-                <span className="bouton contour petit carte-lieu-bouton">
-                  {p('Voir les détails')}
-                  <Icone nom="chevron" taille={18} />
-                </span>
-              </span>
-            </Link>
-          ))}
-
-          {lieux.length < EMPLACEMENTS_PAR_MEMBRE ? (
-            <Link href="/mes-lieux/ajouter" className="carte ajouter-un-lieu">
-              <span className="rond-plus" aria-hidden="true">
-                <Icone nom="plus" taille={28} strokeWidth={2.4} />
-              </span>
-              <strong>{p('Ajouter un lieu de garde')}</strong>
-              <span>
-                {p('Partagez un nouvel espace privé et aidez d’autres cyclistes à rouler sereinement.')}
-              </span>
-            </Link>
-          ) : (
-            <p className="petit texte-doux centre">
-              {p('Vous proposez {n} lieux, le maximum par membre.', { n: EMPLACEMENTS_PAR_MEMBRE })}
-            </p>
-          )}
-        </div>
-      </div>
+      </header>
+      <Link className="primary bs-cta" href="/mes-lieux/ajouter">
+        Proposer un emplacement
+      </Link>
     </main>
   );
 }

@@ -83,7 +83,7 @@ describe('les horaires d’un emplacement', () => {
 
   test('les jours aux mêmes heures se regroupent sur une ligne', () => {
     expect(libelleDesHoraires(HORAIRES)).toBe(
-      'Lun, Mar, Mer, Jeu · 07:30 → 20:00   Ven · 08:00 → 22:00',
+      'Lun, Mar, Mer, Jeu · 07h30 – 20h00   Ven · 08h00 – 22h00',
     );
   });
 

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { enGardes, enPoints } from '@/components/app/progression';
 import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
@@ -34,8 +33,11 @@ function libelleDeLaPeriode(p: Textes['p'], langue: string, c: ClassementDeLaPer
     return p('Aujourd’hui, {date}', { date: jour(c.premierJour, { day: 'numeric', month: 'long' }) });
   }
   if (c.periode === 'semaine') {
+    // Une semaine à cheval sur deux mois écrit les deux : « du 28 septembre
+    // au 4 octobre », et non « du 28 au 4 octobre ».
+    const memeMois = c.premierJour.slice(0, 7) === c.dernierJour.slice(0, 7);
     return p('Du {debut} au {fin}', {
-      debut: jour(c.premierJour, { day: 'numeric' }),
+      debut: jour(c.premierJour, memeMois ? { day: 'numeric' } : { day: 'numeric', month: 'long' }),
       fin: jour(c.dernierJour, { day: 'numeric', month: 'long' }),
     });
   }
@@ -105,7 +107,7 @@ export default async function TopBikeSitters({
   const { p, langue } = await textes();
   const { periode: demande } = await searchParams;
   const periode = PERIODES_DU_CLASSEMENT.find((x) => x.cle === demande) ?? PERIODES_DU_CLASSEMENT[0];
-  const [c, nonLues, apparait] = await Promise.all([
+  const [c, _nonLues, apparait] = await Promise.all([
     classement(periode.cle, membre.id),
     nombreDeNotificationsNonLues(membre.id),
     apparaitAuClassement(membre.id),
@@ -114,8 +116,7 @@ export default async function TopBikeSitters({
   const suite = c.lignes.slice(podium.length);
 
   return (
-    <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} retour="/progression" />
+    <main id="contenu" data-cote="sitter">
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Top Bike Sitters')}</h1>
 

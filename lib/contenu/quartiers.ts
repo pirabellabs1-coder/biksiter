@@ -14,25 +14,27 @@
 
 export type Quartier = {
   nom: string;
+  /** La commune, pour qu'on retrouve son quartier à partir de son adresse. */
+  commune: string;
   latitude: number;
   longitude: number;
 };
 
 export const QUARTIERS: readonly Quartier[] = [
-  { nom: 'Bruxelles-Central', latitude: 50.8456, longitude: 4.3572 },
-  { nom: 'Place Sainte-Catherine', latitude: 50.85, longitude: 4.347 },
-  { nom: 'Place Flagey', latitude: 50.828, longitude: 4.372 },
-  { nom: 'Châtelain', latitude: 50.826, longitude: 4.36 },
-  { nom: 'Parvis de Saint-Gilles', latitude: 50.828, longitude: 4.345 },
-  { nom: 'Gare du Midi', latitude: 50.836, longitude: 4.336 },
-  { nom: 'Gare du Nord', latitude: 50.86, longitude: 4.36 },
-  { nom: 'Place Dailly', latitude: 50.85, longitude: 4.386 },
-  { nom: 'Place Jourdan', latitude: 50.839, longitude: 4.382 },
-  { nom: 'Place Communale de Molenbeek', latitude: 50.855, longitude: 4.34 },
-  { nom: 'Place de la Vaillance', latitude: 50.838, longitude: 4.308 },
-  { nom: 'Place Bockstael', latitude: 50.88, longitude: 4.345 },
-  { nom: 'Tomberg', latitude: 50.845, longitude: 4.427 },
-  { nom: 'Place Saint-Job', latitude: 50.79, longitude: 4.372 },
+  { nom: 'Bruxelles-Central', commune: 'Bruxelles', latitude: 50.8456, longitude: 4.3572 },
+  { nom: 'Place Sainte-Catherine', commune: 'Bruxelles', latitude: 50.85, longitude: 4.347 },
+  { nom: 'Place Flagey', commune: 'Ixelles', latitude: 50.828, longitude: 4.372 },
+  { nom: 'Châtelain', commune: 'Ixelles', latitude: 50.826, longitude: 4.36 },
+  { nom: 'Parvis de Saint-Gilles', commune: 'Saint-Gilles', latitude: 50.828, longitude: 4.345 },
+  { nom: 'Gare du Midi', commune: 'Saint-Gilles', latitude: 50.836, longitude: 4.336 },
+  { nom: 'Gare du Nord', commune: 'Schaerbeek', latitude: 50.86, longitude: 4.36 },
+  { nom: 'Place Dailly', commune: 'Schaerbeek', latitude: 50.85, longitude: 4.386 },
+  { nom: 'Place Jourdan', commune: 'Etterbeek', latitude: 50.839, longitude: 4.382 },
+  { nom: 'Place Communale de Molenbeek', commune: 'Molenbeek-Saint-Jean', latitude: 50.855, longitude: 4.34 },
+  { nom: 'Place de la Vaillance', commune: 'Anderlecht', latitude: 50.838, longitude: 4.308 },
+  { nom: 'Place Bockstael', commune: 'Laeken', latitude: 50.88, longitude: 4.345 },
+  { nom: 'Tomberg', commune: 'Woluwe-Saint-Lambert', latitude: 50.845, longitude: 4.427 },
+  { nom: 'Place Saint-Job', commune: 'Uccle', latitude: 50.79, longitude: 4.372 },
 ];
 
 export function quartierParNom(nom: string): Quartier | undefined {

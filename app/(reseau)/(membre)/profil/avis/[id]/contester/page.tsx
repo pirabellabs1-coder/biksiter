@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
+import { avisDuMembre } from '@/lib/depot/membre-espace';
 import { textes } from '@/lib/i18n/langue';
+import { exigerUnMembre } from '@/lib/session';
 
 import { contester } from '../../../actions';
+import { CarteDAvisPublie } from '../../carte-d-avis';
 import { FormulaireDeTexte } from '../formulaire';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,11 +20,17 @@ export default async function ContesterUnAvis({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const membre = await exigerUnMembre();
   const { id } = await params;
-  const { p } = await textes();
+  const [{ p }, { recus }] = await Promise.all([
+    textes(),
+    avisDuMembre(membre.id),
+  ]);
+  // On répond à un avis qu'on a sous les yeux : il s'affiche en tête.
+  const avis = recus.find((recu) => recu.id === id);
+  if (!avis || avis.conteste) redirect('/profil/avis');
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil/avis" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Contester un avis')}</h1>
         <div className="encart bleu" style={{ margin: '14px 0 6px' }}>
@@ -32,6 +41,7 @@ export default async function ContesterUnAvis({
             )}
           </span>
         </div>
+        <CarteDAvisPublie p={p} avis={avis} />
         <FormulaireDeTexte
           action={contester.bind(null, id)}
           nom="motif"

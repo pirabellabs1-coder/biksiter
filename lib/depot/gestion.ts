@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg';
 
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
 import {
+  etatApresClassement,
   motifDeModerationValide,
   PERIODES_DE_STATISTIQUES,
   prioriteDuLitige,
@@ -167,6 +168,8 @@ export async function litigesEnCours(): Promise<LitigeEnCours[]> {
 }
 
 export type DetailDuLitige = LitigeEnCours & {
+  cyclisteId: string;
+  bikeSitterId: string;
   etat: string;
   debut: Date;
   fin: Date;
@@ -190,6 +193,39 @@ export type DetailDuLitige = LitigeEnCours & {
   }[];
 };
 
+export type MessageDuDossier = {
+  auteur: 'cycliste' | 'bike_sitter';
+  prenom: string;
+  corps: string;
+  avecPhoto: boolean;
+  ecritLe: Date;
+};
+
+/**
+ * La conversation d'une garde en litige, pour la modération.
+ *
+ * Seulement tant que le litige est ouvert : une conversation qui n'est pas
+ * liée à un dossier en cours ne regarde pas la modération. Les photos ne sont
+ * que signalées ; les constats portent celles qui font foi.
+ */
+export async function conversationDuLitige(
+  id: string,
+): Promise<MessageDuDossier[]> {
+  if (!IDENTIFIANT.test(id)) return [];
+  return interroger<MessageDuDossier>(
+    `select case when m.auteur_id = s.cycliste_id then 'cycliste' else 'bike_sitter' end as auteur,
+            a.prenom, coalesce(m.corps, '') as corps,
+            exists (select 1 from photo_message ph where ph.message_id = m.id) as "avecPhoto",
+            m.ecrit_le as "ecritLe"
+       from message m
+       join stationnement s on s.id = m.stationnement_id
+       join membre a on a.id = m.auteur_id
+      where m.stationnement_id = $1 and s.etat = 'litige'
+      order by m.ecrit_le`,
+    [id],
+  );
+}
+
 export async function detailDuLitige(
   id: string,
 ): Promise<DetailDuLitige | null> {
@@ -200,6 +236,7 @@ export async function detailDuLitige(
     `select s.id, s.etat, s.debut, s.fin, s.type_velo as "typeVelo",
             s.depose_le as "deposeLe", s.repris_le as "reprisLe",
             c.prenom as "prenomDuCycliste", b.prenom as "prenomDuBikeSitter", e.quartier,
+            c.id as "cyclisteId", b.id as "bikeSitterId",
             (select note from evenement_de_garde where stationnement_id = s.id and etape = 'litige'
               order by fait_le desc limit 1) as motif,
             (select fait_le from evenement_de_garde where stationnement_id = s.id and etape = 'litige'
@@ -262,8 +299,10 @@ export async function photoDeConstatPourModeration(
 }
 
 const TEXTE_DE_L_ISSUE: Record<IssueDUnLitige, string> = {
+  poursuivre:
+    'Le litige est classé : la garde reprend son cours, jusqu’à la reprise du vélo avec le code.',
   terminer_avec_points:
-    'La garde est close et les points du Bike Sitter sont accordés.',
+    'La garde est close et les points du bike sitter sont accordés.',
   terminer_sans_points: 'La garde est close, sans points.',
   annuler: 'La garde est annulée.',
 };
@@ -274,7 +313,7 @@ export async function trancherUnLitige(
   issue: IssueDUnLitige,
   motif: string,
   veloRenduConfirme: boolean,
-): Promise<'ok' | 'deja_tranche' | 'velo_chez_le_bike_sitter'> {
+): Promise<'ok' | 'deja_tranche' | 'velo_chez_le_bike_sitter' | 'velo_deja_rendu'> {
   if (!IDENTIFIANT.test(id)) return 'deja_tranche';
   return dansUneTransaction(async (client) => {
     const { rows } = await client.query<{
@@ -293,6 +332,49 @@ export async function trancherUnLitige(
     const garde = rows[0];
     // Déjà tranché, peut-être par quelqu'un d'autre.
     if (!garde) return 'deja_tranche';
+
+    // Classer le litige rend la garde à son cours : l'adresse, le téléphone
+    // et la conversation restent ouverts, et le vélo se reprend avec le code.
+    if (issue === 'poursuivre') {
+      const reprise = etatApresClassement({
+        depose: garde.depose,
+        repris: garde.repris,
+      });
+      if (!reprise) return 'velo_deja_rendu';
+      await client.query(
+        `update stationnement set etat = $2, conteste = false where id = $1`,
+        [id, reprise],
+      );
+      await client.query(
+        `insert into evenement_de_garde (stationnement_id, etape, acteur, note)
+         values ($1, $2, 'moderation', $3)`,
+        [id, reprise, motif.trim()],
+      );
+      await client.query(
+        `update signalement
+            set etat = 'traite', traite_par = $2, traite_le = now(),
+                note_de_moderation = coalesce(note_de_moderation, $3)
+          where cible_type = 'garde' and cible = $1 and etat <> 'traite'`,
+        [id, moderateurId, motif.trim().slice(0, 600)],
+      );
+      for (const membreId of [garde.cycliste_id, garde.bike_sitter_id]) {
+        await notifier(client, membreId, {
+          texte:
+            'La modération a examiné le signalement de votre garde. {decision} {motif}',
+          valeurs: { decision: TEXTE_DE_L_ISSUE[issue], motif: motif.trim() },
+          lien: `/gardes/${id}`,
+          urgente: true,
+        });
+      }
+      await tracer(client, {
+        membreId: null,
+        moderateurId,
+        type: 'litige_tranche',
+        motif,
+        details: { garde: id, issue, veloRenduConfirme },
+      });
+      return 'ok';
+    }
 
     // Clore la garde coupe l'adresse, le téléphone et la conversation : tant
     // que le vélo est chez le bike sitter, on ne la clôt pas sans que la
@@ -344,6 +426,15 @@ export async function trancherUnLitige(
        values ($1, $2, 'moderation', $3)`,
       [id, issue === 'annuler' ? 'annule' : 'termine', motif.trim()],
     );
+    // Le litige et le signalement qui l'a ouvert sont un seul dossier : trancher
+    // l'un clôt l'autre, sinon il gonflerait la file des signalements.
+    await client.query(
+      `update signalement
+          set etat = 'traite', traite_par = $2, traite_le = now(),
+              note_de_moderation = coalesce(note_de_moderation, $3)
+        where cible_type = 'garde' and cible = $1 and etat <> 'traite'`,
+      [id, moderateurId, motif.trim().slice(0, 600)],
+    );
     for (const membreId of [garde.cycliste_id, garde.bike_sitter_id]) {
       await notifier(client, membreId, {
         texte:
@@ -389,6 +480,20 @@ export async function signalements(
             case sg.cible_type
               when 'membre' then (select m.prenom || ' ' || upper(left(m.nom, 1)) || '.' from membre m where m.id::text = sg.cible)
               when 'emplacement' then (select e.type || ' · ' || e.quartier from emplacement e where e.reference = sg.cible)
+              when 'garde' then (
+                select 'Garde du ' || to_char(s.debut at time zone 'Europe/Brussels', 'DD/MM') || ' · '
+                       || c.prenom || ' chez ' || b.prenom
+                  from stationnement s
+                  join emplacement e on e.id = s.emplacement_id
+                  join membre c on c.id = s.cycliste_id
+                  join membre b on b.id = e.membre_id
+                 where s.id::text = sg.cible)
+              when 'avis' then (
+                select 'Avis de ' || au.prenom || ' sur ' || ci.prenom
+                  from avis_sur_une_garde av
+                  join membre au on au.id = av.auteur_id
+                  join membre ci on ci.id = av.cible_id
+                 where av.id::text = sg.cible)
               else null
             end as "cibleLibelle",
             case sg.cible_type
@@ -417,8 +522,9 @@ export async function faireAvancerUnSignalement(
       etat: EtatDUnSignalement;
       cible_type: string;
       cible: string;
+      auteur_id: string | null;
     }>(
-      'select etat, cible_type, cible from signalement where id = $1 for update',
+      'select etat, cible_type, cible, auteur_id from signalement where id = $1 for update',
       [id],
     );
     const signalement = rows[0];
@@ -449,6 +555,15 @@ export async function faireAvancerUnSignalement(
             : 'Signalement examiné et classé.',
         details: { signalement: id },
       });
+      // La personne qui a signalé sait que quelqu'un a lu, sans le détail de
+      // la décision, qui concerne un autre membre.
+      if (signalement.auteur_id) {
+        await notifier(client, signalement.auteur_id, {
+          texte:
+            'Votre signalement a été examiné par la modération. Merci de nous avoir prévenus.',
+          lien: '/notifications',
+        });
+      }
     }
     return true;
   });
@@ -464,6 +579,7 @@ export type MembreEnGestion = {
   suspendu: boolean;
   moderateur: boolean;
   membreDepuis: number;
+  email: string;
 };
 
 export async function rechercherDesMembres(
@@ -478,7 +594,8 @@ export async function rechercherDesMembres(
   const [membres, comptes] = await Promise.all([
     interroger<MembreEnGestion>(
       `select m.id, m.prenom, upper(left(m.nom, 1)) as initiale, m.verification, m.suspendu,
-              m.moderateur, extract(year from m.cree_le)::int as "membreDepuis"
+              m.moderateur, extract(year from m.cree_le)::int as "membreDepuis",
+              m.email
          from membre m
         where m.supprime_le is null
           and ($1 = '' or m.prenom ilike $2 or m.nom ilike $2 or m.email ilike $2)

@@ -37,7 +37,7 @@ export function FormulaireDuLieu({
   valeurs: ValeursDuLieu;
   options: {
     types: readonly Option[];
-    quartiers: readonly string[];
+    quartiers: readonly Option[];
     acces: readonly Option[];
     verrouillages: readonly Option[];
     intemperies: readonly Option[];
@@ -106,8 +106,10 @@ export function FormulaireDuLieu({
           {options.types.map(([valeur, libelle]) => (
             <label key={valeur} className="tuile-choix">
               <input type="radio" name="type" value={valeur} defaultChecked={valeurs.type === valeur} required />
-              <Icone nom="maison" taille={22} />
               <span>{libelle}</span>
+              {/* Un repère de sélection plutôt qu'une même icône répétée
+                  quatorze fois, qui n'apprenait rien. */}
+              <span className="tuile-coche" aria-hidden="true" />
             </label>
           ))}
         </div>
@@ -134,8 +136,10 @@ export function FormulaireDuLieu({
             <option value="" disabled>
               —
             </option>
-            {options.quartiers.map((quartier) => (
-              <option key={quartier}>{quartier}</option>
+            {options.quartiers.map(([valeur, libelle]) => (
+              <option key={valeur} value={valeur}>
+                {libelle}
+              </option>
             ))}
           </select>
         </label>
@@ -206,7 +210,7 @@ export function FormulaireDuLieu({
             onClick={() => setCapacite((c) => Math.max(1, c - 1))}
             aria-label={textes.moins}
           >
-            −
+            <Icone nom="moins" taille={20} strokeWidth={2.4} />
           </button>
           <input
             name="capacite"
@@ -223,7 +227,7 @@ export function FormulaireDuLieu({
             onClick={() => setCapacite((c) => Math.min(10, c + 1))}
             aria-label={textes.plus}
           >
-            +
+            <Icone nom="plus" taille={20} strokeWidth={2.4} />
           </button>
         </div>
         {erreur('capacite')}

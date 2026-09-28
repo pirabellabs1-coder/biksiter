@@ -6,7 +6,7 @@ const VALIDES = {
   jours: [1, 2, 3],
   ouverture: '08:00',
   fermeture: '20:00',
-  dureeMaxHeures: 8,
+  dureeMaxHeures: 3,
   delaiDeReponse: 'jour',
   fermetures: ['2026-12-24'],
 };
@@ -29,7 +29,7 @@ describe('les disponibilités d’un lieu', () => {
   });
 
   test('une durée ou un délai hors liste est refusé', () => {
-    expect(motifsDesDisponibilites({ ...VALIDES, dureeMaxHeures: 12 })).toHaveLength(1);
+    expect(motifsDesDisponibilites({ ...VALIDES, dureeMaxHeures: 8 })).toHaveLength(1);
     expect(motifsDesDisponibilites({ ...VALIDES, delaiDeReponse: 'jamais' })).toHaveLength(1);
   });
 

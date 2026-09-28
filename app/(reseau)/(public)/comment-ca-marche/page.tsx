@@ -74,7 +74,7 @@ export default async function CommentCaMarche() {
           ),
         ],
         [
-          p('Décrire votre espace'),
+          p('Décrire votre emplacement'),
           p(
             'Vous précisez le type d’espace, les horaires d’accueil, la capacité et les types de vélos acceptés. Votre adresse exacte n’apparaît pas sur la fiche publique.',
           ),

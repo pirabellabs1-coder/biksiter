@@ -13,6 +13,10 @@ import {
 } from '@/lib/depot/membre-espace';
 import { suspendreLesDemandes } from '@/lib/depot/lieux';
 import {
+  enregistrerMaPhoto,
+  retirerMaPhoto,
+} from '@/lib/depot/photo-de-profil';
+import {
   modifierLeNom,
   retirerUneAlerte,
   supprimerLeCompte,
@@ -21,9 +25,12 @@ import {
   reglerLaTranquillite,
   TRANQUILLITE_PAR_DEFAUT,
 } from '@/lib/depot/notifications';
+import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
 import { langueCourante } from '@/lib/i18n/langue';
 import { phraseur } from '@/lib/i18n/traduction';
 import { estUneHeure } from '@/lib/regles/creneau';
+import { PHOTOS_DE_PROFIL_PAR_HEURE } from '@/lib/regles/limites';
+import { estUnTypeAccepte, TAILLE_MAXIMALE_OCTETS } from '@/lib/regles/photos';
 import { exigerUnMembre, seDeconnecter } from '@/lib/session';
 
 export type EtatSimple = { erreur: string | null };
@@ -74,10 +81,13 @@ export async function bloquerOuDebloquer(donnees: FormData): Promise<void> {
   redirect(/^[0-9a-f-]{36}$/.test(cible) ? `/membres/${cible}` : '/profil');
 }
 
+/** Un signalement envoyé se confirme sur place, là où on l'a écrit. */
+export type EtatDuSignalement = EtatSimple & { envoye?: boolean };
+
 export async function envoyerUnSignalement(
-  _precedent: EtatSimple,
+  _precedent: EtatDuSignalement,
   donnees: FormData,
-): Promise<EtatSimple> {
+): Promise<EtatDuSignalement> {
   const membre = await exigerUnMembre();
   const cibleType = String(donnees.get('cible') ?? '');
   const cible = String(donnees.get('id') ?? '');
@@ -96,7 +106,9 @@ export async function envoyerUnSignalement(
     details: String(donnees.get('details') ?? ''),
   });
   if (!resultat.ok) return { erreur: await traduire(resultat.texte) };
-  redirect('/profil?signalement=envoye');
+  // On reste sur l'écran du signalement, qui le confirme et propose de
+  // revenir : atterrir sur son propre profil ne disait pas ce qui s'était passé.
+  return { erreur: null, envoye: true };
 }
 
 export async function repondre(
@@ -202,3 +214,52 @@ export async function basculerLesNouvellesDemandes(
   revalidatePath('/profil');
   redirect(ok ? '/profil' : '/profil?demandes=impossible');
 }
+
+/**
+ * La photo de profil : une image de téléphone, 8 Mo au plus. Elle est
+ * recadrée en carré et ré-encodée sans métadonnées avant d'être gardée.
+ */
+export async function changerMaPhoto(
+  _precedent: EtatSimple,
+  donnees: FormData,
+): Promise<EtatSimple> {
+  const membre = await exigerUnMembre();
+  const fichier = donnees.get('photo');
+  if (!(fichier instanceof File) || fichier.size === 0) {
+    return { erreur: await traduire('Choisissez une photo.') };
+  }
+  if (!estUnTypeAccepte(fichier.type)) {
+    return { erreur: await traduire('Choisissez une image (JPEG, PNG, WebP ou HEIC).') };
+  }
+  if (fichier.size > TAILLE_MAXIMALE_OCTETS) {
+    return { erreur: await traduire('Cette photo est trop lourde (8 Mo maximum).') };
+  }
+  // Chaque envoi est décodé par le serveur : la limite passe avant.
+  if (await limiteDejaAtteinte(PHOTOS_DE_PROFIL_PAR_HEURE, membre.id)) {
+    return {
+      erreur: await traduire(
+        'Vous avez changé de photo plusieurs fois en peu de temps. Vous pourrez en choisir une autre dans une heure.',
+      ),
+    };
+  }
+  await noterUneTentative('photo_de_profil', membre.id);
+  try {
+    await enregistrerMaPhoto(membre.id, Buffer.from(await fichier.arrayBuffer()));
+  } catch {
+    return {
+      erreur: await traduire(
+        'Cette photo n’a pas pu être lue. Essayez une autre image.',
+      ),
+    };
+  }
+  revalidatePath('/', 'layout');
+  redirect('/profil?photo=enregistree');
+}
+
+export async function retirerLaPhotoDeProfil(): Promise<void> {
+  const membre = await exigerUnMembre();
+  await retirerMaPhoto(membre.id);
+  revalidatePath('/', 'layout');
+  redirect('/profil?photo=retiree');
+}
+

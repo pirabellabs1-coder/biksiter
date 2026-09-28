@@ -40,12 +40,21 @@ export const HEURES: readonly string[] = Array.from({ length: 96 }, (_, rang) =>
 
 /**
  * Un créneau par défaut qui a du sens : la prochaine heure pleine, pour trois
- * heures. Trop tard dans la soirée, le lendemain matin.
+ * heures. Trop tard dans la soirée, le lendemain matin ; en pleine nuit, le
+ * matin même — personne n'accueille à deux heures du matin.
  */
 export function creneauParDefaut(maintenant: Date): Creneau {
   const aujourdhui = jourABruxelles(maintenant);
   const debut =
     Math.ceil((minutesDe(heureABruxelles(maintenant)) + 30) / 60) * 60;
+  if (debut < 9 * 60) {
+    return {
+      jourDepot: aujourdhui,
+      heureDepot: '09:00',
+      jourReprise: aujourdhui,
+      heureReprise: '12:00',
+    };
+  }
   if (debut + 180 > 21 * 60) {
     const demain = ajouterJours(aujourdhui, 1);
     return {

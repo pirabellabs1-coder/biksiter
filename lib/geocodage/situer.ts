@@ -1,7 +1,10 @@
 import 'server-only';
 
 import type { Quartier } from '@/lib/contenu/quartiers';
-import type { PointGeographique } from '@/lib/regles/territoire';
+import {
+  codePostalHorsDeBruxelles,
+  type PointGeographique,
+} from '@/lib/regles/territoire';
 
 import { geocoder } from './geocodeur';
 
@@ -30,6 +33,12 @@ export async function situerLEmplacement(
 
   if (trouvaille.trouve) {
     return { situe: true, point: trouvaille.point, precise: true };
+  }
+
+  // Géocodeur muet ou adresse introuvable : avant de retomber sur le centre
+  // du quartier, un code postal hors de Bruxelles suffit à refuser.
+  if (codePostalHorsDeBruxelles(adresse)) {
+    return { situe: false, motif: 'hors_zone' };
   }
 
   return {

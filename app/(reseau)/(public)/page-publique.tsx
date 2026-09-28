@@ -2,8 +2,6 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { Icone, type NomDIcone } from '@/components/app/icone';
-import { EnTeteDuSite } from '@/components/site/en-tete-du-site';
-import { PiedPublic } from '@/components/site/pied-public';
 import type { SectionDeTexte } from '@/lib/contenu/conditions';
 import type { Textes } from '@/lib/i18n/langue';
 
@@ -16,14 +14,13 @@ import type { Textes } from '@/lib/i18n/langue';
  * étroite perdue au milieu de l'écran.
  */
 export function PagePublique({
-  textes,
+  textes: _textes,
   titre,
   introduction,
   surtitre,
   enTete,
   cote,
   coteAGauche = false,
-  retour = '/',
   children,
 }: {
   textes: Textes;
@@ -40,9 +37,7 @@ export function PagePublique({
   children: ReactNode;
 }) {
   return (
-    <>
-      <EnTeteDuSite p={textes.p} retour={retour} />
-      <main id="contenu" className="page-publique">
+    <main id="contenu" className="page-publique">
         <div className="bande-titre">
           <div className="contenu-public">
             {surtitre ? <p className="surtitre-public">{surtitre}</p> : null}
@@ -67,8 +62,6 @@ export function PagePublique({
           {cote ? <aside className="corps-cote">{cote}</aside> : null}
         </div>
       </main>
-      <PiedPublic {...textes} />
-    </>
   );
 }
 

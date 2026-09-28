@@ -13,6 +13,8 @@ export async function basculerUnFavori(donnees: FormData): Promise<void> {
   const voulu = donnees.get('voulu') === 'retirer' ? 'retirer' : 'ajouter';
   const decision = await basculerLeFavori(membre.id, reference, voulu);
   revalidatePath('/favoris');
+  // La fiche montre le cœur plein ou vide : elle doit se relire.
+  revalidatePath(`/emplacements/${reference}`);
 
   // On revient là d'où vient le geste : la fiche du lieu (avec sa recherche)
   // ou la liste des favoris, et nulle part ailleurs.

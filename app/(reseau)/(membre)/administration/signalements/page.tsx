@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { NavigationDAdministration } from '@/components/app/administration';
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
+import { EnTeteDeModeration } from '@/components/maquette/moderation/en-tete-de-moderation';
+import { OngletsDeModeration } from '@/components/maquette/moderation/onglets';
 import { signalements } from '@/lib/depot/gestion';
 import { textes } from '@/lib/i18n/langue';
 import { jourAffiche } from '@/lib/regles/creneau';
@@ -23,28 +22,39 @@ export default async function Signalements({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
-  await exigerUnModerateur();
+  const moderateur = await exigerUnModerateur();
   const { p } = await textes();
   const { etat: demande, erreur } = await searchParams;
-  const onglet = ETATS_D_UN_SIGNALEMENT.find((e) => e.cle === demande) ?? ETATS_D_UN_SIGNALEMENT[0];
+  const onglet =
+    ETATS_D_UN_SIGNALEMENT.find((e) => e.cle === demande) ??
+    ETATS_D_UN_SIGNALEMENT[0];
   const liste = await signalements(onglet.cle);
+  const initiales = `${moderateur.prenom.at(0) ?? ''}${moderateur.nom.at(0) ?? ''}`.toUpperCase();
 
   const typeDeCible: Record<string, string> = {
     membre: p('Profil'),
-    emplacement: p('Lieu'),
+    emplacement: p('Emplacement'),
     garde: p('Garde'),
     avis: p('Avis'),
   };
 
   return (
     <main id="contenu">
-      <EnTete p={p} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Signalements')}</h1>
-        <p className="sous-titre">{p('Les profils, emplacements et avis signalés par les membres du réseau.')}</p>
-        <NavigationDAdministration p={p} actif="signalements" />
+      <EnTeteDeModeration initiales={initiales} />
+      <div className="page">
+        <header className="page-tete">
+          <span className="kicker">FILE DES SIGNALEMENTS</span>
+          <h1>{p('Signalements')}</h1>
+          <p>
+            {p(
+              'Les profils, emplacements, gardes et avis qui ont fait l’objet d’une alerte. Chaque décision reste dans l’historique du compte concerné.',
+            )}
+          </p>
+        </header>
 
-        <nav className="puces" aria-label={p('État des signalements')} style={{ marginTop: 0, marginBottom: 12 }}>
+        <OngletsDeModeration p={p} actif="signalements" />
+
+        <nav className="puces" aria-label={p('État des signalements')}>
           {ETATS_D_UN_SIGNALEMENT.map((etat) => (
             <Link
               key={etat.cle}
@@ -58,81 +68,134 @@ export default async function Signalements({
         </nav>
 
         {erreur ? (
-          <div className="encart rouge" role="alert" style={{ marginBottom: 12 }}>
-            <Icone nom="alerte" taille={22} />
-            <span>{p('Ce signalement a déjà changé d’état, peut-être par une autre personne.')}</span>
-          </div>
+          <article className="mod-carte urgent" role="alert">
+            <div className="mod-tete">
+              <span className="mod-etat rouge">{p('Déjà changé')}</span>
+            </div>
+            <p className="gris">
+              {p(
+                'Ce signalement a déjà changé d’état, peut-être par une autre personne de l’équipe.',
+              )}
+            </p>
+          </article>
         ) : null}
 
         {liste.length === 0 ? (
-          <div className="carte vide-liste">
-            <Icone nom="drapeau" taille={30} className="texte-leger" />
-            <strong>{p('Aucun signalement ici.')}</strong>
-          </div>
+          <article className="mod-carte">
+            <div className="mod-tete">
+              <span className="mod-etat">
+                {p('Aucun signalement à afficher')}
+              </span>
+            </div>
+            <p className="vide-onglet">
+              {p('Rien dans cette file pour le moment.')}
+            </p>
+          </article>
         ) : (
-          <ul className="pile" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {liste.map((signalement) => (
-              <li key={signalement.id} className="carte pile" style={{ gap: 8 }}>
-                <div className="ligne sans-cadre" style={{ padding: 0, minHeight: 0, alignItems: 'flex-start' }}>
-                  <span className="ligne-icone texte-rouge" aria-hidden="true">
-                    <Icone nom="drapeau" taille={22} />
-                  </span>
-                  <span className="ligne-texte">
-                    <strong>{p(signalement.motif)}</strong>
-                    <span>
-                      {typeDeCible[signalement.cibleType]} · {signalement.cibleLibelle ?? signalement.cible}
-                    </span>
-                    <span>
-                      {p('Signalé le {date} par {prenom}', {
-                        date: jourAffiche(jourABruxelles(new Date(signalement.creeLe))),
-                        prenom: signalement.auteur ?? p('un membre'),
-                      })}
-                    </span>
-                  </span>
-                  <span className={signalement.etat === 'traite' ? 'pastille' : signalement.etat === 'en_cours' ? 'pastille ambre' : 'pastille rouge'}>
-                    {signalement.etat === 'traite' ? p('Traité') : signalement.etat === 'en_cours' ? p('En cours') : p('Nouveau')}
-                  </span>
-                </div>
-                {signalement.details ? (
-                  <p className="texte-doux" style={{ margin: 0, whiteSpace: 'pre-line' }}>
-                    « {signalement.details} »
-                  </p>
-                ) : null}
-                {signalement.note ? (
-                  <p className="petit" style={{ margin: 0 }}>
-                    <strong>{p('Note :')}</strong> {signalement.note}
-                  </p>
-                ) : null}
-                {signalement.lienDeLaCible ? (
-                  <Link href={signalement.lienDeLaCible} className="lien-souligne">
+          liste.map((signalement) => (
+            <article
+              key={signalement.id}
+              className={
+                signalement.etat === 'ouvert' ? 'mod-carte urgent' : 'mod-carte'
+              }
+            >
+              <div className="mod-tete">
+                <span
+                  className={
+                    signalement.etat === 'ouvert' ? 'mod-etat attente' : 'mod-etat'
+                  }
+                >
+                  {signalement.etat === 'traite'
+                    ? `${p('Traité')}`
+                    : signalement.etat === 'en_cours'
+                      ? `${p('En cours')}`
+                      : `${p('Nouveau')}`}
+                </span>
+                <span className="gris">
+                  {p('signalé le {date}', {
+                    date: jourAffiche(
+                      jourABruxelles(new Date(signalement.creeLe)),
+                    ),
+                  })}
+                </span>
+              </div>
+              <h3>{p(signalement.motif)}</h3>
+              <p className="gris">
+                {typeDeCible[signalement.cibleType]} ·{' '}
+                {signalement.cibleLibelle ?? signalement.cible} ·{' '}
+                {p('par {prenom}', {
+                  prenom: signalement.auteur ?? p('un membre'),
+                })}
+              </p>
+              {signalement.details ? (
+                <p style={{ marginTop: 8 }}>« {signalement.details} »</p>
+              ) : null}
+              {signalement.note ? (
+                <p className="gris" style={{ marginTop: 8 }}>
+                  <b>{p('Note de modération :')}</b> {signalement.note}
+                </p>
+              ) : null}
+              {signalement.lienDeLaCible ? (
+                <div className="actions-fin">
+                  <Link
+                    href={signalement.lienDeLaCible}
+                    className="outline"
+                  >
                     {p('Voir la fiche concernée')}
                   </Link>
-                ) : null}
-                {signalement.etat !== 'traite' ? (
-                  <form action={avancerUnSignalement} className="pile" style={{ gap: 8 }}>
-                    <input type="hidden" name="signalement" value={signalement.id} />
-                    <input type="hidden" name="onglet" value={onglet.cle} />
-                    <label className="champ-texte">
-                      <span>{p('Note de modération (facultative)')}</span>
-                      <textarea name="note" maxLength={600} style={{ minHeight: 64 }} />
-                    </label>
-                    <div className="deux-colonnes">
-                      {signalement.etat === 'ouvert' ? (
-                        <button type="submit" name="vers" value="en_cours" className="bouton contour">
-                          {p('Prendre en charge')}
-                        </button>
-                      ) : (
-                        <span />
-                      )}
-                      <button type="submit" name="vers" value="traite" className="bouton plein">
-                        {p('Marquer traité')}
+                </div>
+              ) : null}
+              {signalement.etat !== 'traite' ? (
+                <form
+                  action={avancerUnSignalement}
+                  style={{ marginTop: 12, display: 'grid', gap: 8 }}
+                >
+                  <input
+                    type="hidden"
+                    name="signalement"
+                    value={signalement.id}
+                  />
+                  <input type="hidden" name="onglet" value={onglet.cle} />
+                  <label style={{ display: 'grid', gap: 4 }}>
+                    <span className="gris">
+                      {p('Note de modération (facultative)')}
+                    </span>
+                    <textarea
+                      name="note"
+                      maxLength={600}
+                      style={{
+                        minHeight: 64,
+                        borderRadius: 12,
+                        border: '1px solid var(--line)',
+                        padding: 10,
+                        font: 'inherit',
+                      }}
+                    />
+                  </label>
+                  <div className="actions-fin" style={{ marginTop: 0 }}>
+                    {signalement.etat === 'ouvert' ? (
+                      <button
+                        type="submit"
+                        name="vers"
+                        value="en_cours"
+                        className="outline"
+                      >
+                        {p('Prendre en charge')}
                       </button>
-                    </div>
-                  </form>
-                ) : null}
-              </li>
-            ))}
-          </ul>
+                    ) : null}
+                    <button
+                      type="submit"
+                      name="vers"
+                      value="traite"
+                      className="primary"
+                    >
+                      {p('Marquer traité')}
+                    </button>
+                  </div>
+                </form>
+              ) : null}
+            </article>
+          ))
         )}
       </div>
     </main>

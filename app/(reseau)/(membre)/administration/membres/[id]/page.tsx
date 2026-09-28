@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
+import { EnTeteDeModeration } from '@/components/maquette/moderation/en-tete-de-moderation';
 import { FormulaireDeDecision } from '@/components/app/formulaire-de-decision';
-import { Icone } from '@/components/app/icone';
 import { enPoints } from '@/components/app/progression';
 import { ficheDeGestion } from '@/lib/depot/gestion';
 import { textes } from '@/lib/i18n/langue';
@@ -17,7 +16,7 @@ import { FormulaireDeCorrection } from './correction';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Membre') };
+  return { title: p('Fiche de membre') };
 }
 
 export default async function FicheDUnMembre({
@@ -40,147 +39,193 @@ export default async function FicheDUnMembre({
     signalement_traite: p('Signalement traité'),
   };
   const gerable = !fiche.moderateur && fiche.id !== moderateur.id;
+  const initiales = `${moderateur.prenom.at(0) ?? ''}${moderateur.nom.at(0) ?? ''}`.toUpperCase();
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/administration/membres" cloche={false} />
-      <div className="ecran-app ecran-large fiche-detail">
-        <div className="carte carte-profil">
-          <span className="avatar-app grand" aria-hidden="true">
-            {fiche.prenom.charAt(0)}
-          </span>
-          <span className="ligne-texte">
-            <strong className="nom-profil">
-              {fiche.prenom} {fiche.nom}
-            </strong>
-            <span>{fiche.email}</span>
-            <span>{p('Membre depuis {annee}', { annee: fiche.membreDepuis })}</span>
-            <span className={fiche.suspendu ? 'pastille rouge' : 'pastille'} style={{ marginTop: 4 }}>
-              {fiche.suspendu ? p('Suspendu') : p('Actif')}
+      <EnTeteDeModeration
+        retour="/administration/membres"
+        initiales={initiales}
+      />
+      <div className="page">
+        <header className="page-tete">
+          <span className="kicker">FICHE DE MEMBRE</span>
+          <h1>
+            {fiche.prenom} {fiche.nom}
+          </h1>
+          <p>
+            {fiche.email} ·{' '}
+            {p('Membre depuis {annee}', { annee: fiche.membreDepuis })}
+            {fiche.verification === 'verifiee'
+              ? ` · ${p('identité vérifiée')}`
+              : ''}
+          </p>
+        </header>
+
+        <article className={fiche.suspendu ? 'mod-carte urgent' : 'mod-carte'}>
+          <div className="mod-tete">
+            <span
+              className={fiche.suspendu ? 'mod-etat rouge' : 'mod-etat vert'}
+            >
+              {fiche.suspendu
+                ? `${p('Compte suspendu')}`
+                : `${p('Compte actif')}`}
             </span>
-          </span>
-        </div>
+            {fiche.moderateur ? (
+              <span className="gris">{p('Membre de l’équipe de modération')}</span>
+            ) : null}
+          </div>
+          <dl className="infos serre">
+            <div className="info">
+              <dt>{p('Gardes accueillies')}</dt>
+              <dd>
+                <b>{fiche.gardesAccueillies}</b>
+              </dd>
+            </div>
+            <div className="info">
+              <dt>{p('Gardes confiées')}</dt>
+              <dd>
+                <b>{fiche.gardesConfiees}</b>
+              </dd>
+            </div>
+            <div className="info">
+              <dt>{p('Signalements reçus')}</dt>
+              <dd>
+                <b>{fiche.signalementsRecus}</b>
+              </dd>
+            </div>
+            <div className="info">
+              <dt>{p('Gardes engagées')}</dt>
+              <dd>
+                <b>{fiche.gardesEngagees}</b>
+                <span>{p('demandes ou gardes en cours')}</span>
+              </dd>
+            </div>
+          </dl>
+        </article>
 
         {indications.statut ? (
-          <div className="encart" role="status" style={{ marginTop: 12 }}>
-            <Icone nom="coche" taille={22} />
-            <span>{fiche.suspendu ? p('Compte suspendu : ses sessions sont fermées.') : p('Compte réactivé.')}</span>
-          </div>
+          <article className="mod-carte" role="status">
+            <div className="mod-tete">
+              <span className="mod-etat">{p('Statut mis à jour')}</span>
+            </div>
+            <p className="gris">
+              {fiche.suspendu
+                ? p('Compte suspendu : ses sessions sont fermées.')
+                : p('Compte réactivé.')}
+            </p>
+          </article>
         ) : null}
         {indications.points ? (
-          <div className="encart" role="status" style={{ marginTop: 12 }}>
-            <Icone nom="coche" taille={22} />
-            <span>{p('Correction enregistrée : le membre est prévenu.')}</span>
-          </div>
+          <article className="mod-carte" role="status">
+            <div className="mod-tete">
+              <span className="mod-etat">{p('Correction enregistrée')}</span>
+            </div>
+            <p className="gris">
+              {p('Le membre a été prévenu de la correction.')}
+            </p>
+          </article>
         ) : null}
 
-        <div className="tuiles" style={{ marginTop: 12 }}>
-          <span className="tuile">
-            <strong>{fiche.gardesAccueillies}</strong>
-            <span>{p('gardes accueillies')}</span>
-          </span>
-          <span className="tuile">
-            <strong>{fiche.gardesConfiees}</strong>
-            <span>{p('gardes confiées')}</span>
-          </span>
-          <span className="tuile">
-            <strong>{fiche.signalementsRecus}</strong>
-            <span>{p('signalements reçus')}</span>
-          </span>
-        </div>
-
-        <h2 className="titre-section">{p('Points')}</h2>
-        <div className="encart solde-encart">
-          <Icone nom="etoile" taille={24} plein />
-          <span>
-            <strong>{enPoints(p, fiche.solde.acquis)}</strong>
+        <section className="bloc">
+          <h2>{p('Points')}</h2>
+          <p className="gris">
+            <b>{enPoints(p, fiche.solde.acquis)}</b>
             {fiche.solde.enAttente > 0
-              ? p('{n} points en attente', { n: fiche.solde.enAttente })
-              : p('disponibles')}
-          </span>
-        </div>
-        {fiche.id === moderateur.id ? (
-          <p className="texte-doux">{p('Vos propres points doivent être corrigés par un autre membre de l’équipe.')}</p>
-        ) : (
-        <div className="carte" style={{ marginTop: 10 }}>
-          <FormulaireDeCorrection
-            action={corrigerLeSolde.bind(null, fiche.id)}
-            maximum={CORRECTION_MAXIMALE}
-            textes={{
-              ajouter: p('Ajouter des points'),
-              retirer: p('Retirer des points'),
-              nombre: p('Nombre de points'),
-              motif: p('Motif de la correction'),
-              aide: p('Ce motif est communiqué au membre et conservé dans son historique.'),
-              enregistrer: p('Enregistrer la correction'),
-              envoi: p('Enregistrement…'),
-            }}
-          />
-        </div>
-        )}
-
-        <h2 className="titre-section">{p('Statut du compte')}</h2>
-        {gerable ? (
-          <div className="carte">
-            <FormulaireDeDecision
-              action={changerLeStatutDuCompte.bind(null, fiche.id)}
-              champsCaches={{ suspendre: fiche.suspendu ? 'non' : 'oui' }}
-              confirmation={
-                !fiche.suspendu && fiche.gardesEngagees > 0
-                  ? p('Je suspends malgré la garde en cours.')
-                  : undefined
-              }
-              choix={[]}
-              avant={
-                <div className="texte-doux pile" style={{ margin: 0, gap: 0 }}>
-                  {fiche.suspendu
-                    ? p('Réactiver le compte permet au membre de se reconnecter et de reprendre ses gardes.')
-                    : p('Suspendre le compte ferme ses sessions, retire ses lieux des recherches et clôt ses demandes en attente.')}
-                  {!fiche.suspendu && fiche.gardesEngagees > 0 ? (
-                    <span className="encart ambre" style={{ marginTop: 8 }}>
-                      <Icone nom="alerte" taille={20} />
-                      <span>
-                        {p('{n} garde(s) en cours avec ce membre : sans session, la remise du vélo par code ne sera plus possible.', {
-                          n: fiche.gardesEngagees,
-                        })}
-                      </span>
-                    </span>
-                  ) : null}
-                </div>
-              }
+              ? ` · ${p('{n} points en attente', { n: fiche.solde.enAttente })}`
+              : ` · ${p('disponibles')}`}
+          </p>
+          {fiche.id === moderateur.id ? (
+            <p className="gris">
+              {p(
+                'Vos propres points doivent être corrigés par un autre membre de l’équipe.',
+              )}
+            </p>
+          ) : (
+            <FormulaireDeCorrection
+              action={corrigerLeSolde.bind(null, fiche.id)}
+              maximum={CORRECTION_MAXIMALE}
               textes={{
-                motif: p('Motif'),
-                aideDuMotif: p('Il reste dans l’historique du compte.'),
-                confirmer: fiche.suspendu ? p('Réactiver le compte') : p('Suspendre le compte'),
+                ajouter: p('Ajouter des points'),
+                retirer: p('Retirer des points'),
+                nombre: p('Nombre de points'),
+                motif: p('Motif de la correction'),
+                aide: p(
+                  'Ce motif est communiqué au membre et conservé dans son historique.',
+                ),
+                enregistrer: p('Enregistrer la correction'),
                 envoi: p('Enregistrement…'),
               }}
             />
-          </div>
-        ) : (
-          <p className="texte-doux">
-            {p('Ce compte ne peut pas être suspendu depuis cet écran. Il s’agit du vôtre ou de celui d’un membre de la modération.')}
-          </p>
-        )}
+          )}
+        </section>
 
-        <h2 className="titre-section">{p('Historique des actions')}</h2>
-        {fiche.actions.length === 0 ? (
-          <p className="texte-doux">{p('Aucune action de modération sur ce compte.')}</p>
-        ) : (
-          <ul className="liste" style={{ listStyle: 'none', padding: 0 }}>
-            {fiche.actions.map((action, rang) => (
-              <li key={rang} className="ligne ligne-info">
-                <span className="ligne-texte">
-                  <strong>{libelleDeLAction[action.action] ?? action.action}</strong>
-                  <span>{action.motif}</span>
+        <section className="bloc">
+          <h2>{p('Statut du compte')}</h2>
+          {gerable ? (
+            <>
+              <p className="gris">
+                {fiche.suspendu
+                  ? p(
+                      'Réactiver le compte permet au membre de se reconnecter et de reprendre ses gardes.',
+                    )
+                  : p(
+                      'Suspendre le compte ferme ses sessions, retire ses lieux des recherches et clôt ses demandes en attente.',
+                    )}
+              </p>
+              <FormulaireDeDecision
+                action={changerLeStatutDuCompte.bind(null, fiche.id)}
+                champsCaches={{ suspendre: fiche.suspendu ? 'non' : 'oui' }}
+                danger={!fiche.suspendu}
+                confirmation={
+                  !fiche.suspendu && fiche.gardesEngagees > 0
+                    ? p('Je suspends malgré la garde en cours.')
+                    : undefined
+                }
+                choix={[]}
+                textes={{
+                  motif: p('Motif'),
+                  aideDuMotif: p('Il reste dans l’historique du compte.'),
+                  confirmer: fiche.suspendu
+                    ? p('Réactiver le compte')
+                    : p('Suspendre le compte'),
+                  envoi: p('Enregistrement…'),
+                }}
+              />
+            </>
+          ) : (
+            <p className="gris">
+              {p(
+                'Ce compte ne peut pas être suspendu depuis cet écran. Il s’agit du vôtre ou de celui d’un membre de la modération.',
+              )}
+            </p>
+          )}
+        </section>
+
+        <article className="mod-carte">
+          <div className="mod-tete">
+            <span className="mod-etat">{p('Historique des actions')}</span>
+          </div>
+          {fiche.actions.length === 0 ? (
+            <p className="vide-onglet">
+              {p('Aucune action de modération sur ce compte.')}
+            </p>
+          ) : (
+            <ul className="liste-nette">
+              {fiche.actions.map((action, rang) => (
+                <li key={rang}>
+                  <b>{libelleDeLAction[action.action] ?? action.action}</b>
                   <span>
+                    {action.motif}
+                    {' · '}
                     {jourAffiche(jourABruxelles(new Date(action.faitLe)))}
                     {action.parQui ? ` · ${action.parQui}` : ''}
                   </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
       </div>
     </main>
   );

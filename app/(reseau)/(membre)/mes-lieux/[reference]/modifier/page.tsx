@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { lieuDuMembre } from '@/lib/depot/lieux';
 import { textes } from '@/lib/i18n/langue';
 import { exigerUnMembre } from '@/lib/session';
@@ -29,7 +28,6 @@ export default async function ModifierUnLieu({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/mes-lieux/${reference}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Modifier mon lieu')}</h1>
         <p className="sous-titre">

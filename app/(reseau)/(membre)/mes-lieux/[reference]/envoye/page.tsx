@@ -2,93 +2,102 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
-import { lieuDuMembre } from '@/lib/depot/lieux';
-import { textes } from '@/lib/i18n/langue';
+import { lieuDuMembre, mesLieux } from '@/lib/depot/lieux';
+import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import { exigerUnMembre } from '@/lib/session';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Lieu enregistré') };
-}
+export const metadata: Metadata = { title: 'Emplacement en ligne' };
 
-/** La fin du parcours « Devenir Bike Sitter » : ce qui est fait, et ce qui vient. */
-export default async function LieuEnregistre({
+/** La fin du parcours : ce qui est fait, ce qui s'examine, ce qui vient. */
+export default async function EmplacementEnLigne({
   params,
 }: {
   params: Promise<{ reference: string }>;
 }) {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
   const { reference } = await params;
-  const lieu = await lieuDuMembre(membre.id, reference);
+  const [lieu, _lieux, _nonLues] = await Promise.all([
+    lieuDuMembre(membre.id, reference),
+    mesLieux(membre.id),
+    nombreDeNotificationsNonLues(membre.id),
+  ]);
   if (!lieu) notFound();
 
-  const etapes: [boolean, string, string][] = [
-    [
-      lieu.identiteVerifiee,
-      p('Identité vérifiée'),
-      lieu.identiteVerifiee
-        ? p('Votre identité a été confirmée.')
-        : p('Envoyez votre pièce d’identité : une personne de l’association la vérifie.'),
-    ],
-    [
-      lieu.nombreDePhotos > 0,
-      p('Photos du lieu'),
-      lieu.nombreDePhotos > 0
-        ? p('{n} photo(s) ajoutée(s).', { n: lieu.nombreDePhotos })
-        : p('Aucune photo pour l’instant : vous pourrez en ajouter à tout moment.'),
-    ],
-    [
-      lieu.publie,
-      p('Publication'),
-      lieu.publie
-        ? p('Votre lieu apparaît dans les recherches.')
-        : p('Nous vous prévenons dès que votre lieu est en ligne.'),
-    ],
-  ];
+  const classeDeLEtape = (fait: boolean, enCours: boolean) =>
+    fait ? 'fait' : enCours ? 'encours' : undefined;
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/mes-lieux" cloche={false} />
-      <div className="ecran-app ecran-parcours confirmation">
-        <span className="rond-etat grand" aria-hidden="true">
-          <Icone nom="coche" taille={46} strokeWidth={2.6} />
-        </span>
-        <h1 className="titre-ecran centre">
-          {lieu.publie ? p('Votre lieu est en ligne !') : p('Lieu enregistré')}
+      <div className="dashboard-wrap" id="bsenvoye">
+        <h1>
+          {lieu.publie ? 'Votre emplacement est en ligne' : 'Votre emplacement est prêt'}
         </h1>
-        <p className="sous-titre centre">{p('Merci pour votre participation au réseau.')}</p>
+        <p className="bs-intro">
+          {lieu.publie
+            ? 'Les cyclistes du quartier peuvent maintenant vous envoyer une demande. Vous restez libre d’accepter ou de refuser chacune, et vous pouvez mettre l’accueil en pause à tout moment.'
+            : 'Il sera publié dès que les étapes ci-dessous seront terminées. Rien d’autre ne vous est demandé.'}
+        </p>
 
-        <ol className="suivi" style={{ marginTop: 10 }}>
-          {etapes.map(([fait, titre, texte]) => (
-            <li key={titre} className={fait ? 'fait' : 'maintenant'}>
-              <span className="suivi-point" aria-hidden="true">
-                {fait ? <Icone nom="coche" taille={14} strokeWidth={3} /> : null}
-              </span>
-              <span className="ligne-texte">
-                <strong>{titre}</strong>
-                <span>{texte}</span>
-              </span>
-            </li>
-          ))}
+        {/* Ce qui se passe réellement : l'identité vérifiée par une personne
+            (règle 2) est la seule validation humaine ; ensuite, la
+            publication est immédiate. */}
+        <ol className="suivi">
+          <li className={classeDeLEtape(lieu.identiteVerifiee, true)}>
+            <b>
+              {lieu.identiteVerifiee
+                ? 'Identité vérifiée'
+                : 'Identité en cours de vérification'}
+            </b>
+            <span>
+              {lieu.identiteVerifiee
+                ? 'Votre pièce a été regardée par une personne, puis supprimée.'
+                : 'Une personne de l’association regarde votre pièce, puis la supprime. Vous recevez une notification dès que c’est fait.'}
+            </span>
+          </li>
+          {/* Les photos ne conditionnent pas la publication : l'étape est
+              faite, et l'invitation à en ajouter vient sous la liste. */}
+          <li className="fait">
+            <b>Emplacement décrit</b>
+            <span>
+              {lieu.nombreDePhotos > 0
+                ? 'Le lieu, ses accès et ses photos sont enregistrés.'
+                : 'Le lieu et ses accès sont enregistrés.'}
+            </span>
+          </li>
+          <li className={classeDeLEtape(lieu.publie, lieu.identiteVerifiee)}>
+            <b>{lieu.publie ? 'Publié' : 'Publication'}</b>
+            <span>
+              {lieu.publie
+                ? 'Votre emplacement apparaît dans les recherches, dans une zone approximative.'
+                : 'Automatique dès que votre identité est vérifiée.'}
+            </span>
+          </li>
         </ol>
 
-        <div className="boutons" style={{ marginTop: 16 }}>
-          {!lieu.identiteVerifiee ? (
-            <Link href="/inscription/identite" className="bouton plein">
-              {p('Vérifier mon identité')}
-              <Icone nom="chevron" taille={20} />
-            </Link>
-          ) : null}
-          <Link href={`/mes-lieux/${reference}`} className={lieu.identiteVerifiee ? 'bouton plein' : 'bouton contour'}>
-            {p('Voir mon lieu')}
+        {lieu.nombreDePhotos === 0 ? (
+          <p className="prog-note">
+            Ajoutez quelques photos de l’emplacement : les cyclistes
+            choisissent plus volontiers un lieu qu’ils peuvent voir.
+          </p>
+        ) : null}
+        {lieu.nombreDePhotos === 0 ? (
+          <Link className="primary bs-cta" href={`/mes-lieux/${reference}/photos`}>
+            Ajouter les photos
           </Link>
-          <Link href="/accueil" className="bouton discret">
-            {p('Retour à l’accueil')}
+        ) : !lieu.identiteVerifiee ? (
+          <Link className="primary bs-cta" href="/profil/verifications">
+            Suivre ma vérification
           </Link>
-        </div>
+        ) : (
+          <Link className="primary bs-cta" href="/accueil">
+            Aller à mon espace Bike Sitter
+          </Link>
+        )}
+        {lieu.publie ? (
+          <Link className="outline bs-cta" href={`/emplacements/${reference}`}>
+            Voir ma fiche telle que la voient les cyclistes
+          </Link>
+        ) : null}
       </div>
     </main>
   );

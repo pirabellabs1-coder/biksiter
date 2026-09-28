@@ -27,6 +27,11 @@ export function baseConfiguree(): boolean {
     && process.env.DATABASE_URL.length > 0;
 }
 
+function entierDeLEnvironnement(nom: string, parDefaut: number): number {
+  const valeur = Number.parseInt(process.env[nom] ?? '', 10);
+  return Number.isFinite(valeur) && valeur > 0 ? valeur : parDefaut;
+}
+
 export function reserve(): Pool {
   if (!baseConfiguree()) {
     throw new BaseNonConfiguree();
@@ -35,14 +40,25 @@ export function reserve(): Pool {
   if (!globalThis.reserveBikeSitters) {
     globalThis.reserveBikeSitters = new Pool({
       connectionString: process.env.DATABASE_URL,
-      max: 10,
+      // Réglables par l'environnement : un serveur de développement partagé
+      // par plusieurs sessions de test a besoin de plus de connexions, et
+      // d'un peu plus de patience envers un pooler distant.
+      max: entierDeLEnvironnement('DATABASE_POOL_MAX', 10),
       idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 5_000,
+      connectionTimeoutMillis: entierDeLEnvironnement(
+        'DATABASE_DELAI_CONNEXION_MS',
+        5_000,
+      ),
       // En production l'hébergeur impose TLS ; en local il n'y en a pas.
+      // « requis » : TLS avec vérification stricte du certificat.
+      // « chiffre » : TLS sans vérification (nécessaire avec le pooler Supabase,
+      //   dont la chaîne n'est pas reconnue par l'autorité racine de Node).
       ssl:
         process.env.DATABASE_SSL === 'requis'
           ? { rejectUnauthorized: true }
-          : undefined,
+          : process.env.DATABASE_SSL === 'chiffre'
+            ? { rejectUnauthorized: false }
+            : undefined,
     });
   }
 

@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { dateDeGarde } from '@/components/app/garde';
 import { Icone } from '@/components/app/icone';
 import { referenceDeGarde } from '@/components/membre/garde';
@@ -66,7 +65,6 @@ export default async function SuiviDuSignalement({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Suivi du signalement')}</h1>
         <p className="sous-titre">{p('Vous êtes informé à chaque étape d’une garde.')}</p>

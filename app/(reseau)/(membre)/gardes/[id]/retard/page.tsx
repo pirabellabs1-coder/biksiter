@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { amenagementsDeLaGarde } from '@/lib/depot/amenagements';
 import { detailDeLaGarde } from '@/lib/depot/gardes';
@@ -43,7 +42,6 @@ export default async function JeSeraiEnRetard({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <span className="rond-etat" aria-hidden="true" style={{ margin: '4px 0 16px' }}>
           <Icone nom="horloge" taille={30} strokeWidth={2.2} />

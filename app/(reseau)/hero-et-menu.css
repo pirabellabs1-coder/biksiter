@@ -1,0 +1,1163 @@
+/* =============================================================================
+   Le menu hamburger.
+
+   Il n'existe que sous 900 px. Un bouton posé dans `.header-actions`, ouvre
+   un panneau qui glisse depuis la droite ; un voile assombrit le reste.
+   ========================================================================== */
+
+.hamburger {
+  display: none;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0;
+  z-index: 30;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hamburger:hover,
+.hamburger:focus-visible {
+  background: rgba(0, 130, 59, 0.08);
+  transform: scale(1.06);
+}
+
+.hamburger:active {
+  transform: scale(0.94);
+}
+
+.hamburger > span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: 5px;
+}
+
+.hamburger i {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition:
+    transform 0.28s cubic-bezier(0.68, -0.4, 0.32, 1.4),
+    opacity 0.15s ease,
+    background 0.2s ease,
+    width 0.22s ease;
+  transform-origin: center;
+}
+
+/* Au survol, les trois barres respirent : la barre du haut s'allonge un peu,
+ * celle du milieu se rétracte, celle du bas glisse. L'effet est doux, une
+ * seconde à peine, et respecte prefers-reduced-motion. */
+.hamburger:hover i {
+  background: var(--green);
+}
+
+.hamburger:hover i:nth-child(1) {
+  width: 24px;
+  transform: translateX(-2px);
+}
+.hamburger:hover i:nth-child(2) {
+  width: 16px;
+}
+.hamburger:hover i:nth-child(3) {
+  width: 24px;
+  transform: translateX(2px);
+}
+
+.hamburger[aria-expanded='true'] i {
+  background: var(--green);
+  width: 22px;
+}
+
+.hamburger[aria-expanded='true'] i:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger[aria-expanded='true'] i:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+.hamburger[aria-expanded='true'] i:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hamburger,
+  .hamburger i {
+    transition: none;
+  }
+  .hamburger:hover {
+    transform: none;
+  }
+  .hamburger:hover i:nth-child(1),
+  .hamburger:hover i:nth-child(2),
+  .hamburger:hover i:nth-child(3) {
+    width: 22px;
+    transform: none;
+  }
+}
+
+.hamburger-voile {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 41, 26, 0.42);
+  backdrop-filter: blur(3px);
+  z-index: 40;
+  animation: hamburger-voile-apparait 0.2s ease-out;
+}
+
+@keyframes hamburger-voile-apparait {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.hamburger-panneau {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 88vw);
+  background: #fff;
+  z-index: 50;
+  padding: 92px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  box-shadow: -30px 0 60px rgba(6, 41, 26, 0.16);
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.hamburger-panneau.ouvert {
+  transform: translateX(0);
+}
+
+/*
+ * La navigation du panneau est verticale et compacte. On force les liens en
+ * `display: block` : les <a> sont par défaut inline, et une règle générale
+ * de la feuille des maquettes (`.topbar nav a`) pourrait les remettre en
+ * ligne dans un contexte inattendu. Ici c'est net.
+ */
+.hamburger-panneau > nav {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch;
+  gap: 4px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  width: 100%;
+}
+
+.hamburger-panneau > nav a {
+  display: block;
+  width: 100%;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--police-manrope), sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  padding: 14px 14px;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.hamburger-panneau > nav a:hover,
+.hamburger-panneau > nav a:focus-visible {
+  background: #eef8f1;
+  color: var(--green);
+  transform: translateX(4px);
+  box-shadow: none;
+}
+
+.hamburger-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.hamburger-actions .primary,
+.hamburger-actions .outline {
+  text-align: center;
+  border-radius: 999px;
+  padding: 14px 20px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.hamburger-actions .outline {
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  background: transparent;
+}
+
+/* Le panneau n'est présent QUE sous 900 px. Sur bureau, la navigation en pilule
+   dans la topbar suffit. */
+@media (min-width: 901px) {
+  .hamburger,
+  .hamburger-voile,
+  .hamburger-panneau {
+    display: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .hamburger {
+    display: grid !important;
+    place-items: center;
+  }
+
+  /* Sur mobile, la navigation en pilule disparaît, on ne garde que le bouton
+     hamburger et un unique bouton d'action à côté. */
+  .topbar > nav {
+    display: none;
+  }
+
+  /* La bascule cycliste/sitter et le lien secondaire restent en retrait. */
+  .header-actions .link-button {
+    display: none;
+  }
+
+  /* Un seul bouton d'auth à côté du hamburger — sinon la barre déborde. */
+  .header-actions > a.primary + a.outline,
+  .header-actions > a.outline + a.primary,
+  .header-actions > .link-button {
+    display: none;
+  }
+}
+
+/* Sous 560, on retire aussi la bascule de rôle pour laisser respirer. */
+@media (max-width: 560px) {
+  .header-actions .bascule-role {
+    display: none;
+  }
+}
+
+body.menu-hamburger-ouvert {
+  overflow: hidden;
+}
+
+/* =============================================================================
+   La navigation en pilule de la topbar — reformée en <ul>.
+
+   Cette navigation est bâtie sur une <ul> pour recevoir le méga menu du blog
+   comme un <li>. Les entrées gardent la même apparence qu'avant (pastille
+   sage, coins arrondis, effet de survol doux).
+   ========================================================================== */
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.topbar-nav > li {
+  position: relative;
+  display: flex;
+}
+
+.topbar-nav a,
+.topbar-nav .mega-declencheur {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.topbar-nav a:hover,
+.topbar-nav .mega-declencheur:hover,
+.topbar-nav .mega-ouvert .mega-declencheur {
+  background: white;
+  color: var(--green);
+  box-shadow: 0 5px 16px rgba(5, 57, 29, 0.08);
+}
+
+/* =============================================================================
+   Le méga menu du blog.
+
+   Un panneau posé sous la topbar, plus large que le déclencheur. Trois
+   colonnes : rubriques, articles récents, un article mis en avant. Sur
+   téléphone, ce panneau est masqué — le hamburger porte un lien direct vers
+   /blog à la place.
+   ========================================================================== */
+
+.mega-chevron {
+  font-size: 10px;
+  transition: transform 0.18s ease;
+  color: var(--muted);
+}
+
+.topbar-nav .mega-ouvert .mega-declencheur .mega-chevron {
+  transform: rotate(180deg);
+  color: var(--green);
+}
+
+.mega-panneau {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  width: min(880px, 92vw);
+  background: #fff;
+  border: 1px solid rgba(0, 130, 59, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 32px 80px rgba(4, 60, 30, 0.18);
+  padding: 26px 26px 22px;
+  z-index: 60;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease,
+    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Une petite « pointe » sous le déclencheur, purement décorative. */
+.mega-panneau::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-top: 1px solid rgba(0, 130, 59, 0.12);
+  border-left: 1px solid rgba(0, 130, 59, 0.12);
+  border-radius: 3px;
+}
+
+.mega-ouvert .mega-panneau {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.mega-int {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1.15fr;
+  gap: 22px;
+}
+
+.mega-col {
+  min-width: 0;
+}
+
+.mega-col h3 {
+  margin: 0 0 12px;
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mega-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.mega-col.rubriques a {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.mega-col.rubriques a:hover,
+.mega-col.rubriques a:focus-visible {
+  background: #eef8f1;
+  transform: translateX(2px);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.mega-col.rubriques .pastille {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #edf7f0, #d6ebdd);
+  color: var(--green);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-style: normal;
+}
+
+.mega-col.rubriques a > span:last-child {
+  display: block;
+  min-width: 0;
+}
+
+.mega-col.rubriques a b {
+  display: block;
+  font-family: var(--police-manrope), sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.mega-col.rubriques a em {
+  display: block;
+  font-style: normal;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.mega-col.recents a {
+  display: block;
+  padding: 12px;
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.mega-col.recents a:hover,
+.mega-col.recents a:focus-visible {
+  background: #eef8f1;
+  transform: translateX(2px);
+  box-shadow: none;
+}
+
+.mega-col.recents em {
+  display: block;
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.mega-col.recents b {
+  display: block;
+  font-family: var(--police-manrope), sans-serif;
+  font-weight: 700;
+  font-size: 14.5px;
+  margin: 4px 0 4px;
+  color: var(--ink);
+}
+
+.mega-col.recents span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* L'article à la une — carte plus riche, avec un visuel dégradé et un
+   pictogramme, un titre plus gros, un CTA. */
+.mega-col.alaune {
+  display: block;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #f2f9f4 0%, #e6f2ea 100%);
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid rgba(0, 130, 59, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mega-col.alaune:hover,
+.mega-col.alaune:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(4, 60, 30, 0.12);
+}
+
+.alaune-etiquette {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.alaune-visuel {
+  position: relative;
+  height: 78px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: linear-gradient(120deg, #087333, #17a453);
+  display: grid;
+  place-items: center;
+}
+
+.alaune-degrade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 20% 30%,
+      rgba(255, 255, 255, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(6, 30, 18, 0.35),
+      transparent 60%
+    );
+}
+
+.alaune-glyphe {
+  position: relative;
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.04em;
+}
+
+.mega-col.alaune h4 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: 17px;
+  line-height: 1.2;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.mega-col.alaune p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.alaune-lire {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--green);
+}
+
+.mega-pied {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.mega-tout {
+  color: var(--green) !important;
+  background: transparent !important;
+  font-weight: 700;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  text-decoration: none;
+  box-shadow: none !important;
+  border: 1.5px solid var(--green);
+}
+
+.mega-tout:hover,
+.mega-tout:focus-visible {
+  background: var(--green) !important;
+  color: #fff !important;
+}
+
+.mega-note {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* Sous 900 px, le méga menu disparaît — le hamburger porte le lien /blog. */
+@media (max-width: 900px) {
+  .topbar-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 1050px) {
+  .mega-int {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mega-col.alaune {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .mega-col.alaune .alaune-visuel {
+    margin: 0;
+    height: 100%;
+    min-height: 96px;
+  }
+  .mega-col.alaune .alaune-etiquette {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mega-panneau,
+  .mega-chevron,
+  .mega-col.rubriques a,
+  .mega-col.recents a,
+  .mega-col.alaune {
+    transition: none;
+  }
+}
+
+/* =============================================================================
+   Le hero refait — plus généreux, plus calme, plus premium.
+
+   On garde tout le balisage (`.hero`, `.hero-grid`, `.hero-copy`,
+   `.hero-brand-visual`, `.plan`, `.trust-strip`) : ce sont les mêmes classes
+   que la maquette. Ce qui change, c'est le rythme, le typographique, l'ombre
+   et le fond.
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  padding: 88px 5vw 44px;
+  background:
+    radial-gradient(
+      1200px 720px at 82% 12%,
+      rgba(22, 136, 237, 0.08),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 540px at 8% 0%,
+      rgba(0, 130, 59, 0.12),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #f7fbf8 0%, #f2f7f3 100%);
+  overflow: hidden;
+}
+
+/* Un rideau très doux au bas du hero, pour raccorder à la section suivante
+   sans coupure franche. */
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  background: linear-gradient(180deg, transparent, #fff 92%);
+  pointer-events: none;
+}
+
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1220px;
+  margin: 0 auto 56px;
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  align-items: center;
+  gap: 60px;
+}
+
+.hero-copy {
+  text-align: left;
+  max-width: 640px;
+}
+
+/* L'eyebrow devient une pastille sur fond sage. Plus lisible, plus premium. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(0, 130, 59, 0.09);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--green);
+  text-transform: none;
+}
+
+.eyebrow span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 0;
+}
+
+.hero h1 {
+  font-family: var(--police-manrope), sans-serif;
+  font-size: clamp(46px, 6.2vw, 82px);
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  margin: 22px 0 22px;
+  font-weight: 800;
+  color: #0a2417;
+}
+
+.hero-copy > p {
+  margin: 0 0 34px;
+  max-width: 560px;
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Une bande de « raccourcis » entre le hero et la carte de recherche.
+   Optionnelle, on l'active seulement si elle est présente dans le balisage. */
+.hero-raccourcis {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.hero-raccourcis a {
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: 0.18s ease;
+}
+
+.hero-raccourcis a:hover {
+  border-color: var(--green);
+  color: var(--green);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 130, 59, 0.12);
+}
+
+/* Le plan de quartier — cadre blanc plus élégant, ombre profonde,
+   pastilles arrondies avec ombre douce. */
+.hero-brand-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.plan {
+  position: relative;
+  width: min(440px, 90%);
+  aspect-ratio: 1;
+  background: #ffffff;
+  border-radius: 32px;
+  padding: 22px;
+  box-shadow:
+    0 30px 60px rgba(4, 60, 30, 0.12),
+    0 6px 18px rgba(4, 60, 30, 0.06),
+    inset 0 0 0 1px rgba(0, 130, 59, 0.06);
+  overflow: hidden;
+}
+
+.plan svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  display: block;
+}
+
+.plan .ici,
+.plan .min {
+  position: absolute;
+  z-index: 2;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 12.5px;
+  box-shadow: 0 10px 24px rgba(4, 60, 30, 0.16);
+  background: #fff;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.plan .ici {
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  background: var(--ink);
+  color: #fff;
+}
+
+.plan .ici i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 4px rgba(255, 118, 94, 0.28);
+}
+
+.plan .min {
+  color: var(--green);
+}
+
+.plan .min::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.plan .m1 { left: 18%; top: 24%; }
+.plan .m2 { right: 12%; top: 26%; }
+.plan .m3 { left: 22%; bottom: 22%; }
+
+/* La carte flottante « Identité vérifiée ». Plus discrète, mieux posée. */
+.floating-card.card-two {
+  position: absolute;
+  right: -22px;
+  bottom: 32px;
+  z-index: 3;
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 22px 45px rgba(4, 60, 30, 0.18);
+  border: 1px solid rgba(0, 130, 59, 0.08);
+}
+
+.floating-card.card-two i {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e4f2ff;
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.floating-card.card-two b {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.floating-card.card-two span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* La carte de recherche — plus grande, plus douce, plus premium. */
+.hero .search-card {
+  position: relative;
+  z-index: 2;
+  max-width: 1120px;
+  margin: 0 auto;
+  border-radius: 22px;
+  padding: 14px;
+  border: 1px solid rgba(0, 130, 59, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 30px 70px rgba(4, 60, 30, 0.10),
+    0 3px 12px rgba(4, 60, 30, 0.04);
+}
+
+.hero .chercher {
+  border-radius: 14px;
+  padding: 16px 22px;
+  background: var(--green);
+  color: white;
+  border: 0;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 12px 26px rgba(0, 130, 59, 0.24);
+  transition: 0.18s ease;
+}
+
+.hero .chercher:hover {
+  background: var(--green-dark, #005f20);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(0, 130, 59, 0.3);
+}
+
+/* La bande de garanties — pastilles individuelles au lieu d'une bande unique. */
+.hero .trust-strip {
+  max-width: 1120px;
+  margin: 22px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.hero .trust-strip span {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  color: var(--muted);
+}
+
+.hero .trust-strip span b {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.hero .trust-strip .verified b {
+  color: var(--blue);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: 56px 20px 32px;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+
+  .hero-copy {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .hero-copy > p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-brand-visual {
+    order: -1;
+  }
+
+  .plan {
+    width: min(340px, 82vw);
+    padding: 16px;
+  }
+
+  .plan .ici {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .plan .min {
+    padding: 6px 10px;
+    font-size: 11.5px;
+  }
+
+  .floating-card.card-two {
+    right: -8px;
+    bottom: 14px;
+    padding: 10px 14px;
+  }
+
+  .hero .trust-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/*
+ * Sous 560 px, la vignette est trop chargée pour rester lisible : plutôt que
+ * de la rétrécir jusqu'à écraser le texte des pastilles, on la retire.
+ * Le titre, la promesse et la carte de recherche suffisent à cadrer la page,
+ * et la vue en zigzag « Comment ça marche » plus bas montre déjà l'idée.
+ */
+@media (max-width: 560px) {
+  .hero {
+    padding: 44px 16px 24px;
+  }
+
+  .hero-brand-visual {
+    display: none;
+  }
+
+  .hero-grid {
+    gap: 0;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+    margin: 18px 0 16px;
+  }
+
+  .hero-copy > p {
+    font-size: 16.5px;
+  }
+
+  .hero .trust-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================================================
+   Les bascules de rôle dans la barre du bas.
+
+   Deux entrées changent de rôle avant de naviguer : elles passent donc par un
+   formulaire, et non par un lien. Le formulaire doit se comporter comme les
+   autres cellules de la grille.
+   ========================================================================== */
+
+.tabbar .tb-f {
+  display: grid;
+  margin: 0;
+}
+
+.tabbar .tb-f > .tb {
+  width: 100%;
+}
+
+/* =============================================================================
+   La recherche : dégager le bas de page.
+
+   La pastille « Liste / Carte » est fixée à 88 px du bas et flotte au-dessus
+   du contenu. Quand la liste est courte — ou vide — le bandeau de confiance
+   arrive juste en dessous et se retrouve recouvert. On réserve donc la place
+   qu'occupe la pastille, plus celle de la barre du bas.
+   ========================================================================== */
+
+@media (max-width: 899px) {
+  .rech-page {
+    padding-bottom: 150px;
+  }
+
+  /* Le bandeau reste lisible : il ne passe jamais sous la pastille. */
+  .bandeau-confiance {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* =============================================================================
+   La carte OpenStreetMap.
+
+   Elle remplace le plan dessiné de la maquette. Elle occupe la même boîte
+   `.map` et garde ses outils par-dessus — bascule Plan/Satellite, zoom,
+   « Rechercher dans cette zone », légende.
+
+   Règle 4 : on n'y pose aucune épingle d'adresse. Chaque bike sitter est un
+   cercle de trois cents mètres centré sur une position déjà arrondie en base.
+   ========================================================================== */
+
+.map {
+  position: relative;
+  overflow: hidden;
+}
+
+.carte-osm {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #eef3ef;
+}
+
+/* Les outils de la maquette restent lisibles au-dessus des tuiles. */
+.map .map-outils,
+.map .map-zoom,
+.map .map-position,
+.map .map-legende,
+.map .map-apercu,
+.map .map-rezone,
+.map .map-echelle,
+.map .map-note {
+  z-index: 2;
+}
+
+/* Leaflet pose ses propres commandes ; on ne garde que l'attribution, que la
+   licence OpenStreetMap impose. */
+.carte-osm .leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 2px 6px;
+  border-radius: 6px 0 0 0;
+}
+
+.carte-osm .leaflet-control-zoom {
+  display: none;
+}
+
+/* Le fond de la boîte ne doit pas rester le damier dessiné de la maquette. */
+.map:has(.carte-osm) {
+  background-image: none;
+}
+
+.map:has(.carte-osm) .water,
+.map:has(.carte-osm) .map-road {
+  display: none;
+}
+
+/* =============================================================================
+   Les grands titres sur téléphone.
+
+   La maquette fixe `.dashboard-wrap h1` à 48 px sans exception mobile. Elle
+   ne montrait que des prénoms courts : « Bonjour Lissanon » passe à la ligne
+   et occupe cent cinquante pixels de haut sur un écran de 375. On réduit,
+   sans toucher au rendu sur ordinateur.
+   ========================================================================== */
+
+@media (max-width: 560px) {
+  .dashboard-wrap h1 {
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .page-tete h1 {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+}

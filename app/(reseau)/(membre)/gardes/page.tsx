@@ -1,120 +1,158 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
-import { CarteDeGarde } from '@/components/app/garde';
 import { Icone } from '@/components/app/icone';
+import { CarteDeGarde } from '@/components/maquette/garde/carte-de-garde';
+import { OngletsDesGardes } from '@/components/maquette/garde/onglets';
 import { gardesDuMembre } from '@/lib/depot/accueil';
-import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
-import { textes } from '@/lib/i18n/langue';
-import {
-  EXPIRATION_D_UNE_DEMANDE_HEURES,
-  ONGLETS_DES_GARDES,
-  ongletDeLEtat,
-} from '@/lib/regles/garde';
+import { JOURS_D_ACCES_AUX_PHOTOS } from '@/lib/regles/constat';
+import { EXPIRATION_D_UNE_DEMANDE_HEURES } from '@/lib/regles/garde';
+import { vueDeLEtat, type VueDesGardes } from '@/lib/regles/vues-des-gardes';
 import { exigerUnMembre } from '@/lib/session';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Mes gardes') };
-}
 
-export default async function MesGardes({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | undefined>>;
-}) {
+export const metadata: Metadata = { title: 'Mes gardes' };
+
+export default async function MesGardes() {
   const membre = await exigerUnMembre();
-  const { t, p } = await textes();
-  const { onglet: demande } = await searchParams;
-  const [gardes, nonLues] = await Promise.all([
-    gardesDuMembre(membre.id),
-    nombreDeNotificationsNonLues(membre.id),
-  ]);
+  const gardes = await gardesDuMembre(membre.id);
 
-  const onglet =
-    ONGLETS_DES_GARDES.find((o) => o.cle === demande) ?? ONGLETS_DES_GARDES[0];
-  const liste = gardes.filter((g) => ongletDeLEtat(g.etat) === onglet.cle);
-  // À venir se lit dans l'ordre où les gardes arrivent ; le reste, du plus récent.
-  if (onglet.cle === 'a-venir') {
-    liste.sort(
-      (a, b) => new Date(a.debut).getTime() - new Date(b.debut).getTime(),
+  // Les gardes du cycliste : c'est son parcours que cet écran raconte.
+  const miennes = gardes.filter((g) => g.role === 'cycliste');
+  const par = (vue: VueDesGardes) =>
+    miennes.filter((g) => vueDeLEtat(g.etat) === vue);
+  const avenir = par('avenir').sort(
+    (a, b) => a.debut.getTime() - b.debut.getTime(),
+  );
+  const demandes = par('demandes');
+  const terminees = par('terminees');
+
+  const cartes = (liste: typeof miennes) =>
+    liste.map((garde) => (
+      <CarteDeGarde key={garde.id} garde={garde} />
+    ));
+
+  // Sans aucune garde, les onglets n'auraient rien à trier : l'écran dit
+  // simplement comment commencer.
+  if (miennes.length === 0) {
+    return (
+      <main id="contenu" className="ecran">
+        <header className="ecran-tete">
+          <h1>Mes gardes</h1>
+          <p className="ecran-intro">
+            Vos demandes et vos gardes, à venir comme passées.
+          </p>
+        </header>
+        <div className="etat-vide" data-vide="gardes" style={{ display: 'block' }}>
+          <span className="ev-i" aria-hidden="true">
+            <Icone nom="gardes" taille={26} />
+          </span>
+          <h2>Aucune garde pour l’instant</h2>
+          <p>
+            Cherchez un bike sitter près de l’endroit où vous allez. Une
+            demande prend deux minutes, et vous pouvez la retirer tant
+            qu’elle n’est pas acceptée.
+          </p>
+          <Link className="primary" href="/recherche">
+            Chercher un bike sitter
+          </Link>
+        </div>
+        <nav className="raccourcis" aria-label="Votre espace">
+          <Link href="/profil/velos">
+            <Icone nom="velo" taille={18} />
+            Mes vélos
+          </Link>
+          <Link href="/favoris">
+            <Icone nom="coeur" taille={18} />
+            Favoris
+          </Link>
+          <Link href="/inviter">
+            <Icone nom="enveloppe" taille={18} />
+            Inviter
+          </Link>
+          <Link href="/profil">
+            <Icone nom="profil" taille={18} />
+            Mon compte
+          </Link>
+        </nav>
+      </main>
     );
   }
 
   return (
     <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Mes gardes')}</h1>
-        <nav className="onglets-haut" aria-label={p('Mes gardes')}>
-          {ONGLETS_DES_GARDES.map((o) => {
-            const combien = gardes.filter(
-              (g) => ongletDeLEtat(g.etat) === o.cle,
-            ).length;
-            return (
-              <Link
-                key={o.cle}
-                href={`/gardes?onglet=${o.cle}`}
-                aria-current={o.cle === onglet.cle ? 'page' : undefined}
-              >
-                {p(o.titre)}
-                {combien > 0 &&
-                o.cle !== 'terminees' &&
-                o.cle !== 'annulees' ? (
-                  <span className="compteur">{combien}</span>
-                ) : null}
-              </Link>
-            );
-          })}
-        </nav>
+      <div className="dashboard-wrap">
+        <h1>Mes gardes</h1>
 
-        {liste.length === 0 ? (
-          <div className="carte vide-liste">
-            <Icone nom="calendrier" taille={30} />
-            <strong>
-              {onglet.cle === 'a-venir'
-                ? p('Aucune autre garde prévue.')
-                : p('Aucun élément dans cette rubrique.')}
-            </strong>
-            <span>
-              {p('Vous pouvez rechercher un bike sitter pour votre prochaine sortie.')}
-            </span>
-            <Link href="/recherche" className="bouton contour petit">
-              {p('Rechercher un bike sitter')}
-            </Link>
-          </div>
-        ) : (
-          <div className="pile grille-cartes">
-            {liste.map((garde) => (
-              <div key={garde.id}>
-                <CarteDeGarde t={t} p={p} garde={garde} />
-                {garde.etat === 'demande' ? (
-                  <p className="petit texte-doux sous-carte">
-                    {garde.role === 'bike_sitter'
-                      ? p('À traiter · expire dans {n} h', {
-                          n: heuresRestantes(garde.demandeLe),
-                        })
-                      : p('Expire dans {n} h sans réponse', {
-                          n: heuresRestantes(garde.demandeLe),
-                        })}
+
+
+        <OngletsDesGardes
+          nombres={{
+            avenir: avenir.length,
+            demandes: demandes.length,
+            terminees: terminees.length,
+          }}
+          initial={
+            avenir.length > 0
+              ? 'avenir'
+              : demandes.length > 0
+                ? 'demandes'
+                : 'terminees'
+          }
+          raccourcis={
+            <nav className="raccourcis" aria-label="Votre espace">
+              <Link href="/profil/velos">
+                <Icone nom="velo" taille={18} />
+                Mes vélos
+              </Link>
+              <Link href="/favoris">
+                <Icone nom="coeur" taille={18} />
+                Favoris
+              </Link>
+              <Link href="/inviter">
+                <Icone nom="enveloppe" taille={18} />
+                Inviter
+              </Link>
+              <Link href="/profil">
+                <Icone nom="profil" taille={18} />
+                Mon compte
+              </Link>
+            </nav>
+          }
+          vues={{
+            avenir: (
+              <>
+                {cartes(avenir)}
+                {avenir.length === 0 && miennes.length > 0 ? (
+                  <p className="vide-onglet">
+                    Aucune garde confirmée pour l’instant. Une demande acceptée
+                    apparaît ici.
                   </p>
                 ) : null}
-              </div>
-            ))}
-          </div>
-        )}
+              </>
+            ),
+            demandes: (
+              <>
+                {cartes(demandes)}
+                <p className="vide-onglet">
+                  Sans réponse, une demande expire à l’heure prévue du dépôt,
+                  et au plus tard après {EXPIRATION_D_UNE_DEMANDE_HEURES}{' '}
+                  heures. Elle reste ici, marquée « Demande expirée ».
+                </p>
+              </>
+            ),
+            terminees: (
+              <>
+                {cartes(terminees)}
+                <p className="vide-onglet">
+                  Les photos d’une garde restent consultables{' '}
+                  {JOURS_D_ACCES_AUX_PHOTOS} jours après sa clôture.
+                </p>
+              </>
+            ),
+          }}
+        />
       </div>
     </main>
-  );
-}
-
-function heuresRestantes(demandeLe: Date): number {
-  return Math.max(
-    0,
-    Math.ceil(
-      EXPIRATION_D_UNE_DEMANDE_HEURES -
-        (Date.now() - new Date(demandeLe).getTime()) / 3_600_000,
-    ),
   );
 }

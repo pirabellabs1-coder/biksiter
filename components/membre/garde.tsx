@@ -39,7 +39,7 @@ export const ETAPES_DE_LA_FRISE: readonly [string, string][] = [
   ['accepte', 'Acceptée'],
   ['arrivee', 'Arrivée signalée'],
   ['velo_recu', 'Vélo reçu'],
-  ['reprise_demandee', 'Récupération confirmée'],
+  ['reprise_demandee', 'Reprise demandée'],
   ['velo_restitue', 'Vélo restitué'],
   ['termine', 'Terminé'],
 ];

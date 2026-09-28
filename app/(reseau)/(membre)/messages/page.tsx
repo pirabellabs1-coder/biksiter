@@ -1,97 +1,120 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
-import { ListeDesConversations } from '@/components/app/conversations';
-import { EnTete } from '@/components/app/en-tete';
+import { Avatar } from '@/components/app/avatar';
 import { Icone } from '@/components/app/icone';
 import { conversationsDuMembre } from '@/lib/depot/membre-espace';
-import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import { textes } from '@/lib/i18n/langue';
+import { jourAffiche } from '@/lib/regles/creneau';
 import { exigerUnMembre } from '@/lib/session';
+import { heureABruxelles, jourABruxelles } from '@/lib/temps';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Messages') };
+  return { title: p('Messagerie') };
 }
 
-export default async function Messages({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | undefined>>;
-}) {
+/** L'heure d'un message du jour, sinon sa date : « 14:05 », « 26/09 ». */
+function quandEcrit(instant: Date): string {
+  return jourABruxelles(instant) === jourABruxelles()
+    ? heureABruxelles(instant)
+    : jourAffiche(jourABruxelles(instant));
+}
+
+/** « Garde d’aujourd’hui, 14h00 → 18h00 », ou la date quand ce n'est pas le jour même. */
+function creneauEcrit(debut: Date, fin: Date): string {
+  const jour = jourABruxelles(debut);
+  const quand =
+    jour === jourABruxelles() ? 'Garde d’aujourd’hui' : `Garde du ${jourAffiche(jour)}`;
+  return `${quand}, ${heureABruxelles(debut)} → ${heureABruxelles(fin)}`;
+}
+
+export default async function Messagerie() {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
-  const { q } = await searchParams;
-  const recherche = (q ?? '').trim().toLowerCase().slice(0, 60);
-  const [toutes, nonLues] = await Promise.all([
-    conversationsDuMembre(membre.id),
-    nombreDeNotificationsNonLues(membre.id),
-  ]);
-  const conversations = recherche
-    ? toutes.filter(
-        (c) =>
-          c.autrePrenom.toLowerCase().includes(recherche) ||
-          (c.dernierMessage ?? '').toLowerCase().includes(recherche),
-      )
-    : toutes;
+  const conversations = await conversationsDuMembre(membre.id);
 
   return (
-    <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} />
-      <div className="ecran-app ecran-large">
-        <div className="messagerie">
-          <section className="messagerie-liste">
-            <h1 className="titre-ecran">{p('Messages')}</h1>
-            <form
-              action="/messages"
-              method="get"
-              role="search"
-              style={{ margin: '10px 0 14px' }}
-            >
-              <label className="champ-app champ-recherche">
-                <Icone nom="recherche" taille={20} />
-                <span className="lecteur">
-                  {p('Rechercher une conversation')}
-                </span>
-                <input
-                  type="search"
-                  name="q"
-                  defaultValue={q ?? ''}
-                  placeholder={p('Rechercher une conversation…')}
-                />
-              </label>
-            </form>
+    <main id="contenu" className="ecran">
+      <header className="ecran-tete">
+        <h1>Messages</h1>
+        <p className="ecran-intro">
+          Une conversation par garde, avec le membre qui la partage avec vous.
+        </p>
+      </header>
 
-            <ListeDesConversations p={p} conversations={conversations} />
-
-            {toutes.length === 0 ? (
-              <p className="petit texte-doux centre" style={{ marginTop: 14 }}>
-                {p(
-                  "Une conversation s'ouvre dès qu'une demande est envoyée ou acceptée.",
-                )}
-              </p>
-            ) : recherche && conversations.length === 0 ? (
-              <p className="petit texte-doux centre" style={{ marginTop: 14 }}>
-                {p('Aucune conversation ne correspond à « {q} ».', {
-                  q: q ?? '',
-                })}
-              </p>
-            ) : null}
-          </section>
-
-          {/* Sur ordinateur, le volet de droite attend qu'on choisisse. */}
-          <section className="messagerie-vide" aria-hidden="true">
-            <span className="messagerie-vide-icone">
-              <Icone nom="messages" taille={30} />
-            </span>
-            <strong>{p('Sélectionnez une conversation')}</strong>
-            <span>
-              {p(
-                'Vos échanges avec les bike sitters et les cyclistes s’affichent ici.',
-              )}
-            </span>
-          </section>
+      {conversations.length === 0 ? (
+        <div className="etat-vide" data-vide="messages">
+          <span className="ev-i" aria-hidden="true">
+            <Icone nom="messages" taille={26} />
+          </span>
+          <h2>Aucune conversation</h2>
+          <p>
+            Une conversation s’ouvre dès qu’une demande est envoyée : vous
+            pouvez écrire à un bike sitter avant même sa réponse.
+          </p>
+          <Link className="primary" href="/recherche">
+            Chercher un bike sitter
+          </Link>
         </div>
-      </div>
+      ) : (
+        <ul className="groupe" role="list">
+          {conversations.map((conversation) => (
+            <li key={conversation.id}>
+              <Link
+                href={`/messages/${conversation.id}`}
+                className={conversation.nonLu ? 'rangee conversation non-lue' : 'rangee conversation'}
+              >
+                <Avatar
+                  membreId={conversation.autreId}
+                  prenom={conversation.autrePrenom}
+                  version={conversation.autrePhoto}
+                  taille={46}
+                />
+                <span className="rangee-texte">
+                  <span className="conversation-ligne">
+                    <strong>
+                      {conversation.autrePrenom} {conversation.autreInitiale}.
+                    </strong>
+                    {conversation.dernierMessageLe ? (
+                      <time
+                        dateTime={new Date(conversation.dernierMessageLe).toISOString()}
+                      >
+                        {quandEcrit(new Date(conversation.dernierMessageLe))}
+                      </time>
+                    ) : null}
+                  </span>
+                  <span className="conversation-apercu">
+                    {conversation.dernierMessage
+                      ? conversation.dernierMessage
+                      : conversation.dernierMessagePhoto
+                        ? 'Photo'
+                        : 'Aucun message pour l’instant'}
+                  </span>
+                  <span className="conversation-garde">
+                    {creneauEcrit(
+                      new Date(conversation.debut),
+                      new Date(conversation.fin),
+                    )}
+                  </span>
+                </span>
+                {conversation.nonLu ? (
+                  <span className="point-non-lu">
+                    <span className="lecteur">Message non lu</span>
+                  </span>
+                ) : null}
+                <Icone nom="chevron" taille={18} className="rangee-chevron" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="prog-note">
+        Les échanges restent dans l’application. Votre numéro n’est visible
+        que pendant une garde acceptée, par la personne qui la partage avec
+        vous. En cas de litige, un modérateur peut lire la conversation liée
+        à la garde, et elle seule.
+      </p>
     </main>
   );
 }

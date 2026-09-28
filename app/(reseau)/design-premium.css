@@ -1,0 +1,3541 @@
+/* =============================================================================
+   La finition « application » de Bike Sitters.
+
+   Ce fichier se charge en dernier. Il ne change ni la structure des écrans ni
+   le sens des couleurs (règle 6) : il donne à l'ensemble la tenue d'une
+   application native — celle qu'on attend d'un produit qu'on garde sur son
+   téléphone.
+
+   Les partis pris, dans l'ordre où ils se voient :
+   - la police du système (SF Pro sur iPhone et Mac, Roboto sur Android) : le
+     texte se lit comme le reste du téléphone, sans police à télécharger ;
+   - des surfaces blanches posées sur un fond légèrement teinté, séparées par
+     des filets translucides plutôt que par des bordures grises ;
+   - des en-têtes et une barre d'onglets en matériau dépoli, que le contenu
+     traverse en défilant ;
+   - des boutons en capsule qui répondent à l'appui ;
+   - des contrôles segmentés et des interrupteurs au dessin familier ;
+   - un mouvement court, amorti, jamais décoratif — et absent pour qui l'a
+     désactivé dans son système.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Les fondations
+   -------------------------------------------------------------------------- */
+:root {
+  --police-systeme-texte: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --police-systeme-titre: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+    'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+
+  /* Les feuilles des maquettes lisent ces trois variables : on les redirige
+     vers la police du système, en un seul endroit. */
+  --police-dm-sans: var(--police-systeme-texte);
+  --police-manrope: var(--police-systeme-titre);
+  --police-inter: var(--police-systeme-texte);
+
+  /* Une seule famille de gris, teintée du vert de la marque. */
+  --fond-app: #f2f3ef;
+  --coche-blanche: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E");
+  --surface: #ffffff;
+  --surface-douce: #f7f8f5;
+  --encre: #0f1f17;
+  --encre-2: rgba(15, 31, 23, 0.6);
+  --encre-3: rgba(15, 31, 23, 0.4);
+  --trait: rgba(15, 31, 23, 0.09);
+  --trait-fort: rgba(15, 31, 23, 0.15);
+  --remplissage: rgba(118, 124, 120, 0.12);
+  --remplissage-fort: rgba(118, 124, 120, 0.2);
+
+  --vert: #017628;
+  --vert-appuye: #015f20;
+  --vert-teinte: rgba(1, 118, 40, 0.08);
+  --vert-teinte-forte: rgba(1, 118, 40, 0.14);
+  --vert-trait: rgba(1, 118, 40, 0.2);
+
+  --r-groupe: 16px;
+  --r-carte: 20px;
+  --r-champ: 12px;
+
+  /* Des ombres teintées, une seule source de lumière (le haut). Le premier
+     niveau tient surtout au filet de 0,5 px : c'est lui qui dessine la carte. */
+  --ombre-1: 0 0 0 0.5px rgba(15, 31, 23, 0.08),
+    0 1px 2px rgba(15, 31, 23, 0.04);
+  --ombre-2: 0 0 0 0.5px rgba(15, 31, 23, 0.08),
+    0 10px 30px -12px rgba(15, 31, 23, 0.22);
+  --ombre-3: 0 0 0 0.5px rgba(15, 31, 23, 0.06),
+    0 24px 60px -18px rgba(15, 31, 23, 0.35);
+
+  /* La courbe des feuilles iOS : un départ vif, une arrivée très douce. */
+  --courbe: cubic-bezier(0.32, 0.72, 0, 1);
+  --courbe-appui: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --materiau: rgba(248, 249, 246, 0.78);
+}
+
+html {
+  /* Pas de défilement doux global : à chaque changement d'écran, la page
+     glissait vers le haut au lieu d'arriver en place — rien de natif. */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+body {
+  font-family: var(--police-systeme-texte);
+  font-feature-settings: 'kern' 1;
+}
+/* Un appui ne fait plus clignoter un rectangle bleu : chaque contrôle a son
+   propre retour visuel. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(h1, h2, h3) {
+  text-wrap: balance;
+}
+:where(p, li, dd) {
+  text-wrap: pretty;
+}
+/* Les chiffres qui se comparent s'alignent. */
+:where(.prog-stats b, [data-solde], .compteur, .bulle-heure, .guard-date b,
+  .walk, .prog-points, time) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le fond de l'application : un blanc cassé à peine teinté, sur lequel les
+   surfaces blanches se lisent sans bordure. */
+body:has(.app-membre) {
+  background: var(--fond-app);
+}
+.app-membre {
+  background: var(--fond-app);
+  color: var(--encre);
+}
+
+/* -----------------------------------------------------------------------------
+   2. La typographie de l'application
+   -------------------------------------------------------------------------- */
+/* Le grand titre de chaque écran, au gabarit des titres iOS. */
+.app-membre h1 {
+  font-family: var(--police-systeme-titre);
+  font-size: clamp(30px, 1.6vw + 24px, 40px);
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  line-height: 1.1;
+}
+.app-membre :is(h2, h3) {
+  font-family: var(--police-systeme-titre);
+  letter-spacing: -0.016em;
+}
+.app-membre :is(.prog-titre, .titre-section) {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  margin: 32px 0 10px;
+}
+
+/* Les surtitres en capitales vertes (« VOTRE ESPACE ») répétés sur chaque
+   écran faisaient gabarit. Ils deviennent une ligne discrète en casse de
+   phrase : ils disent encore où l'on est, sans crier. */
+.app-membre :is(.kicker, .eyebrow) {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: lowercase;
+  color: var(--encre-2);
+  margin: 0 0 2px;
+}
+.app-membre :is(.kicker, .eyebrow)::first-letter {
+  text-transform: uppercase;
+}
+
+/* Le texte courant : une mesure lisible, un interligne calme. */
+.app-membre :is(.page-tete p, .sous-titre) {
+  color: var(--encre-2);
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+
+/* -----------------------------------------------------------------------------
+   3. L'en-tête : une barre de navigation dépolie
+   -------------------------------------------------------------------------- */
+.app-membre .app-header {
+  height: calc(60px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 14px 0;
+  gap: 8px;
+  background: var(--materiau);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--trait-fort);
+  box-shadow: none;
+}
+@media (min-width: 900px) {
+  .app-membre .app-header {
+    height: 68px;
+    padding: 0 max(3vw, 24px);
+  }
+}
+.app-membre .app-header .back {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 0;
+  margin-left: -6px;
+  border-radius: 50%;
+  color: var(--vert);
+  font-size: 0;
+  transition: background-color 0.2s ease;
+}
+.app-membre .app-header .back:active {
+  background: var(--vert-teinte);
+}
+.app-membre .brand.mini .brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+@media (min-width: 900px) {
+  .app-membre .brand.mini .brand-mark {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* La bascule de rôle : un contrôle segmenté iOS. */
+.app-membre .bascule-role {
+  background: var(--remplissage);
+  border: 0;
+  border-radius: 10px;
+  padding: 2px;
+  gap: 0;
+}
+.app-membre .br {
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--encre);
+  min-height: 0;
+  transition:
+    background-color 0.25s var(--courbe),
+    box-shadow 0.25s var(--courbe),
+    color 0.2s ease;
+}
+body:not([data-mode='sitter']) .app-membre .br[data-mode='cycliste'],
+body[data-mode='sitter'] .app-membre .br[data-mode='sitter'] {
+  background: var(--surface);
+  color: var(--encre);
+  box-shadow:
+    0 3px 8px rgba(15, 31, 23, 0.12),
+    0 3px 1px rgba(15, 31, 23, 0.04),
+    0 0 0 0.5px rgba(15, 31, 23, 0.04);
+}
+@media (max-width: 899px) {
+  .app-membre .br {
+    padding: 6px 10px;
+    font-size: 12.5px;
+  }
+  .app-membre .app-header .bascule-role {
+    margin-right: 6px;
+  }
+}
+
+/* La cloche et l'avatar : deux cercles de même taille, alignés. */
+.app-membre .cloche {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: var(--remplissage);
+}
+.app-membre .cloche:hover {
+  background: var(--remplissage-fort);
+}
+.app-membre .cloche span {
+  right: -2px;
+  top: -2px;
+  min-width: 17px;
+  height: 17px;
+  font-size: 10.5px;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--fond-app);
+}
+.app-membre .app-header .avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--vert);
+  box-shadow: none;
+}
+
+/* -----------------------------------------------------------------------------
+   4. La barre d'onglets : dépolie, fine, à la mesure iOS
+   -------------------------------------------------------------------------- */
+@media (max-width: 899px) {
+  .tabbar {
+    background: var(--materiau);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-top: 0.5px solid var(--trait-fort);
+    box-shadow: none;
+    padding: 5px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+  }
+  .tb {
+    gap: 2px;
+    padding: 4px 2px;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    color: rgba(15, 31, 23, 0.46);
+  }
+  .tb.actif {
+    color: var(--vert);
+  }
+  .tb .tb-i {
+    transition: transform 0.25s var(--courbe-appui);
+  }
+  .tb:active .tb-i {
+    transform: scale(0.88);
+  }
+  .tb.actif .tb-i svg {
+    stroke-width: 2.1;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   5. Les boutons : des capsules qui répondent à l'appui
+   -------------------------------------------------------------------------- */
+:is(.primary, .rb-go, .rc-btn, .bouton.plein, .white, .bleu) {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition:
+    transform 0.18s var(--courbe-appui),
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+:is(.primary, .rb-go, .rc-btn, .bouton.plein) {
+  background: var(--vert);
+  color: #fff;
+  border: 0;
+  box-shadow:
+    0 1px 1px rgba(1, 60, 20, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+/* Le bouton de recherche et les anciens boutons bleus deviennent verts :
+   une action est verte, le bleu reste à l'identité vérifiée (règle 6). */
+:is(.rb-go, .bleu) {
+  background: var(--vert);
+  color: #fff;
+  border: 0;
+}
+:is(.primary, .rb-go, .rc-btn, .bouton.plein):hover {
+  transform: none;
+}
+@media (hover: hover) {
+  :is(.primary, .rb-go, .rc-btn, .bouton.plein):hover {
+    background: var(--vert-appuye);
+  }
+}
+:is(.primary, .rb-go, .rc-btn, .bouton.plein, .outline, .bouton.contour,
+  .rc-carte, .white, .danger):active {
+  transform: scale(0.97);
+}
+
+/* Le bouton secondaire : teinté de vert, avec un filet translucide — plus un
+   contour gris qui faisait « formulaire web ». */
+:is(.outline, .bouton.contour, .rc-carte) {
+  background: var(--vert-teinte);
+  color: var(--vert);
+  border: 1px solid var(--vert-trait);
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition:
+    transform 0.18s var(--courbe-appui),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+@media (hover: hover) {
+  :is(.outline, .bouton.contour, .rc-carte):hover {
+    background: var(--vert-teinte-forte);
+    border-color: var(--vert-trait);
+    color: var(--vert);
+  }
+}
+.danger {
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Les tailles : confortables au pouce, jamais massives. */
+@media (max-width: 1023px) {
+  :is(.primary, .outline, .danger, .white, .bleu, .rc-btn, .rc-carte) {
+    min-height: 46px;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+  .bouton {
+    min-height: 50px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .bouton.petit {
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   6. Les surfaces : des cartes dessinées par un filet, pas par une bordure
+   -------------------------------------------------------------------------- */
+.app-membre :is(.bloc, .dem-carte, .fav, .notif, .mod-carte, .carte,
+  .fp2-bloc, .carte-cote, .reco, .etat-vide, .rech-liste .rc) {
+  background: var(--surface);
+  border: 0;
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre-1);
+}
+.app-membre .guard-card {
+  background: var(--surface);
+  border: 0;
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre-1);
+}
+/* L'état d'une garde garde sa marque latérale (la couleur double le texte de
+   la pastille, règle 6). */
+.app-membre .guard-card.attente {
+  box-shadow:
+    inset 3px 0 0 var(--lamp, #c97a12),
+    var(--ombre-1);
+}
+.app-membre .guard-card.refus,
+.app-membre .guard-card.terminee {
+  box-shadow: var(--ombre-1);
+}
+
+/* Les cartes qu'on touche s'enfoncent légèrement. */
+.app-membre a:is(.dem-carte, .fav, .notif, .carte, .ligne, .reco):active,
+.app-membre :is(.dem-carte, .fav, .notif) a:active {
+  transform: scale(0.985);
+}
+.app-membre a:is(.dem-carte, .fav, .notif, .carte, .ligne, .reco) {
+  transition: transform 0.2s var(--courbe-appui);
+}
+
+/* -----------------------------------------------------------------------------
+   7. Les listes groupées, à la manière des Réglages
+   -------------------------------------------------------------------------- */
+.groupe {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border-radius: var(--r-groupe);
+  box-shadow: var(--ombre-1);
+  overflow: hidden;
+}
+.groupe + .groupe {
+  margin-top: 12px;
+}
+.rangee {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 10px 16px;
+  color: var(--encre);
+  text-decoration: none;
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+/* Le filet entre deux rangées commence après l'icône, comme sur iOS. */
+.rangee + .rangee::before,
+.groupe > li + li > .rangee::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 60px;
+  height: 0.5px;
+  background: var(--trait-fort);
+}
+.groupe.sans-icone .rangee + .rangee::before,
+.groupe.sans-icone > li + li > .rangee::before {
+  left: 16px;
+}
+a.rangee:active,
+button.rangee:active {
+  background: var(--surface-douce);
+}
+@media (hover: hover) {
+  a.rangee:hover {
+    background: var(--surface-douce);
+  }
+}
+.rangee-icone {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--vert);
+  color: #fff;
+}
+.rangee-icone.douce {
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+}
+.rangee-texte {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rangee-texte strong {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.rangee-texte > span {
+  font-size: 13.5px;
+  color: var(--encre-2);
+  line-height: 1.35;
+}
+.rangee-valeur {
+  flex: none;
+  font-size: 15px;
+  color: var(--encre-2);
+}
+.rangee-chevron {
+  flex: none;
+  color: var(--encre-3);
+}
+
+/* Les listes à tirets du profil (« Vos données ») deviennent des rangées. */
+.app-membre .liste-nette li {
+  padding-left: 0;
+}
+.app-membre .liste-nette li::before {
+  content: none;
+}
+.app-membre .ligne-verif {
+  padding: 12px 0;
+  border-top: 0.5px solid var(--trait-fort);
+}
+
+/* -----------------------------------------------------------------------------
+   8. Les chiffres d'accueil : une seule bande, trois colonnes
+   -------------------------------------------------------------------------- */
+.app-membre .prog-stats {
+  gap: 0;
+  background: var(--surface);
+  border-radius: var(--r-groupe);
+  box-shadow: var(--ombre-1);
+  overflow: hidden;
+}
+.app-membre .prog-stats > div {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 14px 6px 13px;
+}
+.app-membre .prog-stats > div + div {
+  box-shadow: inset 0.5px 0 0 var(--trait-fort);
+}
+.app-membre .prog-stats b {
+  font-family: var(--police-systeme-titre);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.app-membre .prog-stats span {
+  font-size: 12px;
+  color: var(--encre-2);
+  line-height: 1.3;
+}
+
+/* -----------------------------------------------------------------------------
+   9. Les contrôles segmentés (Mes gardes, Liste / Carte)
+   -------------------------------------------------------------------------- */
+.app-membre .tabs {
+  display: flex;
+  gap: 0;
+  padding: 2px;
+  margin: 18px 0 16px;
+  background: var(--remplissage);
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+}
+.app-membre .tabs :is(button, a) {
+  flex: 1 1 0;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--encre);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition:
+    background-color 0.25s var(--courbe),
+    box-shadow 0.25s var(--courbe);
+}
+.app-membre .tabs :is(button, a).active,
+.app-membre .tabs :is(button, a)[aria-selected='true'] {
+  background: var(--surface);
+  color: var(--encre);
+  border-bottom: 0;
+  box-shadow:
+    0 3px 8px rgba(15, 31, 23, 0.12),
+    0 3px 1px rgba(15, 31, 23, 0.04);
+}
+.app-membre .tabs :is(button, a)::after {
+  content: none;
+}
+
+/* Liste / Carte, sur téléphone. */
+@media (max-width: 1023px) {
+  #results .bascule {
+    background: var(--remplissage);
+    border: 0;
+    border-radius: 10px;
+    padding: 2px;
+    gap: 0;
+    margin: 2px auto 14px;
+  }
+  #results .bascule .bascule-btn {
+    min-height: 32px;
+    min-width: 120px;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--encre);
+  }
+  #results .bascule .bascule-btn.actif {
+    box-shadow:
+      0 3px 8px rgba(15, 31, 23, 0.12),
+      0 3px 1px rgba(15, 31, 23, 0.04);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   10. Les interrupteurs iOS
+   -------------------------------------------------------------------------- */
+:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']) {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: 51px;
+  height: 31px;
+  /* Les champs reçoivent 48 px de haut et une marge intérieure pour le
+     doigt : un interrupteur garde sa forme de piste. */
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  border-radius: 999px;
+  /* Éteint, la piste doit se voir sur le fond clair des cartes. */
+  background: rgba(118, 124, 120, 0.34);
+  cursor: pointer;
+  transition: background-color 0.25s var(--courbe);
+}
+:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch'])::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    0 3px 1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s var(--courbe);
+}
+:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):checked {
+  background: var(--vert);
+}
+:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):checked::before {
+  transform: translateX(20px);
+}
+:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):focus-visible {
+  outline: 3px solid var(--vert-trait);
+  outline-offset: 2px;
+}
+:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* -----------------------------------------------------------------------------
+   11. Les champs de saisie
+   -------------------------------------------------------------------------- */
+/* Sur iPhone, un champ en dessous de 16 px fait zoomer la page à la saisie. */
+@media (max-width: 1023px) {
+  :is(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='hidden']),
+    select, textarea) {
+    font-size: 16px;
+  }
+}
+.app-membre .champ > span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--encre-2);
+  margin-bottom: 6px;
+}
+.app-membre .champ :is(input, select, textarea) {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--r-champ);
+  background: var(--surface-douce);
+  box-shadow: inset 0 0 0 0.5px var(--trait-fort);
+  color: var(--encre);
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.app-membre .champ textarea {
+  padding: 12px 14px;
+  min-height: 110px;
+}
+.app-membre .champ :is(input, select, textarea):focus {
+  outline: none;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1.5px var(--vert),
+    0 0 0 4px var(--vert-teinte);
+}
+
+/* -----------------------------------------------------------------------------
+   12. Les feuilles (volet des filtres) : du bas de l'écran, sur téléphone
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .filtres-col {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 88dvh;
+    border: 0;
+    border-radius: 22px 22px 0 0;
+    padding: 26px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+    box-shadow:
+      0 0 0 100vmax rgba(10, 20, 14, 0.32),
+      var(--ombre-3);
+    z-index: 95;
+  }
+  /* La poignée, qui dit qu'on peut refermer. */
+  .filtres-col::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 36px;
+    height: 5px;
+    margin-left: -18px;
+    border-radius: 3px;
+    background: var(--remplissage-fort);
+  }
+  .filtres-col.ouvert {
+    animation: bs-feuille 0.5s var(--courbe) both;
+  }
+}
+@keyframes bs-feuille {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   13. Le mouvement : chaque écran arrive, rien ne gesticule
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* `backwards` : une fois l'entrée jouée, plus aucune transformation ne
+     reste sur l'écran (elle décalerait les éléments en position fixe). */
+  .app-membre > .site > * {
+    animation: bs-entree 0.42s var(--courbe) backwards;
+  }
+}
+@keyframes bs-entree {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   14. Les états vides
+   -------------------------------------------------------------------------- */
+.app-membre :is(.etat-vide, .vide, .carte.vide-liste) {
+  text-align: center;
+  padding: 32px 22px;
+}
+.app-membre .prog-note {
+  color: var(--encre-2);
+  font-size: 15px;
+  background: var(--surface);
+  border-radius: var(--r-groupe);
+  box-shadow: var(--ombre-1);
+  padding: 16px 18px;
+  margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   15. Les petits objets
+   -------------------------------------------------------------------------- */
+/* Les pastilles de statut : plus fines, sans capitales hurlantes. */
+.app-membre :is(.status, .pastille) {
+  letter-spacing: 0;
+}
+.app-membre .status {
+  text-transform: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+/* Les initiales : un disque doux plutôt qu'un bloc. */
+.app-membre .ini-c {
+  border-radius: 50%;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  font-weight: 700;
+}
+/* Le focus clavier, partout le même. */
+.app-membre :is(a, button, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--vert-trait);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   16. Accessibilité : transparence réduite, contraste renforcé
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-transparency: reduce) {
+  .app-membre .app-header,
+  .tabbar {
+    background: #f8f9f6;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-contrast: more) {
+  :root {
+    --trait: rgba(15, 31, 23, 0.3);
+    --trait-fort: rgba(15, 31, 23, 0.4);
+    --encre-2: rgba(15, 31, 23, 0.82);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   17. Les écrans d'accueil de l'application (espace cycliste, bike sitter)
+   -------------------------------------------------------------------------- */
+.ecran {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 18px 16px 40px;
+}
+@media (min-width: 900px) {
+  .ecran {
+    padding: 40px 24px 64px;
+  }
+}
+.ecran-tete {
+  margin: 4px 0 18px;
+}
+.ecran-intro {
+  margin: 6px 0 0;
+  font-size: 17px;
+  color: var(--encre-2);
+  letter-spacing: -0.01em;
+}
+.ecran section + section {
+  margin-top: 8px;
+}
+
+/* Le formulaire de recherche, posé comme une carte de l'application. */
+.espace-recherche .search-card {
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: var(--r-carte);
+  background: var(--surface);
+  box-shadow: var(--ombre-2);
+  padding: 8px;
+}
+.espace-recherche .search-card .field {
+  border-color: var(--trait);
+}
+.espace-recherche .search-card .field label {
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--encre-2);
+}
+.espace-recherche .search-submit {
+  border-radius: 14px;
+}
+
+/* Un titre de section avec son lien « Tout voir » à droite. */
+.titre-avec-lien {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.titre-avec-lien a {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vert);
+}
+
+/* La prochaine garde : une rangée large, la date en vignette. */
+.garde-a-venir {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre-1);
+  color: var(--encre);
+  transition: transform 0.2s var(--courbe-appui);
+}
+.garde-a-venir:active {
+  transform: scale(0.985);
+}
+.gav-date {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 58px;
+  border-radius: 14px;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  line-height: 1;
+}
+.gav-date b {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.gav-date span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.gav-texte {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gav-texte .status {
+  font-size: 13px;
+}
+.gav-texte strong {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+.gav-texte > span:last-child {
+  font-size: 14px;
+  color: var(--encre-2);
+}
+
+/* Les bike sitters favoris : un rail horizontal, qu'on fait glisser. */
+.rail {
+  display: flex;
+  gap: 10px;
+  margin: 0 -16px;
+  padding: 2px 16px 6px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+.rail > li {
+  flex: none;
+  scroll-snap-align: start;
+}
+.rail-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 138px;
+  padding: 14px;
+  background: var(--surface);
+  border-radius: 18px;
+  box-shadow: var(--ombre-1);
+  color: var(--encre);
+  transition: transform 0.2s var(--courbe-appui);
+}
+.rail-carte:active {
+  transform: scale(0.97);
+}
+.rail-initiale {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  font-size: 18px;
+  font-weight: 700;
+}
+.rail-carte strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.rail-carte > span:not(.rail-initiale) {
+  font-size: 13px;
+  color: var(--encre-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rail-carte .rail-note {
+  color: var(--encre);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* L'invitation à accueillir : une surface verte douce, un seul bouton. */
+.carte-accueillir {
+  margin-top: 28px !important;
+  padding: 22px 20px 20px;
+  border-radius: var(--r-carte);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(1, 118, 40, 0.14), transparent 60%),
+    var(--surface);
+  box-shadow: var(--ombre-1);
+}
+.carte-accueillir h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  margin: 0 0 6px;
+}
+.carte-accueillir p {
+  margin: 0 0 16px;
+  color: var(--encre-2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.carte-accueillir .primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Les demandes à traiter : une pile de cartes, le délai en ambre (ce qui
+   attend, règle 6). */
+.titre-compteur {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--remplissage);
+  color: var(--encre-2);
+  font-size: 13px;
+  font-weight: 700;
+  vertical-align: 3px;
+}
+.pile-cartes {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.demande-a-traiter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: var(--r-carte);
+  box-shadow: var(--ombre-1);
+  color: var(--encre);
+  transition: transform 0.2s var(--courbe-appui);
+}
+.demande-a-traiter:active {
+  transform: scale(0.985);
+}
+.demande-a-traiter .rail-initiale {
+  flex: none;
+  margin: 0;
+}
+.demande-a-traiter strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.demande-a-traiter .delai {
+  color: var(--lamp-ink, #7a4e0c);
+  font-weight: 500;
+}
+
+/* Une rangée qui porte un interrupteur (formulaire). */
+.rangee-interrupteur {
+  margin: 0;
+}
+.rangee-interrupteur label {
+  cursor: pointer;
+}
+.rangee-interrupteur input[type='checkbox'] {
+  margin-left: auto;
+}
+/* Le libellé de l'interrupteur hérite du style global des <label> : on lui
+   rend le dessin d'une rangée ordinaire. */
+.rangee-interrupteur label.rangee-texte {
+  display: flex;
+  margin: 0;
+  color: var(--encre);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.rangee-interrupteur label.rangee-texte strong {
+  color: var(--encre);
+}
+.rangee-interrupteur label.rangee-texte span {
+  font-weight: 400;
+  color: var(--encre-2);
+}
+
+/* -----------------------------------------------------------------------------
+   18. L'espace de modération
+   -------------------------------------------------------------------------- */
+/* L'ancienne coquille à barre latérale (colonne de 264-272 px) n'existe plus :
+   sur ordinateur, l'application tient sur une seule colonne. */
+@media (min-width: 840px) {
+  .app.app-membre {
+    display: block;
+  }
+}
+
+/* La modération est un espace à part : un seul en-tête (le sien), et pas la
+   barre d'onglets du membre, qui mènerait ailleurs. */
+.app-membre:has(.en-tete-moderation) > .app-header {
+  display: none;
+}
+body:has(.en-tete-moderation) .tabbar {
+  display: none !important;
+}
+body:has(.en-tete-moderation) {
+  padding-bottom: 0;
+}
+.en-tete-moderation .badge-mod {
+  margin-left: auto;
+  margin-right: 10px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Les rubriques : sept onglets, qui défilent sur téléphone au lieu d'élargir
+   la page. */
+.app-membre .tabs.onglets-moderation,
+.app-membre .onglets-haut {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent);
+}
+.app-membre .tabs.onglets-moderation::-webkit-scrollbar,
+.app-membre .onglets-haut::-webkit-scrollbar {
+  display: none;
+}
+.app-membre .tabs.onglets-moderation a {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+@media (min-width: 900px) {
+  .app-membre .tabs.onglets-moderation {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .app-membre .tabs.onglets-moderation a {
+    flex: 1 1 0;
+  }
+}
+
+/* Les étiquettes d'état des cartes : neutres par défaut ; l'ambre dit ce qui
+   attend, le rouge ce qui presse, le vert ce qui est actif (règle 6). */
+.app-membre .mod-etat {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--encre-2);
+}
+.app-membre .mod-etat.attente {
+  color: var(--lamp-ink, #7a4e0c);
+}
+.app-membre .mod-etat.rouge {
+  color: var(--alert-ink, #8c2f1e);
+}
+.app-membre .mod-etat.vert {
+  color: var(--vert);
+}
+.app-membre .mod-carte.urgent {
+  box-shadow:
+    inset 3px 0 0 var(--alert, #c0432c),
+    var(--ombre-1);
+}
+
+/* Un outil de travail : des boutons à la taille de leur libellé. */
+.app-membre .mod-carte :is(.bouton, .primary, .outline, .bleu, .danger) {
+  width: auto;
+  display: inline-flex;
+  min-height: 40px;
+  padding: 9px 18px;
+  font-size: 15px;
+  box-shadow: none;
+}
+.app-membre .mod-carte .actions-fin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Les puces de filtre respirent avant la liste. */
+.app-membre :is(.puces, .segments) {
+  margin-bottom: 16px;
+}
+
+/* Les chiffres du tableau de bord. */
+.app-membre .mod-chiffres > div {
+  background: var(--surface);
+  border: 0;
+  border-radius: var(--r-groupe);
+  box-shadow: var(--ombre-1);
+}
+.app-membre .mod-chiffres b {
+  font-family: var(--police-systeme-titre);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+/* Une rangée de la liste des membres : le nom, puis l'e-mail et le détail,
+   chacun sur sa ligne (le détail se collait au nom). */
+.app-membre .mod-carte .liste-nette li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 0;
+  border-top: 0.5px solid var(--trait-fort);
+}
+.app-membre .mod-carte .liste-nette li:first-child {
+  border-top: 0;
+}
+.app-membre .mod-carte .liste-nette li > span {
+  font-size: 13.5px;
+  color: var(--encre-2);
+}
+.app-membre .membre-email {
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.acces-moderation {
+  margin: 0 0 20px;
+}
+
+/* Le fond teinté vaut aussi pour le conteneur des écrans (la feuille des
+   maquettes le posait en blanc : les cartes blanches s'y perdaient). */
+.app-membre > .site {
+  background: var(--fond-app);
+}
+
+/* Les chiffres de la modération : deux colonnes serrées sur téléphone. */
+@media (max-width: 899px) {
+  .app-membre .mod-chiffres {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .app-membre .mod-chiffres > div {
+    margin: 0;
+    padding: 12px 14px;
+  }
+  .app-membre .mod-chiffres b {
+    font-size: 22px;
+  }
+  .app-membre .mod-chiffres span {
+    font-size: 13px;
+  }
+  .app-membre .mod-chiffres i,
+  .app-membre .mod-chiffres small {
+    font-size: 11.5px;
+  }
+}
+
+/* « Commencer ma candidature » : un lien en ligne dont la marge ne
+   s'appliquait pas — son rembourrage chevauchait l'encadré du dessus et
+   captait mal le toucher. Il devient un vrai bloc. */
+.bs-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 28px;
+}
+.app-membre .bs-non {
+  background: var(--surface);
+  border: 0;
+  border-radius: var(--r-groupe);
+  box-shadow: var(--ombre-1);
+}
+.app-membre .bs-carte-visuel .bs-chiffre {
+  background: var(--surface);
+  border: 0;
+  box-shadow: var(--ombre-1);
+}
+
+/* Les trois chiffres ne sont pas une carte dans une carte. */
+.app-membre .bs-carte-visuel {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   19. Les cases cachées des pastilles et tuiles de choix
+   Elles étaient en position absolue sans repère : chacune prenait la largeur
+   du formulaire à partir de sa pastille, dépassait de l'écran et forçait le
+   navigateur mobile à dézoomer toute la page (le toucher tombait alors à côté).
+   On les confine dans leur pastille.
+   -------------------------------------------------------------------------- */
+:is(.puce-choix, .tuile-choix) {
+  position: relative;
+}
+:is(.puce-choix, .tuile-choix) > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.code-reserve {
+  display: block;
+  margin-top: 16px;
+  text-align: left;
+}
+
+/* Les tuiles de type d'espace : un repère de sélection à droite. */
+.tuile-choix .tuile-coche {
+  flex: none;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--trait-fort);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.tuile-choix:has(input:checked) .tuile-coche {
+  box-shadow: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E")
+      center / 14px no-repeat,
+    var(--vert);
+}
+.tuile-choix:has(input:checked) {
+  border-color: var(--vert);
+  background: var(--vert-teinte);
+}
+.tuile-choix:has(input:focus-visible) {
+  outline: 3px solid var(--vert-trait);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   20. Le menu hamburger fermé ne laisse plus d'ombre sur la page
+   Rangé hors écran à droite, son ombre de 60 px débordait sur le bord de
+   chaque page publique (le « dégradé » gris). Fermé, il est aussi invisible,
+   ce qui retire ses liens du parcours au clavier.
+   -------------------------------------------------------------------------- */
+.hamburger-panneau {
+  box-shadow: none;
+  visibility: hidden;
+  transition:
+    transform 0.36s var(--courbe),
+    box-shadow 0.36s ease,
+    visibility 0s linear 0.36s;
+}
+.hamburger-panneau.ouvert {
+  visibility: visible;
+  box-shadow: -30px 0 60px rgba(6, 41, 26, 0.16);
+  transition:
+    transform 0.36s var(--courbe),
+    box-shadow 0.36s ease,
+    visibility 0s;
+}
+
+/* La connexion : « Rester connecté » et « Mot de passe oublié ? » sur une
+   même ligne, puis un bouton pleine largeur. */
+.connexion-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 2px 0 18px;
+}
+.connexion-options .fc-case {
+  margin: 0;
+}
+.lien-oubli {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vert);
+  white-space: nowrap;
+}
+.connexion-envoyer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+}
+
+/* -----------------------------------------------------------------------------
+   21. La recherche de l'accueil cycliste
+   Sur téléphone, la maquette empile la recherche en cartes (destination, puis
+   dépôt et reprise côte à côte, puis le bouton) — comme dans l'accueil
+   public. On garde ce dessin et on l'affine : des filets au lieu de
+   bordures, un bouton capsule sans ombre lourde.
+   -------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .espace-recherche .search-card {
+    box-shadow: none !important;
+  }
+  .espace-recherche .search-card .field.destination,
+  .espace-recherche .search-card .quand-mobile .qm {
+    border: 0;
+    border-radius: 16px;
+    box-shadow: var(--ombre-1);
+  }
+  .espace-recherche .search-card .field.destination:focus-within {
+    box-shadow:
+      inset 0 0 0 1.5px var(--vert),
+      0 0 0 4px var(--vert-teinte);
+  }
+  .espace-recherche .search-card .chercher {
+    min-height: 50px;
+    padding: 0 20px;
+    font-size: 17px;
+    font-weight: 600;
+    box-shadow: none;
+  }
+}
+.espace-recherche .autour {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vert-teinte);
+  color: var(--vert);
+}
+.espace-recherche .autour[aria-busy='true'] {
+  opacity: 0.55;
+}
+.loc-refusee {
+  margin: 0;
+  padding: 2px 4px;
+  font-size: 13.5px;
+  color: var(--lamp-ink, #7a4e0c);
+}
+@media (max-width: 720px) {
+  /* Le champ et « Autour de moi » sur une même ligne. */
+  .espace-recherche .search-card .cell-txt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .espace-recherche .search-card .cell-txt input {
+    flex: 1;
+    min-width: 0;
+  }
+  /* Pas de filets hérités autour des horaires. */
+  .espace-recherche .search-card .quand-mobile,
+  .espace-recherche .search-card .qm-bloc {
+    border: 0;
+    box-shadow: none;
+  }
+  /* Le bouton tient dans la largeur des cartes. */
+  .espace-recherche .search-card .chercher {
+    width: 100%;
+    margin: 2px 0 0;
+  }
+}
+@media (max-width: 720px) {
+  .espace-recherche .search-card .quand-mobile {
+    gap: 10px;
+  }
+  .espace-recherche .search-card .chercher {
+    margin-top: 8px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   22. Toutes les cartes de recherche (accueil public compris), sur téléphone
+   Mêmes défauts que dans l'application : « Autour de moi » passait sous le
+   champ, des filets traînaient autour des horaires, le bouton débordait.
+   -------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .search-card .cell-txt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search-card .cell-txt input {
+    flex: 1;
+    min-width: 0;
+  }
+  .search-card .autour {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--vert-teinte);
+    color: var(--vert);
+  }
+  .search-card .quand-mobile,
+  .search-card .qm-bloc {
+    border: 0;
+    box-shadow: none;
+  }
+  /* La maquette force ailleurs un écart nul avec !important. */
+  .search-card .quand-mobile {
+    gap: 10px !important;
+  }
+  .search-card .field.destination,
+  .search-card .quand-mobile .qm {
+    border: 0;
+    border-radius: 16px;
+    box-shadow: var(--ombre-1);
+  }
+  .search-card .chercher,
+  .hero .search-card .chercher {
+    width: 100%;
+    margin: 8px 0 0;
+    min-height: 50px;
+    padding: 0 20px;
+    border-radius: 999px;
+    font-size: 17px;
+    font-weight: 600;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+/* Le grand titre de l'accueil public : l'approche était réglée pour l'ancienne
+   police ; en police système, les mots se touchaient. */
+.hero h1 {
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+@media (max-width: 720px) {
+  .search-card .quand-mobile .qm-bloc:last-child {
+    border-left: 0;
+  }
+}
+
+.demande-a-traiter .gav-texte .delai {
+  color: var(--lamp-ink, #7a4e0c);
+}
+
+/* -----------------------------------------------------------------------------
+   23. L'écran de décision du bike sitter (nouvelle demande)
+   -------------------------------------------------------------------------- */
+/* Le délai de réponse est une attente : ambre, pas rouge (règle 6). */
+.app-membre .delai-bandeau {
+  background: var(--lamp-wash, #fbf1de);
+  border: 0;
+  color: var(--lamp-ink, #7a4e0c);
+  border-radius: 14px;
+  font-weight: 500;
+}
+/* Les informations de la demande : une seule liste groupée. */
+.app-membre .champs.lecture {
+  display: block;
+  max-width: none;
+  background: var(--surface);
+  border-radius: var(--r-groupe);
+  box-shadow: var(--ombre-1);
+  overflow: hidden;
+}
+.app-membre .champs.lecture > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 16px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.app-membre .champs.lecture > div + div {
+  border-top: 0.5px solid var(--trait-fort);
+}
+.app-membre .champs.lecture span {
+  flex: none;
+  font-size: 14px;
+  color: var(--encre-2);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.app-membre .champs.lecture b {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: right;
+}
+.lien-profil {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vert);
+}
+/* Refuser | Accepter : deux boutons côte à côte, à portée du pouce. */
+.barre-decision {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  gap: 10px;
+  margin-top: 22px;
+}
+.barre-decision form {
+  margin: 0;
+}
+.barre-decision :is(.primary, .outline) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+}
+@media (max-width: 899px) {
+  .barre-decision {
+    position: sticky;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    z-index: 5;
+    margin: 22px -18px 0;
+    padding: 10px 18px;
+    /* Opaque : le texte de la demande ne doit pas se lire à travers les
+       deux boutons de la décision. */
+    background: var(--fond-app, #f2f3ef);
+    box-shadow: 0 -0.5px 0 var(--trait-fort);
+  }
+}
+
+/* La page introuvable : calme, centrée, deux chemins pour repartir. */
+.introuvable {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 64px;
+}
+.introuvable-icone {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+  border-radius: 20px;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+}
+.introuvable .ecran-intro {
+  max-width: 34ch;
+}
+.introuvable-actions {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin-top: 26px;
+}
+.introuvable-actions :is(.primary, .outline) {
+  display: flex;
+  justify-content: center;
+}
+
+/* -----------------------------------------------------------------------------
+   24. Règle 6 : ce qui est vérifié est bleu, et se lit comme une étiquette
+   -------------------------------------------------------------------------- */
+.fp2-role {
+  color: var(--verified-ink, #0e5cb8);
+}
+.v-check {
+  background: var(--verified, #1677e8) !important;
+  color: #fff !important;
+}
+/* « Identité vérifiée » : une pastille, pas un surlignage collé au prénom. */
+.tag.ver,
+.dem-carte b .tag.ver,
+.dem-qui .tag.ver,
+#bsprofil .tag.ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 2px 9px 2px 7px;
+  border-radius: 999px;
+  background: var(--verified-wash, #e7f1fe);
+  color: var(--verified-ink, #0e5cb8);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.5;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+.tag.ver::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* -----------------------------------------------------------------------------
+   25. Les deux frises « suivi »
+   Deux dessins portent le même nom : la frise de garde (pastilles
+   `.suivi-point` reliées par un trait) et la frise numérotée de la maquette
+   (cercles 1, 2, 3). Leurs règles se mélangeaient : le trait écrasait les
+   cercles en une barre de 2 px, et la mise en ligne cassait le texte. On les
+   sépare selon leur contenu.
+   -------------------------------------------------------------------------- */
+/* La frise de garde, à pastilles. */
+.suivi li:has(.suivi-point) {
+  padding: 0 0 16px;
+  border-top: 0;
+}
+.suivi li:has(.suivi-point):not(:last-child)::before {
+  content: '';
+  top: 26px;
+  bottom: 0;
+  left: 11px;
+  width: 2px;
+  height: auto;
+  border: 0;
+  border-radius: 1px;
+  background: var(--trait-fort);
+}
+.suivi li.fait:has(.suivi-point):not(:last-child)::before {
+  background: var(--vert);
+}
+.suivi li:has(.suivi-point):last-child::before {
+  content: none;
+}
+/* La frise numérotée. */
+.suivi li:not(:has(.suivi-point)) {
+  display: block;
+  padding: 14px 0 14px 44px;
+  border-top: 0.5px solid var(--trait-fort);
+}
+.suivi li:not(:has(.suivi-point)):first-child {
+  border-top: 0;
+}
+.suivi li:not(:has(.suivi-point))::before {
+  content: counter(e);
+  top: 14px;
+  bottom: auto;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--trait-fort);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--encre-2);
+  font-size: 13px;
+  font-weight: 700;
+}
+/* Une étape faite porte une coche tracée, comme les icônes de l'application,
+   plutôt que le caractère « ✓ », dont le dessin change d'un téléphone à
+   l'autre. */
+.suivi li.fait:not(:has(.suivi-point))::before,
+.fil-etapes li.fait::before {
+  content: '';
+  background: var(--vert) var(--coche-blanche) center / 16px no-repeat;
+  border-color: var(--vert);
+  color: #fff;
+}
+.suivi li.encours:not(:has(.suivi-point))::before {
+  border-color: var(--vert);
+  color: var(--vert);
+}
+
+/* -----------------------------------------------------------------------------
+   26. Les actions d'une garde : une action principale, puis une liste
+   L'action attendue reste un bouton vert pleine largeur. Les autres (prolonger,
+   prévenir d'un retard, écrire, annuler) deviennent des rangées blanches
+   alignées à gauche, avec leur icône — au lieu d'une pile de boutons teintés
+   identiques qu'on ne distinguait pas.
+   -------------------------------------------------------------------------- */
+.app-membre .actions-de-garde {
+  display: grid;
+  gap: 8px;
+}
+.app-membre .actions-de-garde form {
+  margin: 0;
+}
+.app-membre .actions-de-garde :is(.bouton.contour, .bouton.danger-contour) {
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--ombre-1);
+  color: var(--encre);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.app-membre .actions-de-garde .bouton.contour svg {
+  color: var(--vert);
+}
+.app-membre .actions-de-garde .bouton.danger-contour {
+  color: var(--alert-ink, #8c2f1e);
+}
+@media (hover: hover) {
+  .app-membre .actions-de-garde :is(.bouton.contour, .bouton.danger-contour):hover {
+    background: var(--surface-douce);
+  }
+}
+.app-membre .actions-de-garde .bouton.discret {
+  margin-top: 4px;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+/* Annuler descend en fin de liste, en corail : c'est l'action qui défait. */
+.app-membre .actions-de-garde a[href$='/motif/annuler'],
+.app-membre .actions-de-garde a[href$='/motif/annuler'] {
+  order: 20;
+  color: var(--alert-ink, #8c2f1e);
+}
+.app-membre .actions-de-garde .bouton.discret {
+  order: 30;
+}
+.app-membre .actions-de-garde .bouton.discret.texte-rouge {
+  color: var(--alert-ink, #8c2f1e);
+}
+
+/* « Disponible maintenant » : le bike sitter peut ouvrir tout de suite. */
+.pastille-dispo.maintenant {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  font-weight: 600;
+}
+
+/* La confirmation flottante : une bulle sombre sous l'en-tête, qui arrive
+   puis s'efface. */
+.confirmation-flottante {
+  position: fixed;
+  top: calc(72px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* Posée à mi-largeur, la bulle se tassait sur la moitié droite de l'écran
+     et un message long devenait un disque : elle prend la largeur de son
+     texte, dans la limite de l'écran. */
+  width: max-content;
+  max-width: min(calc(100vw - 32px), 460px);
+  padding: 10px 18px 10px 14px;
+  border-radius: 18px;
+  background: rgba(16, 35, 26, 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: var(--ombre-3);
+  opacity: 0;
+  transform: translate(-50%, -12px) scale(0.98);
+  transition:
+    opacity 0.35s var(--courbe),
+    transform 0.45s var(--courbe);
+  pointer-events: none;
+}
+.confirmation-flottante.visible {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+.confirmation-flottante svg {
+  flex: none;
+  color: #7ed79b;
+}
+
+/* -----------------------------------------------------------------------------
+   27. Mes avis
+   Les avis donnés sont des rangées sans lien : le texte peut courir sur
+   plusieurs lignes, l'état de publication se lit dans une pastille.
+----------------------------------------------------------------------------- */
+.rangee-avis-donne {
+  align-items: flex-start;
+}
+.rangee-avis-donne .rangee-texte > span:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.rangee-avis-donne .status {
+  font-size: 12px;
+}
+.pile-cartes > .carte {
+  margin: 0;
+}
+
+/* Un compteur est neutre ; seul celui des demandes qui attendent une réponse
+   prend l'ambre (règle 6 : ce qui est en cours). Collé au titre, pas rejeté
+   au bout de la ligne. */
+.titre-section:has(> .titre-compteur) {
+  justify-content: flex-start;
+}
+.titre-compteur.attente {
+  background: var(--lamp, #c97a12);
+  color: #fff;
+}
+
+/* -----------------------------------------------------------------------------
+   28. Sur ordinateur : une barre latérale, des écrans alignés sur son bord
+   Sur téléphone, la navigation vit dans la barre d'onglets du bas. Sur
+   ordinateur, ces mêmes destinations deviennent une barre latérale : sans
+   elle, un membre n'avait plus que l'en-tête pour se déplacer. Les écrans
+   partent du bord de la barre, à la même largeur partout, au lieu d'une
+   colonne centrée différente d'une page à l'autre.
+   Seulement dans l'application : le site public n'a jamais de barre latérale.
+   -------------------------------------------------------------------------- */
+@media (min-width: 900px) {
+  body:has(.app-membre):not(:has(.en-tete-moderation)) {
+    --largeur-barre: 232px;
+  }
+  body:has(.app-membre):not(:has(.en-tete-moderation)):not([data-mode='sitter'])
+    .tabbar-cycliste,
+  body:has(.app-membre):not(:has(.en-tete-moderation))[data-mode='sitter']
+    .tabbar-sitter {
+    display: flex;
+  }
+  body:has(.app-membre) .tabbar {
+    position: fixed;
+    top: 61px;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    z-index: 40;
+    width: var(--largeur-barre, 232px);
+    flex-direction: column;
+    gap: 2px;
+    padding: 20px 12px;
+    background: var(--fond-app);
+    border: 0;
+    border-right: 0.5px solid var(--trait-fort);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  body:has(.app-membre) .tabbar .tb {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--encre-2);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  body:has(.app-membre) .tabbar .tb .tb-i {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+  }
+  body:has(.app-membre) .tabbar .tb .tb-i svg {
+    width: 20px;
+    height: 20px;
+  }
+  body:has(.app-membre) .tabbar .tb:hover {
+    background: rgba(15, 31, 23, 0.05);
+    color: var(--encre);
+  }
+  body:has(.app-membre) .tabbar .tb.actif {
+    background: var(--surface);
+    color: var(--vert);
+    box-shadow: var(--ombre-1);
+  }
+  body:has(.app-membre) .tabbar .tb:focus-visible {
+    outline: 2px solid var(--vert);
+    outline-offset: 2px;
+  }
+
+  body:has(.app-membre):not(:has(.en-tete-moderation)) .app-membre > .site {
+    margin-left: var(--largeur-barre);
+  }
+  .app-membre > .site
+    :is(
+      .ecran,
+      .dashboard-wrap,
+      .page.page-etroite,
+      .ecran-app.ecran-parcours,
+      .ecran-app.centre-vertical,
+      .ecran-membre
+    ) {
+    max-width: 860px;
+    margin-inline: 0;
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+  .app-membre > .site :is(.ecran, .dashboard-wrap, .page.page-etroite) {
+    padding-top: 40px;
+  }
+  .app-membre > .site .ecran-app.ecran-large {
+    max-width: none;
+    margin-inline: 0;
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   29. La liste des conversations
+   -------------------------------------------------------------------------- */
+.rangee.conversation .rail-initiale {
+  flex: none;
+  margin: 0;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+}
+.rangee.conversation.non-lue .rangee-texte strong {
+  font-weight: 650;
+}
+.point-non-lu {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--vert);
+}
+
+/* La destination sur ordinateur : le bouton « Autour de moi » se range à
+   droite du champ au lieu de tomber dessous. */
+@media (min-width: 721px) {
+  .espace-recherche .search-card .cell-txt {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 8px;
+  }
+  .espace-recherche .search-card .cell-txt .cell-lab {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Les vérifications de la fiche : l'état s'écrit en toutes lettres, en bleu
+   quand il est acquis (règle 6), en gris tant qu'il ne l'est pas. */
+.app-membre .verifs li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app-membre .verifs .vi {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--remplissage);
+  color: var(--encre-2);
+  font-size: 0;
+}
+.app-membre .verifs li > div {
+  flex: 1;
+}
+.app-membre .verifs .v-ok {
+  flex: none;
+  width: auto;
+  height: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--verified-wash, #e7f0fd);
+  color: var(--verified-ink, #0f5bb5);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.app-membre .verifs .v-ok.v-non {
+  background: var(--remplissage);
+  color: var(--encre-2);
+}
+
+/* -----------------------------------------------------------------------------
+   30. Le code à dicter
+   Il se lit à voix haute, parfois dans une cave, le téléphone tendu : deux
+   groupes de trois chiffres, très grands, en chiffres de même largeur.
+   -------------------------------------------------------------------------- */
+.code-a-dicter {
+  margin: 18px 0 8px;
+  padding: 26px 20px 20px;
+  border-radius: var(--r-carte, 20px);
+  background: var(--surface);
+  box-shadow: var(--ombre-2);
+  text-align: center;
+}
+.code-chiffres {
+  display: flex;
+  justify-content: center;
+  gap: 0.45em;
+  margin: 0;
+  font-size: clamp(44px, 14vw, 64px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre);
+}
+.code-a-dicter .code-aide {
+  margin: 16px auto 0;
+  max-width: 34ch;
+  font-size: 14px;
+  color: var(--encre-2);
+}
+.code-a-dicter.expire .code-chiffres {
+  color: var(--encre-2);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+/* La fin d'une garde close se lit en corail (règle 6) : refus, annulation,
+   expiration. Le libellé l'écrit aussi en toutes lettres. */
+.suivi li.close .suivi-point {
+  background: var(--alert, #c0432c);
+  border-color: var(--alert, #c0432c);
+}
+.suivi li.close strong {
+  color: var(--alert, #c0432c);
+}
+
+/* -----------------------------------------------------------------------------
+   31. Les notifications
+   Une rangée par notification : l'icône dit de quoi il s'agit, le point vert
+   ce qui n'a pas été lu, le corail ce qui est urgent (règle 6).
+   -------------------------------------------------------------------------- */
+.notifs-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: -6px 0 8px;
+}
+.notifs-actions .lien {
+  border: 0;
+  background: none;
+  padding: 6px 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vert);
+  cursor: pointer;
+}
+.rangee.notification {
+  align-items: flex-start;
+}
+.rangee.notification .rangee-icone {
+  margin-top: 1px;
+}
+.rangee.notification .rangee-texte strong {
+  font-weight: 400;
+  font-size: 15.5px;
+  line-height: 1.35;
+}
+.rangee.notification.non-lue .rangee-texte strong {
+  font-weight: 600;
+}
+.rangee.notification .point-non-lu {
+  margin-top: 7px;
+}
+.rangee.notification.urgente .rangee-icone {
+  background: var(--alert, #c0432c);
+}
+
+.compositeur-etat {
+  margin: 0;
+  font-size: 13px;
+  color: var(--encre-2);
+}
+.compositeur-etat:empty {
+  display: none;
+}
+
+/* Un code refusé : le champ s'entoure de corail, y compris sous le focus,
+   au lieu d'un filet rouge dans un anneau vert. */
+.code-row input[aria-invalid='true'],
+.code-row input[aria-invalid='true']:focus {
+  border-color: var(--alert, #c0432c);
+  box-shadow: 0 0 0 3px rgba(192, 67, 44, 0.16);
+}
+.code-box2 .code-reserve {
+  margin: 0 0 16px;
+}
+
+/* Les étoiles d'une note : l'encre, pas le jaune. Aucune couleur n'est
+   décorative (règle 6) ; la note s'écrit aussi en chiffres. */
+.app-membre .note-fiche,
+.app-membre .etoiles:not(:has(button, a)) {
+  color: var(--encre);
+}
+.app-membre .etoiles .texte-leger {
+  color: var(--trait-fort);
+}
+
+/* La fiche d'un bike sitter : ses initiales au lieu de la photo du lieu, et
+   un fil d'Ariane sur une ligne. */
+.fp2-photo.fp2-initiale {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--vert-teinte-forte, #dcebdf);
+  color: var(--vert);
+  font-size: 28px;
+  font-weight: 700;
+}
+.app-membre .fp2 .fil,
+.app-membre nav.fil {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--encre-2);
+}
+.app-membre nav.fil a {
+  color: var(--vert);
+  text-decoration: none;
+}
+.app-membre nav.fil b {
+  font-weight: 500;
+  color: var(--encre);
+}
+
+.vignette-app.vignette-personne {
+  display: grid;
+  place-items: center;
+  background: var(--vert-teinte-forte, #dcebdf);
+  color: var(--vert);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+/* La fiche : les faits en liste groupée, les vélos acceptés en puces, les
+   jours en deux lettres, et pas de grand vide au-dessus du fil d'Ariane. */
+.app-membre .fp2-faits-liste {
+  margin: 18px 0 6px;
+}
+.app-membre .fp2-faits-liste .rangee {
+  min-height: 0;
+}
+.app-membre .velos-acceptes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.app-membre .fp2-dist {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.app-membre table.dispo th abbr {
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.app-membre table.dispo tbody th {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+@media (max-width: 899px) {
+  .app-membre #profile .profile-wrap {
+    margin-top: 0;
+    padding-top: 4px;
+  }
+}
+
+.hero .trust-strip span svg {
+  flex: none;
+  color: var(--vert);
+}
+.hero .trust-strip .verified svg {
+  color: var(--blue, #1677e8);
+}
+.rc-trois svg.rc-i {
+  flex: none;
+  color: var(--vert);
+}
+
+/* Les raccourcis de « Mes gardes » passent à la ligne plutôt que d'être
+   coupés au bord de l'écran. */
+.app-membre nav.raccourcis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  overflow: visible;
+  margin-top: 16px;
+}
+.app-membre nav.raccourcis a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.rb-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+/* Les libellés de la barre de recherche en casse de phrase, comme ailleurs. */
+.app-membre .rb-lab {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.suivi li:is(.fait, .close) .suivi-point {
+  color: #fff;
+}
+.suivi li:is(.fait, .close) .suivi-point svg {
+  stroke: currentColor;
+}
+
+.bouton-ajout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Les raisons d'un envoi impossible : une ligne chacune, dans l'encart. */
+.encart .raison-du-refus {
+  display: block;
+}
+.encart .raison-du-refus + .raison-du-refus {
+  margin-top: 4px;
+}
+
+/* Une initiale a toujours son rond teinté, même posée sur une carte blanche. */
+.app-membre .avatar-app,
+.app-membre .personne-de-garde .avatar-app {
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  font-weight: 700;
+}
+
+/* Le cœur des favoris, en haut à droite de la fiche. */
+.fp2-ident {
+  position: relative;
+}
+.fp2-favori {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+}
+.bouton-coeur {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--remplissage);
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: transform 0.18s var(--courbe-appui, ease), color 0.2s ease;
+}
+.bouton-coeur.actif {
+  color: var(--vert);
+  background: var(--vert-teinte);
+}
+.bouton-coeur:active {
+  transform: scale(0.92);
+}
+.bouton-coeur:focus-visible {
+  outline: 2px solid var(--vert);
+  outline-offset: 2px;
+}
+
+/* Les options de sécurité du volet de filtres : libellé à gauche,
+   interrupteur à droite. */
+.fc-bloc .reglages li.rangee-interrupteur {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+.fc-bloc .reglages li.rangee-interrupteur label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--encre);
+}
+.fc-bloc .reglages li.rangee-interrupteur label span {
+  font-size: 13px;
+  color: var(--encre-2);
+}
+
+/* La déconnexion, seule en bas de « Plus » : une rangée, en corail, sans
+   chevron — elle ne mène nulle part, elle agit. */
+.plus-deconnexion {
+  margin: 28px 0 0;
+}
+.rangee.rangee-deconnexion {
+  width: 100%;
+  border: 0;
+  border-radius: var(--r-carte, 20px);
+  background: var(--surface);
+  box-shadow: var(--ombre-1);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rangee.rangee-deconnexion .rangee-icone {
+  background: var(--alert, #c0432c);
+}
+.rangee.rangee-deconnexion strong {
+  color: var(--alert, #c0432c);
+}
+
+/* Un envoi lourd de conséquences (refuser une pièce, suspendre un compte) :
+   corail plein, jamais le vert d'une action ordinaire (règle 6). */
+.app-membre .bouton.danger {
+  background: var(--alert, #c0432c);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+}
+.app-membre .bouton.danger:disabled {
+  opacity: 0.5;
+}
+
+/* « Identité vérifiée » sur les cartes de résultat : le bleu de la
+   protection (règle 6), avec le bouclier. */
+.rc-verifie {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--verified-ink, #0e5cb8);
+  font-weight: 600;
+}
+.rc-verifie::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* Le compteur de la cloche : le vert de la marque, pas le corail d'une
+   erreur (règle 6). */
+.app-membre .cloche span {
+  background: var(--vert);
+  color: #fff;
+}
+
+/* Les puces de filtre de la modération : la marge négative de la maquette
+   supposait un écran à 20 px de marge ; ici, elle débordait de 4 px. */
+.app-membre nav.puces {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.onglet-nombre {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--remplissage-fort, rgba(15, 31, 23, 0.1));
+  color: var(--encre-2);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.tabs .active .onglet-nombre {
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+}
+
+/* Le bouton de la barre de recherche, sur ordinateur : à la hauteur d'un
+   bouton, pas de toute la barre. */
+@media (min-width: 900px) {
+  .app-membre .rb-go {
+    align-self: center;
+    height: 48px;
+    min-height: 0;
+    padding: 0 22px;
+    font-size: 15px;
+  }
+}
+
+/* Une erreur de formulaire, sous les champs : un encart corail détaché du
+   bouton, pas une ligne grise collée dessus. */
+form > p.msg-erreur[role='alert'] {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--rouge-lavis, #fbeae6);
+  color: #9a2525;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+/* Les onglets de « Mes gardes » : le compteur à côté du titre. */
+.app-membre .tabs[role='tablist'] button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+/* Les cartes de « Mes gardes » : texte aligné à gauche, comme la carte, et
+   des boutons à la mesure d'un pouce, pas plus. */
+.app-membre .guard-card .notice {
+  text-align: left;
+}
+.app-membre .guard-actions :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* Une pastille d'état n'est pas un bouton : à plat, sans ombre. Les encarts
+   d'information aussi restent à plat. */
+.app-membre .pastille {
+  box-shadow: none;
+}
+.app-membre .ligne-info .pastille {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+.app-membre .encart {
+  box-shadow: none;
+  border-radius: 16px;
+}
+.app-membre .prog-stats + .recos,
+.app-membre .prog-stats + .cat-filtres {
+  margin-top: 16px;
+}
+.app-membre .encart > span {
+  font-weight: 450;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.app-membre .encart > span strong {
+  display: block;
+  font-weight: 650;
+}
+
+/* Sur ordinateur, la flèche retour se place au-dessus de la colonne de
+   contenu : la marque ne bouge plus d'un écran à l'autre. */
+@media (min-width: 900px) {
+  body:has(.app-membre):not(:has(.en-tete-moderation)) .app-membre > .app-header .back {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--largeur-barre, 232px) + 36px);
+    transform: translateY(-50%);
+    margin: 0;
+  }
+}
+.app-membre :is(.groupe, .pile-cartes) + .prog-note {
+  margin-top: 14px;
+}
+
+/* -----------------------------------------------------------------------------
+   32. Le visage d'un membre : photo de profil ou initiale
+   -------------------------------------------------------------------------- */
+.avatar-membre {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  font-weight: 700;
+  line-height: 1;
+}
+.avatar-membre img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* -----------------------------------------------------------------------------
+   33. L'en-tête du compte : la photo, le nom
+   Comme la fiche d'un contact sur iPhone : le visage au centre, un petit
+   appareil photo pour le changer, le nom dessous.
+   -------------------------------------------------------------------------- */
+.profil-tete {
+  margin: 8px 0 22px;
+  padding: 24px 20px 20px;
+  border-radius: var(--r-carte, 20px);
+  background: var(--surface);
+  box-shadow: var(--ombre-1);
+  text-align: center;
+}
+.profil-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+}
+.profil-visage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vert-teinte-forte);
+  color: var(--vert);
+  font: inherit;
+  font-size: 42px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s var(--courbe-appui, ease);
+}
+.profil-visage:active {
+  transform: scale(0.97);
+}
+.profil-visage:focus-visible {
+  outline: 3px solid var(--vert);
+  outline-offset: 3px;
+}
+.profil-visage img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.profil-visage-badge {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--vert);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--surface);
+}
+.profil-identite h1 {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+.profil-identite p {
+  margin: 6px auto 0;
+  max-width: 34ch;
+  font-size: 14.5px;
+  color: var(--encre-2);
+}
+.profil-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.profil-actions .primary {
+  min-height: 44px;
+  padding: 0 22px;
+}
+.profil-tete .lien {
+  border: 0;
+  background: none;
+  padding: 8px 4px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vert);
+  cursor: pointer;
+}
+.profil-retirer {
+  margin: 6px 0 0;
+}
+.profil-retirer .lien {
+  color: var(--alert, #c0432c);
+}
+.profil-erreur {
+  margin: 10px auto 0;
+  max-width: 36ch;
+  font-size: 14px;
+  color: #9a2525;
+}
+.app-membre .app-header .avatar.avatar-avec-photo {
+  overflow: hidden;
+  padding: 0;
+  background: var(--vert-teinte-forte);
+}
+.app-membre .app-header .avatar.avatar-avec-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* La liste des conversations : nom et heure sur une ligne, l'aperçu du
+   dernier message dessous, comme dans Messages sur iPhone. */
+.rangee.conversation {
+  align-items: center;
+}
+.conversation-ligne {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.conversation-ligne time {
+  flex: none;
+  font-size: 13px;
+  color: var(--encre-2);
+}
+.rangee-texte > .conversation-apercu {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14.5px;
+  color: var(--encre-2);
+}
+.rangee.conversation.non-lue .conversation-apercu {
+  color: var(--encre);
+}
+.rangee-texte > .conversation-garde {
+  font-size: 12.5px;
+  color: var(--encre-2);
+  opacity: 0.85;
+}
+.rail-carte .rail-avatar {
+  margin-bottom: 8px;
+}
+.dem-qui .avatar-membre,
+.personne-de-garde .lien-avatar {
+  flex: none;
+}
+.personne-de-garde .lien-avatar {
+  display: inline-flex;
+  border-radius: 50%;
+}
+
+/* Le profil public d'un membre : le visage à gauche, le nom à côté. */
+.profil-public-tete {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 8px 0 20px;
+}
+.profil-public-tete h1 {
+  margin: 2px 0 6px;
+}
+.profil-public-tete .kicker {
+  margin: 0;
+}
+.profil-public-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Les valeurs saisies s'écrivent en poids normal : le gras est réservé aux
+   titres. Les pastilles d'une liste de vérifications restent compactes. */
+.app-membre :is(.champ, .champ-texte, .champ-app) :is(input, select, textarea) {
+  font-weight: 450;
+}
+.app-membre .ligne-verif .pastille {
+  min-height: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+}
+.avis2 .a2-tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* -----------------------------------------------------------------------------
+   34. Une photo de message, en grand
+   -------------------------------------------------------------------------- */
+button.bulle-photo {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.photo-en-grand {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: none;
+}
+.photo-en-grand[open] {
+  display: grid;
+  place-items: center;
+}
+.photo-en-grand::backdrop {
+  background: rgba(0, 0, 0, 0.92);
+}
+.photo-en-grand > img {
+  max-width: 100%;
+  max-height: 100dvh;
+  object-fit: contain;
+}
+.photo-en-grand form {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: 14px;
+  margin: 0;
+}
+.photo-en-grand-fermer {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .photo-en-grand[open] > img {
+    animation: bs-entree 0.28s var(--courbe) backwards;
+  }
+}
+
+.infos-compte {
+  margin: 14px 0 4px;
+  border-radius: 14px;
+  background: var(--surface-douce, #f6f7f4);
+  box-shadow: inset 0 0 0 0.5px var(--trait-fort);
+}
+.infos-compte > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+}
+.infos-compte > div + div {
+  border-top: 0.5px solid var(--trait-fort);
+}
+.infos-compte dt {
+  font-size: 14px;
+  color: var(--encre-2);
+}
+.infos-compte dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--encre);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* -----------------------------------------------------------------------------
+   35. Une invitation : le code, sa validité, de quoi le transmettre
+   -------------------------------------------------------------------------- */
+.invitation {
+  padding: 18px;
+  border-radius: var(--r-carte, 20px);
+  background: var(--surface);
+  box-shadow: var(--ombre-1);
+}
+.invitation-principale {
+  box-shadow: var(--ombre-2);
+}
+.invitation-code {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.invitation-libelle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--encre-2);
+}
+.invitation-code b {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre);
+}
+.invitation:not(.invitation-principale) .invitation-code b {
+  font-size: 22px;
+}
+.invitation-validite {
+  font-size: 13.5px;
+  color: var(--encre-2);
+}
+.invitation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.invitation-actions :is(.primary, .outline) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 15px;
+}
+.invitation-a-recopier {
+  width: 100%;
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface-douce, #f6f7f4);
+  box-shadow: inset 0 0 0 1px var(--trait-fort);
+  font: inherit;
+  font-size: 14px;
+}
+
+/* Les codes secondaires : une rangée compacte, le code à gauche, les gestes
+   à droite ; le premier code garde toute la place. */
+.invitation:not(.invitation-principale) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  padding: 14px 16px;
+  box-shadow: var(--ombre-1);
+}
+.invitation:not(.invitation-principale) .invitation-libelle {
+  display: none;
+}
+.invitation:not(.invitation-principale) .invitation-code b {
+  font-size: 18px;
+}
+.invitation:not(.invitation-principale) .invitation-validite {
+  font-size: 12.5px;
+}
+.invitation:not(.invitation-principale) .invitation-actions {
+  margin-top: 0;
+  gap: 6px;
+}
+.invitation:not(.invitation-principale) .invitation-actions :is(.primary, .outline) {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13.5px;
+}
+.invitation:not(.invitation-principale) .invitation-actions .primary {
+  background: var(--vert-teinte);
+  color: var(--vert);
+  box-shadow: inset 0 0 0 1px var(--vert-trait);
+}
+
+/* Un interrupteur qui envoie un formulaire (sans JavaScript) : le même
+   dessin que les interrupteurs iOS de l'application. */
+.interrupteur-envoi {
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(120, 120, 128, 0.24);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.interrupteur-envoi > span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
+  transition: transform 0.25s var(--courbe, ease);
+}
+.interrupteur-envoi.actif {
+  background: var(--vert);
+}
+.interrupteur-envoi.actif > span {
+  transform: translateX(20px);
+}
+.interrupteur-envoi:focus-visible {
+  outline: 2px solid var(--vert);
+  outline-offset: 3px;
+}
+.dispo-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+/* Le bas du fil laisse la place au champ de saisie, fixé en bas d'écran. */
+.fin-du-fil {
+  height: 1px;
+  scroll-margin-bottom: 180px;
+}
+.profil-erreur {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--rouge-lavis, #fbeae6);
+}
+.guard-card .paye {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.guard-card .paye-points {
+  font-size: 13.5px;
+  color: var(--encre-2);
+}
+.guard-actions :is(a, button) {
+  white-space: nowrap;
+}
+
+/* La barre de résultats : les cellules du créneau se touchent pour changer
+   de jour ou d'heure, et ouvrent le formulaire de recherche pré-rempli. */
+.rb-cell.rb-cell-bouton {
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rb-cell.rb-cell-bouton:focus-visible {
+  outline: 2px solid var(--vert);
+  outline-offset: -2px;
+  border-radius: 12px;
+}
+.panneau-modifier {
+  margin: 12px 0 8px;
+  padding: 16px;
+  border-radius: var(--r-carte, 20px);
+  background: var(--surface);
+  box-shadow: var(--ombre-2);
+}
+.panneau-modifier-tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.panneau-modifier-tete h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.panneau-modifier-tete .lien {
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: var(--vert);
+  cursor: pointer;
+}
+.panneau-modifier .search-card {
+  max-width: none;
+  margin: 0;
+  box-shadow: none;
+}
+
+/* Les bulles, comme dans Messages : le texte reçu à l'encre (il se lisait
+   comme du texte secondaire), une bulle grise sans bordure, la sienne en
+   vert plein. */
+.app-membre .bulle.autre {
+  background: #e9eae6;
+  border: 0;
+  color: var(--encre);
+}
+.app-membre .bulle.moi {
+  background: var(--vert);
+}
+.app-membre .bulle .bulle-heure {
+  opacity: 0.6;
+}
+.app-membre .bulle-photo img {
+  border-radius: 14px;
+}
+
+/* Les écrans hérités de la maquette (`.app-screen`) prennent le fond de
+   l'application, au lieu d'un fond à eux qui s'arrêtait à mi-écran. */
+.app-membre .app-screen {
+  background: transparent;
+  min-height: 0;
+}
+
+/* 36. La personne à la porte : son visage sur les écrans de remise. */
+.personne-a-la-porte {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 16px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 16px;
+  background: var(--fond-carte, #fff);
+  box-shadow: 0 0 0 1px rgba(20, 24, 20, 0.08);
+}
+.personne-a-la-porte > span:not(.tag, .avatar-membre) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.personne-a-la-porte strong {
+  font-size: 16px;
+}
+.personne-a-la-porte .gris {
+  font-size: 13px;
+}
+.personne-a-la-porte :is(.tag, .avatar-membre) {
+  flex: none;
+}
+
+/* 37. La saisie du code de remise : un libellé visible, l'aide au-dessus du
+   champ, les six chiffres en deux groupes comme on les dicte. */
+.code-box2 .code-libelle {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--encre);
+}
+.code-box2 .code-aide {
+  margin: 0 0 12px;
+  font-weight: 400;
+  color: var(--encre-2);
+}
+.code-box2 .code-aide.faux {
+  font-weight: 600;
+  color: var(--alert, #c0432c);
+}
+.code-box2 #code-de-remise {
+  width: 176px;
+  min-height: 52px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+.code-box2 #code-de-remise[aria-invalid='true'],
+.code-box2 #code-de-remise[aria-invalid='true']:focus,
+.code-box2 #code-de-remise[aria-invalid='true']:focus-visible {
+  outline: none;
+  border-color: var(--alert, #c0432c);
+  box-shadow: 0 0 0 3px rgba(192, 67, 44, 0.18);
+}
+@media (max-width: 560px) {
+  .code-box2 #code-de-remise {
+    flex: 1;
+    width: auto;
+  }
+}
+
+/* Ce qui reste à vérifier au retour : des numéros, sans coche d'avance. */
+.checklist-a-faire {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: a-faire;
+}
+.checklist-a-faire li {
+  counter-increment: a-faire;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  color: var(--encre);
+}
+.checklist-a-faire li::before {
+  content: counter(a-faire);
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(1, 118, 40, 0.1);
+  color: var(--vert);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* La liste des résultats défile dans sa colonne : sans un peu de marge
+   intérieure, le premier chiffre du titre (« 8 bike sitters… ») perd son
+   débord à gauche. */
+@media (max-width: 900px) {
+  .rech-liste {
+    padding-inline: 3px;
+    margin-inline: -3px;
+  }
+}
+
+/* 38. Le bandeau de confirmation (« Lien d'invitation copié ») se lit
+   au-dessus de la barre du bas, au lieu de passer dessous. */
+body:has(.app-membre) .toast {
+  z-index: 90;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
+@media (max-width: 899px) {
+  body:has(.app-membre) .toast {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* 39. L'inscription par invitation : qui vous invite, dès l'arrivée. */
+.invitation-recue {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(20, 24, 20, 0.08);
+}
+.invitation-recue p {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+.invitation-recue p span {
+  font-size: 13.5px;
+  color: var(--encre-2);
+}
+.invitation-initiale {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(1, 118, 40, 0.1);
+  color: var(--vert);
+  font-weight: 700;
+  font-size: 18px;
+}
+.encart-doux {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(15, 31, 23, 0.05);
+  color: var(--encre);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+/* Les trois jalons tiennent sur une ligne, même à 390 px. */
+@media (max-width: 560px) {
+  .jalons {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .jalons li {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 6px;
+    padding: 7px 8px;
+    border-radius: 14px;
+    font-size: 12.5px;
+    line-height: 1.2;
+  }
+  .jalons b {
+    flex: none;
+  }
+}
+
+/* La barre d'avancement d'un parcours est un bloc : en grille, la largeur
+   « 66 % » de son remplissage se calculait sur une colonne de quelques
+   pixels, et la barre paraissait presque vide à l'avant-dernière étape. */
+.etapes-app .barre {
+  display: block;
+}
+
+/* Un code de réserve : une seule action, discrète. */
+.invitation:not(.invitation-principale) > .outline.petit {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+/* La note sous le code principal ne colle pas à sa carte. */
+.invitation + .prog-note {
+  margin-top: 12px;
+}
+
+/* La vignette d'un emplacement dans « Mes emplacements » : on reconnaît
+   son lieu à sa photo. */
+.vignette-lieu {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--surface-douce, #f6f7f4);
+}
+
+/* Un geste en corail (refuser, annuler) prend la même largeur que les autres
+   boutons de fin de formulaire, au lieu de la largeur de son texte. */
+.actions-fin .danger {
+  flex: 1 1 100%;
+  min-height: 50px;
+}
+/* Entre la dernière carte de motif et le champ « Un mot pour… ». */
+.motifs + input[type='hidden'] + .champ,
+.motifs + .champ {
+  margin-top: 16px;
+}
+.compteur-capacite .bouton-rond {
+  width: 48px;
+  height: 48px;
+}
+
+/* Une photo de message garde sa place pendant qu'elle se charge : la bulle
+   ne s'affiche pas vide, et le fil ne saute pas quand l'image arrive. */
+.bulle-photo img {
+  min-height: 160px;
+  object-fit: cover;
+  background: rgba(15, 31, 23, 0.08);
+}
+
+/* Un résultat sans photo du lieu montre le visage (ou l'initiale) du bike
+   sitter, à la taille que la feuille donne à la vignette. */
+.rc-photo-visage {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex: none;
+}
+.rc-photo-visage .avatar-membre {
+  width: 100% !important;
+  height: 100% !important;
+  font-size: 1.5rem !important;
+}
+
+/* 40. La conversation sur ordinateur : deux panneaux à hauteur d'écran, seul
+   le fil défile. Sans cela, toute la page défilait et la liste des
+   conversations, le nom et la garde sortaient de l'écran. */
+@media (min-width: 900px) {
+  .app-membre .messagerie {
+    height: calc(100dvh - 160px);
+    min-height: 480px;
+  }
+  .app-membre .messagerie-liste {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .app-membre .messagerie-conversation {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .app-membre .messagerie-conversation .fil {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 12px;
+  }
+  .app-membre .messagerie-conversation .barre-d-action {
+    position: static;
+    flex: none;
+  }
+}
+
+/* Une photo envoyée seule : un liseré fin, pas un cadre épais de couleur. */
+.app-membre .bulle:has(> .bulle-photo):not(:has(> .bulle-texte)) {
+  padding: 4px 4px 6px;
+}
+.app-membre .bulle:has(> .bulle-photo):not(:has(> .bulle-texte)) .bulle-heure {
+  margin-right: 8px;
+}
+
+/* Une photo de dossier (constat, pièce d'identité) : une vignette nette qui
+   s'ouvre en grand d'un toucher. */
+button.photo-dossier {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--trait-fort);
+  border-radius: 12px;
+  background: var(--surface-douce, #f7f8f5);
+  overflow: hidden;
+  cursor: zoom-in;
+}
+button.photo-dossier img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+}
+button.photo-dossier.photo-piece {
+  margin-top: 12px;
+}
+
+/* Les liens d'un dossier de modération vers les fiches des membres. */
+.liens-du-dossier {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 8px 0 0;
+}
+.liens-du-dossier a {
+  color: var(--vert);
+  font-weight: 600;
+  text-decoration: none;
+}
+.liens-du-dossier a:hover {
+  text-decoration: underline;
+}
+
+/* Une aide sous un champ se lit comme une aide : du texte courant, pas du
+   gras. */
+.app-membre .aide-champ {
+  font-weight: 400;
+}
+
+/* Le conteneur des confirmations d'une garde, vide la plupart du temps, ne
+   doit pas occuper une ligne de la grille : sur ordinateur, il repoussait
+   tout le détail sous les boutons de la colonne de droite. */
+.fiche-detail > .pile:empty {
+  display: none;
+}
+/* Les boutons de la garde s'étendent le long du détail, au lieu d'imposer
+   leur hauteur à la seule carte d'en face. */
+@media (min-width: 1040px) {
+  .fiche-detail > .actions-de-garde {
+    grid-row: span 5;
+  }
+}

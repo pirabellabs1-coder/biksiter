@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { textes } from '@/lib/i18n/langue';
 import { exigerUnMembre } from '@/lib/session';
@@ -30,7 +29,6 @@ export default async function BatteriesDesVelosElectriques() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/regles" />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Vélos électriques')}</h1>
         <p className="sous-titre">{p('Voici les vérifications à effectuer sur la batterie au moment du dépôt.')}</p>

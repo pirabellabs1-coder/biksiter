@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { interroger, uneLigne } from '@/lib/bd/client';
+import { VERSION_DE_LA_PHOTO } from '@/lib/depot/photo-de-profil';
 import type { Creneau as Intervalle } from '@/lib/regles/capacite';
 import {
   dansLesHoraires,
@@ -25,6 +26,7 @@ import {
   type Point,
 } from '@/lib/regles/distance';
 import { AVIS_POUR_AFFICHER_UNE_NOTE } from '@/lib/regles/avis-de-garde';
+import { passeEnTeteDesResultats } from '@/lib/regles/disponibilite-immediate';
 import { instantABruxelles } from '@/lib/temps';
 import { ETATS_QUI_OCCUPENT_UNE_PLACE } from '@/lib/regles/capacite';
 
@@ -44,7 +46,11 @@ export const AVIS_PUBLIE = `a.masque_le is null
 
 type LigneVisible = {
   reference: string;
+  /** Fin de la disponibilité immédiate du bike sitter, si elle est ouverte. */
+  disponibleJusqua: Date | null;
   bikeSitterId: string;
+  /** La version de sa photo de profil, ou null s'il n'en a pas. */
+  photoDuBikeSitter: string | null;
   prenom: string;
   initialeDuNom: string;
   type: string;
@@ -80,6 +86,8 @@ type LigneVisible = {
   nombreDAvis: number;
   gardesMenees: number;
   nombreDePhotos: number;
+  /** Le rang de la première photo du lieu, ou null s'il n'en a pas. */
+  premierePhoto: number | null;
   identiteVerifiee: boolean;
   telephoneVerifie: boolean;
   emailVerifie: boolean;
@@ -111,6 +119,9 @@ const COLONNES = `
   v.horaires_par_jour                          as "parJour",
   array(select to_char(d, 'YYYY-MM-DD') from unnest(v.fermetures) d) as fermetures,
   m.vu_le                                      as "vuLe",
+  ${VERSION_DE_LA_PHOTO('m')}                  as "photoDuBikeSitter",
+  (select e2.disponible_jusqu_a from emplacement e2
+    where e2.reference = v.reference)          as "disponibleJusqua",
   extract(year from m.cree_le)::int            as "membreDepuis",
   m.verification = 'verifiee'                  as "identiteVerifiee",
   m.telephone_verifie_le is not null           as "telephoneVerifie",
@@ -129,7 +140,10 @@ const COLONNES = `
       and ${AVIS_PUBLIE}) as "nombreDAvis",
   (select count(*)::int from photo_emplacement ph
      join emplacement e4 on e4.id = ph.emplacement_id
-    where e4.reference = v.reference) as "nombreDePhotos"`;
+    where e4.reference = v.reference) as "nombreDePhotos",
+  (select min(ph.rang)::int from photo_emplacement ph
+     join emplacement e5 on e5.id = ph.emplacement_id
+    where e5.reference = v.reference) as "premierePhoto"`;
 
 export function horairesDe(ligne: {
   jours: readonly number[];
@@ -256,6 +270,8 @@ function evaluer(
 
 export type EmplacementTrouve = {
   reference: string;
+  /** Disponible tout de suite, pour une garde qui commence dans l'heure. */
+  disponibleMaintenant: boolean;
   bikeSitterId: string;
   prenom: string;
   initialeDuNom: string;
@@ -275,6 +291,9 @@ export type EmplacementTrouve = {
   nombreDAvis: number;
   gardesMenees: number;
   nombreDePhotos: number;
+  premierePhoto: number | null;
+  /** La version de la photo de profil du bike sitter, ou null. */
+  photoDuBikeSitter: string | null;
   identiteVerifiee: boolean;
   vuLe: Date | null;
   derniereGarde: Date | null;
@@ -314,6 +333,9 @@ export async function emplacementsAutourDe(
     [...new Set(lignes.map((l) => l.bikeSitterId))],
     creneau,
   );
+  const maintenant = new Date();
+  const debutDuCreneau =
+    instantABruxelles(creneau.jourDepot, creneau.heureDepot) ?? maintenant;
 
   return lignes
     .map((ligne) => ({
@@ -341,6 +363,8 @@ export async function emplacementsAutourDe(
       nombreDAvis: ligne.nombreDAvis,
       gardesMenees: ligne.gardesMenees,
       nombreDePhotos: ligne.nombreDePhotos,
+      premierePhoto: ligne.premierePhoto,
+      photoDuBikeSitter: ligne.photoDuBikeSitter,
       identiteVerifiee: ligne.identiteVerifiee,
       noteMoyenne:
         ligne.nombreDAvis >= AVIS_POUR_AFFICHER_UNE_NOTE
@@ -353,11 +377,29 @@ export async function emplacementsAutourDe(
     .filter(
       (e) => e.disponibilite.dansLesHoraires && e.disponibilite.dureeAcceptee,
     )
-    .sort((a, b) => a.distance - b.distance);
+    .map((e) => ({
+      ...e,
+      disponibleMaintenant: passeEnTeteDesResultats(
+        lignes.find((l) => l.reference === e.reference)?.disponibleJusqua ??
+          null,
+        debutDuCreneau,
+        maintenant,
+      ),
+    }))
+    // Un bike sitter disponible tout de suite passe devant, pour une garde qui
+    // commence dans l'heure ; ensuite, le plus proche d'abord.
+    .sort(
+      (a, b) =>
+        Number(b.disponibleMaintenant) - Number(a.disponibleMaintenant) ||
+        a.distance - b.distance,
+    );
 }
 
 export type AvisAffiche = {
   id: string;
+  auteurId: string;
+  /** La version de la photo de profil de l'auteur, ou null. */
+  auteurPhoto: string | null;
   auteurPrenom: string;
   auteurInitiale: string;
   note: number;
@@ -424,7 +466,8 @@ export async function avisRecus(
   sens: 'cycliste_vers_bike_sitter' | 'bike_sitter_vers_cycliste' | null,
 ): Promise<AvisAffiche[]> {
   return interroger<AvisAffiche>(
-    `select a.id, m.prenom as "auteurPrenom", upper(left(m.nom, 1)) as "auteurInitiale",
+    `select a.id, m.id as "auteurId", ${VERSION_DE_LA_PHOTO('m')} as "auteurPhoto",
+            m.prenom as "auteurPrenom", upper(left(m.nom, 1)) as "auteurInitiale",
             a.note, a.criteres, a.texte, a.ecrit_le as "ecritLe", a.reponse,
             a.cible_id as "cibleId", a.conteste_le is not null as conteste
        from avis_sur_une_garde a

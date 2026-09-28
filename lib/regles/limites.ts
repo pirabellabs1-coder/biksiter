@@ -19,7 +19,8 @@ export type NatureDeTentative =
   | 'demande_envoyee'
   | 'remise_refusee'
   | 'demande_modifiee'
-  | 'prolongation_demandee';
+  | 'prolongation_demandee'
+  | 'photo_de_profil';
 
 export type Limite = {
   nature: NatureDeTentative;
@@ -84,12 +85,35 @@ export const INSCRIPTIONS_REFUSEES: Limite = {
 };
 
 /**
+ * Inscriptions refusées depuis une même connexion, sur un jour : un code
+ * faux ou une adresse déjà inscrite. Sans elle, on pourrait essayer des
+ * codes, ou vérifier une liste d'adresses, autant qu'on veut. Une famille
+ * derrière la même box ne l'atteint pas.
+ */
+export const INSCRIPTIONS_REFUSEES_PAR_CONNEXION: Limite = {
+  nature: 'inscription_refusee',
+  nombre: 20,
+  fenetreMinutes: JOUR,
+};
+
+/**
  * Messages écrits par un membre, sur une heure. Largement assez pour
  * s'organiser ; au-delà, c'est une insistance que l'autre subit par e-mail.
  */
 export const MESSAGES_PAR_HEURE: Limite = {
   nature: 'message_envoye',
   nombre: 30,
+  fenetreMinutes: HEURE,
+};
+
+/**
+ * Photos de profil envoyées par un membre, sur une heure : de quoi essayer
+ * plusieurs cadrages, pas de quoi faire décoder des images au serveur en
+ * boucle.
+ */
+export const PHOTOS_DE_PROFIL_PAR_HEURE: Limite = {
+  nature: 'photo_de_profil',
+  nombre: 10,
   fenetreMinutes: HEURE,
 };
 

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { lieuDuMembre } from '@/lib/depot/lieux';
 import { textes } from '@/lib/i18n/langue';
@@ -28,7 +27,6 @@ export default async function RetirerUnLieu({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/mes-lieux/${reference}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Retirer ce lieu')}</h1>
         <p className="sous-titre">

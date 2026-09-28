@@ -30,7 +30,9 @@ const SERVICE_PAR_DEFAUT = 'https://nominatim.openstreetmap.org/search';
 const IDENTIFICATION =
   process.env.GEOCODEUR_CONTACT ?? 'BikeSitters (association, Bruxelles)';
 
-const DELAI_MAXIMAL_MS = 6_000;
+// Nominatim répond parfois en plus de cinq secondes : le formulaire attend,
+// mieux vaut patienter que retomber à tort sur le centre du quartier.
+const DELAI_MAXIMAL_MS = 10_000;
 const INTERVALLE_MINIMAL_MS = 1_100;
 
 export type ResultatDeGeocodage =

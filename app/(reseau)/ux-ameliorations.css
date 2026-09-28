@@ -1,0 +1,426 @@
+/* =============================================================================
+   Retouches d'expérience et de finition, posées APRÈS la maquette.
+
+   La maquette fait foi pour la mise en page et le style. Ce fichier ne la
+   remplace pas : il rattrape les endroits où la conversion vers l'application
+   a laissé des défauts visibles sur téléphone — des commandes qui se
+   chevauchent, des rangées coupées net, des blocs devenus trop grands — et il
+   donne aux boutons le relief discret d'une vraie application. Rien ici ne
+   change le sens d'une couleur ni la structure d'un écran.
+
+   Tout est rangé par sujet ; chaque bloc dit pourquoi il existe.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   1. Recherche — la carte occupe toute la place, sans empilement.
+
+   Sur téléphone, la maquette pose la carte en `position:absolute` et empile
+   ses commandes par-dessus. Le bandeau de confiance, lui, restait dans le flux
+   et se dessinait AU-DESSUS de la carte ; la zone carte ne mesurait qu'environ
+   280 px, si bien que légende, zoom, « Rechercher dans cette zone » et le
+   bascule Liste/Carte se télescopaient. On rend la zone extensible et on
+   retire de la carte ce qui n'a de sens que sur grand écran.
+   -------------------------------------------------------------------------- */
+/* Les écrans d'application (recherche, favoris, catalogue, fiche d'un
+   emplacement…) coulent sous l'en-tête comme les autres pages, au lieu de le
+   recouvrir. La maquette les posait en calque plein écran (héritage du
+   prototype à écrans superposés), ce qui masquait le menu du haut. */
+.app-screen {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  overflow: visible;
+}
+
+@media (max-width: 1023px) {
+
+  /* En vue Carte, la carte redevient un bloc de hauteur franche dans le flux,
+     au lieu d'un calque absolu qui débordait sous la barre d'onglets. Ses
+     commandes (légende, zoom, position, relance) se positionnent par rapport
+     à elle et ne se chevauchent plus. */
+  #results .rech-page.vue-carte {
+    position: relative;
+    min-height: 0;
+  }
+  #results .rech-page.vue-carte .map {
+    position: relative;
+    inset: auto;
+    height: 58vh;
+    min-height: 360px;
+  }
+
+  /* Le bandeau « ✓ Espace fermé · ✓ Présence humaine… » est un ornement
+     d'ordinateur : sur téléphone il recouvrait le haut de la carte. La barre
+     de recherche porte déjà cette réassurance ; on le retire ici. */
+  #results .bandeau-confiance {
+    display: none;
+  }
+
+  /* Le choix Liste / Carte n'est plus une pastille posée sur la carte : c'est
+     un sélecteur segmenté, en clair, juste sous la barre de recherche. On le
+     sort donc du bas de l'écran et on le pose dans le flux, en haut. */
+  #results .bascule {
+    position: static;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    display: flex;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    margin: 4px auto 14px;
+    padding: 4px;
+    gap: 4px;
+    background: var(--sage, #dfe9df);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: none;
+  }
+  #results .bascule .bascule-btn {
+    flex: 0 0 auto;
+    min-width: 116px;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 9px 24px;
+    min-height: 38px;
+    border-radius: 999px;
+  }
+  #results .bascule .bascule-btn.actif {
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(9, 45, 26, 0.18);
+  }
+
+  /* La relance de recherche reste une commande de carte, centrée en bas. */
+  #results .map-rezone {
+    bottom: 16px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   2. Les rangées qui défilent le disent.
+
+   Raccourcis de l'accueil, filtres rapides de la recherche : sur téléphone ils
+   défilent à l'horizontale, mais rien ne l'indiquait — le dernier élément
+   semblait coupé. Un léger fondu au bord droit signale qu'il y a la suite, et
+   l'accroche au défilement rend le geste net.
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .raccourcis,
+  .chips-rapides {
+    padding-right: 26px;
+    scroll-snap-type: x proximity;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      #000 calc(100% - 26px),
+      transparent
+    );
+    mask-image: linear-gradient(90deg, #000 calc(100% - 26px), transparent);
+  }
+  .raccourcis > a,
+  .raccourcis > button,
+  .chips-rapides > button {
+    scroll-snap-align: start;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   3. Les boutons ont le relief d'une vraie application.
+
+   La maquette pose les boutons pleins sans bordure ni ombre : à l'écran ils
+   flottaient un peu. On leur donne un liseré translucide et une ombre courte
+   qui les détache du fond sans changer leur couleur. Le survol s'appuie sur
+   la même ombre. (Demande explicite : des boutons mieux définis.)
+   -------------------------------------------------------------------------- */
+.primary,
+.rb-go,
+.white {
+  border: 1px solid rgba(9, 45, 26, 0.14);
+  box-shadow:
+    0 1px 2px rgba(9, 45, 26, 0.16),
+    0 3px 10px rgba(9, 45, 26, 0.1);
+}
+.primary:hover,
+.rb-go:hover {
+  box-shadow:
+    0 2px 4px rgba(9, 45, 26, 0.2),
+    0 6px 18px rgba(9, 45, 26, 0.16);
+}
+/* Le bouton blanc (sur fond vert) garde un liseré clair, pas sombre. */
+.white {
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Un focus clavier visible et cohérent partout : c'est la même marque verte,
+   jamais le contour bleu par défaut du navigateur. */
+.primary:focus-visible,
+.outline:focus-visible,
+.rb-go:focus-visible,
+.raccourcis a:focus-visible,
+.raccourcis button:focus-visible,
+.chips-rapides button:focus-visible,
+.rc-carte:focus-visible,
+.rc-btn:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   4. La vignette de date d'une garde reste une vignette.
+
+   En dessous de 560 px, la maquette passe la carte de garde sur une colonne :
+   la date, prévue pour une vignette de 75 px, s'étirait alors sur toute la
+   largeur en un gros bloc sombre. On la garde compacte, à côté du texte.
+   -------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  .guard-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+  .guard-date {
+    width: 60px;
+    border-radius: 14px;
+    padding: 10px 8px;
+  }
+  /* Les actions gardent leur pleine largeur sous le texte. */
+  .guard-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   5. Confort de lecture au pouce.
+
+   Les cibles tactiles des barres d'onglets et des pastilles atteignent la
+   hauteur recommandée (44 px), sans changer leur apparence.
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .raccourcis > a,
+  .raccourcis > button {
+    min-height: 40px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   6. Collision de noms : `.pastille`.
+
+   La maquette (maquette-167.css) redéfinit `.pastille` en pastille RONDE de
+   22 px, pour la liste de confiance d'une fiche. Chargée après le système de
+   design, cette règle écrasait partout la gélule à libellé dont se servent
+   encore les écrans d'origine — demandes, catalogue, classement, réglages —
+   qui se réduisait alors à un petit cercle gris au texte débordant.
+
+   On rétablit la gélule comme valeur par défaut, et on ne garde le cercle
+   que là où il est réellement voulu : la liste de confiance. Le mega-menu du
+   blog a déjà sa propre règle et n'est pas concerné.
+   -------------------------------------------------------------------------- */
+.pastille {
+  width: auto;
+  height: auto;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: var(--trust-wash);
+  color: var(--trust-deep);
+}
+.fp-confiance .pastille {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  background: #eef2ef;
+  color: var(--muted);
+}
+.fp-confiance .pastille.ok {
+  background: #e6f3ea;
+  color: var(--green);
+}
+
+/* -----------------------------------------------------------------------------
+   7. Barre du bas — icônes tracées, nettes et centrées.
+
+   Les caractères typographiques (⌂ ⌕ ⌾ …) rendaient un pictogramme flou et
+   changeant d'un appareil à l'autre — dont ce « rond » qui n'évoquait rien.
+   La barre utilise désormais les icônes SVG du jeu commun ; on les centre.
+   -------------------------------------------------------------------------- */
+@media (max-width: 899px) {
+  .tabbar .tb-i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   8. Favoris — la vignette n'écrase plus le texte.
+
+   Sur téléphone, la carte d'un favori passe sur deux colonnes (vignette, puis
+   texte). La rangée d'actions, elle, doit passer dessous sur toute la largeur.
+   La règle d'origine visait `.rc-btn` (imbriqué dans `.fav-actions`) au lieu de
+   `.fav-actions` lui-même : les boutons retombaient donc dans la colonne de la
+   vignette et l'élargissaient à ~230 px, réduisant le texte à un filet illisible
+   (« Garage / privé / fermé / à… »). On vise le bon conteneur.
+   -------------------------------------------------------------------------- */
+@media (max-width: 620px) {
+  .fav .fav-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .fav .fav-actions .rc-btn,
+  .fav .fav-actions .rc-carte {
+    flex: 1 1 0;
+    text-align: center;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   9. Règle 6 : le bleu protège, il ne porte pas un bouton.
+
+   `.rc-btn` (« Redemander », « Voir le profil ») était un bouton d'action en
+   bleu — la teinte réservée à l'identité vérifiée. On lui rend la couleur des
+   actions, le vert de la marque.
+   -------------------------------------------------------------------------- */
+.rc-btn {
+  background: var(--green);
+  color: #fff;
+}
+.rc-btn:hover {
+  background: #005f20;
+}
+
+/* -----------------------------------------------------------------------------
+   10. Échelle des boutons — plus fine, plus « appli ».
+
+   Les boutons pleins montaient à 52-54 px : massifs sur un téléphone. On les
+   ramène à une hauteur confortable au pouce (≥ 46 px, la cible tactile
+   recommandée) avec une graisse de texte un peu plus légère. Rien ne change
+   sur ordinateur, où l'espace ne manque pas.
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .bouton {
+    min-height: 48px;
+    font-size: 15px;
+  }
+  .primary,
+  .bleu,
+  .danger,
+  .white,
+  .outline {
+    padding-top: 13px;
+    padding-bottom: 13px;
+    font-size: 0.95rem;
+  }
+  .rb-go {
+    min-height: 48px;
+  }
+  /* Les boutons pleine largeur sous une carte gardent leur largeur mais
+     s'allègent en hauteur. */
+  .sous-carte-bouton {
+    min-height: 48px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   11. Messagerie — joindre et montrer une photo.
+
+   Autour d'une garde, une photo vaut parfois mieux qu'une phrase. Le
+   compositeur reçoit un bouton d'appareil photo à gauche du champ, avec un
+   aperçu de l'image choisie ; la bulle affiche la photo reçue.
+   -------------------------------------------------------------------------- */
+.compositeur-joindre {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--bord);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--trust);
+  cursor: pointer;
+}
+.compositeur-joindre:hover {
+  border-color: var(--trust);
+}
+.compositeur-apercu {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 8px;
+}
+.compositeur-apercu img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--bord);
+}
+.compositeur-retirer {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+}
+.bulle-photo {
+  display: block;
+  margin: 0 0 6px;
+}
+.bulle-photo img {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  border-radius: 12px;
+}
+.bulle-texte {
+  display: block;
+}
+
+/* -----------------------------------------------------------------------------
+   12. Profil — le résumé des vérifications.
+
+   Chaque ligne aligne le libellé à gauche et l'état (pastille) à droite, pour
+   que l'on voie d'un coup ce qui est vérifié et ce qui reste à faire.
+   -------------------------------------------------------------------------- */
+.ligne-verif {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--bord);
+}
+.ligne-verif:first-child {
+  border-top: 0;
+}
+.ligne-verif > span:first-child {
+  font-weight: 600;
+}
+
+/* -----------------------------------------------------------------------------
+   13. Règle 6 : le bleu protège, il n'étiquette pas « Nouveau ».
+
+   L'étiquette « Nouveau » (un Bike Sitter sans avis encore) était bleu clair —
+   la teinte de l'identité vérifiée. On la rend neutre pour ne pas laisser
+   croire à un statut de confiance.
+   -------------------------------------------------------------------------- */
+.etiq-neuf {
+  background: var(--paper, #f5f6f1);
+  color: var(--slate, #587065);
+  border: 1px solid var(--chalk, #dce5dd);
+}

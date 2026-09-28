@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { dansUneTransaction, interroger, uneLigne } from '@/lib/bd/client';
+import { notifier } from '@/lib/depot/notifications';
 import { mettreEnFile } from '@/lib/envois/file';
 import { identiteRefusee, identiteVerifiee } from '@/lib/courriel/modeles';
 import { CONSERVATION_MAXIMALE_JOURS, type TypeDePiece } from '@/lib/regles/pieces';
@@ -121,6 +122,25 @@ export async function trancher(
       { client, aPropos: `vérification ${membreId}` },
     );
 
+    // La décision se lit aussi dans l'application : l'e-mail peut se perdre,
+    // et un refus doit dire au membre ce qu'il peut faire ensuite.
+    await notifier(
+      client,
+      membreId,
+      decision === 'verifiee'
+        ? {
+            texte:
+              'Votre identité est vérifiée. Vous pouvez envoyer des demandes et proposer un emplacement.',
+            lien: '/profil/verifications',
+          }
+        : {
+            texte:
+              'Votre pièce d’identité n’a pas pu être validée : {motif}. Vous pouvez en envoyer une nouvelle.',
+            valeurs: { motif: motif ?? '' },
+            lien: '/profil/verifications',
+          },
+    );
+
     return true;
   });
 }
@@ -184,5 +204,23 @@ export async function marquerCandidatureTraitee(
         set traitee_le = now(), traitee_par = $2
       where id = $1 and traitee_le is null`,
     [candidatureId, moderateurId],
+  );
+}
+
+/** Le motif du dernier refus d'identité, s'il n'a pas été suivi d'une validation. */
+export async function dernierRefusDIdentite(
+  membreId: string,
+): Promise<{ motif: string; decideeLe: Date } | null> {
+  return uneLigne<{ motif: string; decideeLe: Date }>(
+    `select d.motif, d.decidee_le as "decideeLe"
+       from decision_de_moderation d
+      where d.membre_id = $1 and d.decision = 'refusee'
+        and not exists (
+          select 1 from decision_de_moderation v
+           where v.membre_id = d.membre_id and v.decision = 'verifiee'
+             and v.decidee_le > d.decidee_le)
+      order by d.decidee_le desc
+      limit 1`,
+    [membreId],
   );
 }

@@ -1,0 +1,3180 @@
+:root{--green:#017628;--deep:#092d1a;--paper:#f6f5ef;--coral:#e8614d;--blue:#246bfd;--sage:#dfe9df;--ink:#10231a;--muted:#627168;--line:#dbe2dc;--white:#fff}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--police-dm-sans),sans-serif}button,input,select{font:inherit}button,a{transition:.2s ease}button{cursor:pointer}.topbar,.app-header{height:78px;background:rgba(246,245,239,.94);backdrop-filter:blur(14px);display:flex;align-items:center;padding:0 max(5vw,28px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--green);font-family:var(--police-manrope),sans-serif;font-weight:800;letter-spacing:.09em;font-size:18px}.brand svg{width:39px;height:36px;fill:none;stroke:var(--green);stroke-width:2.4;stroke-linejoin:round}.topbar nav{display:flex;gap:30px;margin:auto}.topbar nav a{color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}.topbar nav a:hover{color:var(--green)}.header-actions{display:flex;align-items:center;gap:18px}.link-button{border:0;background:none;font-weight:600;color:var(--ink)}.avatar{width:39px;height:39px;border-radius:50%;border:0;background:var(--deep);color:white;font-weight:700;display:grid;place-items:center}.hero{padding:76px 5vw 0;background:radial-gradient(circle at 88% 20%,#dbe9d8 0,transparent 33%),var(--paper);min-height:650px}.hero-copy{max-width:910px;margin:auto;text-align:center}.eyebrow,.kicker{font-size:12px;letter-spacing:.13em;font-weight:800;color:var(--green)}.eyebrow span{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:7px}.hero h1{font-family:var(--police-manrope),sans-serif;font-size:clamp(42px,6vw,78px);letter-spacing:-.055em;line-height:1.02;margin:22px 0}.hero h1 em{font-style:normal;color:var(--green)}.hero-copy>p{max-width:650px;font-size:18px;line-height:1.65;color:var(--muted);margin:0 auto 40px}.search-card{max-width:1120px;margin:auto;background:white;padding:14px;border:1px solid #d7dfd8;display:grid;grid-template-columns:2fr 1.1fr .6fr .6fr 1.2fr auto;align-items:end;box-shadow:0 18px 60px rgba(13,57,31,.08)}.field{padding:2px 14px;border-right:1px solid var(--line)}.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin-bottom:7px}.field input,.field select{border:0;background:transparent;outline:none;width:100%;color:var(--ink);height:31px}.destination>div{display:flex;align-items:center;gap:7px}.primary{background:var(--green);color:white;border:0;font-weight:700;padding:16px 20px}.primary:hover{background:#005f20;transform:translateY(-1px)}.search-submit{height:56px;white-space:nowrap}.trust-strip{max-width:1120px;margin:26px auto 0;display:grid;grid-template-columns:repeat(4,1fr);font-size:13px}.trust-strip span{text-align:center;padding:15px;border-right:1px solid var(--line)}.trust-strip span:last-child{border:0}.verified{color:var(--blue)}.section{padding:110px max(6vw,32px)}.section-head{text-align:center}.section h2,.become h2{font-family:var(--police-manrope),sans-serif;font-size:clamp(34px,4.3vw,58px);letter-spacing:-.045em;line-height:1.06;margin:15px 0 48px}.steps{display:grid;grid-template-columns:repeat(3,1fr);max-width:1180px;margin:auto;border-top:1px solid var(--line);border-left:1px solid var(--line)}.steps article{position:relative;padding:35px 30px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:235px;background:#faf9f5}.steps i{position:absolute;right:20px;top:18px;color:#afbab2;font-style:normal;font-weight:700;font-size:12px}.step-icon{width:46px;height:46px;background:var(--sage);display:grid;place-items:center;color:var(--green);font-size:22px;margin-bottom:23px}.steps h3{font-family:var(--police-manrope);margin:0 0 8px}.steps p{color:var(--muted);line-height:1.55;margin:0}.moments{background:var(--deep);color:white;display:grid;grid-template-columns:.75fr 1.25fr;gap:7vw;align-items:center}.moments .kicker{color:#7ed79b}.moments h2{margin-bottom:18px}.moments>div>p{color:#b9c8bf;font-size:17px}.moment-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.moment{height:180px;padding:25px;font-size:30px;display:flex;flex-direction:column;justify-content:flex-end}.moment b{font-size:18px;margin:10px 0 4px}.moment span{font-size:13px;opacity:.8}.coral{background:#d65e4b}.green{background:#176b38}.blue{background:#315e79}.sand{background:#9a7c53}.security{display:grid;grid-template-columns:1fr 1fr;gap:8vw;align-items:center}.security-visual{min-height:520px;background:#dce7dc;position:relative;display:grid;place-items:center;overflow:hidden}.door{height:330px;width:220px;background:var(--green);position:relative;color:white;display:grid;place-items:center;font-family:var(--police-manrope);font-weight:800;letter-spacing:.12em;text-align:center}.door i{position:absolute;right:22px;width:8px;height:8px;border-radius:50%;background:white}.bike-art{position:absolute;bottom:52px;font-size:77px;letter-spacing:-20px;color:var(--deep)}.bike-art span{font-size:45px}.safe-pill{position:absolute;top:38px;right:26px;background:white;padding:14px 19px;font-weight:700;color:var(--green)}.security-copy>p{font-size:18px;line-height:1.6;color:var(--muted)}.security-copy ul{list-style:none;padding:10px 0;margin:0}.security-copy li{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px}.security-copy li span{font-size:14px;color:var(--muted)}.become{background:var(--green);color:white;padding:78px max(7vw,38px);display:flex;align-items:center;justify-content:space-between;gap:40px}.become h2{margin:12px 0}.become p{max-width:700px;font-size:17px;line-height:1.6;margin:0}.kicker.light{color:#a9e7bd}.white{border:0;background:white;color:var(--green);font-weight:800;padding:18px 25px;min-width:220px}.faq{max-width:1000px;margin:auto}.faq h2{margin-bottom:35px}.accordions details{border-top:1px solid var(--line);padding:22px 4px}.accordions summary{font-family:var(--police-manrope);font-weight:700;cursor:pointer;list-style:none}.accordions summary:after{content:'+';float:right;color:var(--green);font-size:22px}.accordions details[open] summary:after{content:'–'}.accordions p{color:var(--muted);max-width:800px;line-height:1.6}.app-screen{position:fixed;inset:0;background:var(--paper);z-index:40;overflow:auto;display:none}.app-screen.active{display:block}.app-header{justify-content:space-between}.back{border:0;background:none;font-size:26px;color:var(--green)}.mini{font-size:15px}.results-wrap,.dashboard-wrap{padding:48px 5vw}.results-top{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px}.results-top h2{font-family:var(--police-manrope);font-size:38px;margin:8px 0}.results-top p{color:var(--muted);margin:0}.outline{background:transparent;border:1px solid #a8b5ac;padding:13px 18px;font-weight:700;color:var(--ink)}.results-layout{display:grid;grid-template-columns:1.03fr .97fr;min-height:620px;border:1px solid var(--line)}.result-list{background:white}.result-card{padding:24px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:95px 1fr auto;gap:18px;cursor:pointer}.result-card:hover,.result-card.selected{background:#f1f7f1}.initial{width:95px;height:105px;background:#dce8de;display:grid;place-items:center;font-family:var(--police-manrope);font-size:27px;color:var(--green)}.result-card h3{font-family:var(--police-manrope);margin:3px 0 6px}.badge{font-size:11px;color:var(--blue);font-weight:800}.meta,.fit{font-size:13px;color:var(--muted);margin:4px 0}.walk{text-align:right;color:var(--green);font-family:var(--police-manrope);font-weight:800;font-size:21px}.walk small{display:block;color:var(--muted);font:500 11px var(--police-dm-sans)}.map{position:relative;overflow:hidden;background:#e9ece2;background-image:linear-gradient(30deg,transparent 48%,#d4d9d1 49%,#d4d9d1 52%,transparent 53%),linear-gradient(-45deg,transparent 45%,#d4d9d1 46%,#d4d9d1 49%,transparent 50%);background-size:140px 120px}.water{position:absolute;right:-20%;top:30%;width:140%;height:80px;background:#cbdfe1;transform:rotate(-20deg)}.pin,.destination-pin{position:absolute;border:0;z-index:2}.pin{background:var(--green);color:white;border-radius:30px;padding:10px 13px;font-weight:800}.p1{left:38%;top:25%}.p2{left:63%;top:55%}.p3{left:24%;top:72%}.destination-pin{left:52%;top:40%;color:var(--coral);font-size:28px}.destination-pin small{display:block;background:white;color:var(--ink);font:700 11px var(--police-dm-sans);padding:7px;margin-left:12px;white-space:nowrap}.profile-wrap{max-width:1080px;margin:50px auto;padding:0 28px}.profile-grid{display:grid;grid-template-columns:1fr 360px;gap:45px}.profile-title{display:flex;gap:22px;align-items:center}.profile-title .initial{width:88px;height:88px}.profile-title h1{font-family:var(--police-manrope);margin:0;font-size:38px}.profile-title p{margin:6px 0}.space-box{height:250px;background:#d9e4d8;display:grid;place-items:center;margin:30px 0;font-size:90px;color:var(--green)}.profile-copy h2{font-family:var(--police-manrope)}.profile-copy p{line-height:1.65;color:var(--muted)}.request-box{background:white;border:1px solid var(--line);padding:25px;position:sticky;top:110px}.request-box h3{font-family:var(--police-manrope)}.request-line{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:14px 0;font-size:14px}.request-box .primary{width:100%;margin-top:12px}.notice{font-size:12px;color:var(--muted);text-align:center;line-height:1.4}.dashboard-wrap{max-width:1000px;margin:auto}.dashboard-wrap h1{font-family:var(--police-manrope);font-size:48px}.tabs{display:flex;gap:25px;border-bottom:1px solid var(--line);margin:30px 0}.tabs button{border:0;background:none;padding:14px 2px;font-weight:700}.tabs button.active{color:var(--green);border-bottom:3px solid var(--green)}.guard-card{background:white;border:1px solid var(--line);padding:24px;display:grid;grid-template-columns:75px 1fr auto;gap:22px;align-items:center}.guard-date{background:var(--deep);color:white;display:grid;place-items:center;padding:10px}.guard-date b{font-size:27px}.guard-date span{font-size:10px}.guard-card h3{margin:6px 0}.guard-card p{color:var(--muted);margin:0}.status{font-size:11px;font-weight:800;color:var(--green)}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,100px);background:var(--deep);color:white;padding:15px 22px;z-index:80;opacity:0;transition:.25s}.toast.show{transform:translate(-50%,0);opacity:1}@media(max-width:900px){.topbar nav{display:none}.topbar{padding:0 18px}.link-button{display:none}.hero{padding:48px 18px 0}.hero h1{font-size:45px}.search-card{grid-template-columns:1fr 1fr}.destination,.search-submit{grid-column:1/-1}.field{border:0;border-bottom:1px solid var(--line);padding:12px}.trust-strip{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr 1fr}.moments,.security{grid-template-columns:1fr}.security-visual{min-height:430px}.become{align-items:flex-start;flex-direction:column}.results-layout{grid-template-columns:1fr}.map{min-height:350px;order:-1}.results-top{align-items:flex-start;gap:20px;flex-direction:column}.profile-grid{grid-template-columns:1fr}.request-box{position:static}.section{padding:75px 24px}}@media(max-width:560px){.brand span{font-size:14px}.hero h1{font-size:39px}.hero-copy>p{font-size:16px}.search-card{display:block}.search-submit{width:100%;margin-top:10px}.trust-strip{grid-template-columns:1fr}.trust-strip span{border-right:0;border-bottom:1px solid var(--line)}.steps{grid-template-columns:1fr}.moment-grid{grid-template-columns:1fr}.moment{height:145px}.section{padding:65px 20px}.section h2{font-size:35px}.security-visual{min-height:360px}.door{height:260px;width:180px}.results-wrap{padding:30px 16px}.results-top h2{font-size:30px}.results-layout{border:0}.map{min-height:270px}.result-card{grid-template-columns:70px 1fr}.initial{width:70px;height:82px}.walk{grid-column:2;text-align:left;font-size:16px}.profile-wrap{padding:0 18px}.profile-title h1{font-size:30px}.guard-card{grid-template-columns:60px 1fr}.guard-card .outline{grid-column:1/-1}.dashboard-wrap{padding:35px 18px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Brand-led 2026 refresh */
+:root{--green:#00823b;--green-dark:#00652d;--deep:#06351d;--paper:#f5f8f6;--coral:#ff765e;--blue:#1688ed;--sage:#e3f3e9;--ink:#0b2116;--muted:#607168;--line:#d9e5dd}
+body{background:linear-gradient(180deg,#f8fbf9 0,#f3f7f4 100%)}
+.topbar,.app-header{height:84px;background:rgba(255,255,255,.86);border-color:rgba(0,130,59,.12);box-shadow:0 1px 0 rgba(7,54,30,.04)}
+.brand{gap:12px;color:var(--ink);letter-spacing:.045em}.brand img{width:48px;height:48px;object-fit:contain;border-radius:11px}.brand span b{color:var(--green)}.brand.mini img{width:42px;height:42px}.topbar nav{background:#f1f7f3;padding:8px 18px;border-radius:999px;gap:6px}.topbar nav a{padding:8px 13px;border-radius:999px}.topbar nav a:hover{background:white;box-shadow:0 5px 16px rgba(5,57,29,.08)}
+.avatar{background:linear-gradient(145deg,var(--green),var(--green-dark));box-shadow:0 8px 20px rgba(0,130,59,.2)}
+.hero{padding:64px 5vw 34px;min-height:auto;background:radial-gradient(circle at 80% 25%,rgba(22,136,237,.09),transparent 25%),radial-gradient(circle at 12% 5%,rgba(0,130,59,.10),transparent 30%),#f8fbf9}.hero-grid{max-width:1200px;margin:0 auto 42px;display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:50px}.hero-copy{text-align:left;max-width:720px;margin:0}.hero h1{font-size:clamp(45px,5.4vw,74px);margin:20px 0 24px}.hero-copy>p{margin:0;max-width:620px;font-size:19px}.hero-brand-visual{display:grid;place-items:center}.logo-stage{width:min(390px,34vw);aspect-ratio:1;position:relative;background:white;border:1px solid rgba(0,130,59,.12);border-radius:40px;display:grid;place-items:center;box-shadow:0 30px 80px rgba(3,69,34,.12);transform:rotate(2deg)}.logo-stage:before{content:'';position:absolute;inset:18px;border:1px dashed rgba(0,130,59,.18);border-radius:28px}.logo-stage>img{width:78%;height:78%;object-fit:contain;border-radius:28px}.floating-card{position:absolute;background:white;border:1px solid var(--line);box-shadow:0 18px 45px rgba(5,46,25,.14);border-radius:16px;padding:14px 18px;display:flex}.card-one{left:-38px;top:48px;flex-direction:column}.card-one b{font:800 23px var(--police-manrope);color:var(--green)}.card-one span{font-size:12px;color:var(--muted)}.card-two{right:-45px;bottom:55px;align-items:center;gap:12px}.card-two i{background:#e4f2ff;color:var(--blue);font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center}.card-two div{display:flex;flex-direction:column}.card-two b{font-size:13px}.card-two span{font-size:11px;color:var(--muted);margin-top:2px}
+.search-card{max-width:1200px;border:1px solid rgba(0,130,59,.18);border-radius:20px;padding:12px;box-shadow:0 24px 70px rgba(4,60,30,.12)}.field:first-child{border-radius:12px 0 0 12px}.field label{font-size:12px}.field input,.field select{font-size:14px}.primary,.white,.outline{border-radius:12px}.search-submit{border-radius:13px;box-shadow:0 10px 24px rgba(0,130,59,.22)}.trust-strip{max-width:1200px;background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:16px;padding:5px}.trust-strip span{padding:16px}
+.section{padding-block:120px}.steps{border:0;gap:16px}.steps article{border:1px solid var(--line);border-radius:20px;background:white;min-height:240px;box-shadow:0 14px 35px rgba(9,50,28,.045)}.step-icon{border-radius:14px}.moments{background:linear-gradient(135deg,#052b18,#074926)}.moment{border-radius:18px}.security-visual{border-radius:30px;background:linear-gradient(145deg,#e6f5eb,#d4eadd)}.door{border-radius:28px 28px 8px 8px;box-shadow:0 24px 45px rgba(0,85,39,.18)}.safe-pill{border-radius:999px;box-shadow:0 12px 30px rgba(4,51,27,.12)}.become{margin:0 max(3vw,18px);border-radius:30px;background:linear-gradient(120deg,var(--green-dark),var(--green));box-shadow:0 25px 60px rgba(0,93,42,.18)}.white{box-shadow:0 12px 30px rgba(3,60,30,.16)}.accordions details{background:white;padding:22px 24px;margin-bottom:10px;border:1px solid var(--line);border-radius:14px}
+.results-layout{border-radius:22px;overflow:hidden;box-shadow:0 22px 60px rgba(5,55,29,.08)}.result-card{padding:26px}.initial{border-radius:16px;background:linear-gradient(145deg,#edf7f0,#d6ebdd)}.map{background-color:#eef3ef}.pin{box-shadow:0 8px 20px rgba(0,130,59,.25)}.request-box,.guard-card{border-radius:20px;box-shadow:0 18px 45px rgba(5,55,29,.07)}.space-box{border-radius:24px}.toast{border-radius:999px;box-shadow:0 12px 35px rgba(0,0,0,.2)}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.hero-copy{text-align:center}.hero-copy>p{margin:auto}.hero-brand-visual{display:none}.topbar{height:74px}.brand img{width:43px;height:43px}.search-card{border-radius:18px}.become{border-radius:22px}.steps{gap:12px}}
+@media(max-width:560px){.hero{padding-top:40px}.hero h1{font-size:41px}.hero-copy>p{font-size:17px}.search-card{padding:9px}.trust-strip{border-radius:14px}.steps article{border-radius:16px}.result-card{border-radius:16px;margin-bottom:10px;border:1px solid var(--line)}.result-list{background:transparent}.brand span{font-size:13px}}
+
+/* La capacite se lit avec le creneau, jamais seule. */
+.slot-note{color:var(--muted);font-size:.85rem;margin-top:4px}
+
+/*
+ * Les bike sitters ne s'affichent jamais comme un point precis : un cercle
+ * d'environ trois cents metres, et l'adresse seulement apres acceptation.
+ */
+.map .zone{position:absolute;width:132px;height:132px;border-radius:50%;
+  background:rgba(1,118,40,.14);transform:translate(-50%,-50%);pointer-events:none}
+.map .z1{left:calc(50% + 22px);top:calc(50% - 76px)}
+.map .z2{left:calc(50% + 58px);top:calc(50% + 60px)}
+.map .z3{left:calc(50% - 118px);top:calc(50% + 118px)}
+.map .map-note{position:absolute;left:14px;right:14px;bottom:12px;background:#fff;
+  border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.76rem;
+  color:var(--muted);text-align:center}
+
+/* Le velo se choisit au moment de la demande, pas dans la recherche. */
+.request-line select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;
+  font-weight:700;background:#fff}
+
+/* Le velo se filtre ici : on cherche d'abord, on affine ensuite. */
+.filtres{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 18px}
+.filtres>span{font-size:.85rem;color:var(--muted);margin-right:4px}
+.filtre-velo{border:1px solid var(--line);background:#fff;border-radius:99px;
+  padding:7px 15px;font-size:.88rem;font-weight:600;color:var(--ink)}
+.filtre-velo:hover{border-color:var(--green)}
+.filtre-velo[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.filtre-velo:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.vide{padding:34px 26px;text-align:center;color:var(--muted)}
+.vide b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:8px}
+
+/*
+ * Le focus clavier doit se voir.
+ *
+ * Sans cela, quelqu'un qui navigue au clavier — ou avec un lecteur d'ecran —
+ * ne sait jamais ou il se trouve dans la page.
+ */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+[tabindex]:focus-visible{
+  outline:3px solid var(--green);
+  outline-offset:2px;
+  border-radius:6px;
+}
+/* Sur fond vert, un contour vert ne se verrait pas. */
+.primary:focus-visible, .filtre-velo[aria-pressed="true"]:focus-visible{
+  outline:3px solid var(--ink);
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* Une demande en attente n'est pas une garde : elle se distingue. */
+.guard-card.attente{border-left:3px solid var(--coral)}
+.status.attente{color:var(--coral)}
+.guard-card .notice{color:var(--muted);font-size:.82rem;margin-top:6px}
+
+/* =====================================================================
+   TÉLÉPHONE
+   Le premier écran doit montrer ce qu'on vient chercher : la promesse et
+   le champ de recherche. Tout le reste peut attendre le premier défilement.
+   ===================================================================== */
+@media(max-width:560px){
+  /* La barre : l'avatar passait par-dessus le nom de la marque. */
+  .topbar{padding:0 16px}
+  .topbar .nav-pills{display:none}
+  .topbar .brand{gap:8px;min-width:0}
+  .topbar .brand span{font-size:15px;white-space:nowrap}
+  /* L'avatar est dans .header-actions : c'est ce bloc qu'il faut pousser. */
+  .topbar>nav{display:none}
+  .topbar .header-actions{margin-left:auto;flex:none;gap:8px}
+  .topbar .header-actions .avatar{width:44px;height:44px;font-size:14px}
+  /* « Mes gardes » en toutes lettres ne tient pas : l'avatar suffit. */
+  .topbar .header-actions>a:not(.avatar),
+  .topbar .header-actions>button:not(.avatar){display:none}
+
+  /* Moins d'air au-dessus : la recherche remonte dans l'écran. */
+  .hero{padding-top:22px}
+  .hero h1{font-size:33px;line-height:1.04}
+  .hero .kicker{font-size:11px;letter-spacing:.06em}
+  .hero-copy>p{font-size:15px;margin-top:10px}
+  .hero-visual{display:none}
+
+  /* Les champs se tiennent à la main : 48 px de haut, et les heures côte à
+     côte plutôt qu'empilées. */
+  .search-card{padding:8px;border-radius:16px}
+  .search-card .field{padding:8px 12px}
+  .search-card label{font-size:10px;margin-bottom:2px}
+  .search-card input,.search-card select{min-height:44px;font-size:16px}
+  .search-card{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+  .search-card .destination{grid-column:1 / -1}
+  .search-card .field:nth-child(2){grid-column:1 / -1}
+  .search-card .search-submit{grid-column:1 / -1;min-height:52px;font-size:16px}
+
+  /* Les garanties : deux colonnes plutôt qu'une file illisible. */
+  .trust-strip{display:grid;grid-template-columns:1fr 1fr;gap:1px}
+  .trust-strip span{padding:12px 10px;font-size:12.5px;justify-content:flex-start}
+
+  /* Les filtres défilent horizontalement sans couper la page. */
+  .filtres{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .filtres::-webkit-scrollbar{display:none}
+  .filtres>span{flex:none}
+  .filtre-velo{flex:none;min-height:44px}
+
+  /* Les résultats : la carte passe sous la liste, pas à côté. */
+  .results-layout{grid-template-columns:1fr}
+  .map{height:260px;order:2}
+  /* Le temps de marche est ce qu'on compare : il reste en haut à droite,
+     lisible d'un coup d'œil, pas relégué sous le texte. */
+  .result-card{padding:14px;display:grid;
+    grid-template-columns:52px 1fr auto;column-gap:12px;align-items:start}
+  .result-card .initial{width:52px;height:52px;font-size:17px}
+  .result-card .walk{grid-column:3;grid-row:1;font-size:19px;text-align:right;
+    line-height:1.1;white-space:nowrap}
+  .result-card .walk small{font-size:11px;display:block}
+  .result-card h3{font-size:17px;margin:2px 0}
+  .result-card .meta,.result-card .fit{font-size:13px}
+
+  /* La fiche : la demande passe sous le contenu, et reste atteignable. */
+  .profile-grid{grid-template-columns:1fr}
+  .request-box{position:sticky;bottom:0;margin-top:18px}
+  .request-line select{min-height:44px;font-size:16px}
+
+  /* Toute cible tactile fait au moins 44 px. */
+  .back,.brand,.tabs button,.outline,.primary{min-height:44px}
+}
+
+/* =====================================================================
+   MODERNISATION
+   Trois gestes, pas trente : une typographie plus tendue, des surfaces
+   qui respirent, et le vert reserve a ce qui compte.
+   ===================================================================== */
+
+/* 1. La typographie. Un titre moins large, plus serre, cale sur une
+      colonne : c'est ce qui fait la difference entre « grand » et
+      « travaille ». */
+.hero h1{letter-spacing:-.035em;line-height:.96;max-width:15ch}
+.hero .kicker{font-size:11px;letter-spacing:.16em;opacity:.9}
+.hero-copy>p{font-size:17.5px;line-height:1.62;max-width:46ch;color:var(--muted)}
+h2{letter-spacing:-.03em}
+.section-head h2{line-height:1.04}
+
+/* 2. Les surfaces. Une ombre plus basse et plus large porte mieux qu'une
+      ombre serree : l'element semble pose, pas colle. */
+.search-card{border-radius:22px;border:1px solid rgba(9,45,26,.07);
+  box-shadow:0 2px 4px rgba(9,45,26,.04), 0 26px 60px -28px rgba(9,45,26,.28);
+  background:rgba(255,255,255,.94);backdrop-filter:blur(8px)}
+.search-card .field{border-radius:14px;transition:background .18s ease}
+.search-card .field:focus-within{background:rgba(1,118,40,.05)}
+.trust-strip{border-radius:16px;border:1px solid rgba(9,45,26,.06);
+  box-shadow:0 1px 2px rgba(9,45,26,.03)}
+.result-card{border-radius:18px;transition:border-color .18s ease, transform .18s ease}
+.result-card:hover{border-color:rgba(1,118,40,.35);transform:translateY(-1px)}
+.guard-card{border-radius:18px}
+
+/* 3. Le bouton. Un vert plein, un rayon franc, et une reaction au doigt —
+      rien de plus. */
+.primary{border-radius:14px;box-shadow:0 10px 24px -12px rgba(1,118,40,.55);
+  letter-spacing:-.01em}
+.primary:hover{background:var(--green-dark);box-shadow:0 12px 28px -12px rgba(1,118,40,.6)}
+.primary:active{transform:translateY(1px)}
+.outline{border-radius:14px}
+.filtre-velo{border-radius:12px}
+
+/* Le fond : un degrade tres pale, oriente, plutot qu'un aplat. */
+.hero{background:
+  radial-gradient(1100px 520px at 78% 8%, rgba(1,118,40,.09), transparent 62%),
+  linear-gradient(180deg, #fbfcfb 0%, var(--paper) 100%)}
+
+@media(max-width:560px){
+  .hero h1{letter-spacing:-.03em;font-size:34px;max-width:none}
+  .hero-copy>p{font-size:15.5px}
+  .search-card{border-radius:18px}
+  .primary{border-radius:13px}
+}
+
+/*
+ * Le plan de quartier.
+ *
+ * Le hero montrait le logo agrandi sur un cadre pointille — joli, mais il ne
+ * disait rien du produit. Un plan avec trois zones et leurs temps de marche
+ * dit tout en une image : c'est pres, c'est a pied, et l'adresse n'est pas
+ * donnee.
+ */
+/* Le parent centre son contenu : sans largeur, un bloc en ratio se replie. */
+.plan{position:relative;width:100%;max-width:460px;aspect-ratio:1/1;
+  border-radius:26px;overflow:hidden;
+  background:linear-gradient(160deg,#f4f9f5,#eef5f0);
+  border:1px solid rgba(9,45,26,.07);
+  box-shadow:0 2px 4px rgba(9,45,26,.04), 0 34px 70px -34px rgba(9,45,26,.32)}
+.plan svg{position:absolute;inset:0;width:100%;height:100%}
+.plan .ici{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:7px}
+.plan .ici i{width:15px;height:15px;border-radius:50%;background:var(--deep);
+  box-shadow:0 0 0 7px rgba(9,45,26,.10)}
+.plan .ici b{background:#fff;border:1px solid rgba(9,45,26,.08);border-radius:99px;
+  padding:5px 12px;font-size:12.5px;white-space:nowrap;
+  box-shadow:0 6px 16px -10px rgba(9,45,26,.4)}
+.plan .min{position:absolute;background:var(--green);color:#fff;font-weight:700;
+  font-size:13px;border-radius:99px;padding:7px 14px;
+  box-shadow:0 10px 22px -12px rgba(1,118,40,.7)}
+.plan .m1{left:16%;top:26%}
+.plan .m2{right:12%;top:22%}
+.plan .m3{left:20%;bottom:24%}
+.plan .floating-card{position:absolute;right:14px;bottom:14px;left:auto;top:auto}
+@media(max-width:900px){.plan{max-width:420px;margin:0 auto}}
+@media(max-width:560px){.hero-brand-visual{display:none}}
+
+/* =====================================================================
+   LE PREMIER ÉCRAN
+   Comprendre ne suffit pas : il faut pouvoir essayer sans défiler. Sur un
+   portable de 768 px, la recherche et les garanties doivent tenir.
+   ===================================================================== */
+@media(min-width:901px){
+  .hero{padding-top:34px;padding-bottom:34px}
+  .hero h1{font-size:clamp(42px,4.4vw,62px);line-height:1.0;max-width:14ch}
+  .hero .eyebrow{margin-bottom:12px}
+  .hero-copy>p{margin-top:14px;font-size:16.5px;max-width:44ch}
+  .hero-grid{align-items:center;gap:40px}
+  .plan{max-width:400px}
+  .search-card{margin-top:26px}
+  .trust-strip{margin-top:12px}
+}
+@media(min-width:901px) and (max-height:820px){
+  /* Sur un écran bas, on rend encore un peu de hauteur. */
+  .hero{padding-top:24px}
+  .hero h1{font-size:clamp(38px,3.8vw,52px)}
+  .plan{max-width:340px}
+}
+
+/* Une garde terminee se lit d'un coup d'oeil, sans crier. */
+/* Sept boutons ne tiennent pas dans une colonne : ils passent sous le texte. */
+.guard-card{grid-template-columns:auto minmax(0,1fr)}
+.guard-actions{grid-column:1/-1;display:flex;gap:8px;align-items:center;
+  flex-wrap:wrap;margin-top:12px}
+.guard-card.terminee{opacity:.86}
+.guard-card.terminee .status{color:var(--muted)}
+@media(max-width:560px){
+  .guard-card{grid-template-columns:1fr}
+  .guard-actions{width:100%}
+  .guard-actions button{flex:1;min-height:44px}
+}
+
+/* La saisie du code : peu de place, beaucoup de clarte. */
+.code-box{grid-column:1 / -1;margin-top:14px;padding:16px;border-radius:14px;
+  background:rgba(1,118,40,.05);border:1px solid rgba(1,118,40,.16)}
+.code-intro{font-size:.92rem;color:var(--ink);margin:0 0 12px;max-width:60ch}
+.code-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#codeInput{width:132px;min-height:48px;text-align:center;font-size:22px;font-weight:700;
+  letter-spacing:.28em;border:1px solid var(--line);border-radius:12px;background:#fff}
+.code-aide{font-size:.84rem;color:var(--muted);margin:10px 0 0}
+.code-aide.faux{color:var(--coral);font-weight:600}
+@media(max-width:560px){
+  .code-row{gap:8px}
+  #codeInput{flex:1;width:auto}
+  .code-row .primary{flex:none}
+}
+
+/*
+ * Le calendrier.
+ *
+ * Une liste deroulante de huit dates se lit mal : on ne voit pas le jour de la
+ * semaine, ni ce qui est encore ouvert. Un calendrier montre les deux d'un
+ * coup d'oeil, et grise ce qu'on ne peut pas demander.
+ */
+.champ-date{position:relative}
+.date-btn{width:100%;text-align:left;background:transparent;border:0;padding:0;
+  font:inherit;font-weight:700;font-size:.94rem;color:var(--ink);cursor:pointer;
+  min-height:24px}
+.cal{position:absolute;top:calc(100% + 10px);left:-8px;z-index:60;width:296px;
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;
+  box-shadow:0 24px 60px -26px rgba(9,45,26,.42)}
+.cal[hidden]{display:none}
+.cal-tete{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-tete b{font-size:.95rem;text-transform:capitalize}
+.cal-nav{border:1px solid var(--line);background:#fff;border-radius:9px;width:32px;
+  height:32px;font-size:17px;line-height:1;cursor:pointer;color:var(--ink)}
+.cal-nav[disabled]{opacity:.35;cursor:default}
+.cal-jours,.cal-grille{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-jours span{text-align:center;font-size:.7rem;color:var(--muted);font-weight:700;
+  padding-bottom:4px}
+.cal-grille button{border:0;background:transparent;border-radius:10px;height:36px;
+  font:inherit;font-size:.88rem;color:var(--ink);cursor:pointer}
+.cal-grille button:hover:not([disabled]){background:rgba(1,118,40,.10)}
+.cal-grille button[disabled]{color:#c3ccc6;cursor:default}
+.cal-grille button[aria-pressed="true"]{background:var(--green);color:#fff;font-weight:700}
+.cal-grille .vide{visibility:hidden}
+.cal-note{margin:12px 0 0;font-size:.76rem;color:var(--muted)}
+@media(max-width:560px){.cal{left:0;right:0;width:auto}}
+
+/*
+ * Deux pastilles plutot qu'un calendrier.
+ *
+ * Neuf demandes sur dix seront pour aujourd'hui : ces gens-la ne devraient
+ * jamais voir un calendrier. Il s'ouvre sur « autre date », et seulement la.
+ */
+.jours{display:flex;gap:6px;margin-top:2px}
+.jour{border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:5px 12px;font:inherit;font-size:.84rem;font-weight:600;color:var(--ink);
+  cursor:pointer;white-space:nowrap}
+.jour:hover{border-color:var(--green)}
+.jour[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.jour:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.date-btn[hidden]{display:none}
+@media(max-width:560px){
+  .jour{padding:9px 14px;font-size:.9rem;min-height:40px}
+  .jours{gap:8px}
+}
+
+/*
+ * Ce que voit quelqu'un qui revient.
+ *
+ * La page d'accueil est un argumentaire : utile la premiere fois, du temps
+ * perdu la dixieme. Un membre qui a une garde en cours vient verifier ca, et
+ * il va presque toujours aux memes endroits.
+ */
+.reprise[hidden]{display:none}
+
+.recents{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.recents[hidden]{display:none}
+.recent{border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:5px 12px;font:inherit;font-size:.82rem;color:var(--ink);cursor:pointer;
+  white-space:nowrap;max-width:210px;overflow:hidden;text-overflow:ellipsis}
+.recent:hover{border-color:var(--green);color:var(--green)}
+.recent:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+@media(max-width:560px){
+  .reprise{padding:12px 14px}
+  .reprise button{width:100%}
+  .recent{min-height:38px;font-size:.88rem}
+}
+
+/*
+ * Les resultats ne se valent pas.
+ *
+ * Un garage plain-pied et une cave au bout d'un couloir demandent le meme
+ * clic aujourd'hui. L'acces se lit dans la liste, et le plus proche se
+ * distingue — c'est le critere de tri, autant le dire.
+ */
+.result-card.proche{border-color:rgba(1,118,40,.35);background:rgba(1,118,40,.035)}
+.plus-proche{display:block;margin-top:4px;font-size:.68rem;font-weight:700;
+  color:var(--green);letter-spacing:.03em}
+.acces{margin:4px 0 0;font-size:.82rem;color:var(--muted)}
+@media(max-width:560px){
+  .plus-proche{font-size:.64rem}
+  .acces{font-size:.8rem}
+}
+
+/*
+ * Progression et classement.
+ *
+ * Des reperes pour celui qui accueille : ou il en est, ce qui vient ensuite.
+ * Le classement n'existe que pour ceux qui s'y inscrivent — personne n'est
+ * classe sans l'avoir demande.
+ */
+.prog-carte{background:var(--card,#fff);border:1px solid var(--line);border-radius:16px;
+  padding:22px;margin-top:18px}
+.prog-solde{font-family:var(--police-dm-sans),sans-serif;font-size:32px;font-weight:700;margin:0;
+  letter-spacing:-.02em}
+.prog-sous{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.jauge{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:16px}
+.jauge span{display:block;height:100%;background:var(--green);border-radius:99px}
+.prog-reste{margin:8px 0 0;font-size:.86rem;color:var(--muted)}
+.prog-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.prog-stats div{background:var(--card,#fff);border:1px solid var(--line);border-radius:14px;
+  padding:16px 10px;text-align:center}
+.prog-stats b{display:block;font-family:var(--police-dm-sans),sans-serif;font-size:22px;font-weight:700}
+.prog-stats span{display:block;font-size:.74rem;color:var(--muted);margin-top:3px}
+.prog-titre{font-size:1.15rem;margin:30px 0 12px;letter-spacing:-.02em}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.badge{background:var(--card,#fff);border:1px solid var(--line);border-radius:14px;padding:16px}
+.badge.on{border-color:rgba(1,118,40,.35);background:rgba(1,118,40,.04)}
+.badge b{display:block;font-size:.98rem;color:var(--ink)}
+.badge span{display:block;margin-top:4px;font-size:.82rem;color:var(--muted)}
+.badge em{display:block;margin-top:8px;font-style:normal;font-size:.74rem;font-weight:700;
+  color:var(--green)}
+.badge em.att{color:var(--muted)}
+.prog-classement p{margin:0}
+.prog-note{margin:10px 0 0;font-size:.82rem;color:var(--muted)}
+.prog-classement button{margin-top:16px}
+.rang-liste{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.rang-liste li{display:flex;align-items:center;gap:12px;background:var(--card,#fff);
+  border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.rang-liste li.moi{border-color:rgba(1,118,40,.4);background:rgba(1,118,40,.05)}
+.rang-liste .rang{width:26px;font-family:var(--police-dm-sans),sans-serif;font-weight:700;
+  color:var(--muted);text-align:center}
+.rang-liste .ini{width:36px;height:36px;border-radius:50%;background:rgba(1,118,40,.10);
+  color:var(--green);display:grid;place-items:center;font-weight:700;font-size:.88rem}
+.rang-liste .qui{flex:1;min-width:0}
+.rang-liste .qui b{display:block;font-size:.98rem}
+.rang-liste .qui span{display:block;font-size:.78rem;color:var(--muted)}
+.rang-liste .chiffre{font-size:.88rem;color:var(--muted);white-space:nowrap}
+@media(max-width:560px){
+  .badges{grid-template-columns:1fr}
+  .prog-stats{gap:6px}
+  .prog-stats b{font-size:19px}
+  .prog-classement button{width:100%;min-height:46px}
+}
+
+/* Le bleu est reserve a la verification : un titre de badge n'en est pas une. */
+#progression .badge b{color:var(--ink)}
+/* Les onglets de periode heritaient du style des filtres et se tassaient. */
+#classTable .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
+#classTable .seg button{border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:11px 8px;font:inherit;font-size:.9rem;font-weight:600;color:var(--ink);
+  cursor:pointer;min-height:46px}
+#classTable .seg button.on{background:var(--green);border-color:var(--green);color:#fff}
+#classTable .seg button:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+/*
+ * Le parcours Bike Sitter.
+ *
+ * C'est le cote qui manque vraiment : vingt personnes a convaincre d'ouvrir
+ * leur garage. Chaque ecran dit ce qu'on demande — et, aussi important, ce
+ * qu'on ne demande pas.
+ */
+.bs-intro{color:var(--muted);font-size:1.02rem;max-width:56ch;margin:12px 0 0}
+.bs-liste{list-style:none;margin:12px 0 0;padding:0;max-width:62ch}
+.bs-liste li{padding:13px 0 13px 26px;position:relative;border-top:1px solid var(--line);
+  font-size:.96rem}
+.bs-liste li:first-child{border-top:0}
+.bs-liste li::before{content:"";position:absolute;left:0;top:21px;width:13px;height:2px;
+  background:var(--green);border-radius:2px}
+.bs-liste b{font-weight:700}
+.bs-non{margin-top:22px;background:rgba(1,118,40,.05);border:1px solid rgba(1,118,40,.16);
+  border-radius:16px;padding:18px 22px;max-width:62ch}
+.bs-non b{display:block;margin-bottom:8px}
+.bs-non ul{margin:0;padding-left:18px;color:var(--muted);font-size:.94rem}
+.bs-non li{margin-bottom:4px}
+.bs-cta{margin-top:26px}
+.etapes-barre{height:6px;border-radius:99px;background:var(--line);overflow:hidden;
+  margin-bottom:18px}
+.etapes-barre span{display:block;height:100%;background:var(--green);border-radius:99px}
+.champs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;max-width:660px}
+.champs label{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:12px 16px}
+.champs label span{display:block;font-size:.74rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.champs select{width:100%;border:0;background:transparent;font:inherit;font-size:.98rem;
+  font-weight:600;color:var(--ink);min-height:32px}
+.bs-alerte{margin-top:18px;background:#FCEEEB;border:1px solid #F0CFC7;border-radius:14px;
+  padding:16px 20px;max-width:62ch}
+.bs-alerte b{display:block;color:#8C2F1E;margin-bottom:6px}
+.bs-alerte p{margin:0;color:#8C2F1E;font-size:.9rem}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;
+  max-width:660px}
+.photo-vide{aspect-ratio:4/3;border:1px dashed var(--line);border-radius:14px;
+  display:grid;place-items:center;color:var(--muted);font-size:.82rem;text-align:center;
+  padding:10px;background:rgba(1,118,40,.03)}
+.jours-semaine{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.jour-b{border:1px solid var(--line);background:#fff;border-radius:12px;min-width:56px;
+  min-height:46px;font:inherit;font-weight:600;color:var(--ink);cursor:pointer}
+.jour-b.on{background:var(--green);border-color:var(--green);color:#fff}
+.jour-b:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.suivi{list-style:none;counter-reset:e;margin:20px 0 0;padding:0;max-width:62ch}
+.suivi li{position:relative;padding:14px 0 14px 44px;border-top:1px solid var(--line)}
+.suivi li:first-child{border-top:0}
+.suivi li::before{counter-increment:e;content:counter(e);position:absolute;left:0;top:14px;
+  width:28px;height:28px;border-radius:50%;border:1px solid var(--line);color:var(--muted);
+  display:grid;place-items:center;font-size:.82rem;font-weight:700;background:#fff}
+.suivi li.fait::before{content:"✓";background:var(--green);border-color:var(--green);
+  color:#fff}
+.suivi li.encours::before{border-color:var(--green);color:var(--green)}
+.suivi b{display:block;font-size:.98rem}
+.suivi span{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+@media(max-width:560px){
+  .champs{grid-template-columns:1fr}
+  .photos{grid-template-columns:1fr 1fr}
+  .bs-cta{width:100%;min-height:48px}
+  .jour-b{flex:1;min-width:42px}
+}
+
+/*
+ * Le parcours Bike Sitter, version travaillee.
+ *
+ * Le texte seul se lisait comme un formulaire administratif. Deux colonnes,
+ * un fil d'etapes nomme, des champs qui reagissent : la meme information,
+ * mais on voit ou on en est.
+ */
+#devenirbs .dashboard-wrap,
+#bsespace .dashboard-wrap,
+#bsdispo .dashboard-wrap,
+#bsenvoye .dashboard-wrap{max-width:1000px}
+
+.bs-hero{display:grid;grid-template-columns:1.25fr .9fr;gap:44px;align-items:center;
+  padding:8px 0 12px}
+#devenirbs h1{font-size:clamp(2rem,3.6vw,2.9rem);line-height:1.04;letter-spacing:-.03em;
+  max-width:16ch}
+.bs-carte-visuel{display:grid;gap:10px;background:
+  radial-gradient(600px 300px at 80% 0%, rgba(1,118,40,.10), transparent 62%),
+  linear-gradient(180deg,#fbfcfb,#f2f7f3);
+  border:1px solid rgba(9,45,26,.08);border-radius:22px;padding:22px;
+  box-shadow:0 2px 4px rgba(9,45,26,.04), 0 26px 56px -30px rgba(9,45,26,.3)}
+.bs-chiffre{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.bs-chiffre b{display:block;font-family:var(--police-dm-sans),sans-serif;font-size:1.45rem;
+  letter-spacing:-.02em;line-height:1}
+.bs-chiffre span{display:block;color:var(--muted);font-size:.84rem;margin-top:4px}
+
+/* Le fil d'etapes : on sait ou on est et ce qui reste. */
+.fil-etapes{list-style:none;counter-reset:fe;display:flex;gap:8px;margin:0 0 26px;padding:0;
+  flex-wrap:wrap}
+.fil-etapes li{counter-increment:fe;display:flex;align-items:center;gap:8px;
+  border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 16px 7px 8px;
+  font-size:.86rem;color:var(--muted)}
+.fil-etapes li::before{content:counter(fe);width:22px;height:22px;border-radius:50%;
+  background:var(--line);color:var(--muted);display:grid;place-items:center;
+  font-size:.74rem;font-weight:700}
+.fil-etapes li.on{border-color:var(--green);color:var(--ink);font-weight:700;
+  background:rgba(1,118,40,.05)}
+.fil-etapes li.on::before{background:var(--green);color:#fff}
+.fil-etapes li.fait::before{content:"✓";background:var(--green);color:#fff}
+.fil-etapes li.fait{color:var(--ink)}
+
+/* Les champs respirent et reagissent. */
+.champs label{transition:border-color .16s ease, box-shadow .16s ease}
+.champs label:focus-within{border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(1,118,40,.12)}
+.photo-vide{transition:border-color .16s ease, background .16s ease}
+.photo-vide:hover{border-color:var(--green);background:rgba(1,118,40,.06)}
+.jour-b{transition:transform .12s ease}
+.jour-b:active{transform:translateY(1px)}
+
+#bsespace h1, #bsdispo h1, #bsenvoye h1{font-size:clamp(1.8rem,3vw,2.4rem);
+  letter-spacing:-.03em;line-height:1.06}
+
+@media(max-width:860px){
+  .bs-hero{grid-template-columns:1fr;gap:24px}
+  .bs-carte-visuel{padding:18px}
+}
+@media(max-width:560px){
+  .fil-etapes li{padding:6px 12px 6px 6px;font-size:.8rem}
+  .bs-chiffre b{font-size:1.25rem}
+}
+
+/*
+ * L'espace du bike sitter.
+ *
+ * Ce qu'il vient voir : une demande qui attend, et ce qu'il a promis pour
+ * aujourd'hui. Le reste peut descendre.
+ */
+#bsaccueil .dashboard-wrap, #bsdemande .dashboard-wrap,
+#bsacceptee .dashboard-wrap, #bsprofil .dashboard-wrap{max-width:1000px}
+
+.dispo-ligne{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:18px;
+  background:rgba(1,118,40,.05);border:1px solid rgba(1,118,40,.16);border-radius:16px;
+  padding:16px 20px}
+.dispo-ligne>div{flex:1;min-width:220px}
+.dispo-ligne b{display:block;font-size:1rem}
+.dispo-ligne span{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+
+.dem-carte{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;
+  border:1px solid rgba(1,118,40,.28);border-radius:16px;padding:16px 20px;margin-top:10px;
+  box-shadow:0 1px 2px rgba(9,45,26,.04)}
+.dem-carte.calme{border-color:var(--line)}
+.dem-carte .grow{flex:1;min-width:220px}
+.dem-carte b{display:block;font-size:1.02rem}
+.dem-carte p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.dem-delai{color:#8C2F1E !important;font-weight:600}
+.ini-c{width:44px;height:44px;border-radius:50%;background:rgba(1,118,40,.10);
+  color:var(--green);display:grid;place-items:center;font-weight:700;font-size:1.05rem;
+  flex:none}
+.ini-c.grand{width:58px;height:58px;font-size:1.3rem}
+
+.delai-bandeau{background:#FCEEEB;border:1px solid #F0CFC7;border-radius:14px;
+  padding:14px 18px;color:#8C2F1E;font-size:.92rem;margin-bottom:20px;max-width:62ch}
+.dem-qui{display:flex;align-items:center;gap:16px;margin-top:16px}
+.dem-qui b{font-size:1.1rem}
+.dem-qui p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+
+.champs.lecture{grid-template-columns:1fr 1fr}
+.champs.lecture div{background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:12px 16px}
+.champs.lecture span{display:block;font-size:.74rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em}
+.champs.lecture b{display:block;margin-top:3px;font-size:.98rem}
+
+.note-cycliste{margin-top:18px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;padding:16px 20px;max-width:62ch}
+.note-cycliste b{display:block;margin-bottom:6px;font-size:.92rem}
+.note-cycliste p{margin:0;color:var(--muted);font-size:.94rem;font-style:italic}
+
+.deux-boutons{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.deux-boutons button{min-height:48px;padding-left:26px;padding-right:26px}
+
+.ok-rond{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;
+  display:grid;place-items:center;font-size:30px;margin-bottom:18px}
+
+.reglages{list-style:none;margin:12px 0 0;padding:0;max-width:62ch;
+  border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+.reglages li{padding:14px 20px;border-top:1px solid var(--line)}
+.reglages li:first-child{border-top:0}
+.reglages b{display:block;font-size:.98rem}
+.reglages span{display:block;color:var(--muted);font-size:.86rem;margin-top:2px}
+
+.bascule{width:52px;height:30px;border-radius:99px;border:1px solid var(--line);
+  background:var(--line);position:relative;cursor:pointer;flex:none}
+.bascule span{position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;
+  background:#fff;transition:left .16s ease}
+.bascule.on{background:var(--green);border-color:var(--green)}
+.bascule.on span{left:24px}
+.bascule:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+@media(max-width:560px){
+  .champs.lecture{grid-template-columns:1fr}
+  .deux-boutons button{width:100%}
+  .dem-carte button{width:100%}
+}
+
+/* Le badge de verification doit se detacher du nom, pas s'y coller. */
+.dem-carte b .tag.ver, .dem-qui .tag.ver, #bsprofil .tag.ver{
+  display:inline-block;margin-left:8px;vertical-align:middle;
+  background:var(--blue-wash,#E7F1FE);color:var(--blue,#246bfd);
+  border-radius:999px;padding:3px 10px;font-size:.7rem;font-weight:700;
+  letter-spacing:.02em}
+#bsprofil .bs-intro .tag.ver{margin-left:0;margin-right:6px}
+
+/*
+ * Fin de garde et assistance.
+ *
+ * Les quatre ecrans ou quelque chose peut mal tourner. Chacun dit ce qui se
+ * passe ensuite, plutot que de laisser deviner.
+ */
+#prolonger .dashboard-wrap, #recuperer .dashboard-wrap,
+#avis .dashboard-wrap, #probleme .dashboard-wrap{max-width:1000px}
+
+.code-box2{margin-top:12px;padding:20px;border-radius:16px;
+  background:rgba(1,118,40,.05);border:1px solid rgba(1,118,40,.16);max-width:62ch}
+.code-box2 .code-intro{font-size:.94rem;margin:0 0 14px}
+.code-box2 #codeRec{width:140px;min-height:50px;text-align:center;font-size:24px;
+  font-weight:700;letter-spacing:.3em;border:1px solid var(--line);border-radius:12px;
+  background:#fff}
+
+/* Les etoiles : grandes, cliquables au doigt, sans jaune. */
+.etoiles{display:flex;gap:8px;margin-top:10px}
+.etoiles button{border:1px solid var(--line);background:#fff;border-radius:12px;
+  width:54px;height:54px;font-size:24px;line-height:1;color:var(--line);cursor:pointer}
+.etoiles button.on{color:var(--green);border-color:var(--green);
+  background:rgba(1,118,40,.06)}
+.etoiles button:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+.pastilles{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pf{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;
+  font:inherit;font-size:.9rem;color:var(--ink);cursor:pointer;min-height:42px}
+.pf.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.pf:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+.zone-texte{width:100%;max-width:62ch;min-height:110px;border:1px solid var(--line);
+  border-radius:14px;padding:14px 16px;font:inherit;font-size:.96rem;resize:vertical;
+  margin-top:10px;background:#fff}
+.zone-texte:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+.urgence{margin-top:16px;background:#FCEEEB;border:1px solid #F0CFC7;border-radius:14px;
+  padding:16px 20px;max-width:62ch}
+.urgence b{display:block;color:#8C2F1E}
+.urgence p{margin:4px 0 0;color:#8C2F1E;font-size:.9rem}
+
+.motifs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;max-width:820px}
+.motif{text-align:left;border:1px solid var(--line);background:#fff;border-radius:14px;
+  padding:16px 18px;font:inherit;cursor:pointer;color:var(--ink)}
+.motif:hover{border-color:var(--green)}
+.motif.on{border-color:var(--green);background:rgba(1,118,40,.05)}
+.motif b{display:block;font-size:.98rem}
+.motif span{display:block;color:var(--muted);font-size:.86rem;margin-top:3px}
+.motif:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+@media(max-width:560px){
+  .motifs{grid-template-columns:1fr}
+  .etoiles button{width:48px;height:48px;font-size:21px}
+  .code-box2 #codeRec{flex:1;width:auto}
+}
+
+/*
+ * Sur telephone, la date et l'heure vont ensemble.
+ *
+ * Trois champs separes — jour, de, a — demandaient trois gestes et deux
+ * lectures pour savoir quand on depose. Deux champs suffisent : « Dépôt » et
+ * « Reprise », chacun avec sa date et son heure.
+ */
+.quand-mobile{display:none}
+@media(max-width:560px){
+  .search-card .champ-date,
+  .search-card .field.time{display:none}
+  /* Deux colonnes egales qui ne depassent jamais la largeur du telephone. */
+  .quand-mobile{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:8px;grid-column:1 / -1;margin-top:4px;min-width:0}
+  .qm{min-width:0;overflow:hidden}
+  .qm{display:flex;align-items:center;gap:8px;text-align:left;
+    border:1px solid var(--line);background:#fff;border-radius:14px;
+    padding:11px 11px;font:inherit;color:var(--ink);cursor:pointer;min-height:58px}
+  .qm:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+  .qm-ic{font-size:17px;line-height:1;flex:none;filter:grayscale(1)}
+  .qm-txt{min-width:0}
+  .qm-txt b{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis}
+  .qm-txt span{display:block;font-size:.72rem;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+  /* Le panneau qui s'ouvre au clic reprend les vrais reglages. */
+  .quand-ouvert .search-card .champ-date,
+  .quand-ouvert .search-card .field.time{display:block}
+  .quand-ouvert .quand-mobile{display:none}
+}
+
+/* Le format demande : icone et valeur, sans sous-titre. L intitule reste
+   accessible aux lecteurs d ecran. */
+@media(max-width:560px){
+  .qm{min-height:52px;gap:10px;padding:13px}
+  .qm-txt b{font-size:.95rem}
+  .qm-ic{font-size:18px}
+}
+
+/* La reference met peu d'espace autour de l'icone : c'est ce qui laisse
+   la place a « 6 mars, 18h30 » sur une demi-largeur. */
+@media(max-width:560px){
+  .qm{gap:7px;padding:12px 10px;min-height:50px}
+  .qm-ic{font-size:15px}
+  .qm-txt b{font-size:.86rem;letter-spacing:-.01em}
+}
+@media(max-width:380px){
+  .qm-txt b{font-size:.8rem}
+  .qm{padding:11px 8px}
+}
+
+/* =====================================================================
+   LA DATE ET L'HEURE ENSEMBLE, SUR TOUS LES ÉCRANS
+   Trois champs — jour, de, à — demandaient trois lectures pour savoir
+   quand on dépose. Deux suffisent, et chacun porte sa date.
+   ===================================================================== */
+.search-card{align-items:stretch}
+.search-card .champ-date,
+.search-card .field.time{display:none}
+.quand-mobile{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
+.qm{display:flex;align-items:center;gap:10px;text-align:left;min-width:0;
+  border:1px solid var(--line);background:#fff;border-radius:14px;
+  padding:12px 14px;font:inherit;color:var(--ink);cursor:pointer;min-height:56px}
+.qm:hover{border-color:var(--green)}
+.qm:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.qm-ic{font-size:16px;line-height:1;flex:none;filter:grayscale(1)}
+.qm-txt{min-width:0}
+.qm-txt b{display:block;font-size:.95rem;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+/* Les vrais réglages remplacent les deux champs le temps d'un choix. */
+.quand-ouvert .search-card .champ-date,
+.quand-ouvert .search-card .field.time{display:block}
+.quand-ouvert .quand-mobile{display:none}
+@media(min-width:561px){
+  .quand-mobile{grid-column:auto;margin-top:0}
+  .search-card{display:grid;grid-template-columns:1.15fr 1.5fr auto;gap:6px;
+    align-items:center}
+  .search-card .destination{grid-column:auto}
+  .quand-ouvert .search-card{grid-template-columns:1.1fr 1.05fr .95fr .95fr auto}
+}
+
+/* =====================================================================
+   LA CARTE DE RECHERCHE, DANS L'ORDRE DEMANDÉ
+   Barre de recherche · deux champs date-heure · filtres · bouton.
+   Une colonne, sur tous les écrans : c'est l'ordre dans lequel on
+   répond aux questions.
+   ===================================================================== */
+.search-card, .quand-ouvert .search-card{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:10px;
+  padding:14px;
+  align-items:stretch}
+.search-card .field.destination{grid-column:1 / -1}
+.barre-rech-champ{display:flex;align-items:center;gap:10px;
+  border:1px solid var(--line);border-radius:14px;padding:13px 16px;background:#fff}
+.barre-rech-champ .loupe{font-size:15px;filter:grayscale(1);flex:none}
+.barre-rech-champ input{flex:1;min-width:0;border:0;background:transparent;
+  font:inherit;font-size:1rem;color:var(--ink)}
+.barre-rech-champ input::placeholder{color:var(--muted)}
+.barre-rech-champ:focus-within{border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(1,118,40,.12)}
+
+.quand-mobile{grid-template-columns:1fr 1fr !important;gap:10px}
+
+.filtres-champ{display:flex;align-items:center;gap:12px;text-align:left;
+  border:1px solid var(--line);background:#fff;border-radius:14px;
+  padding:12px 14px 12px 16px;font:inherit;color:var(--ink);cursor:pointer;
+  min-height:62px}
+.filtres-champ:hover{border-color:var(--green)}
+.filtres-champ:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.fc-txt{flex:1;min-width:0}
+.fc-txt b{display:block;font-size:1rem}
+.fc-txt span{display:block;color:var(--muted);font-size:.86rem;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-plus{flex:none;width:38px;height:38px;border-radius:50%;background:var(--green);
+  color:#fff;display:grid;place-items:center;font-size:22px;line-height:1;font-weight:400}
+
+.chercher{border:0;border-radius:999px;background:var(--ink);color:#fff;
+  font:inherit;font-weight:700;font-size:1.02rem;padding:16px;cursor:pointer;
+  min-height:56px}
+.chercher:hover{background:#000}
+.chercher:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+
+/* Les deux champs date-heure sont plus etroits qu'avant : on rend la place
+   prise par l'icone et les marges. */
+.qm{gap:8px;padding:12px 10px}
+.qm-ic{font-size:14px}
+.qm-txt b{font-size:.88rem}
+@media(max-width:400px){
+  .qm{padding:11px 8px;gap:6px}
+  .qm-txt b{font-size:.82rem}
+  .qm-ic{font-size:13px}
+}
+
+/* =====================================================================
+   LE BOUTON ET LA DISPOSITION
+   Vert, comme toutes les actions du produit. En colonne sur telephone,
+   en ligne sur ordinateur — la largeur disponible n'est pas la meme.
+   ===================================================================== */
+.chercher{background:var(--green);border-radius:14px}
+.chercher:hover{background:var(--green-dark, #00652d)}
+
+@media(max-width:560px){
+  /* Un bouton pleine largeur invite a appuyer n'importe ou : on le resserre
+     et on le centre. */
+  .chercher{justify-self:center;width:auto;min-width:62%;padding:15px 34px;
+    border-radius:999px}
+}
+
+@media(min-width:561px){
+  /* Sur ordinateur, tout tient sur une ligne. */
+  .search-card, .quand-ouvert .search-card{
+    grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr)
+      minmax(0,1.1fr) auto !important;
+    align-items:center;
+    gap:8px;
+    padding:10px}
+  .search-card .field.destination{grid-column:auto}
+  .quand-mobile{display:contents}
+  .barre-rech-champ{padding:12px 14px}
+  .filtres-champ{min-height:56px;padding:10px 10px 10px 14px}
+  .fc-txt b{font-size:.94rem}
+  .fc-txt span{font-size:.8rem}
+  .fc-plus{width:34px;height:34px;font-size:20px}
+  .chercher{padding:15px 26px;white-space:nowrap;border-radius:14px}
+  .qm{min-height:56px}
+}
+
+/* Entre le telephone et le grand ecran, cinq colonnes serrent trop :
+   l'apercu des filtres passe sur deux lignes plutot que d'etre coupe. */
+@media(min-width:561px) and (max-width:1100px){
+  .search-card, .quand-ouvert .search-card{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto !important;
+    row-gap:8px}
+  .search-card .field.destination{grid-column:1 / -1}
+  .quand-mobile{display:grid !important;grid-column:1 / 3;
+    grid-template-columns:1fr 1fr !important}
+  .filtres-champ{grid-column:1 / 2}
+  .chercher{grid-column:2 / -1;justify-self:stretch}
+}
+
+/* =====================================================================
+   LES MENUS DE DATE ET D'HEURE
+   Cliquer sur un champ deroule les creneaux qui suivent, date comprise.
+   Plus besoin d'ouvrir trois reglages separes.
+   ===================================================================== */
+.qm-bloc{position:relative;min-width:0}
+.qm-bloc .qm{width:100%}
+.qm-menu{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:70;
+  max-height:266px;overflow-y:auto;background:#fff;border:1px solid var(--line);
+  border-radius:16px;padding:6px;
+  box-shadow:0 24px 60px -26px rgba(9,45,26,.45)}
+.qm-menu[hidden]{display:none}
+.qm-menu button{display:block;width:100%;text-align:left;border:0;background:transparent;
+  border-radius:10px;padding:11px 13px;font:inherit;font-size:.92rem;color:var(--ink);
+  cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qm-menu button:hover{background:rgba(1,118,40,.07)}
+.qm-menu button[aria-selected="true"]{background:var(--green);color:#fff;font-weight:700}
+.qm-menu button:focus-visible{outline:3px solid var(--green);outline-offset:-3px}
+.qm-menu .sep{padding:9px 13px 5px;font-size:.7rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.qm-menu .vide{padding:14px;color:var(--muted);font-size:.88rem}
+/* Les anciens reglages ne servent plus a l'ecran : ils portent les valeurs. */
+.search-card .champ-date,
+.search-card .field.time,
+.quand-ouvert .search-card .champ-date,
+.quand-ouvert .search-card .field.time{display:none !important}
+
+@media(max-width:560px){
+  /* Comme sur la reference : le bouton occupe la largeur de la carte. */
+  .chercher{justify-self:stretch;width:100%;min-width:0;padding:16px;
+    border-radius:999px}
+}
+
+/* Le calendrier, quand il est deplace dans le menu, occupe toute sa largeur. */
+.qm-menu .cal.cal-dans-menu{position:static;width:auto;border:0;box-shadow:none;
+  padding:4px}
+
+/* =====================================================================
+   LA CARTE, TELLE QUE DÉCRITE
+   Un fond plein, des champs blancs empilés, un bouton d'action en bas.
+   Le regard descend : lieu, dates, filtres, action.
+   ===================================================================== */
+.search-card, .quand-ouvert .search-card{
+  background:var(--green-deep, #00491A) !important;
+  border:0 !important;
+  border-radius:24px !important;
+  padding:16px !important;
+  gap:12px !important;
+  grid-template-columns:1fr !important;
+  box-shadow:0 22px 52px -26px rgba(9,45,26,.5) !important}
+
+/* Les champs ressortent en blanc sur le fond plein. */
+.search-card .barre-rech-champ,
+.search-card .qm,
+.search-card .filtres-champ{
+  background:#fff;border:0;border-radius:16px}
+.search-card .barre-rech-champ{padding:15px 18px}
+.search-card .barre-rech-champ input{font-size:1rem}
+.search-card .qm{min-height:56px;padding:14px 16px;gap:9px}
+.search-card .qm-txt b{font-size:.95rem;font-weight:700}
+.search-card .filtres-champ{min-height:70px;padding:12px 12px 12px 18px}
+.search-card .fc-txt b{font-size:1rem}
+.search-card .fc-txt span{font-size:.86rem}
+.search-card .barre-rech-champ:focus-within{box-shadow:0 0 0 3px rgba(255,255,255,.45)}
+.search-card .qm:hover,
+.search-card .filtres-champ:hover{box-shadow:0 0 0 2px rgba(255,255,255,.5)}
+
+/* La rangée de dates : deux blocs identiques. */
+.quand-mobile{display:grid !important;grid-template-columns:1fr 1fr !important;
+  gap:12px !important;grid-column:1 / -1 !important}
+
+/* Le bouton d'action ferme la carte. */
+.chercher{border-radius:999px;padding:18px;font-size:1.05rem;
+  justify-self:stretch;width:100%;min-width:0;margin-top:2px}
+
+@media(min-width:561px){
+  /* Sur ordinateur la carte garde sa forme, mais respire davantage. */
+  .search-card, .quand-ouvert .search-card{padding:18px !important;gap:14px !important}
+  .search-card .qm{min-height:58px}
+}
+
+/* Le champ de destination portait encore son ancien cadre : il se voyait
+   comme un liseré sous la barre blanche. */
+.search-card .field.destination{border:0;background:transparent;padding:0}
+
+/* Les deux blocs de date sont plus etroits sur la carte pleine : on rend la
+   place prise par l'icone et les marges. */
+.search-card .qm{padding:13px 12px;gap:8px}
+.search-card .qm-ic{font-size:14px}
+.search-card .qm-txt b{font-size:.9rem}
+@media(max-width:400px){
+  .search-card .qm{padding:12px 9px;gap:6px}
+  .search-card .qm-txt b{font-size:.84rem}
+  .search-card .qm-ic{font-size:13px}
+}
+
+/* Le palier intermediaire mettait encore le bouton a cote des filtres :
+   il descend en dessous, comme partout ailleurs. */
+@media(min-width:561px) and (max-width:1100px){
+  .search-card, .quand-ouvert .search-card{
+    grid-template-columns:1fr !important}
+  .search-card .field.destination{grid-column:1 / -1}
+  .quand-mobile{grid-column:1 / -1 !important}
+  .filtres-champ{grid-column:1 / -1}
+  .chercher{grid-column:1 / -1;justify-self:stretch}
+}
+
+/* =====================================================================
+   LA CARTE, VERSION PÂLE
+   Un fond léger plutôt qu'un aplat sombre : les champs blancs ressortent
+   sans écraser le reste de la page. Chaque date porte son libellé.
+   ===================================================================== */
+.search-card, .quand-ouvert .search-card{
+  background:rgba(1,118,40,.07) !important;
+  box-shadow:none !important;
+  border:1px solid rgba(1,118,40,.14) !important}
+.search-card .barre-rech-champ,
+.search-card .qm,
+.search-card .filtres-champ{
+  box-shadow:0 1px 2px rgba(9,45,26,.05)}
+
+.qm{flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  text-align:center;padding:11px 10px;min-height:66px}
+.qm-lab{display:block;font-size:.76rem;color:var(--muted);font-weight:500}
+.search-card .qm-txt{width:100%;text-align:center}
+.search-card .qm-txt b{font-size:.98rem;letter-spacing:-.01em}
+
+.duree-ligne{margin:12px 2px 0;font-size:.9rem;color:var(--muted);max-width:52ch}
+.duree-ligne b{color:var(--ink)}
+
+@media(max-width:400px){
+  .search-card .qm-txt b{font-size:.88rem}
+  .qm-lab{font-size:.72rem}
+}
+
+/* Le libelle garde sa casse normale : « Dépôt », pas « DÉPÔT ». */
+.qm-lab{text-transform:none !important;letter-spacing:0 !important}
+
+/* =====================================================================
+   SUR ORDINATEUR : TOUT SUR UNE LIGNE
+   La largeur disponible permet de tout montrer d'un coup. Sur téléphone,
+   la carte reste empilée — c'est la même information, lue autrement.
+   ===================================================================== */
+@media(min-width:901px){
+  .search-card, .quand-ouvert .search-card{
+    grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)
+      minmax(0,1.15fr) auto !important;
+    align-items:center !important;
+    gap:10px !important;
+    padding:12px !important;
+    border-radius:20px !important}
+  .search-card .field.destination{grid-column:auto}
+  .quand-mobile{display:contents !important}
+  .quand-mobile .qm-bloc{min-width:0}
+  .search-card .barre-rech-champ{padding:13px 16px}
+  .search-card .qm{min-height:62px;padding:10px 12px}
+  .search-card .qm-txt b{font-size:.92rem}
+  .qm-lab{font-size:.72rem}
+  .search-card .filtres-champ{min-height:62px;padding:10px 10px 10px 16px}
+  .search-card .fc-txt b{font-size:.94rem}
+  .search-card .fc-txt span{font-size:.8rem}
+  .search-card .fc-plus{width:34px;height:34px;font-size:20px}
+  .chercher{grid-column:auto;justify-self:stretch;width:auto;padding:19px 28px;
+    white-space:nowrap;margin-top:0;font-size:.98rem}
+  .duree-ligne{margin-top:14px}
+}
+
+/* =====================================================================
+   FINITIONS
+   Les details qui font la difference : une ombre qui porte, des champs
+   qui reagissent, une icone qui remplace l'emoji, un bouton qui respire.
+   ===================================================================== */
+.search-card, .quand-ouvert .search-card{
+  background:linear-gradient(180deg, rgba(1,118,40,.09), rgba(1,118,40,.05)) !important;
+  border:1px solid rgba(1,118,40,.13) !important;
+  box-shadow:0 1px 2px rgba(9,45,26,.04),
+             0 26px 60px -34px rgba(9,45,26,.4) !important}
+
+/* Les champs se posent plutot que de flotter. */
+.search-card .barre-rech-champ,
+.search-card .qm,
+.search-card .filtres-champ{
+  box-shadow:0 1px 2px rgba(9,45,26,.06);
+  transition:box-shadow .16s ease, transform .16s ease}
+.search-card .qm:hover,
+.search-card .filtres-champ:hover{
+  box-shadow:0 2px 4px rgba(9,45,26,.07), 0 10px 22px -14px rgba(9,45,26,.35);
+  transform:translateY(-1px)}
+.search-card .qm:active,
+.search-card .filtres-champ:active{transform:translateY(0)}
+.search-card .qm[aria-expanded="true"]{
+  box-shadow:0 0 0 2px var(--green), 0 10px 24px -16px rgba(9,45,26,.5)}
+
+/* La loupe : un trait plutot qu'un emoji, qui change de couleur selon les
+   plateformes. */
+.barre-rech-champ .loupe{display:none}
+.barre-rech-champ::before{
+  content:"";flex:none;width:19px;height:19px;
+  background:currentColor;color:var(--muted);
+  -webkit-mask:no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.4-3.4'/%3E%3C/svg%3E");
+  mask:no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.4-3.4'/%3E%3C/svg%3E")}
+.barre-rech-champ:focus-within::before{color:var(--green)}
+
+/* Le « + » tourne quand les filtres s'ouvrent. */
+.fc-plus{transition:transform .18s ease, box-shadow .18s ease;
+  box-shadow:0 4px 12px -4px rgba(1,118,40,.55)}
+.filtres-champ[aria-expanded="true"] .fc-plus{transform:rotate(45deg)}
+
+/* Le bouton : une ombre portee dans sa propre couleur. */
+.chercher{transition:transform .14s ease, box-shadow .18s ease, background .16s ease;
+  box-shadow:0 10px 24px -10px rgba(1,118,40,.6)}
+.chercher:hover{transform:translateY(-1px);
+  box-shadow:0 14px 30px -10px rgba(1,118,40,.68)}
+.chercher:active{transform:translateY(0)}
+
+/* Les menus arrivent en glissant. */
+.qm-menu{animation:menu-entre .16s ease-out}
+@keyframes menu-entre{from{opacity:0;transform:translateY(-6px)}
+  to{opacity:1;transform:translateY(0)}}
+.qm-menu button{transition:background .12s ease}
+
+/* La ligne de duree : discrete, mais lisible. */
+.duree-ligne{font-size:.92rem;line-height:1.5}
+
+@media(prefers-reduced-motion:reduce){
+  .search-card *, .chercher, .qm-menu{transition:none !important;animation:none !important}
+  .search-card .qm:hover, .chercher:hover{transform:none !important}
+}
+
+/* Le panneau des filtres, sous la barre : des pastilles plutot qu'une liste. */
+.fpanel{background:#fff;border-radius:18px;padding:16px 18px 18px;
+  box-shadow:0 1px 2px rgba(9,45,26,.06);animation:menu-entre .16s ease-out}
+.fpanel[hidden]{display:none}
+.fpanel h3{font-size:.78rem;color:var(--muted);font-weight:700;margin:0 0 8px;
+  text-transform:uppercase;letter-spacing:.06em}
+.fpanel h3+.chips{margin-bottom:16px}
+.fpanel .chips:last-child{margin-bottom:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;
+  padding:8px 15px;font:inherit;font-size:.9rem;cursor:pointer;min-height:40px;
+  transition:background .14s ease, border-color .14s ease, color .14s ease}
+.chip:hover{border-color:var(--green)}
+.chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff;
+  font-weight:600}
+.chip:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+@media(min-width:901px){
+  .fpanel{grid-column:1 / -1;grid-row:2;margin-top:2px}
+}
+
+/* =====================================================================
+   REPRISE TYPOGRAPHIQUE
+   Un seul ton pour le titre, une echelle plus franche, et des sections
+   qui respirent au meme rythme.
+   ===================================================================== */
+.hero h1{
+  font-size:clamp(2.3rem, 5.2vw, 3.9rem);
+  line-height:1.02;
+  letter-spacing:-.035em;
+  max-width:15ch;
+  font-weight:800}
+.hero h1 em{font-style:normal;color:inherit}
+.hero p.sous, .hero-sous{font-size:1.06rem;line-height:1.6;max-width:46ch;
+  color:var(--muted);margin-top:18px}
+
+/* Les titres de section : meme echelle partout, sans sur-titre. */
+.section h2, section h2{
+  font-size:clamp(1.75rem, 3.4vw, 2.6rem);
+  line-height:1.08;
+  letter-spacing:-.03em;
+  max-width:18ch}
+.section > .wrap > p, section > .wrap > p{max-width:56ch}
+
+/* Le rythme vertical : une seule valeur, declinee. */
+.section, section.section{padding-block:clamp(56px, 8vw, 104px)}
+
+/* Le titre tenait sur quatre lignes dont une d'un mot : on le calme. */
+.hero h1{font-size:clamp(2.1rem, 3.9vw, 3.15rem);max-width:19ch;line-height:1.06}
+.hero .kicker{font-weight:600;letter-spacing:0;text-transform:none;font-size:.95rem}
+
+/* =====================================================================
+   LES QUATRE MOMENTS
+   Quatre couleurs sans lien entre elles — dont un rouge, exclu de la
+   charte — devenaient un nuancier. Une seule teinte, quatre profondeurs :
+   c'est la meme famille, et le regard suit.
+   ===================================================================== */
+.moment{border-radius:18px;position:relative;overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.moment.coral{background:#0E7A3A}
+.moment.green{background:#0B6431}
+.moment.blue {background:#094F28}
+.moment.sand {background:#083F21}
+/* Chaque moment porte sa photo : le degrade garde le texte lisible dessus. */
+.moment{display:block;padding:0;min-height:210px;background:#0B6431}
+.moment-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.moment-txt{position:absolute;inset:auto 0 0 0;padding:22px 24px;color:#fff;
+  display:flex;flex-direction:column;gap:3px;
+  background:linear-gradient(to top,rgba(4,32,17,.92) 0%,rgba(4,32,17,.72) 42%,
+    rgba(4,32,17,.35) 75%,transparent 100%)}
+.moment-glyphe{width:30px;height:30px;margin-bottom:10px;color:#fff;
+  filter:drop-shadow(0 2px 6px rgba(2,22,11,.85))}
+@media(max-width:560px){.moment-glyphe{width:26px;height:26px}}
+.moment-txt b{font-size:1.15rem}
+.moment-txt span{font-size:.86rem;opacity:.85;line-height:1.4}
+.moment::before{z-index:1}
+@media(max-width:560px){.moment{min-height:170px}}
+
+.moment b{font-weight:700;letter-spacing:-.01em}
+.moment span{opacity:.78;line-height:1.4}
+/* Un liseré clair marque le haut de chaque tuile, comme une étiquette. */
+.moment::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
+  background:rgba(255,255,255,.28)}
+
+/* =====================================================================
+   LES SIX ÉTAPES
+   C'est une sequence, pas une liste de fonctionnalites : six cartes
+   identiques le cachaient. Un fil les relie, et le numero devient le
+   reperage plutot qu'une decoration en coin.
+   ===================================================================== */
+.steps{gap:0 !important;position:relative}
+.steps article{
+  background:transparent;border:0;box-shadow:none;
+  padding:26px 24px 30px 0;
+  border-top:1px solid var(--line);
+  border-radius:0;
+  display:grid;grid-template-columns:auto 1fr;gap:0 18px;align-items:start}
+.steps article i{
+  grid-row:1 / span 3;
+  position:static;
+  font-style:normal;font-weight:700;font-size:.82rem;
+  width:34px;height:34px;border-radius:50%;
+  background:var(--green);color:#fff;
+  display:grid;place-items:center;
+  margin-top:2px;opacity:1}
+.steps article .step-icon{display:none}
+.steps article h3{margin:4px 0 0;font-size:1.1rem;letter-spacing:-.015em}
+.steps article p{margin-top:6px;color:var(--muted);max-width:44ch;line-height:1.55}
+
+/* Le fil qui relie les etapes d'une meme colonne. */
+@media(min-width:721px){
+  .steps{grid-template-columns:1fr 1fr 1fr}
+  .steps article{padding-right:32px}
+}
+@media(max-width:720px){
+  .steps{grid-template-columns:1fr}
+  .steps article{padding:20px 0 22px}
+}
+
+/* L'icone masquee laissait sa ligne dans la grille : le texte tombait plus
+   bas que son titre. */
+.steps article{grid-template-rows:auto auto}
+.steps article i{grid-row:1 / span 2}
+.steps article h3{grid-column:2;grid-row:1;margin:5px 0 0}
+.steps article p{grid-column:2;grid-row:2;margin-top:6px}
+
+/* La grille conservait une hauteur de ligne heritee de l'ancienne carte :
+   on passe en colonne simple, le numero flotte a gauche du titre. */
+.steps article{display:block !important;padding:24px 30px 26px 0}
+.steps article i{float:left;margin:1px 14px 0 0}
+.steps article h3{margin:5px 0 0;overflow:hidden}
+.steps article p{clear:both;margin:8px 0 0 48px}
+@media(max-width:720px){
+  .steps article p{margin-left:48px}
+}
+
+/* Le logo etait recopie dix-huit fois dans le fichier : une seule image
+   appelee en fond, et la maquette perd trois megaoctets. */
+.brand-mark{flex:none;width:48px;height:48px;border-radius:11px;
+  background:transparent url(/images/maquette-marque-1.webp) center/88% no-repeat}
+.brand.mini .brand-mark{width:42px;height:42px}
+/* Le logo est vert : sur le pied de page sombre, il lui faut sa tuile blanche. */
+.pied .brand-mark{background-color:#fff}
+@media(max-width:900px){.brand-mark{width:43px;height:43px}}
+
+/* Le bloc securite montrait une porte dessinee en CSS : on montre la scene. */
+.security-visual{padding:34px}
+.visuel-securite{display:block;height:min(72%,420px);width:auto;max-width:78%;
+  border-radius:20px;background:#fff;box-shadow:0 24px 50px rgba(4,60,30,.18)}
+@media(max-width:560px){.visuel-securite{height:300px}.security-visual{padding:24px}}
+.visuel-marque{position:absolute;left:26px;bottom:24px;display:flex;align-items:center;
+  gap:10px;background:#fff;border-radius:999px;padding:8px 16px 8px 8px;
+  font:800 13px var(--police-manrope),sans-serif;color:var(--ink);
+  box-shadow:0 12px 30px rgba(4,51,27,.14)}
+.visuel-marque .brand-mark{width:30px;height:30px;border-radius:8px}
+
+/* La bande « Devenez Bike Sitter » gagne la scene de la remise. */
+.become{gap:34px}
+.visuel-devenir{flex:none;width:230px;height:auto;border-radius:20px;background:#fff;
+  box-shadow:0 20px 45px rgba(0,60,27,.25)}
+@media(max-width:900px){.visuel-devenir{width:100%;max-width:330px;order:-1}}
+
+/* La fiche montre un espace plutot qu'un pictogramme. */
+img.space-box{width:100%;height:250px;object-fit:cover;object-position:center 38%;
+  border-radius:24px;background:#fff;border:1px solid var(--line)}
+
+/* Chaque etape porte son dessin : la scene se lit avant la phrase, et le
+   numero reste le reperage de la sequence. */
+.step-art{display:block;width:100%;height:auto;margin:0 0 16px;
+  border-radius:16px;background:#fff;border:1px solid var(--line)}
+.steps article{padding-top:22px;position:relative}
+.steps article i{position:absolute;float:none;left:12px;top:34px;margin:0;
+  box-shadow:0 4px 12px rgba(6,53,29,.22)}
+.steps article h3{margin:0}
+.steps article p{margin:8px 0 0}
+/* Une seule ligne de six quand la largeur le permet vraiment : en dessous de
+   1240 px, un dessin de six colonnes tombe sous 150 px et le telephone
+   dessine a l'interieur devient illisible. On passe alors a trois, puis deux,
+   puis un. Le texte suit la largeur de colonne au lieu d'une taille fixe. */
+.steps{max-width:1340px}
+.steps article{padding:22px 0 28px}
+.steps article h3{font-size:clamp(.98rem,1.05vw,1.15rem)}
+.steps article p{font-size:clamp(.86rem,.92vw,.98rem);line-height:1.5;max-width:34ch}
+.step-art{margin-bottom:14px}
+
+@media(min-width:1180px){
+  /* la marge laterale de la section est reduite ici : sinon six colonnes
+     tombent sous 170 px et les dessins deviennent des vignettes. */
+  .section.how{padding-inline:max(3vw,28px)}
+  .steps{max-width:1420px;grid-template-columns:repeat(6,1fr);gap:0 18px!important}
+  .steps article i{width:30px;height:30px;font-size:.74rem;left:10px;top:32px}
+}
+@media(min-width:900px) and (max-width:1179px){
+  .steps{grid-template-columns:repeat(3,1fr);gap:0 24px!important}
+}
+@media(min-width:620px) and (max-width:899px){
+  .steps{grid-template-columns:repeat(2,1fr);gap:0 22px!important}
+}
+/* Les epingles sont dessinees a partir des resultats : une epingle = un
+   Bike Sitter reellement disponible sur le creneau cherche. */
+#results .map .calque{position:absolute;inset:0}
+#results .map .pin{position:absolute;transform:translate(-50%,-100%);
+  border:0;background:var(--green);color:#fff;font-weight:700;font-size:.78rem;
+  padding:7px 12px;border-radius:999px;white-space:nowrap;
+  box-shadow:0 6px 16px rgba(2,22,11,.28)}
+#results .map .pin:after{content:"";position:absolute;left:50%;top:100%;
+  width:0;height:0;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--green)}
+#results .map .pin:hover,#results .map .pin.actif{background:var(--deep);z-index:4}
+#results .map .pin:hover:after,#results .map .pin.actif:after{border-top-color:var(--deep)}
+.pin-bulle{display:none;position:absolute;left:50%;bottom:calc(100% + 14px);
+  transform:translateX(-50%);background:#fff;color:var(--ink);border-radius:14px;
+  padding:10px;width:230px;text-align:left;align-items:center;gap:10px;
+  box-shadow:0 14px 34px rgba(2,22,11,.22);border:1px solid var(--line)}
+#results .map .pin:hover .pin-bulle,#results .map .pin.actif .pin-bulle{display:flex}
+.pin-bulle img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+  background:#eef5f0}
+.pin-bulle b{display:block;font-size:.88rem}
+.pin-bulle i{display:block;font-style:normal;font-size:.76rem;color:var(--muted);
+  margin-top:2px}
+
+/* Chaque annonce a un titre : « un garage » ne dit pas la meme chose que
+   « un box large ou les cargos passent ». */
+.rc-titre{margin:8px 0 2px;font-weight:700;font-size:.95rem;color:var(--ink)}
+.rc-meta2{margin:4px 0 0;font-size:.82rem;color:var(--muted)}
+.rc-meta2 b{color:var(--green)}
+.rc-demo{background:var(--paper);color:var(--muted);border-radius:6px;
+  padding:2px 7px;font-size:.72rem;font-weight:700;margin-left:6px}
+.fp2-titre{margin:4px 0 6px;font-weight:700;font-size:1rem;color:var(--ink)}
+
+.pied-demo{font-size:.78rem;opacity:.7;max-width:46ch;margin-top:6px}
+
+/* Reglages : une ligne, un interrupteur. */
+.reglages{list-style:none;margin:0;padding:0}
+.reglages li{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:13px 0;border-top:1px solid var(--line)}
+.reglages li:first-child{border-top:0;padding-top:0}
+.reglages b{display:block;font-size:.95rem}
+.reglages span{display:block;font-size:.82rem;color:var(--muted);margin-top:2px}
+
+/* Bike Sitters enregistres. */
+.favoris{display:grid;gap:10px}
+.fav{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;
+  align-items:center;background:#fff;border:1px solid var(--line);
+  border-radius:16px;padding:14px}
+@media(max-width:620px){
+  .fav{grid-template-columns:auto minmax(0,1fr)}
+  .fav .rc-btn{grid-column:1/-1;width:100%}
+}
+.fav img{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#eef5f0}
+.fav b{display:block;font-size:1rem}
+.fav span{display:block;font-size:.84rem;color:var(--muted);margin-top:2px}
+body[data-nouveau="oui"] .favoris{display:none}
+
+/* Le premier jour d'un membre : ce que voient les vingt premiers inscrits. */
+.etat-vide{display:none;background:#fff;border:1px dashed var(--line);
+  border-radius:20px;padding:36px 28px;text-align:center;margin:0 0 14px}
+body[data-nouveau="oui"] .etat-vide{display:block}
+body[data-nouveau="oui"] .vue-garde,
+body[data-nouveau="oui"] .guard-card,
+body[data-nouveau="oui"] #filMsg,
+body[data-nouveau="oui"] .msg-saisie,
+body[data-nouveau="oui"] .msg-tete,
+body[data-nouveau="oui"] .solde,
+body[data-nouveau="oui"] .recos,
+body[data-nouveau="oui"] .cat-filtres{display:none}
+.ev-i{display:grid;place-items:center;width:52px;height:52px;margin:0 auto 14px;
+  border-radius:16px;background:#eef6f0;color:var(--green);font-size:1.3rem}
+.etat-vide h3{font-family:var(--police-manrope),sans-serif;font-size:1.15rem;margin:0 0 8px}
+.etat-vide p{margin:0 auto 18px;color:var(--muted);line-height:1.6;max-width:44ch}
+.etat-vide .bleu,.etat-vide .outline{width:auto;padding:13px 24px;margin:0}
+
+/* Erreurs de formulaire : visibles, et sous le champ concerne. */
+.champ-faux input,.champ-faux textarea,.champ-faux select,
+input.champ-faux,textarea.champ-faux,select.champ-faux{border-color:#b03225;
+  box-shadow:0 0 0 3px rgba(176,50,37,.12)}
+.msg-erreur{display:block;margin-top:6px;font-size:.82rem;color:#b03225;font-weight:600}
+
+/* Avis de non-traduction, en tete des pages de texte long. */
+.avis-traduction{background:#fdf3e3;border:1px solid #f0dfc0;border-radius:12px;
+  padding:12px 16px;margin:0 0 18px;font-size:.88rem;color:#8a5a12;line-height:1.5}
+
+/* Espace de moderation : des files d'attente, pas un tableau de bord. */
+.badge-mod{margin-left:auto;margin-right:14px;background:#eaf3fb;color:#1c5fa8;
+  border-radius:999px;padding:6px 14px;font-size:.78rem;font-weight:700}
+.mod-chiffres{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 18px}
+.mod-chiffres>div{background:#fff;border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px}
+.mod-chiffres b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.5rem}
+.mod-chiffres span{display:block;font-size:.8rem;color:var(--muted);margin-top:2px}
+.vue-mod[hidden]{display:none}
+.mod-carte{background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:20px clamp(18px,2vw,26px);margin:0 0 12px}
+.mod-carte.urgent{border-left:4px solid #b03225}
+.mod-tete{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;margin-bottom:8px;font-size:.8rem}
+.mod-etat{font-weight:700;color:#a56a12}
+.mod-etat.rouge{color:#b03225}
+.mod-carte h3{font-family:var(--police-manrope),sans-serif;font-size:1.1rem;margin:0 0 6px}
+.mod-carte>p{margin:0 0 12px;line-height:1.6}
+.mod-carte .infos{margin-bottom:14px}
+@media(max-width:900px){.mod-chiffres{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.mod-chiffres{grid-template-columns:1fr}}
+
+/* Invitations : le code et le quota restant. */
+.code-invit{display:flex;align-items:center;gap:14px;background:var(--paper);
+  border:1px dashed var(--line);border-radius:14px;padding:16px 18px;margin:0 0 10px}
+.code-invit b{font-family:var(--police-manrope),sans-serif;font-size:1.3rem;letter-spacing:.06em}
+.jauge-invit{height:8px;border-radius:99px;background:#eef2ef;overflow:hidden;
+  margin:14px 0 8px}
+.jauge-invit span{display:block;height:100%;background:var(--green)}
+
+.contrib{color:#a56a12}
+.pastille-contrib{background:#fdf3e3;color:#a56a12;border-radius:999px;
+  padding:5px 13px;font-size:.78rem;font-weight:700}
+.note-contrib{font-size:.8rem;color:var(--muted);line-height:1.5;margin:0 0 12px}
+
+/* La carte reagit : le zoom ecarte la trame, « Satellite » change le fond.
+   Des commandes qui ne font rien valent mieux retirees que decoratives. */
+#results .map{--trame:140px}
+#results .map{background-size:var(--trame) calc(var(--trame) * .86)}
+#results .map.satellite{background-color:#2c3a30;
+  background-image:linear-gradient(30deg,transparent 48%,#46543c 49%,#46543c 52%,transparent 53%),
+    linear-gradient(-45deg,transparent 45%,#3d4b38 46%,#3d4b38 49%,transparent 50%)}
+#results .map.satellite .water{background:#25405a;opacity:.9}
+#results .map.satellite .map-road{background:rgba(255,255,255,.12)}
+#results .map.satellite .destination-pin{color:#fff}
+#results .map.satellite .map-legende,#results .map.satellite .map-rezone{
+  background:rgba(12,22,16,.86);color:#fff}
+#results .map.satellite .map-echelle{color:#d7e2da}
+#results .map.satellite .map-echelle i{border-color:#d7e2da}
+
+/* Les onglets de « Mes gardes » changent vraiment de contenu. */
+.vue-garde[hidden]{display:none}
+.guard-card.attente{border-left:4px solid #d08a2a}
+.attente-date{background:#fdf3e3!important;color:#a56a12!important}
+.status-attente{color:#a56a12}
+.vide-onglet{color:var(--muted);font-size:.88rem;line-height:1.6;margin:6px 2px 0;
+  max-width:60ch}
+
+/* Le focus au clavier doit se voir : sans anneau, on navigue a l'aveugle. */
+:focus{outline:none}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+.primary:focus-visible,.bleu:focus-visible,.outline:focus-visible,
+.rc-btn:focus-visible,.rb-go:focus-visible{outline-offset:4px}
+.tb:focus-visible,.br:focus-visible{outline-offset:-2px}
+a:focus-visible{outline-offset:2px}
+
+/* Une demande refusee se lit sans crier : la carte reste grise. */
+.guard-card.refus{opacity:.92}
+.gris-date{background:#e7ebe8!important;color:var(--muted)!important}
+.status-refus{color:#b03225}
+
+/* Mentions legales et cas defavorables. */
+.ancres{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.ancres a{border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:8px 16px;font-size:.86rem;font-weight:600;color:var(--ink);
+  text-decoration:none}
+.ancres a:hover{border-color:var(--green);color:var(--green)}
+.kicker-rouge{color:#b03225}
+.pied-bas a{color:inherit;text-decoration:none}
+.pied-bas a:hover{text-decoration:underline}
+
+/* Messagerie, annulation, notifications. */
+:root{--ico-cloche:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310231a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 9a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7Z'/%3E%3Cpath d='M10.5 20a2 2 0 0 0 3 0'/%3E%3C/svg%3E")}
+.cloche{display:grid;place-items:center;position:relative;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--line);background:#fff;color:var(--ink);flex:none;
+  margin-right:10px}
+
+/* Plan du site : une carte par ecran, groupees par parcours. */
+.simu-ville{display:grid;gap:8px;width:100%}
+.simu-ville input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font:inherit;max-width:280px}
+.simu-ville .outline{padding:9px 16px;justify-self:start}
+.simu-ville>span{font-size:.85rem;color:var(--muted);line-height:1.5}
+.simu{display:flex;gap:12px;align-items:flex-start;background:#fff;
+  border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 22px}
+.sh-nav a{font-size:.92rem;font-weight:600;color:var(--ink);text-decoration:none;
+  padding:6px 0;border-bottom:2px solid transparent;white-space:nowrap}
+
+/* L'en-tete ne doit jamais casser sur deux lignes : chaque element garde sa
+   ligne, et la navigation s'efface avant que ca deborde. */
+.topbar .brand span,.site-header .brand span,.brand.mini span{white-space:nowrap}
+.topbar nav a{white-space:nowrap}
+.topbar nav{gap:clamp(10px,1.4vw,22px)}
+.link-button{white-space:nowrap}
+.header-actions{gap:clamp(8px,1vw,16px);margin-left:auto}
+.sh-actions{margin-left:auto}
+@media(max-width:1200px){
+  .topbar nav,.sh-nav{display:none}
+}
+@media(max-width:620px){
+  .topbar .link-button{display:none}
+}
+
+/* =====================================================================
+   PAGE DE RECHERCHE
+   Barre en une seule carte, filtres rapides en pastilles, liste a gauche et
+   carte a droite, plus large. Les actions engageantes sont bleues.
+   ===================================================================== */
+#results{display:none}
+#results.active{overflow:hidden;display:flex;flex-direction:column}
+
+.rech-barre{background:var(--paper);flex:none;z-index:6;
+  padding:18px clamp(14px,2.4vw,28px) 4px}
+.rb-int{max-width:1680px;margin:0 auto}
+.rb-carte{display:grid;grid-template-columns:1.5fr 1fr 1fr auto;align-items:stretch;
+  background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.rb-cell{padding:14px 20px;border-left:1px solid var(--line);min-width:0;
+  display:flex;flex-direction:column;justify-content:center}
+.rb-cell:first-child{border-left:0}
+.rb-lab{display:block;font-size:.68rem;letter-spacing:.09em;font-weight:700;
+  color:var(--muted);margin-bottom:5px}
+.rb-cell b{font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rb-lieu input{border:0;outline:0;background:none;font:inherit;font-size:1rem;
+  color:var(--ink);width:100%;min-width:0;padding:0}
+.rb-go{border:0;background:var(--blue);color:#fff;font-weight:700;font-size:.98rem;
+  padding:0 30px;white-space:nowrap;display:flex;align-items:center;gap:8px;
+  margin:10px;border-radius:12px}
+.rb-go:hover{filter:brightness(.94)}
+
+.chips-rapides{display:flex;flex-wrap:wrap;gap:10px;
+  max-width:1680px;margin:14px auto 0;padding:0 clamp(14px,2.4vw,28px) 16px}
+.cr{border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:10px 18px;font-size:.9rem;font-weight:600;color:var(--ink);white-space:nowrap}
+.cr:hover{border-color:var(--green)}
+.cr.actif{border-color:var(--green);background:#eef6f0;color:var(--green)}
+
+.rech-page{flex:1;min-height:0;display:grid;
+  grid-template-columns:minmax(360px,.85fr) 1.15fr;grid-template-rows:1fr auto;gap:0;
+  padding:0 clamp(14px,2.4vw,28px) 16px;max-width:1680px;margin:0 auto;width:100%}
+.rech-liste{overflow-y:auto;background:#fff;border:1px solid var(--line);
+  border-radius:18px;padding:18px;margin-right:16px}
+.rl-tete{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;margin:0 0 14px}
+.rl-tete h2{font-family:var(--police-manrope),sans-serif;font-size:1.22rem;margin:0}
+.rl-mention{font-size:.78rem;color:var(--muted)}
+
+/* Carte d'un Bike Sitter */
+.rech-liste .rc{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;
+  border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;
+  background:#fff;cursor:pointer;align-items:start}
+.rech-liste .rc.selected,.rech-liste .rc:hover{border-color:var(--green);
+  box-shadow:0 0 0 1px var(--green)}
+.rc-photo{width:62px;height:62px;border-radius:12px;object-fit:cover;background:#eef5f0}
+.rc-haut{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rc-corps h3{font-family:var(--police-manrope),sans-serif;font-size:1.05rem;margin:0}
+.rc-verif{margin:2px 0 0;font-size:.8rem;font-weight:600;color:var(--green)}
+.rc-note{font-size:.98rem;white-space:nowrap}
+.rc-meta{margin:8px 0 0;font-size:.84rem;color:var(--muted)}
+.rc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.rc-tags span{background:var(--paper);border-radius:8px;padding:5px 10px;
+  font-size:.78rem;color:var(--ink)}
+.rc-actions{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+.rc-carte{border:1px solid var(--line);background:#fff;border-radius:10px;
+  padding:9px 15px;font-size:.86rem;font-weight:600;color:var(--ink)}
+.rc-carte:hover{border-color:var(--green);color:var(--green)}
+.rc-btn{border:0;background:var(--blue);color:#fff;font-weight:700;border-radius:10px;
+  padding:10px 17px;font-size:.86rem}
+.rc-btn:hover{filter:brightness(.94)}
+
+/* La carte */
+#results .map{position:relative;top:auto;height:auto;min-height:0;
+  border:1px solid var(--line);border-radius:18px;overflow:hidden;align-self:stretch}
+#results .map .calque{position:absolute;inset:0}
+#results .map .pin{position:absolute;transform:translate(-50%,-100%);
+  border:0;background:var(--green);color:#fff;font-weight:700;font-size:.82rem;
+  padding:8px 14px;border-radius:999px;white-space:nowrap;
+  box-shadow:0 6px 16px rgba(2,22,11,.28)}
+#results .map .pin:after{content:"";position:absolute;left:50%;top:100%;width:0;height:0;
+  transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--green)}
+#results .map .pin.actif,#results .map .pin:hover{background:var(--blue);z-index:4}
+#results .map .pin.actif:after,#results .map .pin:hover:after{border-top-color:var(--blue)}
+.pin-bulle{display:none}
+.map-legende{position:absolute;left:16px;top:16px;background:#fff;border-radius:999px;
+  padding:8px 15px;font-size:.84rem;font-weight:700;color:var(--green);
+  box-shadow:0 6px 18px rgba(2,22,11,.12)}
+.map-apercu{position:absolute;left:16px;right:16px;bottom:16px;background:#fff;
+  border-radius:16px;padding:16px 18px;box-shadow:0 14px 40px rgba(2,22,11,.2);
+  max-width:420px}
+.map-apercu .ap-verif{margin:0;font-size:.8rem;font-weight:700;color:var(--green)}
+.map-apercu h3{font-family:var(--police-manrope),sans-serif;font-size:1.1rem;margin:4px 0 2px}
+.map-apercu p{margin:0;font-size:.86rem;color:var(--muted)}
+.map-apercu .bleu{margin-top:12px;padding:12px}
+/* Les commandes de la carte ont perdu leurs styles avec le nettoyage du bloc
+   precedent : elles sont redefinies ici, une seule fois. */
+.bascule-plan{display:flex;background:#fff;border-radius:10px;padding:3px;
+  box-shadow:0 6px 18px rgba(2,22,11,.16)}
+.bascule-plan button{border:0;background:none;padding:7px 15px;border-radius:8px;
+  font-weight:700;font-size:.82rem;color:var(--muted)}
+.bascule-plan button.actif{background:var(--green);color:#fff}
+.map-zoom{position:absolute;display:grid;background:#fff;border-radius:10px;
+  overflow:hidden;box-shadow:0 6px 18px rgba(2,22,11,.16)}
+.map-zoom button{border:0;background:none;width:38px;height:36px;font-size:1.1rem;
+  color:var(--ink)}
+.map-zoom button+button{border-top:1px solid var(--line)}
+.map-position{position:absolute;width:38px;height:38px;border-radius:10px;border:0;
+  background:#fff;color:var(--green);font-size:1.05rem;
+  box-shadow:0 6px 18px rgba(2,22,11,.16)}
+.map-rezone{position:absolute;border:0;background:#fff;border-radius:999px;
+  padding:11px 20px;font-weight:700;font-size:.85rem;color:var(--ink);
+  white-space:nowrap;box-shadow:0 8px 24px rgba(2,22,11,.2)}
+.map-rezone:hover{color:var(--green)}
+.map-echelle{position:absolute;font-size:.72rem;color:var(--muted);
+  display:flex;align-items:center;gap:6px}
+.map-echelle i{width:44px;height:6px;border:1px solid var(--muted);border-top:0}
+
+/* Les commandes de la carte : legende en haut a gauche, bascule de fond juste
+   dessous, zoom et position a droite, relance en bas au centre. */
+#results .map-outils{position:absolute;left:16px;top:62px}
+#results .map-zoom{right:16px;top:16px}
+#results .map-position{right:16px;top:100px}
+#results .map-rezone{left:50%;right:auto;top:auto;bottom:70px;
+  transform:translateX(-50%)}
+#results .map-echelle{right:16px;bottom:16px}
+#results .map-note{display:none}
+.bandeau-confiance{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 26px;
+  justify-content:center;padding:14px 16px;margin-top:16px;background:#fff;
+  border:1px solid var(--line);border-radius:14px;
+  font-size:.86rem;font-weight:600;color:var(--green)}
+
+/* Le panneau de filtres devient un volet, appele par « Autres filtres ». */
+.filtres-col{position:fixed;top:0;right:0;bottom:0;width:min(380px,92vw);z-index:70;
+  display:none;background:#fff;border-left:1px solid var(--line);
+  padding:22px 20px 40px;overflow-y:auto;box-shadow:-20px 0 60px rgba(2,22,11,.16)}
+.filtres-col.ouvert{display:block}
+.fc-tete{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  margin-bottom:16px}
+.fc-fermer{display:block;border:0;background:none;font-size:1.6rem;color:var(--muted);
+  line-height:1}
+.filtres-col .barre-filtres{display:block;padding:0;border:0}
+.filtres-col .gf{display:block;padding:16px 0;border-top:1px solid var(--line);
+  margin:0;width:auto}
+.filtres-col .gf-lab,.fc-bloc h3{display:block;font-family:var(--police-manrope),sans-serif;
+  font-weight:700;font-size:.95rem;color:var(--ink);text-transform:none;
+  letter-spacing:0;margin:0 0 10px}
+.fc-bloc{padding:16px 0;border-top:1px solid var(--line)}
+.fc-bloc:first-of-type{border-top:0;padding-top:0}
+.fc-sous{font-size:.82rem;color:var(--muted);margin:0 0 8px}
+#rayon{width:100%;accent-color:var(--green)}
+.fc-bornes{display:flex;justify-content:space-between;font-size:.74rem;
+  color:var(--muted);margin-top:4px}
+.fc-select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  background:#fff;font:inherit;font-size:.88rem}
+.filtres-col .gf-chips{display:grid;gap:2px}
+.filtres-col .chip{display:flex;align-items:center;gap:10px;width:100%;
+  border:0!important;background:none!important;color:var(--ink)!important;
+  padding:7px 0;border-radius:0;font-size:.88rem;font-weight:500;text-align:left}
+.filtres-col .chip:before{content:"";width:17px;height:17px;border-radius:5px;
+  border:1.5px solid #c4cfc7;flex:none;background:#fff}
+.filtres-col .chip[aria-pressed="true"]:before{background:var(--green);
+  border-color:var(--green);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5L19 7'/%3E%3C/svg%3E");
+  background-size:12px;background-position:center;background-repeat:no-repeat}
+.fc-det{border-top:1px solid var(--line);padding:14px 0}
+.fc-det summary{font-family:var(--police-manrope),sans-serif;font-weight:700;font-size:.95rem;
+  cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+.fc-det summary::-webkit-details-marker{display:none}
+.fc-det summary:after{content:"⌄";color:var(--muted)}
+.fc-det[open] summary:after{content:"⌃"}
+.fc-case{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:.88rem}
+.fc-case input{accent-color:var(--green);width:16px;height:16px}
+.btn-filtres,.rb-sous{display:none}
+
+.bascule{display:none;position:fixed;left:50%;bottom:20px;z-index:90;
+  width:max-content;flex-wrap:nowrap;transform:translateX(-50%);
+  background:var(--deep);border-radius:999px;padding:5px;gap:2px;
+  box-shadow:0 12px 30px rgba(2,22,11,.32)}
+.bascule-btn{flex:none;white-space:nowrap;border:0;background:none;
+  color:rgba(255,255,255,.72);font-weight:700;font-size:.9rem;padding:9px 20px;
+  border-radius:999px}
+.bascule-btn.actif{background:#fff;color:var(--ink)}
+
+@media(max-width:1180px){
+  .rech-page{grid-template-columns:minmax(300px,.9fr) 1.1fr}
+}
+@media(max-width:1023px){
+  #results.active{overflow:auto}
+  .rb-carte{grid-template-columns:1fr 1fr;border-radius:14px}
+  .rb-lieu{grid-column:1/-1;border-bottom:1px solid var(--line)}
+  .rb-cell:nth-child(3){border-left:1px solid var(--line)}
+  .rb-go{grid-column:1/-1;justify-content:center;margin:0 10px 10px}
+  .chips-rapides{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .chips-rapides::-webkit-scrollbar{display:none}
+  .rech-page{grid-template-columns:1fr;position:relative;min-height:calc(100vh - 300px)}
+  .rech-liste{margin-right:0;border:0;padding:0;background:transparent}
+  #results .map{position:absolute;inset:0;border-radius:18px}
+  .bascule{display:inline-flex}
+  .rech-page.vue-liste .map{display:none}
+  .rech-page.vue-carte .rech-liste{display:none}
+  .map-apercu{max-width:none}
+  .bandeau-confiance{font-size:.78rem;gap:6px 16px}
+}
+@media(max-width:560px){
+  .rc-photo{width:52px;height:52px}
+  .rc-actions .rc-btn,.rc-actions .rc-carte{flex:1 1 auto;text-align:center}
+}
+
+/* =====================================================================
+   BARRE D'ONGLETS MOBILE
+   Sur telephone, une barre fixe en bas remplace la navigation du haut :
+   quatre destinations et un acces a toutes les pages.
+   ===================================================================== */
+/* Un membre peut etre les deux : le selecteur de role est dans l'en-tete,
+   visible en permanence, et il change la navigation entiere. */
+.app-header .bascule-role{margin-left:auto;margin-right:14px}
+.bascule-role{display:flex;background:var(--paper);border:1px solid var(--line);
+  border-radius:999px;padding:3px;gap:2px}
+.br{border:0;background:none;border-radius:999px;padding:8px 15px;
+  font-weight:700;font-size:.84rem;color:var(--muted);white-space:nowrap}
+.br:hover{color:var(--ink)}
+body:not([data-mode="sitter"]) .br[data-mode="cycliste"],
+body[data-mode="sitter"] .br[data-mode="sitter"]{background:#fff;color:var(--ink);
+  box-shadow:0 1px 3px rgba(4,32,17,.12)}
+body[data-mode="sitter"] .br[data-mode="sitter"]{color:var(--green)}
+/* Sur telephone aussi, le membre doit pouvoir changer de role sans chercher :
+   le selecteur reste dans l'en-tete, en version courte. */
+@media(max-width:899px){
+  .bascule-role{padding:2px;margin-left:auto}
+  .br{padding:7px 11px;font-size:.76rem}
+  .app-header .bascule-role{margin-right:10px}
+  .topbar .bascule-role{margin-right:8px}
+  .brand span:last-child{font-size:0}
+  .brand span:last-child b{font-size:0}
+  .app-header .brand.mini span:last-child,.topbar .brand span:last-child{display:none}
+  .topbar .link-button{display:none}
+}
+
+.tabbar{display:none}
+.tb-bascule{color:var(--green)}
+@media(max-width:899px){
+  .tabbar{display:none;grid-template-columns:repeat(5,1fr);
+    position:fixed;left:0;right:0;bottom:0;z-index:80;
+    background:rgba(255,255,255,.96);backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 24px rgba(4,32,17,.06)}
+  .tb{border:0;background:none;display:grid;justify-items:center;gap:3px;
+    padding:6px 2px;font-size:.66rem;font-weight:600;color:var(--muted);
+    border-radius:12px;line-height:1.2}
+  .tb-i{font-size:1.12rem;line-height:1}
+  .tb.actif{color:var(--green)}
+  .tb.actif .tb-i{transform:translateY(-1px)}
+  body:not([data-mode="sitter"]) .tabbar-cycliste{display:grid}
+  body[data-mode="sitter"] .tabbar-sitter{display:grid}
+  body{padding-bottom:74px}
+  .app-screen{padding-bottom:74px}
+  #results .bascule{bottom:88px}
+  #results .map-rezone{bottom:126px}
+  #results .map-note{display:none}
+  .filtres-col{padding-bottom:90px}
+}
+
+/* Le style des blocs de contenu avait disparu avec la refonte de la fiche :
+   les pages de l'association et les nouveaux ecrans s'en servent toujours. */
+.bloc{background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:24px clamp(18px,2.2vw,28px);margin:0 0 14px}
+.bloc h2{font-family:var(--police-manrope),sans-serif;font-size:1.18rem;letter-spacing:-.02em;
+  margin:0 0 12px}
+.bloc>p{margin:0;color:var(--muted);line-height:1.65}
+.bloc .mention,.mention{font-size:.85rem;color:var(--muted);margin-top:14px}
+
+/* Listes libelle / valeur : elles avaient disparu avec la refonte de la fiche. */
+.infos{margin:0;display:grid;gap:0}
+.info{display:grid;grid-template-columns:minmax(130px,34%) 1fr;gap:16px;
+  padding:13px 0;border-top:1px solid var(--line)}
+.info:first-child{border-top:0;padding-top:0}
+.info dt{color:var(--muted);font-size:.9rem}
+.info dd{margin:0}
+.info dd b{display:block;font-weight:700}
+.info dd span{display:block;color:var(--muted);font-size:.85rem;margin-top:2px}
+@media(max-width:560px){.info{grid-template-columns:1fr;gap:4px}}
+
+/* =====================================================================
+   FICHE D'UN BIKE SITTER — galerie en tete, reservation collee a droite
+   ===================================================================== */
+.fp2{max-width:1240px;margin:0 auto;padding:16px clamp(14px,2.4vw,26px) 70px}
+.fp2-grille{display:grid;grid-template-columns:minmax(0,1fr) 370px;
+  gap:clamp(16px,2vw,26px);align-items:start}
+.fp2-main{min-width:0;display:grid;gap:16px}
+
+/* Galerie */
+.galerie2{background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:12px;overflow:hidden}
+.g2-scene{position:relative;border-radius:14px;overflow:hidden;background:#eef5f0;
+  aspect-ratio:16/9}
+.g2-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity .25s}
+.g2-img.actif{opacity:1}
+.g2-badge{position:absolute;left:14px;top:14px;background:rgba(255,255,255,.94);
+  border-radius:999px;padding:7px 14px;font-size:.82rem;font-weight:700;
+  color:var(--green)}
+.g2-fl{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;
+  border:0;border-radius:50%;background:rgba(255,255,255,.94);font-size:1.3rem;
+  line-height:1;color:var(--ink);box-shadow:0 6px 18px rgba(2,22,11,.18)}
+.g2-prev{left:12px}.g2-suiv{right:12px}
+.g2-compteur{position:absolute;right:14px;bottom:14px;background:rgba(6,40,22,.72);
+  color:#fff;border-radius:999px;padding:4px 12px;font-size:.76rem}
+.g2-vignettes{display:flex;gap:8px;margin-top:10px;overflow-x:auto;
+  scrollbar-width:none}
+.g2-vignettes::-webkit-scrollbar{display:none}
+.g2-v{flex:none;width:92px;height:62px;border-radius:10px;overflow:hidden;padding:0;
+  border:2px solid transparent;background:#eef5f0}
+.g2-v.actif{border-color:var(--green)}
+.g2-v img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Identite et faits */
+.fp2-bloc{background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:22px clamp(18px,2.2vw,28px) 26px}
+.fp2-ident{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.fp2-photo{position:relative;flex:none}
+.fp2-photo img{width:74px;height:74px;border-radius:50%;object-fit:cover;
+  background:#eef5f0;display:block}
+.fp2-photo i{position:absolute;right:-2px;bottom:-2px;width:22px;height:22px;
+  border-radius:50%;background:var(--green);color:#fff;font-size:.66rem;
+  display:grid;place-items:center;border:2px solid #fff;font-style:normal}
+.fp2-ident h1{font-family:var(--police-manrope),sans-serif;font-weight:700;
+  font-size:clamp(1.45rem,2.2vw,1.95rem);letter-spacing:-.03em;margin:0 0 2px;
+  display:flex;align-items:center;gap:8px}
+.fp2-role{margin:0 0 6px;font-weight:700;color:var(--green);font-size:.9rem}
+.fp2-chiffres{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 2px;
+  font-size:.9rem}
+.fp2-dist{margin:0;font-size:.84rem;color:var(--muted)}
+.fp2-faits{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 4px}
+.fp2-faits>div{border:1px solid var(--line);border-radius:14px;padding:14px 8px;
+  text-align:center;font-size:.84rem;font-weight:600}
+.f-i{display:block;margin:0 auto 6px;font-size:1.05rem;color:var(--green)}
+.fp2-faits .f-i.pt{display:block;width:12px;height:12px;border-radius:50%}
+
+.fp2-sect{border-top:1px solid var(--line);margin-top:22px;padding-top:20px}
+.fp2-sect h2{font-family:var(--police-manrope),sans-serif;font-size:1.12rem;margin:0 0 12px;
+  display:flex;align-items:center;gap:10px}
+.fp2-sect p{margin:0;color:var(--muted);line-height:1.65}
+.petite{font-size:.84rem}
+.note-inline{font-size:.95rem;color:var(--ink);white-space:nowrap}
+.puces{display:flex;flex-wrap:wrap;gap:8px}
+.puce{background:#eef6f0;border-radius:10px;padding:7px 13px;font-size:.84rem;
+  font-weight:600;color:var(--ink)}
+.puce.ok{color:var(--green)}
+.avis2{display:grid;gap:10px}
+.avis2 article{border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.a2-tete{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 6px!important}
+.a2-tete b{font-size:.92rem}
+.avis2 p:last-child{color:var(--ink);font-size:.92rem;line-height:1.6}
+
+/* Colonne de reservation */
+.fp2-cote{display:grid;gap:16px;position:sticky;top:96px}
+.creneau{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);
+  border-radius:14px;overflow:hidden;margin:14px 0 12px}
+.creneau label{padding:11px 14px;border-left:1px solid var(--line)}
+.creneau label:first-child{border-left:0}
+.creneau span{display:block;font-size:.74rem;color:var(--muted);margin-bottom:3px}
+.creneau input{width:100%;border:0;background:none;font:inherit;font-weight:700;
+  font-size:.92rem;color:var(--ink);padding:0}
+.ligne-duree{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 14px;font-size:.88rem}
+.pastille-gratuit{background:#e9f5ed;color:var(--green);border-radius:999px;
+  padding:5px 13px;font-size:.78rem;font-weight:700}
+.bleu{width:100%;border:0;background:var(--blue);color:#fff;font-weight:700;
+  border-radius:13px;padding:15px;font-size:1rem;margin-top:4px}
+.bleu:hover{filter:brightness(.94)}
+.info-bleue{background:#eaf3fb;border:1px solid #d5e6f6;border-radius:12px;
+  padding:11px 14px;margin:12px 0 0;font-size:.82rem;color:#1c4e86;line-height:1.5}
+.zone-hachure{height:150px;border-radius:14px;margin:14px 0 10px;
+  display:grid;place-items:center;font-weight:700;color:var(--green);
+  background:repeating-linear-gradient(-45deg,#eef3ef 0 14px,#e2ebe5 14px 28px)}
+
+@media(max-width:1100px){
+  .fp2-grille{grid-template-columns:minmax(0,1fr)}
+  .fp2-cote{position:static}
+}
+@media(max-width:640px){
+  .fp2-faits{grid-template-columns:1fr 1fr}
+  .fp2-ident{grid-template-columns:auto minmax(0,1fr);gap:14px}
+  .g2-v{width:74px;height:52px}
+  .creneau{grid-template-columns:1fr}
+  .creneau label{border-left:0;border-top:1px solid var(--line)}
+  .creneau label:first-child{border-top:0}
+}
+
+/* Un Bike Sitter qui debute n'a pas de moyenne : on le dit, on ne l'invente pas. */
+.etiq-neuf{background:#eaf3fb;color:#1c5fa8;border-radius:999px;padding:3px 10px;
+  font-size:.74rem;font-weight:700}
+
+/* Le Bike Sitter doit pouvoir regarder sa fiche telle qu'elle est publiee. */
+.apercu-fiche{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;background:#eaf3fb;border:1px solid #d5e6f6;border-radius:18px;
+  padding:16px 20px;margin:0 0 18px}
+.apercu-fiche p{margin:0}
+.apercu-fiche b{display:block;font-size:.98rem}
+.apercu-fiche span{display:block;font-size:.85rem;color:var(--muted);margin-top:2px}
+
+/* Le second bouton du selecteur change selon que le membre est deja Bike Sitter. */
+.br-devenir,.tb-devenir{display:none}
+body[data-sitter="non"] .tb-sitter{display:none}
+body[data-sitter="non"] .tb-devenir{display:grid}
+body[data-sitter="non"] .br-sitter{display:none}
+body[data-sitter="non"] .br-devenir{display:block}
+
+
+/* Profil d'un membre : assez pour reconnaitre la personne et son velo,
+   rien de plus. */
+.mb-tete{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;
+  margin:0 0 16px}
+.mb-photo{width:clamp(86px,12vw,116px);aspect-ratio:1;border-radius:50%;
+  object-fit:cover;background:#eef5f0;border:4px solid #fff;
+  box-shadow:0 12px 30px rgba(5,55,29,.16)}
+.mb-ident{min-width:0}
+.mb-ident h1{font-family:var(--police-manrope),sans-serif;font-weight:700;
+  font-size:clamp(1.6rem,2.6vw,2.2rem);letter-spacing:-.03em;line-height:1.05;
+  margin:6px 0 4px;display:flex;align-items:center;gap:9px}
+.mb-lieu{margin:0 0 8px;color:var(--muted);font-size:.9rem}
+.mb-reperes{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;
+  border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:0 0 16px}
+.mb-reperes>div{padding:14px 16px;border-left:1px solid var(--line)}
+.mb-reperes>div:first-child{border-left:0}
+.mb-reperes b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.2rem}
+.mb-reperes span{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
+.mb-velo{display:block;width:100%;height:clamp(150px,22vw,210px);object-fit:cover;
+  object-position:center 60%;border-radius:16px;background:#eef5f0;
+  border:1px solid var(--line);margin:0 0 16px}
+@media(max-width:560px){
+  .mb-tete{grid-template-columns:auto 1fr;gap:14px}
+  .mb-reperes{grid-template-columns:1fr}
+  .mb-reperes>div{border-left:0;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .mb-reperes>div:first-child{border-top:0}
+  .mb-reperes span{margin-top:0;text-align:right}
+}
+
+/* Messagerie, annulation, notifications. */
+.cloche{position:relative;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--line);background:#fff;color:var(--ink);flex:none;
+  margin-right:10px}
+.cloche:before{content:"";display:block;width:19px;height:19px;
+  background:var(--ico-cloche) center/contain no-repeat}
+.cloche:hover{border-color:var(--green);color:var(--green)}
+.cloche span{position:absolute;right:-3px;top:-3px;min-width:18px;height:18px;
+  border-radius:999px;background:var(--coral);color:#fff;font-size:.66rem;
+  font-weight:700;display:grid;place-items:center;padding:0 4px;border:2px solid #fff}
+
+.msg-tete{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;
+  margin:0 0 14px}
+.msg-tete b{display:block}
+.msg-tete .gris{font-size:.82rem}
+.msg-tete .outline{padding:8px 14px;font-size:.84rem}
+.fil-msg{display:grid;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:18px;padding:18px;margin:0 0 12px}
+.msg-jour{text-align:center;font-size:.76rem;color:var(--muted);margin:0 0 4px}
+.msg{max-width:78%;border-radius:16px;padding:11px 14px;position:relative}
+.msg p{margin:0;font-size:.92rem;line-height:1.5}
+.msg span{display:block;font-size:.7rem;margin-top:5px;opacity:.7}
+.msg.recu{background:var(--paper);justify-self:start;border-bottom-left-radius:6px}
+.msg.envoye{background:var(--green);color:#fff;justify-self:end;
+  border-bottom-right-radius:6px}
+.msg-saisie{display:grid;grid-template-columns:1fr auto;gap:10px}
+.msg-saisie input{border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+  font:inherit;background:#fff}
+.msg-saisie input:focus{outline:0;border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(1,118,40,.12)}
+
+.motifs{display:grid;gap:8px}
+.motifs .motif[aria-pressed="true"]{border-color:var(--green);background:#eef6f0}
+.danger{border:0;background:#b03225;color:#fff;font-weight:700;border-radius:12px;
+  padding:14px 22px}
+.danger:hover{filter:brightness(.94)}
+
+.notifs{display:grid;gap:8px}
+.notif{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;
+  text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;
+  padding:14px 16px}
+.notif:hover{border-color:var(--green)}
+.notif.neuf{background:#f2f9f5;border-color:#cfe6d8}
+.n-i{width:34px;height:34px;border-radius:10px;background:#eef6f0;color:var(--green);
+  display:grid;place-items:center;font-size:.95rem}
+.n-t b{display:block;font-size:.94rem}
+.n-t span{display:block;font-size:.83rem;color:var(--muted);margin-top:2px;
+  line-height:1.45}
+.n-h{font-size:.74rem;color:var(--muted);white-space:nowrap}
+@media(max-width:560px){
+  .cloche{margin-right:6px;width:34px;height:34px}
+  .notif{grid-template-columns:auto 1fr}
+  .n-h{grid-column:2;margin-top:4px}
+  .msg-tete{grid-template-columns:auto 1fr}
+  .msg-tete .outline{grid-column:1/-1}
+}
+
+/* Profil d'un membre, vu par le Bike Sitter : volontairement pauvre. */
+.bloc-membre{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.init-membre{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+  background:#dcefe2;color:#025c27;font-family:var(--police-manrope),sans-serif;font-weight:800;
+  font-size:1.5rem}
+.bloc-membre .fp-chiffres{margin:0 0 10px}
+.message-membre{background:var(--paper);border-radius:14px;padding:14px 16px;
+  margin-top:14px!important;font-style:italic;line-height:1.6}
+@media(max-width:560px){
+  .bloc-membre{grid-template-columns:1fr}
+}
+
+/* Catalogue de recompenses, inscription, depot du velo. */
+.page-etroite{max-width:720px}
+.solde{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;
+  border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:0 0 18px}
+.solde>div{padding:16px 18px;border-left:1px solid var(--line)}
+.solde>div:first-child{border-left:0}
+.solde span{display:block;font-size:.78rem;color:var(--muted)}
+.solde b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.15rem;margin-top:3px}
+.cat-filtres{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.cat-filtres .chip{border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:8px 16px;font-size:.86rem;font-weight:600}
+.cat-filtres .chip.actif{background:var(--green);color:#fff;border-color:var(--green)}
+.recos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.reco{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;
+  display:grid;align-content:start;gap:6px}
+.reco[hidden]{display:none}
+.reco-tete{display:flex;align-items:center;justify-content:space-between}
+.reco-cat{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted)}
+.reco-cout{background:#e9f5ed;color:var(--green);border-radius:999px;padding:4px 10px;
+  font-size:.78rem}
+.reco h3{font-family:var(--police-manrope),sans-serif;font-size:1.02rem;margin:4px 0 0}
+.reco p{margin:0;font-size:.84rem;color:var(--muted)}
+.reco button{margin-top:10px;width:100%;padding:10px;border-radius:11px}
+.reco-bloquee{opacity:.72}
+.reco-bloquee button{cursor:default}
+
+.jalons{list-style:none;display:flex;gap:8px;margin:0 0 18px;padding:0;flex-wrap:wrap}
+.jalons li{display:flex;align-items:center;gap:8px;background:#fff;
+  border:1px solid var(--line);border-radius:999px;padding:8px 14px;
+  font-size:.84rem;color:var(--muted)}
+.jalons b{width:22px;height:22px;border-radius:50%;background:#eef2ef;
+  display:grid;place-items:center;font-size:.76rem;color:var(--muted)}
+.jalons .fait{color:var(--ink);border-color:var(--green)}
+.jalons .fait b{background:var(--green);color:#fff}
+
+.photos-constat{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:10px;margin:14px 0}
+.photo-case{border:1.5px dashed var(--line);background:var(--paper);border-radius:14px;
+  padding:26px 10px;font-size:.84rem;font-weight:600;color:var(--muted)}
+.photo-case.pleine{border-style:solid;border-color:var(--green);color:var(--green);
+  background:#eef6f0}
+.code-cases{display:flex;gap:10px;margin-top:12px}
+.code-cases input{width:56px;height:62px;text-align:center;font-size:1.5rem;
+  font-family:var(--police-manrope),sans-serif;font-weight:700;border:1px solid var(--line);
+  border-radius:14px;background:#fff}
+.code-cases input:focus{outline:0;border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(1,118,40,.12)}
+.actions-fin{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+@media(max-width:560px){
+  .solde{grid-template-columns:1fr}
+  .solde>div{border-left:0;border-top:1px solid var(--line)}
+  .solde>div:first-child{border-top:0}
+  .actions-fin .primary,.actions-fin .outline{flex:1 1 100%}
+}
+
+/* Plan du site : une carte par ecran, groupees par parcours. */
+.simu{display:flex;gap:12px;align-items:flex-start;background:#fff;
+  border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 22px}
+.simu input{margin-top:3px;width:18px;height:18px;accent-color:var(--green)}
+.simu b{display:block;font-size:.95rem;margin-bottom:2px}
+.simu span{font-size:.85rem;color:var(--muted);line-height:1.5}
+.plan-note-sitter{display:none}
+body[data-mode="sitter"] .plan-note-sitter{display:block}
+body[data-mode="sitter"] .plan-cycliste{display:none}
+.plan-note-sitter p{margin:0 0 14px;line-height:1.6}
+.plan-groupe{margin:0 0 26px}
+.plan-groupe h2{font-family:var(--police-manrope),sans-serif;font-size:1.1rem;margin:0 0 12px}
+.plan-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:10px}
+.plan-carte{display:block;text-align:left;background:#fff;border:1px solid var(--line);
+  border-radius:16px;padding:16px 18px}
+.plan-carte:hover{border-color:var(--green);
+  box-shadow:0 10px 26px -18px rgba(3,44,19,.5)}
+.plan-carte b{display:block;font-size:.98rem;margin-bottom:4px}
+.plan-carte span{display:block;font-size:.82rem;color:var(--muted);line-height:1.45}
+
+/* En-tete complet du site sur la fiche, comme sur le visuel de reference. */
+.site-header{display:flex;align-items:center;gap:clamp(16px,2.5vw,34px);
+  padding:0 clamp(16px,2.6vw,30px);height:74px;background:#fff;
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.sh-nav{display:flex;gap:clamp(14px,1.8vw,26px);margin-right:auto}
+.sh-nav a{font-size:.92rem;font-weight:600;color:var(--ink);text-decoration:none;
+  padding:6px 0;border-bottom:2px solid transparent}
+.sh-nav a:hover{color:var(--green);border-color:var(--green)}
+.sh-actions{display:flex;align-items:center;gap:10px}
+.sh-langue{border:0;background:none;font-weight:600;font-size:.88rem;color:var(--ink)}
+.sh-actions .outline{padding:9px 16px;font-size:.88rem;border-radius:11px}
+.sh-inscrire{padding:10px 20px;border-radius:11px;font-size:.88rem;width:auto;
+  margin-top:0}
+@media(max-width:1023px){.sh-nav,.sh-langue{display:none}}
+@media(max-width:900px){
+  /* L'en-tete de la fiche portait trop de commandes pour la largeur d'un
+     telephone : le bouton d'inscription sortait de l'ecran. */
+  .sh-actions .rond,.sh-actions .outline{display:none}
+  .sh-inscrire{padding:9px 14px;font-size:.82rem}
+}
+
+.info-i{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;
+  border:1px solid var(--muted);color:var(--muted);font-size:.62rem;font-style:italic;
+  vertical-align:1px}
+.mc-zone{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50%;
+  background:rgba(1,118,40,.18);transform:translate(-50%,-50%)}
+.mc-pin{z-index:1}
+
+/* Les champs de la demande portent leur pictogramme, comme sur le visuel. */
+.ch-ico{position:relative}
+.carte-cote .ch-ico input{padding-left:36px}
+.ch-ico:after{position:absolute;left:12px;bottom:11px;font-size:.9rem;
+  color:var(--muted)}
+.ch-date:after{content:"▤"}
+.ch-heure:after{content:"◴"}
+
+/* Verifications : pictogramme a gauche, coche pleine a droite. */
+.verifs li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px}
+.vi{width:34px;height:34px;border-radius:10px;background:#eef6f0;color:var(--green);
+  display:grid;place-items:center;flex:none}
+.verifs b{display:block;font-size:.94rem}
+.verifs div span{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+
+/* Avis avec portrait, etoiles et date. */
+.avis{display:grid;grid-template-columns:auto 1fr;gap:12px}
+.avis-photo{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#eef5f0}
+.avis-meta{display:flex;align-items:center;gap:8px;margin:2px 0 6px!important;
+  font-size:.78rem}
+.avis b{font-size:.9rem}
+.note-globale .gris{font-size:.85rem;margin-left:4px}
+
+/* Trois etats de disponibilite. */
+.pt.demi{background:linear-gradient(90deg,var(--green) 50%,#dfe5e0 50%)}
+.dispo td{border:1px solid var(--line)}
+.dispo thead th{border:1px solid var(--line);background:var(--paper)}
+.dispo tbody th{border:1px solid var(--line);padding-left:10px;font-weight:600}
+
+/* Tuiles d'equipement sur fond vert pale, comme la reference. */
+.tuile{background:#f1f8f3}
+.capacite{background:#f1f8f3}
+
+/* Les voisins : coeur a droite, pastille « en ligne » sur le portrait. */
+.voisins{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.voisin{display:flex;align-items:center;gap:8px;background:#fff;
+  border:1px solid var(--line);border-radius:16px;padding:12px}
+.voisin-btn{display:flex;align-items:center;gap:12px;flex:1;min-width:0;
+  border:0;background:none;text-align:left;padding:0}
+.v-photo{position:relative;flex:none}
+.v-photo img{width:48px;height:48px;border-radius:50%;object-fit:cover;
+  background:#eef5f0;display:block}
+.v-photo i{position:absolute;right:1px;bottom:1px;width:11px;height:11px;
+  border-radius:50%;background:#33b16a;border:2px solid #fff}
+.v-txt{min-width:0}
+.v-txt b{display:block;font-size:.92rem}
+.voisin .v-note{display:flex;align-items:center;gap:4px;white-space:nowrap;
+  font-size:.78rem;margin:1px 0}
+.voisin .v-note .gris{display:inline}
+.v-note .etoiles{font-size:.8rem}
+.v-note .gris{display:inline}
+.v-txt>.gris{display:block;font-size:.76rem}
+.rond.petit{width:32px;height:32px;font-size:.9rem;flex:none}
+.fleches{display:flex;gap:6px}
+.fleches button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:#fff;color:var(--ink)}
+.fleches button:hover{border-color:var(--green);color:var(--green)}
+
+/* Points forts : une liste a deux colonnes, pas des tuiles de plus. */
+.forts{list-style:none;margin:0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px 22px}
+.forts li{display:flex;align-items:center;gap:10px;font-size:.92rem;
+  color:var(--ink);padding:5px 0}
+.forts .ico-mini{color:var(--green);flex:none}
+
+/* La derniere vignette annonce le reste de la galerie. */
+.g-plus{position:relative}
+.g-voile{position:absolute;inset:0;border:0;background:rgba(4,32,17,.55);
+  color:#fff;font-weight:700;font-size:.88rem;backdrop-filter:blur(2px)}
+.g-plus figcaption{display:none}
+
+/* Quartiers couverts. */
+.zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:18px;margin-top:14px}
+.zones h3{font-family:var(--police-manrope),sans-serif;font-size:.95rem;margin:0 0 8px}
+.zones ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.zones a{font-size:.86rem;color:var(--muted);text-decoration:none}
+.zones a:hover{color:var(--green)}
+
+/* Avis : onglets et lecture de la repartition en toutes lettres. */
+.onglets-avis{display:flex;gap:6px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.oa{border:0;background:none;padding:8px 2px;margin-right:16px;font-weight:700;
+  font-size:.88rem;color:var(--muted);border-bottom:2px solid transparent}
+.oa.actif{color:var(--ink);border-color:var(--green)}
+.resume-note{font-size:.84rem;margin:0 0 12px!important}
+.carte-cote .barre{grid-template-columns:86px 1fr 40px;font-size:.74rem}
+.carte-cote .barre span:first-child{white-space:nowrap}
+.carte-cote .barre span:last-child{white-space:nowrap;text-align:right}
+.barre span:last-child{text-align:right}
+
+/* Horaires de la semaine. */
+.etat{border-radius:999px;padding:5px 12px;font-size:.76rem;font-weight:700}
+.etat.ouvert{background:#e9f5ed;color:var(--green)}
+.etat.partiel{background:#fdf3e3;color:#a56a12}
+.etat.ferme{background:#f2f0ef;color:var(--muted)}
+.horaires{list-style:none;margin:12px 0 0;padding:0}
+.horaires li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;
+  border-top:1px solid var(--line);font-size:.86rem;color:var(--muted)}
+.horaires li:first-child{border-top:0}
+.horaires li.auj{color:var(--ink)}
+.horaires li.auj b{color:var(--green)}
+.heure-locale{font-size:.78rem;margin-top:12px!important}
+
+/* Contacts rapides. */
+.contacts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.contact{border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:12px 6px;font-size:.8rem;font-weight:600;color:var(--ink);
+  display:grid;justify-items:center;gap:5px}
+.contact:hover{border-color:var(--green);color:var(--green)}
+
+/* =====================================================================
+   FICHE D'UN BIKE SITTER
+   Deux colonnes : le contenu a gauche, la demande, les verifications et les
+   avis colles a droite. Tout ce qui rassure est visible sans defiler.
+   ===================================================================== */
+.fp{max-width:1220px;margin:0 auto;padding:18px clamp(14px,2.4vw,26px) 70px}
+.fil{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.82rem;
+  color:var(--muted);margin:0 0 18px}
+.fil a{color:var(--muted)}
+.fil a:hover{color:var(--green)}
+.fil b{color:var(--ink)}
+.fp-grille{display:grid;grid-template-columns:minmax(0,1fr) 380px;min-width:0;
+  gap:clamp(18px,2vw,28px);align-items:start}
+.fp-main{display:grid;gap:16px;min-width:0}
+
+.fp-tete{background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:22px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  gap:0 24px;min-width:0}
+.fp-photo{position:relative;width:clamp(140px,14vw,180px)}
+.fp-photo img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;
+  background:#eef5f0;display:block}
+.fp-statut{position:absolute;left:8px;bottom:8px;right:8px;background:rgba(6,40,22,.82);
+  color:#fff;border-radius:999px;padding:6px 10px;font-size:.72rem;font-weight:600;
+  display:flex;align-items:center;gap:6px;backdrop-filter:blur(6px)}
+.fp-statut i{width:7px;height:7px;border-radius:50%;background:#5fd08a;flex:none}
+.fp-ident{min-width:0}
+.fp-ident h1{font-family:var(--police-manrope),sans-serif;font-weight:700;
+  font-size:clamp(1.7rem,2.6vw,2.3rem);letter-spacing:-.03em;margin:2px 0 4px;
+  display:flex;align-items:center;gap:10px}
+.v-check{width:23px;height:23px;border-radius:50%;background:var(--green);color:#fff;
+  font-size:.75rem;display:grid;place-items:center;flex:none}
+.fp-role{margin:0 0 12px;font-weight:600;color:var(--ink);font-size:.95rem}
+.fp-lieu{margin:0 0 10px;color:var(--muted);font-size:.92rem}
+.fp-lieu a{color:var(--green);font-weight:700;margin-left:10px;white-space:nowrap}
+.fp-chiffres{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px;
+  font-size:.95rem}
+.etoiles{color:#f2a33c;letter-spacing:1px}
+.gris{color:var(--muted)}
+.sep{width:1px;height:16px;background:var(--line);margin:0 6px}
+.ico{width:22px;height:22px}
+.ico-mini{width:17px;height:17px;vertical-align:-3px}
+.fp-confiance{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;
+  gap:8px 20px;font-size:.84rem;color:var(--muted)}
+.fp-confiance li{display:flex;align-items:center;gap:8px}
+.pastille{width:22px;height:22px;border-radius:50%;background:#eef2ef;
+  display:grid;place-items:center;font-size:.7rem;color:var(--muted)}
+.pastille.ok{background:#e6f3ea;color:var(--green)}
+.fp-actions{display:flex;gap:8px;align-items:flex-start}
+.rond{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);
+  background:#fff;font-size:1rem;color:var(--ink)}
+.rond:hover{border-color:var(--green);color:var(--green)}
+
+.fp-bloc,.fp-apropos{background:#fff;border:1px solid var(--line);border-radius:20px;
+  padding:24px clamp(18px,2vw,26px)}
+.fp-apropos{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);
+  gap:24px;align-items:start}
+.fp-bloc h2,.fp-apropos h2,.carte-cote h2{font-family:var(--police-manrope),sans-serif;
+  font-size:1.14rem;letter-spacing:-.02em;margin:0 0 12px}
+.fp-apropos p{margin:0;color:var(--muted);line-height:1.65}
+.fp-resume{background:var(--paper);border-radius:16px;padding:16px;display:grid;gap:14px}
+.fp-resume>div{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.ri{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--line);
+  display:grid;place-items:center;color:var(--green)}
+.fp-resume b{display:block;font-size:.9rem}
+.fp-resume span{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+
+.fp-titre-ligne{display:flex;align-items:baseline;justify-content:space-between;
+  gap:16px;flex-wrap:wrap}
+.lien{border:0;background:none;color:var(--green);font-weight:700;font-size:.88rem}
+
+.galerie{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+  margin-top:14px}
+.galerie figure{position:relative;margin:0;border-radius:14px;overflow:hidden;
+  background:#eef5f0}
+.galerie .g-grand{grid-column:span 2;grid-row:span 2}
+.galerie img{display:block;width:100%;height:100%;object-fit:cover}
+.galerie .g-grand img{aspect-ratio:4/3}
+.galerie figure:not(.g-grand) img{aspect-ratio:4/3}
+.galerie figcaption{position:absolute;left:8px;bottom:8px;background:rgba(255,255,255,.93);
+  border-radius:999px;padding:5px 11px;font-size:.74rem;font-weight:600;
+  display:flex;align-items:center;gap:6px}
+
+.tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.tuile{background:var(--paper);border-radius:14px;padding:16px 14px;text-align:center;
+  color:var(--green)}
+.tuile b{display:block;color:var(--ink);font-size:.88rem;margin-top:8px}
+.tuile span{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}
+.capacite{display:flex;align-items:center;gap:14px;background:var(--paper);
+  border-radius:14px;padding:16px;color:var(--green)}
+.capacite b{display:block;color:var(--ink)}
+.capacite span{color:var(--muted);font-size:.82rem}
+
+.legende{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);
+  margin:0}
+.pt{width:11px;height:11px;border-radius:50%;background:#dfe5e0;display:inline-block}
+.pt.ok{background:var(--green)}
+.dispo{width:100%;table-layout:fixed;border-collapse:collapse;font-size:.82rem;
+  margin-top:14px}
+.dispo thead th:first-child{width:27%}
+.j-c{display:none}
+.dispo th{font-weight:600;color:var(--muted);padding:8px 4px;text-align:center;
+  border-bottom:1px solid var(--line)}
+.dispo tbody th{text-align:left;color:var(--ink);white-space:normal;
+  padding:8px 10px;line-height:1.3}
+.dispo td{text-align:center;padding:9px 4px;border-bottom:1px solid var(--line)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.bandeau-msg{background:#eaf3fb;border:1px solid #d5e6f6;border-radius:18px;
+  padding:16px 20px;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap}
+.bandeau-msg p{margin:0;font-size:.92rem}
+
+.voisins{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.voisin{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;
+  border:1px solid var(--line);border-radius:16px;padding:12px}
+.voisin:hover{border-color:var(--green)}
+.voisin img{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;
+  background:#eef5f0}
+.voisin b{display:block;font-size:.92rem}
+.voisin span{display:block;font-size:.76rem;margin-top:1px}
+
+.fp-cote{display:grid;gap:16px;position:sticky;top:100px}
+.carte-cote{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px}
+.mini-carte{display:flex;align-items:center;gap:12px;border:1px solid var(--line);
+  border-radius:14px;padding:10px;margin:14px 0 12px}
+.mc-plan{width:78px;height:58px;border-radius:10px;flex:none;position:relative;
+  background:#eef3ef;background-image:linear-gradient(30deg,transparent 48%,#dbe2dc 49%,#dbe2dc 52%,transparent 53%);
+  background-size:40px 34px}
+.mc-pin{position:absolute;inset:0;display:grid;place-items:center;color:var(--green);
+  font-size:1.1rem}
+.mini-carte b{display:block;font-size:.92rem}
+.mini-carte span{font-size:.78rem}
+.dispo-jour{display:flex;align-items:center;gap:8px;background:#e9f5ed;
+  border-radius:12px;padding:10px 14px;font-size:.88rem;font-weight:600;
+  color:var(--green);margin:0 0 14px}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.carte-cote .champ input[readonly]{background:var(--paper);cursor:default}
+.carte-cote .primary{width:100%;margin-top:4px}
+.carte-cote .notice{font-size:.78rem;color:var(--muted);margin:12px 0 0;line-height:1.5}
+
+.verifs{list-style:none;margin:0;padding:0}
+.verifs li{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 0;border-top:1px solid var(--line)}
+.verifs li:first-child{border-top:0;padding-top:0}
+.verifs b{font-weight:600;font-size:.92rem}
+.v-ok{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;
+  display:grid;place-items:center;font-size:.78rem;flex:none}
+
+.note-globale{display:flex;align-items:center;gap:10px;margin:6px 0 12px}
+.note-globale b{font-family:var(--police-manrope),sans-serif;font-size:2.1rem;letter-spacing:-.03em}
+.barres{display:grid;gap:5px;margin-bottom:16px}
+.barre{display:grid;grid-template-columns:32px 1fr 22px;align-items:center;gap:8px;
+  font-size:.76rem;color:var(--muted)}
+.piste{height:7px;border-radius:4px;background:#eef2ef;overflow:hidden}
+.piste span{display:block;height:100%;background:var(--green)}
+.avis-liste{display:grid;gap:12px}
+.avis{border-top:1px solid var(--line);padding-top:12px}
+.avis:first-child{border-top:0;padding-top:0}
+.avis-tete{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.avis-init{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:#dcefe2;color:#025c27;flex:none;
+  font-family:var(--police-manrope),sans-serif;font-weight:800;font-size:.95rem}
+.avis-tete b{display:block;font-size:.88rem}
+.avis-tete span{display:block;font-size:.74rem;color:var(--muted)}
+.avis p{margin:0;font-size:.86rem;line-height:1.55;color:var(--muted)}
+
+.zone-carte{position:relative;height:190px;margin-top:14px;border-radius:16px;
+  overflow:hidden;border:1px solid var(--line);background:#eef3ef;
+  background-image:linear-gradient(30deg,transparent 48%,#dbe2dc 49%,#dbe2dc 52%,transparent 53%),
+    linear-gradient(-45deg,transparent 45%,#dbe2dc 46%,#dbe2dc 49%,transparent 50%);
+  background-size:140px 120px}
+.zc-cercle{position:absolute;left:50%;top:50%;width:150px;height:150px;
+  border-radius:50%;background:rgba(1,118,40,.14);transform:translate(-50%,-50%)}
+.zc-etoile{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-size:22px;color:var(--coral)}
+.zc-note{position:absolute;left:14px;bottom:12px;background:#fff;
+  border:1px solid var(--line);border-radius:999px;padding:6px 13px;
+  font-size:.76rem;color:var(--muted)}
+.etiquettes{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.etiquette{border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+  font-size:.86rem;font-weight:600;background:#fff}
+
+/* Le portrait remplace les initiales dans la liste des resultats. */
+.portrait-liste{width:95px;height:105px;object-fit:cover;object-position:center 30%;
+  border-radius:16px;background:#eef5f0;border:1px solid var(--line)}
+
+@media(max-width:1100px){
+  .fp-grille{grid-template-columns:minmax(0,1fr)}
+  .fp-cote{position:static;grid-template-columns:1fr 1fr}
+  .fp-cote .carte-cote:first-child{grid-column:1/-1}
+}
+@media(max-width:820px){
+  .fp-tete{grid-template-columns:auto minmax(0,1fr);gap:0 16px}
+  .fp-actions{grid-column:2;margin-top:12px}
+  .fp-apropos{grid-template-columns:1fr}
+  .galerie{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .j-l{display:none}
+  .j-c{display:inline}
+  .dispo thead th:first-child{width:30%}
+  .galerie .g-grand{grid-column:1/-1;grid-row:auto}
+  .fp-cote{grid-template-columns:1fr}
+  .dispo{font-size:.72rem}
+  .dispo tbody th{white-space:normal}
+}
+@media(max-width:560px){
+  .result-card{grid-template-columns:64px minmax(0,1fr) auto!important}
+  .portrait-liste{width:64px;height:76px}
+  /* sans minmax(0,…) la colonne prenait la largeur de son contenu le plus long */
+  .fp-tete{grid-template-columns:minmax(0,1fr);padding:18px}
+  .fp-ident,.fp-chiffres,.fp-confiance{min-width:0}
+  .fp-confiance{flex-direction:column;gap:8px}
+  .fp-chiffres{font-size:.9rem}
+  .fil{font-size:.76rem}
+  .fp-photo{width:128px;margin-bottom:14px}
+  .fp-actions{grid-column:1}
+  .deux{grid-template-columns:1fr}
+}
+
+/* =====================================================================
+   LES PAGES DE L'ASSOCIATION
+   Trois pages de contenu : qui nous sommes, nos regles, nous ecrire.
+   Meme habillage que la fiche, pour ne pas inventer un troisieme style.
+   ===================================================================== */
+.page{max-width:1000px;margin:0 auto;padding:clamp(28px,5vw,56px) clamp(16px,3vw,28px) 70px}
+.page-tete{margin:0 0 30px;max-width:760px}
+.page-tete h1{font-family:var(--police-manrope),sans-serif;font-weight:700;
+  font-size:clamp(1.9rem,3.6vw,3rem);letter-spacing:-.035em;line-height:1.05;
+  margin:12px 0 14px}
+.page-tete p{margin:0;color:var(--muted);font-size:1.05rem;line-height:1.65}
+.page-grille{display:grid;gap:16px}
+.contact-grille{grid-template-columns:1.25fr .75fr;align-items:start}
+
+.liste-nette{list-style:none;margin:0;padding:0}
+.liste-nette li{padding:12px 0 12px 26px;border-top:1px solid var(--line);
+  position:relative;color:var(--muted);line-height:1.6}
+.liste-nette li:first-child{border-top:0}
+.liste-nette li:before{content:"–";position:absolute;left:0;color:var(--green)}
+.liste-nette b{color:var(--ink)}
+
+.regles{list-style:none;counter-reset:r;margin:0;padding:0;display:grid;gap:12px}
+.regles li{counter-increment:r;background:#fff;border:1px solid var(--line);
+  border-radius:18px;padding:22px 24px 22px 70px;position:relative;
+  color:var(--muted);line-height:1.6}
+.regles li:before{content:counter(r,decimal-leading-zero);position:absolute;
+  left:22px;top:22px;width:32px;height:32px;border-radius:50%;
+  background:var(--green);color:#fff;display:grid;place-items:center;
+  font-family:var(--police-manrope),sans-serif;font-weight:700;font-size:.8rem}
+.regles b{display:block;color:var(--ink);font-size:1.02rem;margin-bottom:4px}
+
+.champ{display:block;margin:0 0 14px}
+.champ span{display:block;font-size:.84rem;color:var(--muted);margin-bottom:6px}
+.champ input,.champ select,.champ textarea{width:100%;border:1px solid var(--line);
+  border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);
+  font-family:inherit;font-size:.95rem}
+.champ textarea{resize:vertical}
+.champ input:focus,.champ select:focus,.champ textarea:focus{outline:0;
+  border-color:var(--green);box-shadow:0 0 0 3px rgba(1,118,40,.12)}
+#contactForm .primary{width:100%;margin-top:6px}
+
+@media(max-width:899px){
+  .contact-grille{grid-template-columns:1fr}
+  .regles li{padding:20px 20px 20px 60px}
+  .regles li:before{left:18px;top:20px}
+}
+
+/* Le centrage venait du conteneur interne, pas du titre. */
+@media(max-width:560px){
+  .hero-copy{text-align:left !important}
+  .hero-copy h1{text-align:left !important}
+}
+
+/* =====================================================================
+   PIED DE PAGE
+   La page s'arretait sur une question sans reponse. Le pied dit qui
+   nous sommes, ou aller, et quoi faire si quelque chose tourne mal.
+   ===================================================================== */
+.pied{background:var(--deep);color:#fff;padding:clamp(48px,7vw,88px) 0 0}
+.pied-grille{max-width:1260px;margin:0 auto;padding:0 clamp(20px,4vw,40px);
+  display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:clamp(20px,3vw,40px);
+  align-items:start}
+.acces{display:block;font-size:.72rem;opacity:.6}
+@media(max-width:1100px){.pied-grille{grid-template-columns:1fr 1fr 1fr}}
+/* Le bloc « un problème » occupait le bas de la premiere colonne et laissait
+   un grand vide sous les trois autres : il passe en bande, sur toute la largeur. */
+.pied-aide{grid-column:1 / -1;border-top:1px solid rgba(255,255,255,.14);
+  margin-top:clamp(20px,3vw,34px);padding-top:clamp(18px,2.4vw,26px);
+  display:grid;grid-template-columns:auto 1fr;gap:6px 26px;align-items:baseline}
+.pied-aide h2,.pied-aide h3{margin:0;white-space:nowrap}
+.pied-aide p{margin:0;max-width:70ch}
+.pied .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;
+  color:#fff}
+.pied .brand img{width:30px;height:auto}
+.pied .brand span{font-weight:800;letter-spacing:-.02em}
+.pied .brand b{color:#7ED79B;font-weight:800}
+.pied-marque p{margin-top:14px;color:#b9c8bf;font-size:.94rem;line-height:1.6;
+  max-width:38ch}
+.pied h2{font-size:.95rem;font-weight:700;margin:0 0 12px;letter-spacing:-.01em}
+.pied nav a{display:block;color:#b9c8bf;text-decoration:none;font-size:.94rem;
+  padding:5px 0;transition:color .14s ease}
+.pied nav a:hover{color:#fff}
+.pied nav a:focus-visible{outline:2px solid #7ED79B;outline-offset:3px;border-radius:4px}
+.pied-aide p{color:#b9c8bf;font-size:.92rem;line-height:1.6;max-width:34ch}
+.pied-bas{max-width:1180px;margin:clamp(32px,5vw,56px) auto 0;
+  padding:20px clamp(20px,4vw,40px) 28px;border-top:1px solid rgba(255,255,255,.14);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  color:#93a79a;font-size:.86rem}
+.pied-bas p{margin:0}
+@media(max-width:860px){
+  .pied-grille{grid-template-columns:1fr 1fr}
+  .pied-marque, .pied-aide{grid-column:1 / -1}
+  .pied-aide{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .pied-grille{grid-template-columns:1fr}
+  .pied-bas{flex-direction:column;gap:6px}
+}
+
+/* =====================================================================
+   LA BARRE, D'UN SEUL TENANT
+   Quatre cartes blanches qui flottaient sur un fond vert devenaient
+   quatre objets sans lien. Un seul contenant, des filets entre les
+   cellules, et le meme squelette partout : un libelle, une valeur.
+   ===================================================================== */
+.search-card, .quand-ouvert .search-card{
+  background:#fff !important;
+  border:1px solid var(--line) !important;
+  border-radius:20px !important;
+  padding:0 !important;
+  gap:0 !important;
+  overflow:visible;
+  box-shadow:0 1px 2px rgba(9,45,26,.05),
+             0 20px 44px -30px rgba(9,45,26,.35) !important}
+
+/* Chaque cellule : meme hauteur, meme structure, un filet a gauche. */
+.search-card .barre-rech-champ,
+.search-card .qm,
+.search-card .filtres-champ{
+  background:transparent;border:0;border-radius:0;box-shadow:none;
+  min-height:74px;padding:13px 20px;align-items:center;justify-content:flex-start;
+  text-align:left;width:100%;flex-direction:row;gap:0}
+.search-card .qm{flex-direction:row}
+.cell-txt{display:block;min-width:0;width:100%}
+.cell-lab{display:block;font-size:.76rem;color:var(--muted);font-weight:500;
+  margin-bottom:2px;text-transform:none;letter-spacing:0}
+.search-card .qm-lab{font-size:.76rem;margin-bottom:2px}
+.search-card .qm-txt{text-align:left;width:100%}
+.search-card .qm-txt b,
+.search-card .cell-txt b{font-size:.98rem;font-weight:700;letter-spacing:-.01em;
+  display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barre-rech-champ::before{display:none}
+.barre-rech-champ input{width:100%;font-size:.98rem;font-weight:700;padding:0}
+.barre-rech-champ input::placeholder{font-weight:500;color:var(--muted)}
+
+/* Le survol teinte la cellule entiere plutot que de la soulever. */
+.search-card .qm:hover,
+.search-card .filtres-champ:hover{background:rgba(1,118,40,.05);transform:none;
+  box-shadow:none}
+.search-card .qm[aria-expanded="true"],
+.search-card .filtres-champ[aria-expanded="true"]{background:rgba(1,118,40,.07);
+  box-shadow:none}
+.search-card .barre-rech-champ:focus-within{background:rgba(1,118,40,.05);
+  box-shadow:none}
+
+/* Le bouton rond disparait : toute la cellule est deja le bouton. */
+.fc-plus{display:none}
+
+@media(min-width:901px){
+  .search-card, .quand-ouvert .search-card{
+    grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr)
+      minmax(0,1.15fr) auto !important;
+    padding:0 !important;align-items:stretch !important}
+  .qm-bloc{display:flex}
+  .search-card .qm-bloc,
+  .search-card .filtres-champ{border-left:1px solid var(--line)}
+  .chercher{margin:10px 10px 10px 6px;border-radius:14px;padding:0 28px;
+    min-height:54px;align-self:center}
+}
+@media(max-width:900px){
+  .search-card .qm-bloc,
+  .search-card .filtres-champ{border-top:1px solid var(--line)}
+  .quand-mobile{grid-template-columns:1fr 1fr !important;gap:0 !important}
+  .quand-mobile .qm-bloc:last-child{border-left:1px solid var(--line)}
+  .chercher{margin:10px;border-radius:14px;min-height:54px;width:auto}
+}
+
+/* Le champ de saisie a sa propre hauteur de ligne : sans cela, « Lieu » ne
+   tombait pas sur la meme ligne que « Dépôt ». */
+.search-card .cell-lab,
+.search-card .qm-lab{line-height:1.25;margin-bottom:3px}
+.barre-rech-champ input{line-height:1.3;height:auto;display:block}
+.search-card .qm-txt b,
+.search-card .cell-txt b{line-height:1.3}
+
+/* =====================================================================
+   LE MENU SUR ÉCRAN ÉTROIT
+   Une liste deroulante sous le champ recouvrait les cellules suivantes :
+   il fallait deux clics pour atteindre les filtres. Elle devient un
+   panneau bas, avec un fond qui se ferme d'un clic.
+   ===================================================================== */
+@media(max-width:900px){
+  .qm-menu{position:fixed;left:0;right:0;bottom:0;top:auto;
+    max-height:62vh;border-radius:22px 22px 0 0;padding:10px 10px 22px;
+    box-shadow:0 -20px 50px -24px rgba(9,45,26,.5);
+    animation:feuille .2s ease-out;z-index:120}
+  .qm-menu::before{content:"";display:block;width:38px;height:4px;border-radius:99px;
+    background:var(--line);margin:2px auto 10px}
+  .qm-menu button{padding:14px 16px;font-size:1rem}
+  .qm-menu .sep{padding:10px 16px 6px}
+  @keyframes feuille{from{transform:translateY(14px);opacity:0}
+    to{transform:translateY(0);opacity:1}}
+}
+/* Le fond qui capte le clic et referme. */
+.voile{position:fixed;inset:0;background:rgba(9,45,26,.28);z-index:110;
+  animation:menu-entre .16s ease-out}
+.voile[hidden]{display:none}
+@media(min-width:901px){.voile{display:none}}
+
+/* Le panneau doit etre opaque : le voile se voyait au travers. */
+@media(max-width:900px){
+  .qm-menu{background:#fff !important;border:0}
+}
+
+/* Le panneau etait enferme dans le contexte d'empilement de la carte :
+   son z-index ne pouvait pas depasser le voile. On remonte la carte. */
+@media(max-width:900px){
+  /* La carte ne monte qu'au moment ou un menu est ouvert : sinon elle
+     recouvrait les autres ecrans et interceptait les clics. */
+  .menu-ouvert .search-card{position:relative;z-index:130}
+  .qm-bloc{position:static}
+  .voile{z-index:115}
+}
+
+/* La barre n'a plus que trois cellules : on redonne sa part a chacune. */
+@media(min-width:901px){
+  .search-card, .quand-ouvert .search-card{
+    grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr) auto !important}
+}
+
+/* =====================================================================
+   LA PALETTE, TIRÉE DU LOGO
+   Le logo est en #087333 ; l'interface utilisait deux autres verts, et
+   trois bleus se disputaient le badge de vérification. Une seule famille
+   désormais, et des proportions tenues : le vert porte les actions, le
+   vert profond les fonds pleins, le bleu ne dit qu'une chose.
+   ===================================================================== */
+:root{
+  --green:#087333;          /* le vert du logo, pour les actions */
+  --green-dark:#075E2A;     /* survol et appui */
+  --green-deep:#032C13;     /* fonds pleins, pied de page */
+  --deep:#032C13;
+  --green-wash:#EEF5F1;     /* aplats légers */
+  --green-line:#D3E6DA;     /* liserés */
+  --blue:#094F8F;           /* vérification, et rien d'autre */
+  --blue-wash:#ECF5FE;
+  --ink:#0B2116;
+  --muted:#5A6F64;
+}
+
+/* Les proportions : le vert plein reste rare. Un seul bouton par écran,
+   les aplats font le reste. */
+.chercher, .btn.primary, button.primary, .primary{background:var(--green)}
+.chercher:hover, button.primary:hover{background:var(--green-dark)}
+.search-card{box-shadow:0 1px 2px rgba(3,44,19,.05),
+  0 20px 44px -30px rgba(3,44,19,.35) !important}
+.fc-plus{box-shadow:0 4px 12px -4px rgba(8,115,51,.5)}
+.chercher{box-shadow:0 10px 24px -10px rgba(8,115,51,.55)}
+.chercher:hover{box-shadow:0 14px 30px -10px rgba(8,115,51,.62)}
+
+/* Le bleu ne sert qu'à la vérification. */
+.tag.ver{background:var(--blue-wash);color:var(--blue)}
+.badge{color:var(--blue)}
+
+/* Les tuiles reprennent les quatre profondeurs de la même famille. */
+.moment.coral{background:#0A6A31}
+.moment.green{background:#085828}
+.moment.blue {background:#06471F}
+.moment.sand {background:#043618}
+
+/* =====================================================================
+   L'ÉCRAN DE RÉSULTATS
+   Les filtres en tête, la liste a gauche, la carte a droite sur toute
+   la hauteur. On compare sans perdre la carte de vue.
+   ===================================================================== */
+.results-wrap{max-width:1520px;margin:0 auto;padding:24px clamp(16px,3vw,32px) 0}
+.results-top{margin-bottom:16px}
+.results-top h2{font-size:clamp(1.5rem,2.4vw,2rem);letter-spacing:-.03em}
+
+.barre-filtres{display:flex;align-items:center;gap:clamp(14px,2vw,28px);
+  flex-wrap:wrap;padding:14px 0 18px;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);margin-bottom:18px}
+.gf{display:flex;align-items:center;gap:10px;min-width:0}
+.gf-lab{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.gf-chips{display:flex;gap:6px;flex-wrap:wrap}
+.barre-filtres .chip{border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:999px;padding:7px 13px;font:inherit;font-size:.86rem;cursor:pointer;
+  min-height:36px;transition:background .14s ease,border-color .14s ease,color .14s ease}
+.barre-filtres .chip:hover{border-color:var(--green)}
+.barre-filtres .chip[aria-pressed="true"]{background:var(--green);
+  border-color:var(--green);color:#fff;font-weight:600}
+.barre-filtres .chip:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.gf-reset{margin-left:auto;border:0;background:none;color:var(--green);
+  font:inherit;font-weight:700;font-size:.88rem;cursor:pointer;padding:6px 2px}
+.gf-reset[hidden]{display:none}
+
+/* La carte tient toute la hauteur et suit le defilement. */
+.results-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);
+  border:0;gap:20px;min-height:0;align-items:start}
+.result-list{background:transparent;display:grid;gap:10px;align-content:start}
+.result-card{background:#fff;border:1px solid var(--line);border-radius:16px;
+  border-bottom:1px solid var(--line);
+  transition:border-color .14s ease, box-shadow .16s ease}
+.result-card:hover,.result-card.selected{background:#fff;border-color:var(--green);
+  box-shadow:0 2px 4px rgba(3,44,19,.05), 0 14px 30px -20px rgba(3,44,19,.4)}
+.map{border-radius:20px;position:sticky;top:96px;
+  height:calc(100vh - 120px);min-height:440px;border:1px solid var(--line)}
+
+@media(max-width:1000px){
+  .results-layout{grid-template-columns:1fr}
+  .map{position:relative;top:0;height:360px;order:-1}
+}
+@media(max-width:560px){
+  .barre-filtres{gap:12px;padding:12px 0 14px}
+  .gf{flex-direction:column;align-items:flex-start;gap:6px;width:100%}
+  .gf-chips{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;
+    scrollbar-width:none;width:100%}
+  .gf-chips::-webkit-scrollbar{display:none}
+  .barre-filtres .chip{white-space:nowrap}
+  .gf-reset{margin-left:0}
+  .map{height:280px}
+}
+
+.pin[hidden]{display:none}
+/* Le reperage de la destination reprend la couleur d encre plutot qu un
+   rouge etranger a la charte. */
+.destination-pin{color:var(--ink)}
+
+/* Le badge de verification ressemblait a un bouton : il n'en est pas un. */
+.result-card .badge{display:inline-block;background:var(--blue-wash);
+  color:var(--blue);border:0;border-radius:999px;padding:3px 9px;
+  font-size:.68rem;font-weight:700;letter-spacing:.02em;box-shadow:none;
+  margin-bottom:5px}
+
+/* =====================================================================
+   LE RAPPEL DE RECHERCHE
+   Sur la page de resultats, la recherche reste sous les yeux : changer
+   une heure ne demande pas de revenir en arriere.
+   ===================================================================== */
+.rappel-recherche{display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;
+  align-items:center;width:100%;text-align:left;
+  background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:0;margin:0 0 18px;cursor:pointer;font:inherit;color:var(--ink);
+  box-shadow:0 1px 2px rgba(3,44,19,.05);transition:box-shadow .16s ease}
+.rappel-recherche:hover{box-shadow:0 2px 4px rgba(3,44,19,.06),
+  0 14px 30px -20px rgba(3,44,19,.4)}
+.rappel-recherche:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.rr-cell{padding:12px 20px;min-width:0;border-left:1px solid var(--line)}
+.rr-cell:first-child{border-left:0}
+.rr-lab{display:block;font-size:.74rem;color:var(--muted);line-height:1.25}
+.rr-cell b{display:block;font-size:.94rem;line-height:1.3;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.rr-loupe{width:40px;height:40px;border-radius:50%;background:var(--green);
+  margin:0 12px;flex:none;display:grid;place-items:center}
+.rr-loupe::before{content:"";width:17px;height:17px;background:#fff;
+  -webkit-mask:no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.4-3.4'/%3E%3C/svg%3E");
+  mask:no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.4-3.4'/%3E%3C/svg%3E")}
+.results-top h2{margin:0 0 4px}
+
+@media(max-width:700px){
+  .rappel-recherche{grid-template-columns:1fr auto}
+  .rr-cell:nth-child(2){grid-row:2;border-left:0;border-top:1px solid var(--line)}
+  .rr-cell:nth-child(3){grid-row:2;grid-column:2;border-top:1px solid var(--line)}
+  .rr-loupe{grid-row:1;grid-column:2}
+}
+
+
+.raccourcis{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.raccourcis button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);
+  background:#fff;border-radius:999px;padding:9px 16px;font-size:.88rem;
+  font-weight:600;color:var(--ink)}
+.raccourcis button:hover{border-color:var(--green);color:var(--green)}
+.raccourcis span{color:var(--green)}
+.guard-autres{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;
+  gap:6px 16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:.86rem}
+.guard-autres>span{color:var(--muted)}
+.guard-autres .lien{font-size:.86rem}
+@media(max-width:560px){
+  .raccourcis{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;padding-bottom:2px}
+  .raccourcis::-webkit-scrollbar{display:none}
+  .raccourcis button{white-space:nowrap}
+}
+
+.groupee{margin:14px 0 4px;align-items:flex-start}
+.maintenant{display:flex;gap:12px;align-items:flex-start;background:#eef6f0;
+  border:1px solid #cfe6d8;border-radius:16px;padding:14px 16px;margin:0 0 16px}
+.maintenant input{margin-top:3px;width:18px;height:18px;accent-color:var(--green)}
+.maintenant b{display:block;font-size:.95rem;margin-bottom:2px}
+.maintenant span{font-size:.85rem;color:var(--muted);line-height:1.5}
+.ind-note{display:block;font-size:.72rem;color:var(--muted);font-style:normal;margin-top:4px}
+.mod-chiffres .alerte{border-color:#e6c8a0;background:#fdf7ee}
+.mod-chiffres .alerte b{color:#a56a12}
+.mod-chiffres.secondaire b{font-size:1.2rem}
+.fav-actions{display:flex;gap:8px;flex-wrap:wrap}
+.badge-top{display:inline-block;background:#fdf3e3;color:#a56a12;border-radius:999px;
+  padding:3px 10px;font-size:.72rem;font-weight:700;margin-left:6px;white-space:nowrap}
+
+.velos-liste{list-style:none;margin:14px 0 0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:8px}
+.velos-liste li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);
+  border-radius:12px;padding:10px 13px;font-size:.88rem}
+.velos-liste .vl-i{width:20px;height:20px;border-radius:50%;display:grid;
+  place-items:center;font-size:.7rem;flex:none}
+.velos-liste .oui{background:#eef6f0;border-color:#cfe6d8;font-weight:600}
+.velos-liste .oui .vl-i{background:var(--green);color:#fff}
+.velos-liste .non{color:var(--muted);background:#fff}
+.velos-liste .non .vl-i{background:#eef0ee;color:var(--muted)}
+
+.reco-actions{margin-top:12px}
+.reco-actions button{width:100%;padding:11px;border-radius:12px}
+.rc-tete-grande{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin:8px 0 18px}
+.rc-tete-grande h1{font-family:var(--police-manrope),sans-serif;font-size:clamp(1.6rem,2.4vw,2.2rem);
+  letter-spacing:-.03em;margin:8px 0 4px}
+.rc-cout-grand{background:#eef6f0;border-radius:18px;padding:16px 22px;text-align:center}
+.rc-cout-grand b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.9rem;
+  color:var(--green);line-height:1}
+.rc-cout-grand span{font-size:.78rem;color:var(--muted)}
+.part-tete{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;
+  margin:0 0 14px}
+.part-ini{width:52px;height:52px;border-radius:16px;background:var(--green);color:#fff;
+  display:grid;place-items:center;font-family:var(--police-manrope),sans-serif;font-weight:800;
+  font-size:1.3rem}
+.part-tete b{display:block;font-size:1rem}
+.part-tete .gris{display:block;font-size:.84rem}
+.part-mot{margin:16px 0;padding:14px 18px;background:var(--paper);border-radius:14px;
+  font-style:italic;line-height:1.6;border-left:3px solid var(--green)}
+.part-mot cite{display:block;margin-top:8px;font-style:normal;font-size:.84rem;
+  color:var(--muted)}
+.part-chiffres{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.part-chiffres>div{border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.part-chiffres b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.05rem}
+.part-chiffres span{font-size:.8rem;color:var(--muted)}
+
+/* Les visages sont le premier repère de confiance : ils doivent se
+   reconnaître sans zoomer. */
+.rech-liste .rc-photo{width:84px;height:84px;border-radius:50%;
+  object-position:center top}
+.fp2-photo img{width:110px;height:110px}
+.fp2-photo i{width:28px;height:28px;font-size:.78rem}
+.fav img{width:72px;height:72px}
+.avis-photo{width:52px;height:52px}
+.v-photo img{width:62px;height:62px}
+.mb-photo{width:clamp(110px,14vw,146px)}
+.avis-init,.ini-c{width:48px;height:48px;font-size:1.05rem}
+@media(max-width:560px){
+  .rech-liste .rc-photo{width:64px;height:64px}
+  .fp2-photo img{width:88px;height:88px}
+  .fav img{width:60px;height:60px}
+}
+
+/* Sur téléphone, la recherche s'empile en cartes : un champ par geste,
+   et le bouton en pleine largeur. */
+@media(max-width:720px){
+  .search-card{display:grid!important;gap:10px;background:transparent!important;
+    border:0!important;box-shadow:none!important;padding:0!important}
+  .search-card .field.destination,.search-card .quand-mobile .qm{
+    background:#fff;border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--o-1)}
+  .search-card .field.destination{padding:2px 16px 2px 46px;position:relative}
+  .search-card .field.destination:before{content:"⌕";position:absolute;left:17px;
+    top:50%;transform:translateY(-50%);font-size:1.5rem;color:var(--ink)}
+  .search-card .barre-rech-champ{border:0;padding:0;background:none}
+  .search-card .cell-lab{display:none}
+  .search-card .field.destination input{font-size:1.05rem;padding:16px 0;border:0;
+    background:none;width:100%}
+  .search-card .quand-mobile{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .search-card .quand-mobile .qm{padding:14px 16px;width:100%;text-align:left}
+  .search-card .qm-lab{font-size:.74rem;color:var(--muted)}
+  .search-card .qm-txt b{font-size:1rem}
+  .search-card .chercher{width:100%;padding:17px;border-radius:999px;
+    font-size:1.05rem;margin-top:4px}
+}
+
+.dispo abbr{text-decoration:none;border:0;font-weight:600}
+.dispo thead th:first-child{width:28%}
+@media(max-width:720px){.dispo thead th:first-child{width:30%}}
+
+/* Le tableau des disponibilités : chaque intitulé sur une seule ligne, et
+   des pastilles assez grandes pour se lire d'un coup d'œil. */
+.dispo{font-size:.86rem}
+.dispo thead th:first-child{width:36%}
+.dispo tbody th{white-space:nowrap;font-weight:700;color:var(--ink);
+  padding:11px 12px;font-size:.88rem}
+.dispo thead th{padding:10px 4px;font-size:.8rem;letter-spacing:-.01em}
+.dispo td{padding:11px 4px}
+.dispo .pt{width:13px;height:13px}
+@media(max-width:720px){
+  .dispo{font-size:.76rem}
+  .dispo tbody th{padding:10px 6px;font-size:.8rem}
+  .dispo thead th{padding:8px 2px;font-size:.72rem}
+  .dispo td{padding:10px 2px}
+  .dispo .pt{width:11px;height:11px}
+}
+@media(max-width:420px){
+  .dispo tbody th{font-size:.76rem;padding:9px 6px}
+}
+
+/* Hors connexion : un bandeau qui ne ment pas sur l'état du réseau. */
+.bandeau-horsligne{display:flex;align-items:center;gap:10px;background:#fdf3e3;
+  border:1px solid #f0dfc0;border-radius:12px;padding:12px 16px;margin:0 0 18px;
+  font-weight:700;color:#8a5a12;font-size:.9rem}
+.bh-pastille{width:10px;height:10px;border-radius:50%;background:#d08a2a;flex:none}
+.file-attente{background:var(--paper);border-radius:14px;padding:14px 16px;
+  margin-top:14px}
+.file-attente b{display:block;font-size:.95rem}
+.file-attente span{display:block;font-size:.84rem;color:var(--muted);margin-top:2px}
+.deux-ligne{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.deux-ligne button{padding:13px 22px;white-space:nowrap}
+@media(max-width:560px){
+  .deux-ligne{grid-template-columns:1fr}
+  .deux-ligne button{width:100%}
+}
+
+.bareme{margin:0 0 14px}
+.bareme summary{cursor:pointer;font-weight:700;font-size:.86rem;color:var(--green);
+  list-style:none}
+.bareme summary::-webkit-details-marker{display:none}
+.bareme summary:after{content:" ⌄"}
+.bareme[open] summary:after{content:" ⌃"}
+.tab-bareme{width:100%;border-collapse:collapse;margin:10px 0 8px;font-size:.86rem}
+.tab-bareme th{text-align:left;font-weight:600;color:var(--muted);padding:8px 0;
+  border-top:1px solid var(--line)}
+.tab-bareme td{text-align:right;font-weight:700;padding:8px 0;
+  border-top:1px solid var(--line)}
+.tab-bareme tr:first-child th,.tab-bareme tr:first-child td{border-top:0}
+
+/* Le créneau se choisit ici, une seule fois : les deux champs en lecture
+   seule redisaient ce que les menus disent déjà. */
+.cc-grille{display:grid;gap:10px;margin:14px 0;padding:14px;
+  background:var(--paper);border-radius:14px}
+.cc-grille .champ input,.cc-grille .champ select{background:#fff}
+.cc-info{margin:2px 0 0;font-size:.84rem;font-weight:700;color:var(--green)}
+
+/* Configuration des tarifs du Bike Sitter. */
+.modes-tarif{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.mode-tarif{text-align:left;border:1px solid var(--line);background:#fff;
+  border-radius:16px;padding:14px 16px}
+.mode-tarif b{display:block;font-size:.98rem;margin-bottom:4px}
+.mode-tarif span{font-size:.84rem;color:var(--muted);line-height:1.5}
+.mode-tarif.actif{border-color:var(--green);background:#eef6f0;
+  box-shadow:0 0 0 1px var(--green)}
+.grille-tarifs{display:grid;gap:10px;background:var(--paper);border-radius:16px;
+  padding:16px}
+.gt-ligne{display:grid;grid-template-columns:1fr 120px auto;gap:12px;
+  align-items:center}
+.gt-ligne>span{font-weight:600;font-size:.9rem}
+.gt-champ{display:flex;align-items:center;gap:6px;background:#fff;
+  border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.gt-champ input{border:0;background:none;font:inherit;font-weight:700;width:100%;
+  min-width:0}
+.gt-champ input:focus{outline:none}
+.gt-champ i{font-style:normal;color:var(--muted)}
+.gt-ligne small{font-size:.78rem;color:var(--muted);white-space:nowrap}
+@media(max-width:620px){
+  .modes-tarif{grid-template-columns:1fr}
+  .gt-ligne{grid-template-columns:1fr auto;row-gap:4px}
+  .gt-ligne small{grid-column:1/-1}
+}
+
+.points-pub{background:var(--paper)}
+.pts-int{max-width:1100px;margin:0 auto;padding:0 clamp(20px,4vw,40px)}
+.pts-intro{max-width:60ch;color:var(--muted);line-height:1.65;margin:0 0 26px}
+.pts-grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:12px;margin:0 0 20px}
+.pts-carte{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
+.pts-carte b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.5rem;
+  color:var(--green);margin-bottom:6px}
+.pts-carte span{font-size:.88rem;color:var(--muted);line-height:1.5}
+.pts-note{font-size:.86rem;color:var(--muted);max-width:66ch;margin:0 0 20px}
+
+.paiement{background:var(--paper);border-radius:14px;padding:14px 16px;margin:0 0 12px}
+.pay-lab{display:block;font-size:.74rem;color:var(--muted);font-weight:700;
+  letter-spacing:.06em;margin-bottom:8px}
+.paiement .fc-case{padding:5px 0}
+.paiement .petite{margin-top:8px}
+
+.paye{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;
+  font-size:.84rem;color:var(--muted)}
+.paye-etat{background:#fdf3e3;color:#a56a12;border-radius:999px;padding:3px 10px;
+  font-weight:700;font-size:.76rem}
+
+.paye-etat.gratuite{background:#eef6f0;color:var(--green)}
+.gt-ligne input:disabled{color:var(--muted);cursor:not-allowed}
+.gt-ligne input:disabled ~ *{opacity:.6}
+
+/* Carte de résultat avec la photo de l'emplacement, comme on la regarde
+   vraiment : l'espace d'abord, la personne ensuite, le prix à droite. */
+.rech-liste .rc{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;
+  padding:14px;align-items:start}
+.rc-photo-large{position:relative;aspect-ratio:16/8;background:#eef5f0}
+.rc-photo-large img{width:100%;height:100%;object-fit:cover;display:block}
+.rc-coeur{position:absolute;right:12px;top:12px;width:36px;height:36px;
+  border-radius:50%;border:0;background:rgba(255,255,255,.94);font-size:1.05rem;
+  color:var(--ink);box-shadow:0 4px 12px rgba(2,22,11,.18)}
+.rc-coeur[aria-pressed="true"]{color:#b03225}
+.rc-corps{padding:0;min-width:0}
+.rc-haut{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rc-haut h3{display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  font-family:var(--police-manrope),sans-serif;font-size:1.05rem;margin:0}
+.rc-portrait{width:52px;height:52px;border-radius:50%;object-fit:cover;
+  background:#eef5f0}
+.rc-qui h3{display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  font-family:var(--police-manrope),sans-serif;font-size:1.02rem;margin:0}
+.rc-note{margin:3px 0 0;font-size:.84rem;display:flex;flex-wrap:wrap;gap:5px;
+  align-items:center}
+.rc-prix{flex:none;text-align:right;background:#eef6f0;border-radius:14px;
+  padding:8px 12px;min-width:96px}
+.rc-prix .rc-dispo{display:block;font-size:.68rem;color:var(--green);
+  font-weight:700;letter-spacing:.02em}
+.rc-prix b{display:block;font-family:var(--police-manrope),sans-serif;font-size:1.22rem;
+  color:var(--green);line-height:1.15}
+.rc-prix .rc-duree{display:block;font-size:.72rem;color:var(--muted)}
+.rech-liste .rc-titre{margin:10px 0 0;font-weight:700;font-size:.95rem}
+.rc-trois{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  margin-top:12px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:.76rem;color:var(--muted);text-align:center}
+.rc-trois>div{min-width:0}
+.rc-i{display:block;color:var(--green);font-size:1rem;margin-bottom:3px}
+.rc-actions{margin-top:14px}
+.cr-filtres{margin-left:auto}
+@media(max-width:560px){
+  .rc-prix{align-self:flex-start;padding:6px 11px;min-width:auto}
+  .rc-prix b{font-size:1rem}
+  .rc-prix .rc-duree{font-size:.68rem}
+  .rech-liste .rc{gap:11px;padding:12px}
+  .rc-trois{grid-template-columns:1fr;text-align:left;gap:5px}
+  .rc-trois .rc-i{display:inline;margin-right:6px}
+}
+
+/* Volet de filtres : disponibilité, prix, et un bouton qui compte. */
+.fc-jours{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fj{border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:11px 12px;font-size:.84rem;font-weight:600;color:var(--ink);
+  text-align:left}
+.fj.actif{border-color:var(--green);background:var(--green);color:#fff}
+#prixMax{width:100%;accent-color:var(--blue)}
+.fc-pied{position:sticky;bottom:0;background:#fff;padding:14px 0;
+  border-top:1px solid var(--line);margin-top:8px}
+@media(max-width:1023px){
+  .filtres-col.ouvert{padding-bottom:92px}
+  .filtres-col.ouvert ~ .rech-page .bascule,
+  body:has(.filtres-col.ouvert) .bascule{display:none}
+}
+.fc-pied .bleu{width:100%;padding:15px;border-radius:14px}
+
+/* Filtres : paliers de rayon, modes de prix, bouton de géolocalisation. */
+.autour{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:#fff;color:var(--green);font-size:1rem;flex:none;margin-left:8px}
+.autour:hover{border-color:var(--green)}
+.fc-paliers{display:flex;justify-content:space-between;font-size:.72rem;
+  color:var(--muted);margin-top:4px}
+.modes-prix{display:grid;gap:8px;margin:0 0 12px}
+.mp{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px;
+  font-size:.86rem;font-weight:600;color:var(--ink);text-align:left}
+.mp[aria-pressed="true"]{border-color:var(--green);background:#eef6f0;color:var(--green)}
+.reglages .bascule[aria-pressed="true"],.reglages .bascule.on{background:var(--green)}
+#prixNote{margin-top:6px}
+@media(min-width:620px){.modes-prix{grid-template-columns:repeat(3,1fr)}}
+
+/* Carte de résultat : hiérarchie plus nette, moins de hauteur perdue. */
+.rech-liste .rc{gap:13px;padding:13px}
+.rc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;
+  margin:8px 0 0;font-size:.82rem;color:var(--muted)}
+.rc-meta>span{position:relative}
+.rc-meta>span+span:before,.rc-etoile+span:before{content:"";position:absolute;
+  left:-7px;top:50%;width:3px;height:3px;border-radius:50%;background:#c3ccc6;
+  transform:translateY(-50%)}
+.rc-etoile{color:var(--ink);font-size:.88rem;white-space:nowrap}
+.rc-etoile:before{content:none}
+.pastille-dispo{display:inline-block;margin-left:8px;font-size:.72rem;
+  font-weight:700;color:var(--green)}
+.rc-prix{display:flex;flex-direction:column;align-items:flex-end;gap:0;
+  padding:7px 13px;min-width:0}
+.rc-prix b{font-size:1.18rem}
+.rc-prix .rc-duree{font-size:.72rem}
+.rc-trois{margin-top:10px;padding-top:10px;gap:6px;font-size:.74rem}
+.rc-trois>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-i{font-size:.92rem;margin-bottom:2px}
+.rech-liste .rc-titre{font-size:.98rem;line-height:1.35}
+.rc-actions{margin-top:12px;gap:8px}
+.rc-carte,.rc-btn{padding:9px 15px;font-size:.85rem}
+
+/* Volet : des cases à cocher plus denses, et un pied qui ne flotte pas. */
+.filtres-col .gf-chips{gap:0}
+.filtres-col .chip{padding:6px 0;font-size:.87rem}
+.fc-bloc,.filtres-col .gf{padding:14px 0}
+.fc-pied{background:linear-gradient(#fff0,#fff 18%);padding:18px 0 6px;border-top:0}
+.fc-pied .bleu{box-shadow:0 8px 24px -10px rgba(36,107,253,.6)}
+
+/* =====================================================================
+   COUCHE DE FINITION
+   ===================================================================== */
+:root{
+  --r-s:14px; --r-m:18px;
+  --o-1:0 1px 2px rgba(6,40,22,.05);
+  --o-2:0 2px 6px rgba(6,40,22,.06), 0 12px 28px -18px rgba(6,40,22,.35);
+  --trait:#e4ebe6; --geste:180ms cubic-bezier(.2,.7,.3,1);
+}
+:root{--line:var(--trait)}
+.bloc,.fp2-bloc,.carte-cote,.mod-carte,.guard-card,.galerie2,.plan-carte,
+.rech-liste,.etat-vide,.fav,.notif,.reco,.avis2 article,.mb-reperes,
+.solde,.fp2-faits>div,.tuile,.rc,.result-card{border-radius:var(--r-m)}
+.primary,.bleu,.outline,.danger,.rc-btn,.rb-go,.rc-carte,.champ input,
+.champ select,.champ textarea,.fc-select,.msg-saisie input{border-radius:var(--r-s)}
+.bloc,.fp2-bloc,.carte-cote,.mod-carte,.galerie2,.rech-liste{box-shadow:var(--o-1)}
+.plan-carte,.fav,.notif,.reco,.rc,.result-card,.guard-card{box-shadow:var(--o-1);
+  transition:box-shadow var(--geste), border-color var(--geste), transform var(--geste)}
+.plan-carte:hover,.fav:hover,.notif:hover,.rc:hover,.result-card:hover{
+  box-shadow:var(--o-2); transform:translateY(-1px)}
+.primary,.bleu,.outline,.danger,.rc-btn,.rb-go,.rc-carte,.contact,.cr,.br,.tb,
+.rond,.cloche,.lien{transition:background var(--geste), color var(--geste),
+  border-color var(--geste), box-shadow var(--geste), transform var(--geste)}
+.primary:active,.bleu:active,.outline:active,.danger:active,.rc-btn:active,
+.rb-go:active,.rc-carte:active{transform:translateY(1px)}
+.bleu,.rc-btn,.rb-go{box-shadow:0 10px 22px -14px rgba(36,107,253,.85)}
+.primary{box-shadow:0 10px 22px -14px rgba(1,118,40,.85)}
+h1{letter-spacing:-.035em}
+h2,h3{letter-spacing:-.02em}
+.page-tete h1{font-size:clamp(1.9rem,1.2rem + 2.2vw,3rem);line-height:1.06}
+.page-tete p{font-size:clamp(1rem,.95rem + .2vw,1.1rem);line-height:1.6;max-width:62ch}
+.bloc p,.fp2-sect p,.mod-carte>p{line-height:1.66}
+.etat-vide{border-style:solid;border-color:var(--trait);box-shadow:var(--o-1)}
+.etiquette{background:#fff;border:1px solid var(--trait)}
+.topbar,.site-header{box-shadow:0 1px 0 var(--trait)}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .plan-carte:hover,.fav:hover,.notif:hover,.rc:hover,.result-card:hover{transform:none}
+}
+
+/* Lien d'évitement */
+.saut-contenu{position:absolute;left:12px;top:-60px;z-index:200;background:#fff;
+  color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 18px;
+  font-weight:700;text-decoration:none;box-shadow:0 12px 30px rgba(2,22,11,.2);
+  transition:top 140ms}
+.saut-contenu:focus{top:12px}
+
+/* Impression */
+@media print{
+  .tabbar,.bascule,.cloche,.bascule-role,.saut-contenu,.map-outils,.map-zoom,
+  .map-position,.map-rezone,.chips-rapides,.filtres-col,.sh-actions,
+  .header-actions{display:none!important}
+  .app-screen{position:static!important;display:block!important;
+    page-break-after:always;overflow:visible!important;height:auto!important}
+  .app-screen[aria-hidden="true"]{display:none!important}
+  body{background:#fff}
+  .bloc,.fp2-bloc,.carte-cote,.mod-carte,.guard-card,.rc,.plan-carte{
+    box-shadow:none!important;border:1px solid #ccc}
+  .pied{background:#fff;color:#000}
+  a{text-decoration:underline}
+  .rech-page{display:block}
+  #results .map{height:320px}
+}

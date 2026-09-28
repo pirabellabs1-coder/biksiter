@@ -38,7 +38,9 @@ export const ACCES = [
   'Escalier',
   'Ascenseur',
   'Rampe',
-  'Passage par l’intérieur du logement',
+  // Apostrophe droite, comme la contrainte de la base (migration 001) et le
+  // prototype : avec l'apostrophe courbe, l'enregistrement était refusé.
+  "Passage par l'intérieur du logement",
   'Passage étroit',
   'Autre',
 ] as const;

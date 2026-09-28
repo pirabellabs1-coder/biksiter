@@ -9,7 +9,9 @@ import { limiteDejaAtteinte, noterUneTentative } from '@/lib/depot/tentatives';
 import { texte } from '@/lib/formulaires/etat';
 import { langueCourante } from '@/lib/i18n/langue';
 import { phraseur } from '@/lib/i18n/traduction';
-import { ACCUEIL_DES_MEMBRES } from '@/lib/navigation';
+import { membreAUnEmplacement } from '@/lib/depot/lieux';
+import { modeCourant } from '@/lib/mode';
+import { ACCUEIL_DES_MEMBRES, ACCUEIL_DU_BIKE_SITTER } from '@/lib/navigation';
 import {
   LONGUEUR_MAXIMALE_DU_MOT_DE_PASSE,
   ressembleAUnEmail,
@@ -114,8 +116,15 @@ export async function seConnecter(
 
   await poserLeCookieDeSession(await ouvrirUneSession(compte.id));
 
+  // On retrouve le membre là où il s'était arrêté : dans l'espace du bike
+  // sitter s'il l'avait choisi et qu'il accueille, dans son espace de
+  // cycliste sinon.
+  const versLEspaceDuBikeSitter =
+    (await modeCourant()) === 'bike_sitter' &&
+    (await membreAUnEmplacement(compte.id));
+
   // `redirect` lève une exception de contrôle : rien ne l'entoure d'un try.
-  redirect(ACCUEIL_DES_MEMBRES);
+  redirect(versLEspaceDuBikeSitter ? ACCUEIL_DU_BIKE_SITTER : ACCUEIL_DES_MEMBRES);
 }
 
 export async function seDeconnecterEtRentrer(): Promise<void> {

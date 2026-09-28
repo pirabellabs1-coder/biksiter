@@ -1,5 +1,6 @@
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
+import { laLangueChoisieSApplique } from './espaces';
 import {
   type Cle,
   estUneLangue,
@@ -9,26 +10,22 @@ import {
   traduire,
 } from './traduction';
 
-export { LANGUES, type Cle, type Langue } from './traduction';
-
-/**
- * La langue de l'interface.
- *
- * Bruxelles est bilingue, et l'anglais couvre les résidents internationaux :
- * trois langues au lancement. Le français est la source ; ce qui n'est pas
- * traduit reste en français.
- */
-export const NOMS_DES_LANGUES: Record<Langue, string> = {
-  fr: 'Français',
-  nl: 'Nederlands',
-  en: 'English',
-};
+export {
+  LANGUES,
+  NOMS_DES_LANGUES,
+  type Cle,
+  type Langue,
+} from './traduction';
 
 /** Le témoin où la langue choisie est gardée. */
 export const TEMOIN_DE_LANGUE = 'langue';
 
 /** Le français tant que la personne n'a pas choisi une autre langue. */
 export async function langueCourante(): Promise<Langue> {
+  // L'adresse de la page vient du middleware ; sans elle (une action, un
+  // e-mail), la langue choisie s'applique.
+  const chemin = (await headers()).get('x-chemin');
+  if (chemin !== null && !laLangueChoisieSApplique(chemin)) return 'fr';
   const choisie = (await cookies()).get(TEMOIN_DE_LANGUE)?.value;
   return estUneLangue(choisie) ? choisie : 'fr';
 }

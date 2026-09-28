@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { etatDuCompte } from '@/lib/depot/comptes';
+import { dernierRefusDIdentite } from '@/lib/depot/moderation';
 import { textes } from '@/lib/i18n/langue';
 import { exigerUnMembre } from '@/lib/session';
 
@@ -15,14 +15,18 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MesVerifications() {
   const membre = await exigerUnMembre();
   const { p } = await textes();
-  const compte = await etatDuCompte(membre.id);
+  const [compte, refus] = await Promise.all([
+    etatDuCompte(membre.id),
+    dernierRefusDIdentite(membre.id),
+  ]);
   if (!compte) return null;
+  const identiteRefusee = compte.verification === 'refusee' && refus !== null;
 
   const lignes: {
     icone: NomDIcone;
     titre: string;
     detail: string;
-    etat: 'verifie' | 'examen' | 'a_faire';
+    etat: 'verifie' | 'examen' | 'refuse' | 'a_faire';
     lien: string;
   }[] = [
     {
@@ -44,20 +48,23 @@ export default async function MesVerifications() {
     {
       icone: 'profil',
       titre: p('Identité'),
-      detail: p('Pièce vérifiée puis supprimée'),
+      detail: identiteRefusee
+        ? p('Pièce non validée : {motif}', { motif: refus.motif })
+        : p('Pièce vérifiée puis supprimée'),
       etat:
         compte.verification === 'verifiee'
           ? 'verifie'
           : compte.verification === 'en_cours'
             ? 'examen'
-            : 'a_faire',
+            : identiteRefusee
+              ? 'refuse'
+              : 'a_faire',
       lien: '/inscription/identite',
     },
   ];
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil" cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Mes vérifications')}</h1>
         <p className="sous-titre">
@@ -90,7 +97,7 @@ export default async function MesVerifications() {
                   className="bouton contour petit"
                   aria-describedby={`verification-${rang}`}
                 >
-                  {p('Vérifier')}
+                  {ligne.etat === 'refuse' ? p('Envoyer une nouvelle pièce') : p('Vérifier')}
                 </Link>
               )}
             </li>

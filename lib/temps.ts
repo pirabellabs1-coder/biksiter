@@ -124,3 +124,44 @@ const HEURE_24 = new Intl.DateTimeFormat('fr-BE', {
 export function heureABruxelles(instant: Date = new Date()): string {
   return HEURE_24.format(instant).replace('h', ':').padStart(5, '0');
 }
+
+/**
+ * « juin 2026 » — pour dire depuis quand quelqu'un est membre, sans donner
+ * le jour, qui ne regarde personne.
+ */
+export function moisEtAnnee(instant: Date): string {
+  return new Intl.DateTimeFormat('fr-BE', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: FUSEAU,
+  }).format(instant);
+}
+
+const JOUR_COURT = new Intl.DateTimeFormat('fr-BE', {
+  timeZone: FUSEAU,
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+});
+
+/**
+ * « Aujourd'hui · 14:00 – 17:00 », « Demain · 10:00 – 13:00 »,
+ * « lun. 5 oct. · 10:00 – 13:00 » — le créneau tel qu'on le lit d'un coup
+ * d'œil sur une carte. La forme longue reste pour les écrans de détail.
+ */
+export function creneauCourt(
+  debut: Date,
+  fin: Date,
+  maintenant: Date = new Date(),
+): string {
+  const jour = jourABruxelles(debut);
+  const aujourdhui = jourABruxelles(maintenant);
+  const demain = jourABruxelles(new Date(maintenant.getTime() + 86_400_000));
+  const libelle =
+    jour === aujourdhui
+      ? 'Aujourd’hui'
+      : jour === demain
+        ? 'Demain'
+        : JOUR_COURT.format(debut);
+  return `${libelle} · ${HEURE_SEULE.format(debut)} – ${HEURE_SEULE.format(fin)}`;
+}

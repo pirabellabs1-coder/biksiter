@@ -17,10 +17,12 @@ const enTetesDeSecurite = [
   // Ne fuite pas le chemin consulté vers les sites externes — les URL du site
   // contiennent des références d'emplacements.
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  // Aucune de ces fonctions n'est utilisée.
+  // Aucune de ces fonctions n'est utilisée, sauf la position — pour notre
+  // seule origine : « Autour de moi » la lit sur le téléphone pour choisir le
+  // quartier le plus proche, et elle n'est ni envoyée ni conservée.
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
   },
   // Une fois venu en HTTPS, le navigateur n'essaie plus jamais la version en
   // clair : c'est là qu'un cookie de session se ferait intercepter. Seulement
@@ -54,6 +56,10 @@ const configuration: NextConfig = {
     // mégaoctets (lib/regles/constat.ts), pour que l'envoi tienne sous cette
     // limite. Au-delà, l'action échouerait avant d'avoir pu répondre.
     serverActions: { bodySizeLimit: '17mb' },
+    // Le middleware relit le corps des requêtes : sa limite (10 Mo par
+    // défaut) coupait les envois plus lourds avant l'action, qui répondait
+    // par une erreur au lieu de son message « 8 Mo maximum ».
+    middlewareClientMaxBodySize: '17mb',
   },
 
   // Les anciennes adresses des pages de texte, pour les liens déjà partagés.

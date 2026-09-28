@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
+import { Avatar } from '@/components/app/avatar';
 import { dateDeGarde, PastilleDEtat } from '@/components/app/garde';
 import { Icone, type NomDIcone } from '@/components/app/icone';
 import { nomPublic } from '@/components/membre/elements';
@@ -13,9 +13,9 @@ import {
   referenceDeGarde,
 } from '@/components/membre/garde';
 import { enPoints } from '@/components/app/progression';
+import { demandeSuivante } from '@/lib/depot/accueil';
 import { amenagementsDeLaGarde } from '@/lib/depot/amenagements';
 import { detailDeLaGarde } from '@/lib/depot/gardes';
-import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import { pointsDeLaGarde } from '@/lib/depot/progression';
 import { textes } from '@/lib/i18n/langue';
 import {
@@ -37,10 +37,12 @@ import {
   ATTENTE_AVANT_DE_REPARTIR_MINUTES,
   demandeUnMotif,
   DETENTEUR_DU_CODE,
+  delaiEnFrancais,
   estEnRetardAuDepot,
-  EXPIRATION_D_UNE_DEMANDE_HEURES,
   gestesPossibles,
   minutesEcoulees,
+  minutesPourRepondre,
+  peutDeclarerLAbsence,
   phaseDuGeste,
   REFUS_D_UN_GESTE,
   type Phase,
@@ -72,6 +74,13 @@ const CLASSE_DU_STYLE = {
   ghost: 'bouton contour',
 } as const;
 
+/** Le dernier jalon d'une garde qui s'est arrêtée avant son terme. */
+const FIN_D_UNE_GARDE_CLOSE: Partial<Record<string, string>> = {
+  refuse: 'Demande déclinée',
+  annule: 'Garde annulée',
+  expire: 'Demande expirée',
+};
+
 export default async function DetailDUneGarde({
   params,
   searchParams,
@@ -83,19 +92,34 @@ export default async function DetailDUneGarde({
   const { t, p } = await textes();
   const { id } = await params;
   const indications = await searchParams;
-  const [garde, nonLues] = await Promise.all([
-    detailDeLaGarde(membre.id, id),
-    nombreDeNotificationsNonLues(membre.id),
-  ]);
+  const garde = await detailDeLaGarde(membre.id, id);
   if (!garde) notFound();
-  const [points, { retards, prolongation }] = await Promise.all([
+  const decision =
+    garde.role === 'bike_sitter' &&
+    (indications.decision === 'acceptee' || indications.decision === 'refusee')
+      ? indications.decision
+      : null;
+  const [points, { retards, prolongation }, suivante] = await Promise.all([
     garde.role === 'bike_sitter' && (garde.etat === 'termine' || garde.etat === 'litige')
       ? pointsDeLaGarde(garde.id, membre.id)
       : null,
     amenagementsDeLaGarde(garde.id),
+    // Une demande traitée en appelle souvent une autre : on propose d'enchaîner.
+    decision ? demandeSuivante(membre.id) : null,
   ]);
 
   const maintenant = new Date();
+  // Une garde close (refusée, annulée, expirée) ne montre que ce qui a eu
+  // lieu, puis sa fin : plus d'étape « prévue » qui n'arrivera pas.
+  const finDeLaGarde = FIN_D_UNE_GARDE_CLOSE[garde.etat];
+  const etapesDeLaFrise: readonly (readonly [string, string])[] = finDeLaGarde
+    ? [
+        ...ETAPES_DE_LA_FRISE.filter(([etape]) =>
+          garde.evenements.some((e) => e.etape === etape),
+        ),
+        [garde.etat, finDeLaGarde],
+      ]
+    : ETAPES_DE_LA_FRISE;
   // Une demande expirée propose de chercher ailleurs, sur le même créneau s'il est encore devant nous.
   const creneauAVenir = garde.debut.getTime() > maintenant.getTime();
   const rechercheSimilaire = creneauAVenir
@@ -179,17 +203,43 @@ export default async function DetailDUneGarde({
     ['reprise', p('Constat au retour')],
   ];
 
-  const minutesRestantes = Math.max(
-    0,
-    Math.round(
-      EXPIRATION_D_UNE_DEMANDE_HEURES * 60 - minutesEcoulees(garde.demandeLe, maintenant),
-    ),
+  // Le délai de réponse : vingt-quatre heures au plus, jamais au-delà de
+  // l'heure du dépôt. Le même calcul pour les deux côtés de la porte.
+  const minutesRestantes = minutesPourRepondre(
+    garde.demandeLe,
+    garde.debut,
+    maintenant,
   );
   const heures = Math.round((garde.fin.getTime() - garde.debut.getTime()) / 3_600_000);
 
   // L'en-tête dit d'abord où en est la garde, comme dans les maquettes.
+  // Une garde close ou annulée par la modération le dit, avec son
+  // explication : « le vélo a été rendu » serait faux si rien n'a été remis
+  // avec le code.
+  const decisionDeModeration =
+    garde.etat === 'termine' || garde.etat === 'annule'
+      ? ([...garde.evenements]
+          .reverse()
+          .find(
+            (e) =>
+              e.acteur === 'moderation' &&
+              (e.etape === 'termine' || e.etape === 'annule'),
+          ) ?? null)
+      : null;
   const entete: { icone: NomDIcone; titre: string; texte: string; ton: string } =
-    garde.etat === 'demande'
+    decisionDeModeration
+      ? {
+          icone: 'bouclier',
+          titre:
+            garde.etat === 'termine'
+              ? p('Garde close par la modération')
+              : p('Garde annulée par la modération'),
+          texte: decisionDeModeration.note
+            ? p('Décision : {motif}', { motif: decisionDeModeration.note })
+            : p('Un modérateur a examiné le signalement et pris une décision.'),
+          ton: garde.etat === 'termine' ? '' : 'rouge',
+        }
+      : garde.etat === 'demande'
       ? moi === 'bike_sitter'
         ? {
             icone: 'horloge',
@@ -203,9 +253,11 @@ export default async function DetailDUneGarde({
         : {
             icone: 'envoyer',
             titre: p('Demande envoyée'),
-            texte: p('{prenom} vous répondra dans les {n} heures.', {
+            // Le vrai délai : vingt-quatre heures au plus, et jamais au-delà
+            // de l'heure du dépôt — c'est ce délai-là que voit le bike sitter.
+            texte: p('{prenom} peut répondre pendant encore {delai}. Sans réponse, la demande expire et vous en êtes prévenu.', {
               prenom: autre.prenom,
-              n: EXPIRATION_D_UNE_DEMANDE_HEURES,
+              delai: delaiEnFrancais(minutesRestantes),
             }),
             ton: '',
           }
@@ -243,9 +295,11 @@ export default async function DetailDUneGarde({
                   icone: 'coche',
                   titre: p('Garde terminée'),
                   texte:
-                    moi === 'bike_sitter'
+                    moi === 'bike_sitter' && points?.etat === 'acquis'
                       ? p('Vous avez aidé {prenom} à protéger son vélo.', { prenom: autre.prenom })
-                      : p('Le vélo a été rendu. La garde est terminée.'),
+                      : moi === 'bike_sitter'
+                        ? p('La garde est close.')
+                        : p('Le vélo a été rendu. La garde est terminée.'),
                   ton: '',
                 }
               : garde.etat === 'expire'
@@ -272,9 +326,14 @@ export default async function DetailDUneGarde({
                 : {
                     icone: 'croix',
                     titre: libelleDEtat(t, garde.etat),
-                    texte: garde.motif
-                      ? p('Motif : {motif}', { motif: garde.motif })
-                      : p('Cette garde n’aura pas lieu.'),
+                    // « Je préfère ne pas répondre » est l'absence de motif :
+                    // l'afficher comme un motif sonnerait sec.
+                    texte:
+                      garde.motif && garde.motif !== 'Je préfère ne pas répondre'
+                        ? p('Motif : {motif}', { motif: garde.motif })
+                        : garde.etat === 'refuse' && moi === 'cycliste'
+                          ? p('Cette demande n’a pas pu être acceptée. D’autres bike sitters accueillent peut-être sur ce créneau.')
+                          : p('Cette garde n’aura pas lieu.'),
                     ton: 'rouge',
                   };
 
@@ -295,7 +354,6 @@ export default async function DetailDUneGarde({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/gardes" notificationsNonLues={nonLues} />
       <div className="ecran-app ecran-large fiche-detail">
         <div className={`entete-de-garde ${entete.ton}`}>
           <span className="rond-etat" aria-hidden="true">
@@ -450,6 +508,24 @@ export default async function DetailDUneGarde({
               <Icone nom="chevron" taille={20} />
             </Link>
           ) : null}
+          {decision ? (
+            <div className="encart" role="status">
+              <Icone nom="coche" taille={22} />
+              <span>
+                {decision === 'acceptee'
+                  ? p('Demande acceptée : {prenom} reçoit votre adresse et votre téléphone.', { prenom: autre.prenom })
+                  : p('Demande déclinée : {prenom} reçoit une notification.', { prenom: autre.prenom })}
+                {suivante ? (
+                  <>
+                    {' '}
+                    <Link href={`/demande/${suivante}`} className="lien-souligne">
+                      {p('Voir la demande suivante')}
+                    </Link>
+                  </>
+                ) : null}
+              </span>
+            </div>
+          ) : null}
           {indications.demande === 'envoyee' ? (
             <div className="encart" role="status">
               <Icone nom="coche" taille={22} />
@@ -553,10 +629,15 @@ export default async function DetailDUneGarde({
         <div className="carte personne-de-garde">
           <Link
             href={`/membres/${autre.id}`}
-            className="avatar-app"
+            className="lien-avatar"
             aria-label={p('Voir le profil de {prenom}', { prenom: autre.prenom })}
           >
-            {autre.prenom.charAt(0)}
+            <Avatar
+              membreId={autre.id}
+              prenom={autre.prenom}
+              version={autre.photo}
+              taille={48}
+            />
           </Link>
           <div className="ligne-texte">
             <strong>{nomPublic(autre.prenom, autre.initiale)}</strong>
@@ -620,7 +701,7 @@ export default async function DetailDUneGarde({
               {garde.emplacement.adresse ? (
                 <>
                   <span>
-                    {moi === 'cycliste' ? p('Adresse du dépôt') : p('Votre espace')}
+                    {moi === 'cycliste' ? p('Adresse du dépôt') : p('Votre emplacement')}
                   </span>
                   <strong>{garde.emplacement.adresse}</strong>
                   {garde.emplacement.precisions ? (
@@ -710,8 +791,8 @@ export default async function DetailDUneGarde({
           <div className="encart" style={{ marginTop: 12 }}>
             <Icone nom="bouclier" taille={22} />
             <span>
-              <strong>{p('L’adresse du cycliste n’est pas nécessaire.')}</strong>
-              {p('La garde a lieu dans votre espace privé et sécurisé.')}
+              <strong>{p('Tout se passe chez vous.')}</strong>
+              {p('La garde a lieu dans votre emplacement privé et sécurisé.')}
             </span>
           </div>
         ) : null}
@@ -723,14 +804,12 @@ export default async function DetailDUneGarde({
               <strong>
                 {moi === 'cycliste' ? p('À ne pas oublier') : p('Préparez la garde')}
               </strong>
-              <ul>
+              {/* Des numéros, pas des coches : ce sont des choses à faire. */}
+              <ol className="checklist-a-faire">
                 {checklist.map((element) => (
-                  <li key={element}>
-                    <Icone nom="coche" taille={16} strokeWidth={2.6} />
-                    {element}
-                  </li>
+                  <li key={element}>{element}</li>
                 ))}
-              </ul>
+              </ol>
             </span>
           </div>
         ) : null}
@@ -810,15 +889,30 @@ export default async function DetailDUneGarde({
 
         <h2 className="titre-section">{p('Suivi de la garde')}</h2>
         <ol className="suivi">
-          {ETAPES_DE_LA_FRISE.map(([etape, libelle]) => {
+          {etapesDeLaFrise.map(([etape, libelle]) => {
             const evenement = garde.evenements.find((e) => e.etape === etape);
             const enCours =
               garde.etat === etape || (etape === 'velo_recu' && garde.etat === 'en_cours');
             const fait = etapesFaites.has(etape);
             return (
-              <li key={etape} className={enCours ? 'maintenant' : fait ? 'fait' : 'a-venir'}>
+              <li
+                key={etape}
+                className={
+                  etape === garde.etat && FIN_D_UNE_GARDE_CLOSE[garde.etat]
+                    ? 'fait close'
+                    : enCours
+                      ? 'maintenant'
+                      : fait
+                        ? 'fait'
+                        : 'a-venir'
+                }
+              >
                 <span className="suivi-point" aria-hidden="true">
-                  {fait && !enCours ? <Icone nom="coche" taille={14} strokeWidth={3} /> : null}
+                  {etape === garde.etat && FIN_D_UNE_GARDE_CLOSE[garde.etat] ? (
+                    <Icone nom="croix" taille={12} strokeWidth={3} />
+                  ) : fait && !enCours ? (
+                    <Icone nom="coche" taille={14} strokeWidth={3} />
+                  ) : null}
                 </span>
                 <span className="ligne-texte">
                   <strong>{p(libelle)}</strong>
@@ -876,6 +970,33 @@ export default async function DetailDUneGarde({
                   className={classe}
                 >
                   {libelle}
+                </Link>
+              );
+            }
+            // Déclarer l'absence n'a de sens qu'une fois le retard toléré passé :
+            // avant, le bouton menait à un refus.
+            if (
+              transition.geste === 'absence' &&
+              !peutDeclarerLAbsence(garde.etat, new Date(garde.debut), maintenant)
+            ) {
+              return null;
+            }
+            // L'heure de reprise passée, le bike sitter qui a encore le vélo a
+            // son propre écran : écrire au cycliste, puis prévenir la modération.
+            if (
+              transition.geste === 'signaler' &&
+              moi === 'bike_sitter' &&
+              garde.etat === 'en_cours' &&
+              new Date(garde.fin) < maintenant
+            ) {
+              return (
+                <Link
+                  key={transition.geste}
+                  href={`/gardes/${garde.id}/non-recupere`}
+                  className="bouton contour"
+                >
+                  <Icone nom="horloge" taille={18} />
+                  {p('Le vélo n’a pas été récupéré')}
                 </Link>
               );
             }

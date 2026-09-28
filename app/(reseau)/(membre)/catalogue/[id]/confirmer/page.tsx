@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { ICONE_DE_LA_CATEGORIE, enPoints } from '@/components/app/progression';
 import { offreDuCatalogue } from '@/lib/depot/catalogue';
@@ -44,7 +43,6 @@ export default async function ConfirmerUnAvantage({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/catalogue/${offre.id}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Confirmer l’avantage')}</h1>
         <p className="sous-titre">{p('Vous êtes sur le point d’échanger vos points contre l’avantage suivant.')}</p>

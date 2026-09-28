@@ -10,6 +10,7 @@ import {
 import { mettreEnFile } from '@/lib/envois/file';
 import { adresseDuSite } from '@/lib/adresse-du-site';
 import { bienvenue } from '@/lib/courriel/modeles';
+import { INVITATION_VALABLE } from '@/lib/depot/invitations';
 import { emettreUnJeton } from '@/lib/depot/jetons';
 import { INSCRIPTION_SUR_INVITATION } from '@/lib/regles/modules';
 import type { EtatDeVerification } from '@/lib/regles/publication';
@@ -102,6 +103,7 @@ export async function creerLeMembre(inscription: Inscription): Promise<Membre> {
              from invitation i
              join membre m on m.id = i.emise_par
             where i.code = $1 and i.utilisee_par is null
+              and ${INVITATION_VALABLE}
             for update of i`,
           [inscription.codeDInvitation.toUpperCase()],
         );
@@ -187,7 +189,7 @@ export async function invitationPresentee(
               order by e.cree_le limit 1)      as quartier
        from invitation i
        join membre m on m.id = i.emise_par
-      where i.code = $1 and i.utilisee_par is null`,
+      where i.code = $1 and i.utilisee_par is null and ${INVITATION_VALABLE}`,
     [code.toUpperCase()],
   );
 }
@@ -207,16 +209,4 @@ export async function enregistrerLaVerification(
       where id = $1`,
     [membreId, resultat],
   );
-}
-
-export async function invitationsDisponibles(
-  membreId: string,
-): Promise<string[]> {
-  const lignes = await interroger<{ code: string }>(
-    `select code from invitation
-      where emise_par = $1 and utilisee_par is null
-      order by creee_le`,
-    [membreId],
-  );
-  return lignes.map((ligne) => ligne.code);
 }

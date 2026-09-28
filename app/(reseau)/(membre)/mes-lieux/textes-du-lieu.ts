@@ -1,4 +1,4 @@
-import { NOMS_DE_QUARTIER } from '@/lib/contenu/quartiers';
+import { QUARTIERS } from '@/lib/contenu/quartiers';
 import type { Textes } from '@/lib/i18n/langue';
 import {
   ACCES,
@@ -15,7 +15,9 @@ export function optionsEtTextesDuLieu(p: Textes['p']) {
   return {
     options: {
       types: TYPES_EMPLACEMENT_PRIVE.map((type) => [type, p(type)] as const),
-      quartiers: NOMS_DE_QUARTIER,
+      quartiers: QUARTIERS.map(
+        (quartier) => [quartier.nom, `${quartier.nom} (${quartier.commune})`] as const,
+      ),
       acces: ACCES.map((acces) => [acces, p(acces)] as const),
       verrouillages: Object.entries(VERROUILLAGES).map(([cle, libelle]) => [cle, p(libelle)] as const),
       intemperies: Object.entries(INTEMPERIES).map(([cle, libelle]) => [cle, p(libelle)] as const),

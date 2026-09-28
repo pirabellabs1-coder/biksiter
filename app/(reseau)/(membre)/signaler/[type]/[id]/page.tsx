@@ -1,31 +1,15 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { cibleDuSignalement } from '@/lib/depot/membre-espace';
 import { textes } from '@/lib/i18n/langue';
+import { MOTIFS_DE_SIGNALEMENT } from '@/lib/regles/signalements';
 import { exigerUnMembre } from '@/lib/session';
 
 import { FormulaireDeSignalement } from './formulaire';
 
-/** Les motifs sont enregistrés en français ; seul leur libellé se traduit. */
-const MOTIFS = {
-  membre: [
-    'Comportement inapproprié',
-    'Harcèlement',
-    'Faux profil',
-    "Ne s'est pas présenté",
-    'Autre',
-  ],
-  emplacement: [
-    'Lieu non sûr',
-    'Photos trompeuses',
-    'Emplacement partagé',
-    'Annonce en double',
-    'Autre',
-  ],
-} as const;
+const MOTIFS = MOTIFS_DE_SIGNALEMENT;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
@@ -55,7 +39,6 @@ export default async function Signaler({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={retour} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">
           {type === 'membre' ? p('Signaler un membre') : p('Signaler un emplacement')}
@@ -97,6 +80,10 @@ export default async function Signaler({
             envoyer: p('Envoyer le signalement'),
             envoi: p('Envoi…'),
             annuler: p('Annuler'),
+            envoye: p(
+              'Votre signalement est transmis à la modération. Vous recevez une notification dès qu’il a été examiné.',
+            ),
+            revenir: p('Revenir'),
           }}
         />
       </div>

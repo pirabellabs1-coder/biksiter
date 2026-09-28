@@ -42,11 +42,16 @@ export async function envoyerUnMessage(
     return envoye;
   }
 
+  // Le nom n'a pas de colonne à lui : il ouvre le message, pour que le
+  // bénévole qui répond sache à qui il s'adresse.
+  const nom = texte(donnees, 'nom').slice(0, 80);
   const saisie = {
     email: texte(donnees, 'email'),
     sujet: texte(donnees, 'sujet'),
     message: texte(donnees, 'message'),
   };
+  const aEnregistrer =
+    nom === '' ? saisie.message : `${nom}\n\n${saisie.message}`;
 
   const erreurs = verifierUnMessageDeContact(saisie);
   if (Object.keys(erreurs).length > 0 || !estUnSujetDeContact(saisie.sujet)) {
@@ -77,7 +82,7 @@ export async function envoyerUnMessage(
     resultat = await enregistrerUnMessageDeContact({
       email: saisie.email,
       sujet: saisie.sujet,
-      message: saisie.message,
+      message: aEnregistrer,
     });
   } catch {
     // La personne garde son message à l'écran ; le détail de l'erreur ne lui

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { CarteDeGarde } from '@/components/app/garde';
 import { Icone } from '@/components/app/icone';
 import { gardesDuMembre } from '@/lib/depot/accueil';
@@ -18,9 +17,32 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const ONGLETS: readonly { cle: string; titre: string; etats: readonly EtatDeGarde[] }[] = [
   { cle: 'a-traiter', titre: 'À traiter', etats: ['demande'] },
-  { cle: 'acceptees', titre: 'Acceptées', etats: ['accepte', 'arrivee', 'en_cours', 'reprise_demandee'] },
+  // Un litige se suit avec les gardes en cours, comme côté cycliste : le vélo
+  // peut encore être chez le bike sitter.
+  { cle: 'acceptees', titre: 'Acceptées', etats: ['accepte', 'arrivee', 'en_cours', 'reprise_demandee', 'litige'] },
+  { cle: 'terminees', titre: 'Terminées', etats: ['termine'] },
   { cle: 'refusees', titre: 'Refusées', etats: ['refuse', 'expire', 'annule'] },
 ];
+
+/** Ce que dit un onglet vide : chacun a sa raison de l'être. */
+const VIDE_DE_L_ONGLET: Record<string, readonly [string, string]> = {
+  'a-traiter': [
+    'Aucune demande en attente.',
+    'Vous recevez une notification dès qu’un cycliste vous écrit.',
+  ],
+  acceptees: [
+    'Aucune garde à venir.',
+    'Les demandes que vous acceptez apparaissent ici jusqu’à la reprise du vélo.',
+  ],
+  terminees: [
+    'Aucune garde terminée pour l’instant.',
+    'Chaque garde menée à son terme s’ajoute ici, avec les points qu’elle vous a rapportés.',
+  ],
+  refusees: [
+    'Aucune demande refusée ou expirée.',
+    'Les demandes déclinées, annulées ou restées sans réponse s’afficheraient ici.',
+  ],
+};
 
 /** Les demandes reçues par le bike sitter, pour y répondre dans le délai. */
 export default async function Demandes({
@@ -31,7 +53,7 @@ export default async function Demandes({
   const membre = await exigerUnMembre();
   const { t, p } = await textes();
   const { onglet: demande } = await searchParams;
-  const [gardes, nonLues, stats] = await Promise.all([
+  const [gardes, _nonLues, stats] = await Promise.all([
     gardesDuMembre(membre.id),
     nombreDeNotificationsNonLues(membre.id),
     statistiquesDuBikeSitter(membre.id),
@@ -41,15 +63,23 @@ export default async function Demandes({
   const liste = recues.filter((g) => onglet.etats.includes(g.etat));
   if (onglet.cle === 'a-traiter') {
     liste.sort((a, b) => new Date(a.demandeLe).getTime() - new Date(b.demandeLe).getTime());
+  } else if (onglet.cle === 'acceptees') {
+    // Un litige demande de l'attention : il passe devant les gardes à venir.
+    liste.sort(
+      (a, b) =>
+        Number(b.etat === 'litige') - Number(a.etat === 'litige') ||
+        new Date(a.debut).getTime() - new Date(b.debut).getTime(),
+    );
+  } else if (onglet.cle === 'terminees') {
+    liste.sort((a, b) => new Date(b.fin).getTime() - new Date(a.fin).getTime());
   }
 
   return (
     <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Demandes')}</h1>
         <p className="sous-titre">
-          {p('Répondez dans les {n} heures : sans réponse, la demande expire.', {
+          {p('Répondez avant l’heure du dépôt, et au plus tard sous {n} heures : sans réponse, la demande expire.', {
             n: EXPIRATION_D_UNE_DEMANDE_HEURES,
           })}
         </p>
@@ -58,7 +88,7 @@ export default async function Demandes({
           <div className="carte vide-liste">
             <Icone nom="maison" taille={30} />
             <strong>{p('Vous n’accueillez pas encore de vélos.')}</strong>
-            <span>{p('Vous pouvez proposer votre espace privé pour recevoir des demandes de garde.')}</span>
+            <span>{p('Vous pouvez proposer un emplacement privé pour recevoir des demandes de garde.')}</span>
             <Link href="/devenir-bike-sitter" className="bouton plein petit">
               {p('Devenir Bike Sitter')}
             </Link>
@@ -75,7 +105,7 @@ export default async function Demandes({
                     aria-current={o.cle === onglet.cle ? 'page' : undefined}
                   >
                     {p(o.titre)}
-                    {combien > 0 && o.cle !== 'refusees' ? (
+                    {combien > 0 && (o.cle === 'a-traiter' || o.cle === 'acceptees') ? (
                       <span className="compteur">{combien}</span>
                     ) : null}
                   </Link>
@@ -96,21 +126,29 @@ export default async function Demandes({
             {liste.length === 0 ? (
               <div className="carte vide-liste">
                 <Icone nom="demandes" taille={30} />
-                <strong>{p('Aucune demande ici.')}</strong>
-                <span>{p('Vous serez informé dès qu’un cycliste vous écrira.')}</span>
+                <strong>{p(VIDE_DE_L_ONGLET[onglet.cle]?.[0] ?? 'Aucune demande ici.')}</strong>
+                <span>
+                  {p(
+                    VIDE_DE_L_ONGLET[onglet.cle]?.[1] ??
+                      'Vous recevez une notification dès qu’un cycliste vous écrit.',
+                  )}
+                </span>
               </div>
             ) : (
               <div className="pile">
                 {liste.map((garde) => (
-                  <div key={garde.id}>
-                    <CarteDeGarde t={t} p={p} garde={garde} />
-                    {garde.etat === 'demande' ? (
-                      <Link href={`/gardes/${garde.id}`} className="bouton plein sous-carte-bouton">
-                        {p('Voir la demande')}
-                        <Icone nom="chevron" taille={20} />
-                      </Link>
-                    ) : null}
-                  </div>
+                  <CarteDeGarde
+                    key={garde.id}
+                    t={t}
+                    p={p}
+                    garde={garde}
+                    vignette="personne"
+                    href={
+                      garde.etat === 'demande'
+                        ? `/demande/${garde.id}`
+                        : `/gardes/${garde.id}`
+                    }
+                  />
                 ))}
               </div>
             )}

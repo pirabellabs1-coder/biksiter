@@ -1,0 +1,88 @@
+/* =============================================================================
+   Les mêmes règles, pour les liens.
+
+   Engendré depuis « maquette-167.css » : la maquette est un prototype dont
+   les éléments cliquables sont des <button>. L'application en fait de vrais
+   liens <a>, qui perdaient sans cela bordure, fond, espacement et
+   `white-space`. Chaque règle ci-dessous est celle de la maquette, avec
+   `button` remplacé par `a`.
+
+   Ne pas modifier à la main : relancer le script.
+   ========================================================================== */
+
+@media (max-width:560px){/* « Mes gardes » en toutes lettres ne tient pas : l'avatar suffit. */
+  .topbar .header-actions>a:not(.avatar),
+  .topbar .header-actions>a:not(.avatar){display:none}}
+@media (max-width:560px){/* Toute cible tactile fait au moins 44 px. */
+  .back,.brand,.tabs a,.outline,.primary{min-height:44px}}
+@media (max-width:560px){.guard-actions a{flex:1;min-height:44px}}
+@media (max-width:560px){.reprise a{width:100%}}
+@media (max-width:560px){.prog-classement a{width:100%;min-height:46px}}
+@media (max-width:560px){.deux-boutons a{width:100%}}
+@media (max-width:560px){.dem-carte a{width:100%}}
+@media (max-width:560px){.etoiles a{width:48px;height:48px;font-size:21px}}
+@media (max-width:560px){.raccourcis a{white-space:nowrap}}
+@media (max-width:560px){.deux-ligne a{width:100%}}
+a,input,select{font:inherit}
+a,a{transition:.2s ease}
+a{cursor:pointer}
+.tabs a{border:0;background:none;padding:14px 2px;font-weight:700}
+.tabs a.active{color:var(--green);border-bottom:3px solid var(--green)}
+/*
+ * Le focus clavier doit se voir.
+ *
+ * Sans cela, quelqu'un qui navigue au clavier — ou avec un lecteur d'ecran —
+ * ne sait jamais ou il se trouve dans la page.
+ */
+a:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+[tabindex]:focus-visible{
+  outline:3px solid var(--green);
+  outline-offset:2px;
+  border-radius:6px;
+}
+.cal-grille a{border:0;background:transparent;border-radius:10px;height:36px;
+  font:inherit;font-size:.88rem;color:var(--ink);cursor:pointer}
+.cal-grille a:hover:not([disabled]){background:rgba(1,118,40,.10)}
+.cal-grille a[disabled]{color:#c3ccc6;cursor:default}
+.cal-grille a[aria-pressed="true"]{background:var(--green);color:#fff;font-weight:700}
+.prog-classement a{margin-top:16px}
+#classTable .seg a{border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:11px 8px;font:inherit;font-size:.9rem;font-weight:600;color:var(--ink);
+  cursor:pointer;min-height:46px}
+#classTable .seg a.on{background:var(--green);border-color:var(--green);color:#fff}
+#classTable .seg a:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.deux-boutons a{min-height:48px;padding-left:26px;padding-right:26px}
+.etoiles a{border:1px solid var(--line);background:#fff;border-radius:12px;
+  width:54px;height:54px;font-size:24px;line-height:1;color:var(--line);cursor:pointer}
+.etoiles a.on{color:var(--green);border-color:var(--green);
+  background:rgba(1,118,40,.06)}
+.etoiles a:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.qm-menu a{display:block;width:100%;text-align:left;border:0;background:transparent;
+  border-radius:10px;padding:11px 13px;font:inherit;font-size:.92rem;color:var(--ink);
+  cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qm-menu a:hover{background:rgba(1,118,40,.07)}
+.qm-menu a[aria-selected="true"]{background:var(--green);color:#fff;font-weight:700}
+.qm-menu a:focus-visible{outline:3px solid var(--green);outline-offset:-3px}
+.qm-menu a{transition:background .12s ease}
+.bascule-plan a{border:0;background:none;padding:7px 15px;border-radius:8px;
+  font-weight:700;font-size:.82rem;color:var(--muted)}
+.bascule-plan a.actif{background:var(--green);color:#fff}
+.map-zoom a{border:0;background:none;width:38px;height:36px;font-size:1.1rem;
+  color:var(--ink)}
+.map-zoom a+a{border-top:1px solid var(--line)}
+.reco a{margin-top:10px;width:100%;padding:10px;border-radius:11px}
+.reco-bloquee a{cursor:default}
+.fleches a{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:#fff;color:var(--ink)}
+.fleches a:hover{border-color:var(--green);color:var(--green)}
+.qm-menu a{padding:14px 16px;font-size:1rem}
+/* Les proportions : le vert plein reste rare. Un seul bouton par écran,
+   les aplats font le reste. */
+.chercher, .btn.primary, a.primary, .primary{background:var(--green)}
+.chercher:hover, a.primary:hover{background:var(--green-dark)}
+.raccourcis a{display:flex;align-items:center;gap:8px;border:1px solid var(--line);
+  background:#fff;border-radius:999px;padding:9px 16px;font-size:.88rem;
+  font-weight:600;color:var(--ink)}
+.raccourcis a:hover{border-color:var(--green);color:var(--green)}
+.reco-actions a{width:100%;padding:11px;border-radius:12px}
+.deux-ligne a{padding:13px 22px;white-space:nowrap}

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { NavigationDAdministration } from '@/components/app/administration';
-import { EnTete } from '@/components/app/en-tete';
-import { Icone, type NomDIcone } from '@/components/app/icone';
+import { EnTeteDeModeration } from '@/components/maquette/moderation/en-tete-de-moderation';
+import { OngletsDeModeration } from '@/components/maquette/moderation/onglets';
 import { statistiques } from '@/lib/depot/gestion';
 import { textes } from '@/lib/i18n/langue';
 import { PERIODES_DE_STATISTIQUES } from '@/lib/regles/moderation';
@@ -14,50 +13,54 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: p('Statistiques') };
 }
 
-export default async function Statistiques({
+export default async function StatistiquesDeModeration({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
-  await exigerUnModerateur();
+  const moderateur = await exigerUnModerateur();
   const { p } = await textes();
   const { periode: demande } = await searchParams;
-  const periode = PERIODES_DE_STATISTIQUES.find((x) => x.cle === demande) ?? PERIODES_DE_STATISTIQUES[1];
+  const periode =
+    PERIODES_DE_STATISTIQUES.find((x) => x.cle === demande) ??
+    PERIODES_DE_STATISTIQUES[1];
   const chiffres = await statistiques(periode.cle);
+  const initiales = `${moderateur.prenom.at(0) ?? ''}${moderateur.nom.at(0) ?? ''}`.toUpperCase();
 
+  // Sans période précédente, la comparaison se dit une fois sous les chiffres,
+  // pas quatre fois dans chaque case.
+  const sansComparaison = chiffres.gardesRealisees.variation === null;
   const evolution = (valeur: number | null, unite = '%') =>
     valeur === null
-      ? p('Pas de période précédente à comparer')
+      ? null
       : p('{signe}{n} {unite} par rapport à la période précédente', {
           signe: valeur > 0 ? '+' : valeur < 0 ? '−' : '',
           n: Math.abs(valeur),
           unite,
         });
-  const tuiles: [NomDIcone, string, string, string][] = [
-    ['velo', String(chiffres.gardesRealisees.valeur), p('gardes réalisées'), evolution(chiffres.gardesRealisees.variation)],
-    [
-      'coche',
-      chiffres.tauxDeFinalisation.valeur === null ? '—' : `${chiffres.tauxDeFinalisation.valeur} %`,
-      p('taux de finalisation'),
-      evolution(chiffres.tauxDeFinalisation.variation, p('points')),
-    ],
-    ['alerte', String(chiffres.incidents.valeur), p('incidents signalés'), evolution(chiffres.incidents.variation)],
-    ['utilisateurs', String(chiffres.bikeSittersActifs.valeur), p('Bike Sitters actifs'), evolution(chiffres.bikeSittersActifs.variation)],
-  ];
 
   return (
     <main id="contenu">
-      <EnTete p={p} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Statistiques')}</h1>
-        <p className="sous-titre">{p('Consultez ici les indicateurs collectifs d’activité du réseau.')}</p>
-        <NavigationDAdministration p={p} actif="statistiques" />
+      <EnTeteDeModeration initiales={initiales} />
+      <div className="page">
+        <header className="page-tete">
+          <span className="kicker">STATISTIQUES</span>
+          <h1>{p('Statistiques')}</h1>
+          <p>
+            {p(
+              'Les indicateurs collectifs, pour comprendre comment se portent les gardes du réseau. Aucune donnée individuelle n’apparaît ici.',
+            )}
+          </p>
+        </header>
 
-        <nav className="segments" aria-label={p('Période')}>
+        <OngletsDeModeration p={p} actif="statistiques" />
+
+        <nav className="puces" aria-label={p('Période')}>
           {PERIODES_DE_STATISTIQUES.map((x) => (
             <Link
               key={x.cle}
               href={`/administration/statistiques?periode=${x.cle}`}
+              className={x.cle === periode.cle ? 'puce active' : 'puce'}
               aria-current={x.cle === periode.cle ? 'page' : undefined}
             >
               {p(x.titre)}
@@ -65,36 +68,70 @@ export default async function Statistiques({
           ))}
         </nav>
 
-        <div className="deux-colonnes" style={{ alignItems: 'stretch' }}>
-          {tuiles.map(([icone, valeur, libelle, detail]) => (
-            <div key={libelle} className="carte" style={{ display: 'grid', gap: 4 }}>
-              <Icone nom={icone} taille={24} className={icone === 'alerte' ? 'texte-rouge' : 'texte-vert'} />
-              <strong style={{ fontSize: 24 }}>{valeur}</strong>
-              <span className="petit">{libelle}</span>
-              <span className="petit texte-doux">{detail}</span>
-            </div>
-          ))}
+        <div className="mod-chiffres">
+          <div>
+            <b>{chiffres.gardesRealisees.valeur}</b>
+            <span>
+              {p(chiffres.gardesRealisees.valeur > 1 ? 'gardes réalisées' : 'garde réalisée')}
+            </span>
+            <i className="ind-note">
+              {evolution(chiffres.gardesRealisees.variation)}
+            </i>
+          </div>
+          <div>
+            <b>
+              {chiffres.tauxDeFinalisation.valeur === null
+                ? '—'
+                : `${chiffres.tauxDeFinalisation.valeur} %`}
+            </b>
+            <span>{p('gardes menées à terme')}</span>
+            <i className="ind-note">
+              {evolution(chiffres.tauxDeFinalisation.variation, p('points'))}
+            </i>
+          </div>
+          <div className={chiffres.incidents.valeur > 0 ? 'alerte' : undefined}>
+            <b>{chiffres.incidents.valeur}</b>
+            <span>{p('incidents signalés')}</span>
+            <i className="ind-note">
+              {evolution(chiffres.incidents.variation)}
+            </i>
+          </div>
+          <div>
+            <b>{chiffres.bikeSittersActifs.valeur}</b>
+            <span>{p('Bike Sitters actifs')}</span>
+            <i className="ind-note">
+              {evolution(chiffres.bikeSittersActifs.variation)}
+            </i>
+          </div>
         </div>
+        {sansComparaison ? (
+          <p className="petit texte-doux">
+            {p('Pas encore de période précédente à comparer.')}
+          </p>
+        ) : null}
 
-        <h2 className="titre-section">{p('Gardes par quartier')}</h2>
-        {chiffres.parQuartier.length === 0 ? (
-          <p className="texte-doux">{p('Aucune garde terminée sur cette période.')}</p>
-        ) : (
-          <ul className="liste" style={{ listStyle: 'none', padding: 0 }}>
-            {chiffres.parQuartier.map((quartier) => (
-              <li key={quartier.quartier} className="ligne ligne-info" style={{ flexWrap: 'wrap' }}>
-                <span className="ligne-texte">
-                  <strong>{quartier.quartier}</strong>
-                  <span>{p('{n} garde(s)', { n: quartier.gardes })}</span>
-                </span>
-                <strong>{quartier.part} %</strong>
-                <span className="jauge" aria-hidden="true" style={{ flexBasis: '100%' }}>
-                  <span style={{ width: `${quartier.part}%` }} />
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <article className="mod-carte">
+          <div className="mod-tete">
+            <span className="mod-etat">{p('Gardes par quartier')}</span>
+            <span className="gris">{p(periode.titre)}</span>
+          </div>
+          {chiffres.parQuartier.length === 0 ? (
+            <p className="vide-onglet">
+              {p('Aucune garde terminée sur cette période.')}
+            </p>
+          ) : (
+            <ul className="liste-nette">
+              {chiffres.parQuartier.map((quartier) => (
+                <li key={quartier.quartier}>
+                  <b>
+                    {quartier.quartier} · {quartier.part} %
+                  </b>
+                  <span>{p(quartier.gardes > 1 ? '{n} gardes' : '{n} garde', { n: quartier.gardes })}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
       </div>
     </main>
   );

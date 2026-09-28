@@ -1,14 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
-import { ICONE_DE_LA_CATEGORIE, enPoints } from '@/components/app/progression';
 import { mesBons, offresDuCatalogue } from '@/lib/depot/catalogue';
+import { nombreDEmplacements } from '@/lib/depot/emplacements';
 import { comptesDuMembre, soldeDuMembre } from '@/lib/depot/maillons';
 import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import { textes } from '@/lib/i18n/langue';
-import { CATEGORIES_D_OFFRE, type CategorieDOffre } from '@/lib/regles/catalogue';
+import {
+  CATEGORIES_D_OFFRE,
+  type CategorieDOffre,
+} from '@/lib/regles/catalogue';
+import {
+  POINTS_PAR_GARDE,
+  POINTS_PAR_JOUR_SUPPLEMENTAIRE,
+} from '@/lib/regles/maillons';
 import { exigerUnMembre } from '@/lib/session';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,130 +27,180 @@ export default async function Catalogue({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
-  const { categorie: demandee, q } = await searchParams;
-  const [offres, solde, comptes, bons, nonLues] = await Promise.all([
-    offresDuCatalogue(),
-    soldeDuMembre(membre.id),
-    comptesDuMembre(membre.id),
-    mesBons(membre.id),
-    nombreDeNotificationsNonLues(membre.id),
-  ]);
+  const { categorie: demandee } = await searchParams;
+  const [offres, solde, comptes, bons, _nonLues, mesEmplacements] =
+    await Promise.all([
+      offresDuCatalogue(),
+      soldeDuMembre(membre.id),
+      comptesDuMembre(membre.id),
+      mesBons(membre.id),
+      nombreDeNotificationsNonLues(membre.id),
+      nombreDEmplacements(membre.id),
+    ]);
 
-  const categorie = CATEGORIES_D_OFFRE.find((c) => c.cle === demandee)?.cle ?? null;
-  const recherche = (typeof q === 'string' ? q : '').trim().slice(0, 60).toLocaleLowerCase('fr');
+  const categorie =
+    CATEGORIES_D_OFFRE.find((c) => c.cle === demandee)?.cle ?? null;
   const visibles = offres.filter(
-    (offre) =>
-      (!categorie || offre.categorie === categorie) &&
-      (!recherche ||
-        offre.titre.toLocaleLowerCase('fr').includes(recherche) ||
-        offre.partenaire.toLocaleLowerCase('fr').includes(recherche)),
+    (offre) => !categorie || offre.categorie === categorie,
   );
-  const lien = (cle: CategorieDOffre | null) => {
-    const params = new URLSearchParams();
-    if (cle) params.set('categorie', cle);
-    if (recherche) params.set('q', recherche);
-    const chaine = params.toString();
-    return chaine ? `/catalogue?${chaine}` : '/catalogue';
-  };
+  const categoriesPresentes = CATEGORIES_D_OFFRE.filter((c) =>
+    offres.some((offre) => offre.categorie === c.cle),
+  );
+  const depenses = bons.reduce((total, bon) => total + bon.coutEnMaillons, 0);
+  const lien = (cle: CategorieDOffre | null) =>
+    cle ? `/catalogue?categorie=${cle}` : '/catalogue';
 
   return (
     <main id="contenu">
-      <EnTete p={p} notificationsNonLues={nonLues} retour="/progression" />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Catalogue')}</h1>
-        <p className="sous-titre">
-          {p('Retrouvez ici les avantages proposés par nos partenaires pour équiper et entretenir votre vélo.')}
-        </p>
+      <section className="app-screen active" id="catalogue">
+        <div className="page">
+          <header className="page-tete">
+            <span className="kicker">CATALOGUE</span>
+            <h1>Ce que vos points vous offrent.</h1>
+            <p>
+              Chaque garde menée à terme vous donne des points. Les commerces du
+              quartier offrent un geste en échange — c’est leur façon de
+              soutenir le réseau. Le catalogue est réservé aux Bike Sitters.
+            </p>
+          </header>
 
-        <div className="encart solde-encart">
-          <span className="rond-etat" style={{ width: 44, height: 44, boxShadow: 'none' }} aria-hidden="true">
-            <Icone nom="etoile" taille={22} plein />
-          </span>
-          <span>
-            <strong>{p('{n} points disponibles', { n: solde.acquis })}</strong>
-            {comptes.accueillies > 0
-              ? p('Gagnés grâce à vos gardes')
-              : p('Les avantages s’ouvrent dès votre première garde accueillie.')}
-          </span>
-        </div>
-
-        {bons.length > 0 ? (
-          <Link href="/catalogue/bons" className="ligne carte" style={{ marginTop: 10 }}>
-            <span className="ligne-icone" aria-hidden="true">
-              <Icone nom="cadeau" taille={24} />
-            </span>
-            <span className="ligne-texte">
-              <strong>{p('Mes bons')}</strong>
-              <span>{bons.length === 1
-                  ? p('1 avantage échangé')
-                  : p('{n} avantages échangés', { n: bons.length })}</span>
-            </span>
-            <Icone nom="chevron" taille={20} className="texte-leger" />
-          </Link>
-        ) : null}
-
-        <form action="/catalogue" method="get" role="search" style={{ marginTop: 12 }}>
-          {categorie ? <input type="hidden" name="categorie" value={categorie} /> : null}
-          <label className="champ-app champ-recherche">
-            <Icone nom="recherche" taille={20} />
-            <span className="lecteur">{p('Rechercher un avantage')}</span>
-            <input
-              type="search"
-              name="q"
-              defaultValue={recherche}
-              maxLength={60}
-              placeholder={p('Rechercher un avantage')}
-            />
-          </label>
-        </form>
-
-        <nav className="puces" aria-label={p('Catégories')}>
-          <Link href={lien(null)} className={categorie ? 'puce' : 'puce active'} aria-current={categorie ? undefined : 'page'}>
-            {p('Tous')}
-          </Link>
-          {CATEGORIES_D_OFFRE.map((c) => (
-            <Link
-              key={c.cle}
-              href={lien(c.cle)}
-              className={c.cle === categorie ? 'puce active' : 'puce'}
-              aria-current={c.cle === categorie ? 'page' : undefined}
+          {comptes.accueillies === 0 ? (
+            // La feuille de la maquette réserve cet encart au compte tout neuf ;
+            // ici, c'est l'absence de garde accueillie qui le fait apparaître.
+            <div
+              className="etat-vide"
+              data-vide="points"
+              style={{ display: 'block' }}
             >
-              {p(c.titre)}
-            </Link>
-          ))}
-        </nav>
-
-        {visibles.length === 0 ? (
-          <div className="carte vide-liste" style={{ marginTop: 14 }}>
-            <Icone nom="recherche" taille={30} className="texte-leger" />
-            <strong>{p('Aucun avantage ne correspond.')}</strong>
-            <Link href="/catalogue" className="lien-souligne">
-              {p('Voir tout le catalogue')}
-            </Link>
-          </div>
-        ) : (
-          <ul className="grille-offres" style={{ listStyle: 'none', padding: 0, marginTop: 14 }}>
-            {visibles.map((offre) => (
-              <li key={offre.id} style={{ display: 'contents' }}>
-                <Link href={`/catalogue/${offre.id}`} className="offre-carte">
-                  <span className="offre-visuel">
-                    <span className={offre.stockRestant > 0 ? 'pastille' : 'pastille gris'}>
-                      {offre.stockRestant > 0 ? p('Disponible') : p('Épuisé')}
-                    </span>
-                    <Icone nom={ICONE_DE_LA_CATEGORIE[offre.categorie]} taille={44} strokeWidth={1.5} />
-                  </span>
-                  <strong>{offre.titre}</strong>
-                  <span className="offre-pied">
-                    <span className="pastille">{enPoints(p, offre.coutEnMaillons)}</span>
-                    <Icone nom="chevron" taille={18} className="texte-leger" />
-                  </span>
+              <span className="ev-i" aria-hidden="true">
+                ★
+              </span>
+              <h3>Aucun point pour l’instant</h3>
+              <p>
+                Les points arrivent après votre première garde menée à terme :{' '}
+                {POINTS_PAR_GARDE} points par garde, et{' '}
+                {POINTS_PAR_JOUR_SUPPLEMENTAIRE} de plus par jour entamé au-delà
+                du premier.
+              </p>
+              {mesEmplacements === 0 ? (
+                <Link className="outline" href="/devenir-bike-sitter">
+                  Proposer un emplacement
                 </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="prog-stats" role="group" aria-label="Vos points">
+            <div>
+              <b data-solde>{solde.acquis}</b>
+              <span>
+                point{solde.acquis > 1 ? 's' : ''} disponible
+                {solde.acquis > 1 ? 's' : ''}
+              </span>
+            </div>
+            <div>
+              <b>{depenses}</b>
+              <span>
+                point{depenses > 1 ? 's' : ''} utilisé{depenses > 1 ? 's' : ''}
+              </span>
+            </div>
+            <div>
+              <b>+{POINTS_PAR_GARDE}</b>
+              <span>à la prochaine garde</span>
+            </div>
+          </div>
+
+          {/* Un filtre ne s'affiche que s'il trie quelque chose : une
+            catégorie sans offre mènerait à une liste vide. */}
+          {categoriesPresentes.length > 1 ? (
+            <nav className="cat-filtres" aria-label="Filtrer le catalogue">
+              <Link
+                href={lien(null)}
+                className={categorie ? 'chip' : 'chip actif'}
+                aria-current={categorie ? undefined : 'page'}
+              >
+                Tout
+              </Link>
+              {categoriesPresentes.map((c) => (
+                <Link
+                  key={c.cle}
+                  href={lien(c.cle)}
+                  className={c.cle === categorie ? 'chip actif' : 'chip'}
+                  aria-current={c.cle === categorie ? 'page' : undefined}
+                >
+                  {c.titre}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
+
+          <div className="recos" id="listeRecompenses">
+            {visibles.length > 0 ? (
+              visibles.map((offre) => {
+                const accessible =
+                  offre.coutEnMaillons <= solde.acquis &&
+                  offre.stockRestant > 0;
+                const titreDeLaCategorie =
+                  CATEGORIES_D_OFFRE.find((c) => c.cle === offre.categorie)
+                    ?.titre ?? offre.categorie;
+                return (
+                  <article
+                    className={accessible ? 'reco' : 'reco reco-bloquee'}
+                    key={offre.id}
+                  >
+                    <div className="reco-tete">
+                      <span className="reco-cat">
+                        {offre.categorie === 'autre' ? '' : titreDeLaCategorie}
+                      </span>
+                      <span className="reco-cout">
+                        <b>{offre.coutEnMaillons}</b> pts
+                      </span>
+                    </div>
+                    <h3>{offre.titre}</h3>
+                    <p>
+                      {offre.partenaire}
+                      {offre.quartier ? ` · ${offre.quartier}` : ''}
+                    </p>
+                    <div className="reco-actions">
+                      {/* La maquette mettait cette action en bleu ; le bleu ne
+                        dit que « vérifié » (règle 6), les actions restent
+                        vertes. */}
+                      <Link
+                        className={accessible ? 'primary' : 'outline'}
+                        href={`/catalogue/${offre.id}`}
+                      >
+                        {offre.stockRestant === 0
+                          ? 'Épuisé pour le moment'
+                          : accessible
+                            ? 'Voir et échanger'
+                            : `Encore ${offre.coutEnMaillons - solde.acquis} pts`}
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })
+            ) : (
+              <p className="gris">
+                Aucun geste dans cette catégorie pour le moment.
+              </p>
+            )}
+          </div>
+
+          {bons.length > 0 ? (
+            <p className="mention">
+              <Link href="/catalogue/bons">
+                Retrouver mes bons ({bons.length})
+              </Link>
+            </p>
+          ) : null}
+
+          <p className="mention">
+            Les points n’ont aucune valeur monétaire et ne s’échangent pas
+            contre de l’argent. Un geste offert reste à la discrétion du
+            commerce partenaire, dans la limite de ses stocks.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }

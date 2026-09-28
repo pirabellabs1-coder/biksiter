@@ -158,6 +158,16 @@ export function demandeUnMotif(geste: Geste): boolean {
 }
 
 /**
+ * Parmi ces gestes, ceux dont le motif est obligatoire. Décliner une demande
+ * n'en exige aucun : le bike sitter peut refuser sans se justifier, et
+ * l'écran le lui dit. Les autres gestes engagent une personne qui a besoin
+ * de comprendre ce qui s'est passé.
+ */
+export function motifObligatoire(geste: Geste): boolean {
+  return demandeUnMotif(geste) && geste !== 'refuser';
+}
+
+/**
  * Le vélo ne change de mains qu'avec un code (règle 5). Au dépôt, le cycliste
  * donne le vélo et détient le code ; à la reprise, c'est le bike sitter.
  */
@@ -344,6 +354,34 @@ export function demandeExpiree(
   );
 }
 
+/**
+ * Ce qu'il reste au bike sitter pour répondre, en minutes.
+ *
+ * Le délai court depuis la demande, mais il s'arrête à l'heure du dépôt :
+ * répondre après ne servirait plus le cycliste.
+ */
+export function minutesPourRepondre(
+  demandeLe: Date,
+  debut: Date,
+  maintenant: Date,
+): number {
+  const finDuDelai = Math.min(
+    demandeLe.getTime() + EXPIRATION_D_UNE_DEMANDE_HEURES * 60 * MINUTE,
+    debut.getTime(),
+  );
+  return Math.max(0, Math.floor((finDuDelai - maintenant.getTime()) / MINUTE));
+}
+
+/** « 1 h 48 », « 45 min » : le délai se lit comme on le dirait à voix haute. */
+export function delaiEnFrancais(minutes: number): string {
+  const heures = Math.floor(minutes / 60);
+  const reste = minutes % 60;
+  if (heures === 0) return `${reste} min`;
+  return reste === 0
+    ? `${heures} h`
+    : `${heures} h ${String(reste).padStart(2, '0')}`;
+}
+
 /** On signale son arrivée devant la porte, pas la veille depuis son canapé. */
 export const ARRIVEE_AVANT_L_HEURE_MINUTES = 30;
 
@@ -423,13 +461,23 @@ export function motifsProposes(
         'Autre',
       ];
     case 'signaler':
-      return [
-        "Le vélo n'a pas été restitué",
-        "L'autre personne est injoignable",
-        'Le vélo est endommagé',
-        "Le lieu ne correspond pas à l'annonce",
-        'Autre',
-      ];
+      // Chacun signale ce qu'il a pu vivre de son côté de la porte : le bike
+      // sitter ne se plaint pas de son propre lieu.
+      return acteur === 'cycliste'
+        ? [
+            "Le vélo n'a pas été restitué",
+            "L'autre personne est injoignable",
+            'Le vélo est endommagé',
+            "Le lieu ne correspond pas à l'annonce",
+            'Autre',
+          ]
+        : [
+            "Le vélo n'a pas été récupéré",
+            "L'autre personne est injoignable",
+            'Le vélo déposé pose problème',
+            'Comportement inapproprié',
+            'Autre',
+          ];
     case 'refuser':
       return [
         'Plus de place ce jour-là',

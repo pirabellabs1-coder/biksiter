@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { EmblemeDeBadge, resteDuBadge } from '@/components/app/progression';
 import { progressionDuMembre } from '@/lib/depot/progression';
@@ -24,7 +23,6 @@ export default async function MesBadges() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/progression" />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Mes badges')}</h1>
         <p className="sous-titre">

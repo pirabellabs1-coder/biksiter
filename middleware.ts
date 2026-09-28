@@ -27,10 +27,11 @@ function politique(nonce: string, enDeveloppement: boolean): string {
     // Les styles en ligne restent nécessaires : Next et next/font en posent.
     // Le risque est faible — une feuille de style n'exécute rien.
     `style-src 'self' 'unsafe-inline'`,
-    // Toutes les images sont servies par notre origine, y compris les
-    // visuels éditoriaux de l'accueil (`public/images/`) : rien à charger
-    // chez un tiers, donc rien à autoriser ici.
-    `img-src 'self' data: blob:`,
+    // Les images viennent de notre origine, sauf les tuiles de la carte :
+    // OpenStreetMap pour le plan, Esri pour la vue satellite. Ce sont des
+    // images, rien qui s'exécute, et aucune donnée du membre n'y transite —
+    // seule la zone approximative est demandée.
+    `img-src 'self' data: blob: https://tile.openstreetmap.org https://server.arcgisonline.com`,
     `font-src 'self'`,
     `connect-src 'self'`,
     `form-action 'self'`,
@@ -47,6 +48,9 @@ export function middleware(requete: NextRequest): NextResponse {
 
   const entetes = new Headers(requete.headers);
   entetes.set('x-nonce', nonce);
+  // L'adresse de la page, pour savoir si la langue choisie s'y applique
+  // (lib/i18n/espaces.ts).
+  entetes.set('x-chemin', requete.nextUrl.pathname);
   entetes.set('Content-Security-Policy', csp);
 
   const reponse = NextResponse.next({ request: { headers: entetes } });

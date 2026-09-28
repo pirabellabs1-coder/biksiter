@@ -98,13 +98,14 @@ export type RefusDeProlongation =
 
 /**
  * La nouvelle fin se juge comme une reprise : plus tard que prévu, d'une
- * semaine au plus, à une heure où le lieu accueille, et dans la durée
- * maximale que le bike sitter a fixée.
+ * semaine au plus, à une heure où le lieu accueille, et dans les durées
+ * maximales que le bike sitter a fixées (en heures sur une journée, en jours
+ * au-delà).
  */
 export function nouvelleFinRefusee(
   garde: { debut: Date; fin: Date },
   nouvelleFin: Date,
-  lieu: { horaires: Horaires; dureeMaxJours: number },
+  lieu: { horaires: Horaires; dureeMaxJours: number; dureeMaxHeures: number },
 ): RefusDeProlongation | null {
   const ecart = nouvelleFin.getTime() - garde.fin.getTime();
   if (ecart <= 0) return 'pas_plus_tard';
@@ -126,6 +127,14 @@ export function nouvelleFinRefusee(
   if (lieu.dureeMaxJours !== A_CONVENIR && jours > lieu.dureeMaxJours) {
     return 'duree_du_lieu';
   }
+  // Sur une seule journée, la garde prolongée se juge comme une demande :
+  // pas plus d'heures d'affilée que le bike sitter n'en propose.
+  if (
+    jours === 1 &&
+    nouvelleFin.getTime() - garde.debut.getTime() > lieu.dureeMaxHeures * HEURE
+  ) {
+    return 'duree_du_lieu';
+  }
   return null;
 }
 
@@ -136,9 +145,9 @@ export const TEXTE_DU_REFUS_DE_PROLONGATION: Readonly<
   trop_longue:
     'Une prolongation va jusqu’à une semaine. Au-delà, envoyez une nouvelle demande de garde.',
   hors_horaires:
-    'Cette heure tombe en dehors des disponibilités du lieu : choisissez une heure où le Bike Sitter accueille.',
+    'Cette heure tombe en dehors des disponibilités du lieu : choisissez une heure où le bike sitter accueille.',
   duree_du_lieu:
-    'Cette prolongation dépasse la durée d’accueil que le Bike Sitter propose pour ce lieu.',
+    'Cette prolongation dépasse la durée d’accueil que le bike sitter propose pour ce lieu.',
 };
 
 /** Ce que la prolongation ajoute aux points de la garde, une fois menée à terme. */

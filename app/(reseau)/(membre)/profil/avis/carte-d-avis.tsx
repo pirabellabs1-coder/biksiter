@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Avatar } from '@/components/app/avatar';
 import { Icone } from '@/components/app/icone';
 import type { AvisAffiche } from '@/lib/depot/reseau';
 import type { Textes } from '@/lib/i18n/langue';
@@ -50,9 +51,12 @@ export function CarteDAvisPublie({
   return (
     <article className="carte">
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span className="avatar-app" aria-hidden="true">
-          {avis.auteurPrenom.charAt(0)}
-        </span>
+        <Avatar
+          membreId={avis.auteurId}
+          prenom={avis.auteurPrenom}
+          version={avis.auteurPhoto}
+          taille={44}
+        />
         <span className="ligne-texte">
           <strong>{avis.auteurPrenom}</strong>
           <span>{enJour(new Date(avis.ecritLe))}</span>

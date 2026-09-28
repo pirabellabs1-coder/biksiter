@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { NavigationDAdministration } from '@/components/app/administration';
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
+import { EnTeteDeModeration } from '@/components/maquette/moderation/en-tete-de-moderation';
+import { OngletsDeModeration } from '@/components/maquette/moderation/onglets';
 import { referenceDeGarde } from '@/components/membre/garde';
 import { litigesEnCours } from '@/lib/depot/gestion';
 import { textes } from '@/lib/i18n/langue';
@@ -13,7 +12,7 @@ import { exigerUnModerateur } from '@/lib/session';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
-  return { title: p('Litiges') };
+  return { title: p('Litiges en cours') };
 }
 
 export default async function Litiges({
@@ -21,58 +20,94 @@ export default async function Litiges({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
-  await exigerUnModerateur();
+  const moderateur = await exigerUnModerateur();
   const { p } = await textes();
-  const [{ tranche }, litiges] = await Promise.all([searchParams, litigesEnCours()]);
+  const [{ tranche }, litiges] = await Promise.all([
+    searchParams,
+    litigesEnCours(),
+  ]);
+  const initiales = `${moderateur.prenom.at(0) ?? ''}${moderateur.nom.at(0) ?? ''}`.toUpperCase();
 
   return (
     <main id="contenu">
-      <EnTete p={p} />
-      <div className="ecran-app ecran-large">
-        <h1 className="titre-ecran">{p('Gestion des litiges')}</h1>
-        <p className="sous-titre">{p('Les gardes ayant fait l’objet d’un signalement, triées du plus urgent au plus ancien.')}</p>
-        <NavigationDAdministration p={p} actif="litiges" />
+      <EnTeteDeModeration initiales={initiales} />
+      <div className="page">
+        <header className="page-tete">
+          <span className="kicker">FILE DES LITIGES</span>
+          <h1>{p('Litiges')}</h1>
+          <p>
+            {p(
+              'Les gardes ayant fait l’objet d’un signalement, du plus urgent au plus ancien. Chaque décision est envoyée au cycliste et au Bike Sitter.',
+            )}
+          </p>
+        </header>
+
+        <OngletsDeModeration p={p} actif="litiges" />
 
         {tranche ? (
-          <div className="encart" role="status" style={{ marginBottom: 12 }}>
-            <Icone nom="coche" taille={22} />
-            <span>{p('Litige tranché : les deux membres sont prévenus.')}</span>
-          </div>
+          <article className="mod-carte" role="status">
+            <div className="mod-tete">
+              <span className="mod-etat">{p('Litige tranché')}</span>
+            </div>
+            <p className="gris">
+              {p('Les deux membres ont été prévenus de la décision.')}
+            </p>
+          </article>
         ) : null}
 
         {litiges.length === 0 ? (
-          <div className="carte vide-liste">
-            <Icone nom="bouclier" taille={30} className="texte-vert" />
-            <strong>{p('Aucun litige en cours.')}</strong>
-          </div>
+          <article className="mod-carte">
+            <div className="mod-tete">
+              <span className="mod-etat">{p('Aucun litige en cours')}</span>
+            </div>
+            <p className="vide-onglet">
+              {p('Rien à trancher pour le moment.')}
+            </p>
+          </article>
         ) : (
-          <ul className="pile" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {litiges.map((litige) => (
-              <li key={litige.id}>
-                <Link href={`/administration/litiges/${litige.id}`} className="carte ligne" style={{ alignItems: 'flex-start' }}>
-                  <span className="ligne-texte">
-                    <span className={litige.priorite === 'haute' ? 'pastille rouge' : 'pastille ambre'}>
-                      {litige.priorite === 'haute' ? p('Priorité haute') : p('Priorité moyenne')}
-                    </span>
-                    <strong style={{ marginTop: 6 }}>{litige.motif ? p(litige.motif) : p('Signalement')}</strong>
-                    <span>
-                      {referenceDeGarde(litige.id)} · {litige.quartier}
-                    </span>
-                    <span>
-                      {p('{cycliste} chez {bikeSitter}', {
-                        cycliste: litige.prenomDuCycliste,
-                        bikeSitter: litige.prenomDuBikeSitter,
-                      })}
-                    </span>
-                  </span>
-                  <span className="petit texte-doux" style={{ whiteSpace: 'nowrap' }}>
-                    {jourAffiche(jourABruxelles(new Date(litige.ouvertLe)))} {heureABruxelles(new Date(litige.ouvertLe))}
-                  </span>
-                  <Icone nom="chevron" taille={20} className="texte-leger" />
+          litiges.map((litige) => (
+            <article
+              key={litige.id}
+              className={
+                litige.priorite === 'haute' ? 'mod-carte urgent' : 'mod-carte'
+              }
+            >
+              <div className="mod-tete">
+                <span
+                  className={
+                    litige.priorite === 'haute' ? 'mod-etat rouge' : 'mod-etat attente'
+                  }
+                >
+                  {litige.priorite === 'haute'
+                    ? `${p('Priorité haute')}`
+                    : `${p('Priorité moyenne')}`}
+                </span>
+                <span className="gris">{referenceDeGarde(litige.id)}</span>
+              </div>
+              <h3>{litige.motif ? p(litige.motif) : p('Signalement')}</h3>
+              <p className="gris">
+                {p('{cycliste} chez {bikeSitter}', {
+                  cycliste: litige.prenomDuCycliste,
+                  bikeSitter: litige.prenomDuBikeSitter,
+                })}
+                {' · '}
+                {litige.quartier}
+                {' · '}
+                {p('ouvert le {date} à {heure}', {
+                  date: jourAffiche(jourABruxelles(new Date(litige.ouvertLe))),
+                  heure: heureABruxelles(new Date(litige.ouvertLe)),
+                })}
+              </p>
+              <div className="actions-fin">
+                <Link
+                  href={`/administration/litiges/${litige.id}`}
+                  className="primary"
+                >
+                  {p('Examiner le litige')}
                 </Link>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </article>
+          ))
         )}
       </div>
     </main>

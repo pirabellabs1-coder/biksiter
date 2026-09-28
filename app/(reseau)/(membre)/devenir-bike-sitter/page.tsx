@@ -2,89 +2,95 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { EnTete } from '@/components/app/en-tete';
-import { Icone } from '@/components/app/icone';
 import { mesLieux } from '@/lib/depot/lieux';
 import { monProfil } from '@/lib/depot/membre-espace';
-import { textes } from '@/lib/i18n/langue';
+import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
 import { exigerUnMembre } from '@/lib/session';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { p } = await textes();
-  return { title: p('Devenir Bike Sitter') };
-}
+export const metadata: Metadata = { title: 'Devenir Bike Sitter' };
 
 /**
  * Devenir bike sitter n'est pas un statut qu'on demande : c'est proposer un
- * lieu depuis le même compte. Cet écran dit ce qu'il faut, puis ouvre le
- * parcours d'ajout.
+ * emplacement depuis le même compte. Cet écran dit ce qu'il faut, puis ouvre
+ * le parcours.
  */
 export default async function DevenirBikeSitter() {
   const membre = await exigerUnMembre();
-  const { p } = await textes();
-  const [profil, lieux] = await Promise.all([monProfil(membre.id), mesLieux(membre.id)]);
+  const [profil, lieux, _nonLues] = await Promise.all([
+    monProfil(membre.id),
+    mesLieux(membre.id),
+    nombreDeNotificationsNonLues(membre.id),
+  ]);
   if (lieux.length > 0) redirect('/mes-lieux');
-
-  const conditions: [boolean | null, string][] = [
-    [null, p('Être majeur')],
-    [profil?.identiteVerifiee ?? false, p('Identité vérifiée')],
-    [null, p('Espace privé et fermé')],
-    [null, p('Être présent pendant la garde')],
-    [null, p('Accepter les règles de sécurité')],
-  ];
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/profil" />
-      <div className="ecran-app ecran-parcours">
-        <h1 className="titre-ecran">{p('Devenir Bike Sitter')}</h1>
-        <p className="sous-titre">
-          {p('Vous pouvez proposer votre espace privé aux cyclistes de votre quartier qui cherchent un endroit sûr pour leur vélo.')}
-        </p>
-
-        <div className="illustration-devenir" aria-hidden="true">
-          <Icone nom="maison" taille={70} strokeWidth={1.4} />
-          <span className="illustration-velo">
-            <Icone nom="velo" taille={44} strokeWidth={1.6} />
-          </span>
-          <span className="illustration-cadenas">
-            <Icone nom="cadenas" taille={24} strokeWidth={2} />
-          </span>
+      <div className="dashboard-wrap" id="devenirbs">
+        <div className="bs-hero">
+          <div>
+            <span className="kicker">DEVENIR BIKE SITTER</span>
+            <h1>Accueillez les vélos du quartier chez vous</h1>
+            <p className="bs-intro">
+              Vous recevez le vélo, vous le rangez chez vous, vous le rendez en
+              main propre. Entre les deux, il attend à l’abri et vous vivez
+              votre journée.
+            </p>
+          </div>
+          <div className="bs-carte-visuel">
+            <div className="bs-chiffre">
+              <b>15 min</b>
+              <span>par garde, en tout</span>
+            </div>
+            <div className="bs-chiffre">
+              <b>Gratuit</b>
+              <span>pour vous comme pour le cycliste</span>
+            </div>
+            <div className="bs-chiffre">
+              <b>Au choix</b>
+              <span>vous acceptez les demandes qui vous conviennent</span>
+            </div>
+          </div>
         </div>
 
-        <div className="encart" style={{ alignItems: 'center' }}>
-          <Icone nom="velo" taille={28} />
-          <strong className="texte-vert">{p('Gardez des vélos et gagnez des points.')}</strong>
-        </div>
+        <h2 className="prog-titre">Ce qu’il faut</h2>
+        <ul className="bs-liste">
+          <li>
+            <b>Un emplacement privé et fermé</b> — garage, cave, cour ou pièce
+            dédiée, non accessible à d’autres résidents.
+          </li>
+          <li>
+            <b>Être majeur</b> et faire vérifier votre identité, une fois.
+          </li>
+          <li>
+            <b>Recevoir le vélo et le rendre en personne</b>, aux horaires que
+            vous déclarez.
+          </li>
+          <li>
+            <b>Être joignable</b> pendant la garde.
+          </li>
+        </ul>
 
-        <div className="carte" style={{ marginTop: 12 }}>
-          <p className="petit" style={{ margin: '0 0 8px', fontWeight: 700 }}>
-            {p('Pour devenir Bike Sitter, il faut :')}
-          </p>
-          <ul className="conditions">
-            {conditions.map(([etat, condition]) => (
-              <li key={condition}>
-                <Icone nom="verifie" taille={20} className={etat === false ? 'texte-leger' : 'texte-vert'} />
-                {condition}
-                {etat === false ? (
-                  <Link href="/profil/verifications" className="pastille ambre">
-                    {p('À faire')}
-                  </Link>
-                ) : null}
-              </li>
-            ))}
+        <div className="bs-non">
+          <b>Ce qui reste libre</b>
+          <ul>
+            <li>Vous sortez comme d’habitude pendant la garde</li>
+            <li>Vous répondez oui aux demandes qui vous arrangent</li>
+            <li>Vous choisissez vos jours et vos heures</li>
+            <li>Vous mettez l’accueil en pause quand vous le voulez</li>
           </ul>
         </div>
 
-        <div className="boutons" style={{ marginTop: 16 }}>
-          <Link href="/mes-lieux/ajouter" className="bouton plein">
-            {p('Commencer ma candidature')}
-            <Icone nom="chevron" taille={20} />
-          </Link>
-          <Link href="/comment-ca-marche" className="bouton discret">
-            {p('Comment ça marche')}
-          </Link>
-        </div>
+        {profil?.identiteVerifiee ? null : (
+          <p className="prog-note">
+            Avant la publication, une personne de l’association vérifie votre
+            identité. Les cyclistes savent ainsi à qui ils confient leur vélo.{' '}
+            <Link href="/profil/verifications">Vérifier mon identité</Link>
+          </p>
+        )}
+
+        <Link className="primary bs-cta" href="/mes-lieux">
+          Proposer mon emplacement
+        </Link>
       </div>
     </main>
   );

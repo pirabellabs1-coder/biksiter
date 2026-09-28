@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { EnTete } from '@/components/app/en-tete';
 import { Icone } from '@/components/app/icone';
 import { Anneau, EmblemeDeBadge, iconeDuBadge, resteDuBadge } from '@/components/app/progression';
 import { statistiquesDuBikeSitter } from '@/lib/depot/lieux';
@@ -28,7 +27,6 @@ export default async function MesObjectifs() {
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour="/progression" />
       <div className="ecran-app ecran-large">
         <h1 className="titre-ecran">{p('Mes objectifs')}</h1>
         <p className="sous-titre">

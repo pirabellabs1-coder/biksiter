@@ -1,3 +1,5 @@
+import { avecElision } from '@/lib/texte/elision';
+
 import { MESSAGES } from './messages';
 import { MOTS, PHRASES } from './phrases';
 import { PHRASES_DE_L_ESPACE } from './phrases-de-l-espace';
@@ -11,6 +13,23 @@ import { PHRASES_DU_SITE } from './phrases-du-site';
 
 export const LANGUES = ['fr', 'nl', 'en'] as const;
 export type Langue = (typeof LANGUES)[number];
+
+/**
+ * La langue de l'interface.
+ *
+ * Bruxelles est bilingue, et l'anglais couvre les résidents internationaux :
+ * trois langues au lancement. Le français est la source ; ce qui n'est pas
+ * traduit reste en français.
+ *
+ * Ces noms vivent ici, et non dans `langue.ts`, parce qu'un sélecteur de
+ * langue peut être un composant client : `langue.ts` lit les témoins de la
+ * requête et n'existe que sur le serveur.
+ */
+export const NOMS_DES_LANGUES: Record<Langue, string> = {
+  fr: 'Français',
+  nl: 'Nederlands',
+  en: 'English',
+};
 
 export type Cle = keyof (typeof MESSAGES)['fr'];
 
@@ -116,8 +135,10 @@ export function phraseur(langue: Langue): Phraseur {
     if (!valeurs) {
       return traduit;
     }
-    return traduit.replace(/\{(\w+)\}/g, (tout, cle: string) =>
+    const remplie = traduit.replace(/\{(\w+)\}/g, (tout, cle: string) =>
       Object.hasOwn(valeurs, cle) ? String(valeurs[cle]) : tout,
     );
+    // Un prénom glissé dans « de {prenom} » peut appeler l'élision.
+    return langue === 'fr' ? avecElision(remplie) : remplie;
   };
 }

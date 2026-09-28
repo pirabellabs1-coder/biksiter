@@ -117,7 +117,7 @@ export function EncartDErreurs({
       <Icone nom="alerte" taille={20} />
       <span>
         {erreurs.map((erreur) => (
-          <span key={erreur} className="motif">
+          <span key={erreur} className="raison-du-refus">
             {erreur}
           </span>
         ))}

@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 
 import { FormulaireDeDemande } from '@/app/(reseau)/(membre)/demande/[reference]/formulaire';
 import { textesDuFormulaireDeDemande } from '@/app/(reseau)/(membre)/demande/[reference]/textes';
-import { EnTete } from '@/components/app/en-tete';
 import { jourLisible } from '@/components/app/recherche';
 import { demandeAModifier, motifsPourUneDemande } from '@/lib/depot/gardes';
 import { velosDuMembre } from '@/lib/depot/membre-espace';
@@ -17,6 +16,11 @@ import {
   libelleDesHoraires,
   type Creneau,
 } from '@/lib/regles/creneau';
+import {
+  avecLesHeuresChoisies,
+  heuresDansLAccueil,
+  plagesDAccueil,
+} from '@/lib/regles/heures-proposees';
 import { HEURES } from '@/lib/recherche-courante';
 import { heureABruxelles, jourABruxelles } from '@/lib/temps';
 import { exigerUnMembre } from '@/lib/session';
@@ -70,7 +74,6 @@ export default async function ModifierLaDemande({
 
   return (
     <main id="contenu">
-      <EnTete p={p} retour={`/gardes/${id}`} cloche={false} />
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Modifier la demande')}</h1>
         <p className="sous-titre">
@@ -90,7 +93,11 @@ export default async function ModifierLaDemande({
             quartier: emplacement.quartier,
           }}
           capacite={emplacement.capacite}
-          dureeAcceptee={p(DUREES_MAX_JOURS[emplacement.dureeMaxJours] ?? '')}
+          dureeAcceptee={
+            emplacement.dureeMaxJours > 1
+              ? `${p('Jusqu’à {n} h dans la journée', { n: emplacement.dureeMaxHeures })} · ${p(DUREES_MAX_JOURS[emplacement.dureeMaxJours] ?? '')}`
+              : p('Jusqu’à {n} h d’affilée', { n: emplacement.dureeMaxHeures })
+          }
           horaires={libelleDesHoraires(
             {
               jours: emplacement.jours,
@@ -103,7 +110,11 @@ export default async function ModifierLaDemande({
           )}
           joursDeDepot={Array.from({ length: 7 }, (_, rang) => jourEnListe(rang))}
           joursDeRetour={Array.from({ length: 14 }, (_, rang) => jourEnListe(rang))}
-          heures={HEURES}
+          heures={avecLesHeuresChoisies(
+            heuresDansLAccueil(HEURES, plagesDAccueil(emplacement)),
+            creneau.heureDepot,
+            creneau.heureReprise,
+          )}
           velos={velos}
           initial={{ ...creneau, veloId }}
           verificationInitiale={{

@@ -49,6 +49,18 @@ export async function membreDeLaSession(
   );
 }
 
+/** L'adresse du compte qui porte une session encore valide, ou null. */
+export async function emailDeLaSession(jeton: string): Promise<string | null> {
+  const ligne = await uneLigne<{ email: string }>(
+    `select m.email
+       from session s join membre m on m.id = s.membre_id
+      where s.empreinte_du_jeton = $1 and s.expire_le > now()
+        and not m.suspendu and m.supprime_le is null`,
+    [empreinteDuJeton(jeton)],
+  );
+  return ligne?.email ?? null;
+}
+
 export async function fermerLaSession(jeton: string): Promise<void> {
   await interroger('delete from session where empreinte_du_jeton = $1', [
     empreinteDuJeton(jeton),

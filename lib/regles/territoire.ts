@@ -38,3 +38,28 @@ export const CENTRE_DE_BRUXELLES: PointGeographique = {
   latitude: 50.8465,
   longitude: 4.3517,
 };
+
+/**
+ * Les codes postaux de la Région de Bruxelles-Capitale tiennent tous entre
+ * 1000 et 1299 ; au-delà commencent les deux Brabant.
+ */
+export const CODES_POSTAUX_DE_BRUXELLES = { premier: 1000, dernier: 1299 } as const;
+
+/**
+ * Une adresse qui porte un code postal belge hors de Bruxelles est hors zone.
+ *
+ * C'est le contrôle de secours quand le géocodeur ne répond pas : sans lui,
+ * une adresse à Mons passait, posée au centre du quartier choisi. Une adresse
+ * sans code postal n'est pas refusée — on ne sait pas, on ne suppose rien.
+ */
+export function codePostalHorsDeBruxelles(adresse: string): boolean {
+  const codes = adresse.match(/\b[1-9]\d{3}\b/g);
+  if (!codes) return false;
+  return codes.every((code) => {
+    const n = Number(code);
+    return (
+      n < CODES_POSTAUX_DE_BRUXELLES.premier ||
+      n > CODES_POSTAUX_DE_BRUXELLES.dernier
+    );
+  });
+}
