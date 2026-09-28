@@ -488,6 +488,11 @@ body.menu-hamburger-ouvert {
    pictogramme, un titre plus gros, un CTA. */
 .mega-col.alaune {
   display: block;
+  /* Les liens du menu restent sur une ligne ; cette carte, elle, porte un
+     titre et un texte qui doivent passer à la ligne dans sa largeur. */
+  white-space: normal;
+  overflow-wrap: break-word;
+  min-width: 0;
   padding: 16px;
   border-radius: 18px;
   background: linear-gradient(160deg, #f2f9f4 0%, #e6f2ea 100%);
