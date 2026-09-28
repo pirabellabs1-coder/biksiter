@@ -7,6 +7,7 @@ import { PhotoDeProfil } from '@/components/maquette/compte/photo-de-profil';
 import { ReglagesDeNotification } from '@/components/maquette/compte/reglages-de-notification';
 import { Icone } from '@/components/app/icone';
 import { etatDuCompte } from '@/lib/depot/comptes';
+import { canauxConfigures } from '@/lib/envois/canaux';
 import { monProfil } from '@/lib/depot/membre-espace';
 import { tranquilliteDuMembre } from '@/lib/depot/notifications';
 import { versionDeMaPhoto } from '@/lib/depot/photo-de-profil';
@@ -23,12 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const CONFIRMATIONS_DU_PROFIL: Record<string, string> = {
   envoye:
-    'Votre signalement est transmis à la modération. Vous serez prévenu quand il aura été examiné.',
-};
-
-const CONFIRMATIONS_DE_LA_PHOTO: Record<string, string> = {
-  enregistree: 'Photo enregistrée.',
-  retiree: 'Photo retirée.',
+    'Votre signalement est transmis à la modération. Vous recevez une notification dès qu’il a été examiné.',
 };
 
 export default async function MonCompte({
@@ -37,7 +33,7 @@ export default async function MonCompte({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const membre = await exigerUnMembre();
-  const { signalement, demandes, photo } = await searchParams;
+  const { signalement, demandes } = await searchParams;
   const [profil, compte, versionDeLaPhoto, tranquillite] = await Promise.all([
     monProfil(membre.id),
     etatDuCompte(membre.id),
@@ -48,29 +44,33 @@ export default async function MonCompte({
 
   // Le statut des trois vérifications, résumé ici et détaillé dans la page
   // dédiée. Une pastille écrit toujours l'état en toutes lettres (règle 6).
+  // Sans passerelle SMS, un numéro enregistré ne peut pas être confirmé : il
+  // se dit « Enregistré », pas « À faire ».
+  const canaux = canauxConfigures();
   const verifications = [
     {
       titre: 'E-mail',
       verifie: Boolean(compte?.emailVerifieLe),
       examen: false,
+      enregistre: false,
     },
     {
       titre: 'Identité',
       verifie: compte?.verification === 'verifiee',
       examen: compte?.verification === 'en_cours',
+      enregistre: false,
     },
     {
       titre: 'Téléphone',
       verifie: Boolean(compte?.telephoneVerifieLe),
       examen: false,
+      enregistre: !canaux.sms && Boolean(compte?.telephone),
     },
   ];
 
   const confirmation = signalement
     ? CONFIRMATIONS_DU_PROFIL[signalement]
-    : photo
-      ? CONFIRMATIONS_DE_LA_PHOTO[photo]
-      : demandes === 'impossible'
+    : demandes === 'impossible'
       ? 'Les nouvelles demandes n’ont pas pu être rouvertes : aucun emplacement publié.'
       : undefined;
 
@@ -133,6 +133,8 @@ export default async function MonCompte({
                     <Icone nom="horloge" taille={14} />
                     En cours d’examen
                   </span>
+                ) : v.enregistre ? (
+                  <span className="pastille gris">Enregistré</span>
                 ) : (
                   <span className="pastille gris">À faire</span>
                 )}

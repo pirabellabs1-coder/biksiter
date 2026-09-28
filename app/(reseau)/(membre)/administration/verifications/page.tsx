@@ -56,7 +56,7 @@ export default async function Verifications({
             <p className="gris">
               {decision === 'verifiee'
                 ? p(
-                    'Identité vérifiée. La pièce a été supprimée et le membre est prévenu.',
+                    'Identité vérifiée. La pièce a été supprimée et le membre reçoit une notification.',
                   )
                 : p(
                     'Refus enregistré. La pièce a été supprimée et le membre a reçu le motif.',

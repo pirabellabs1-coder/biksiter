@@ -149,8 +149,8 @@ export default async function EspaceBikeSitter() {
         </h2>
         {demandes.length === 0 ? (
           <p className="prog-note">
-            Aucune demande n’attend votre réponse. Vous serez prévenu dès qu’un
-            cycliste vous écrira.
+            Aucune demande n’attend votre réponse. Vous recevez une notification
+            dès qu’un cycliste vous écrit.
           </p>
         ) : (
           <ul className="pile-cartes" role="list">

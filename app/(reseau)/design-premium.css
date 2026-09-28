@@ -3809,3 +3809,30 @@ button.photo-dossier.photo-piece {
 .prog-stats:has(> :nth-child(2):last-child) {
   grid-template-columns: repeat(2, 1fr);
 }
+
+/* Une photo de message a une largeur à elle : tant qu'elle se charge, la
+   bulle garde la forme d'une photo au lieu de se replier en gélule vide
+   (une largeur en pourcentage dépendait de la bulle, qui dépendait d'elle). */
+.app-membre .bulle-photo img {
+  width: 240px;
+  max-width: 62vw;
+  height: auto;
+}
+.app-membre .bulle.moi .bulle-photo img {
+  background: rgba(255, 255, 255, 0.22);
+}
+/* L'aperçu à envoyer se tient sous « Envoi de la photo… », pâli pendant
+   l'envoi. */
+.compositeur-apercu {
+  margin-top: 10px;
+}
+.compositeur-apercu[aria-busy='true'] img {
+  opacity: 0.6;
+}
+
+/* Une référence et sa pastille séparées par un écart plutôt que par un point
+   médian, qui restait seul en fin de ligne quand la pastille passait dessous.
+   (La date et son état, sur les avis donnés, sont déjà en flex plus haut.) */
+.reference-de-garde {
+  flex-wrap: wrap;
+}

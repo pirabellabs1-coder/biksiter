@@ -1087,7 +1087,7 @@ export const PHRASES: Record<'nl' | 'en', Record<string, string>> = {
     'Cour privée': 'Privékoer',
     'Créer un compte': 'Een account aanmaken',
     'Créer votre compte': 'Maak uw account aan',
-    "Créez-en une depuis une recherche sans résultat : vous serez prévenu dès qu'un emplacement ouvre.":
+    "Créez-en une depuis une recherche sans résultat : vous recevez une notification dès qu'un emplacement ouvre.":
       'Maak er een aan vanuit een zoekopdracht zonder resultaat: u wordt verwittigd zodra er een plek opengaat.',
     "Créneau repris de votre recherche. Vous pouvez encore l'ajuster.":
       'Tijdslot overgenomen uit uw zoekopdracht. U kunt het nog aanpassen.',
@@ -1490,7 +1490,7 @@ export const PHRASES: Record<'nl' | 'en', Record<string, string>> = {
     'Cour privée': 'Private courtyard',
     'Créer un compte': 'Create an account',
     'Créer votre compte': 'Create your account',
-    "Créez-en une depuis une recherche sans résultat : vous serez prévenu dès qu'un emplacement ouvre.":
+    "Créez-en une depuis une recherche sans résultat : vous recevez une notification dès qu'un emplacement ouvre.":
       'Create one from a search with no results: you will be told as soon as a spot opens.',
     "Créneau repris de votre recherche. Vous pouvez encore l'ajuster.":
       'Time slot taken from your search. You can still adjust it.',

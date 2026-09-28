@@ -24,7 +24,7 @@ export default async function MesAlertes() {
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Mes alertes')}</h1>
         <p className="sous-titre">
-          {p('Vous serez notifié dès qu’un nouvel emplacement ouvre dans une zone où votre recherche n’a rien trouvé.')}
+          {p('Vous recevez une notification dès qu’un nouvel emplacement ouvre dans une zone où votre recherche n’a rien trouvé.')}
         </p>
 
         {alertes.length === 0 ? (
@@ -33,7 +33,7 @@ export default async function MesAlertes() {
             <strong>{p('Aucune alerte.')}</strong>
             <span>
               {p(
-                'Créez-en une depuis une recherche sans résultat : vous serez prévenu dès qu’un emplacement ouvre.',
+                'Créez-en une depuis une recherche sans résultat : vous recevez une notification dès qu’un emplacement ouvre.',
               )}
             </span>
             <Link href="/recherche" className="bouton contour petit">

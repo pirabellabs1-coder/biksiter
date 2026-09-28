@@ -25,6 +25,11 @@ export function FormulaireDePhotos({
     remplacer: string;
     envoyer: string;
     envoi: string;
+    /**
+     * À la création d'un lieu, les photos sont facultatives : sans photo
+     * choisie, le bouton le dit, au lieu d'un second lien pour le même geste.
+     */
+    sansPhoto?: { bouton: string; note: string };
   };
 }) {
   const [etat, envoyer, enCours] = useActionState(action, { erreurs: {} });
@@ -34,6 +39,10 @@ export function FormulaireDePhotos({
     () => () => Object.values(apercus).forEach((adresse) => URL.revokeObjectURL(adresse)),
     [apercus],
   );
+
+  const aucunePhoto =
+    Object.keys(apercus).length === 0 && existantes.length === 0;
+  const sansPhoto = aucunePhoto ? textes.sansPhoto : undefined;
 
   function soumettre(evenement: FormEvent<HTMLFormElement>) {
     evenement.preventDefault();
@@ -89,8 +98,9 @@ export function FormulaireDePhotos({
         </div>
       ) : null}
 
+      {sansPhoto ? <p className="prog-note">{sansPhoto.note}</p> : null}
       <button type="submit" className="bouton plein" disabled={enCours}>
-        {enCours ? textes.envoi : textes.envoyer}
+        {enCours ? textes.envoi : (sansPhoto?.bouton ?? textes.envoyer)}
         <Icone nom="chevron" taille={20} />
       </button>
     </form>

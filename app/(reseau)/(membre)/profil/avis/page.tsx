@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: 'Mes avis' };
 const CONFIRMATIONS: Record<string, string> = {
   reponse: 'Votre réponse est publiée sous l’avis.',
   contestation:
-    'Votre demande est transmise à la modération. Vous serez prévenu de sa décision.',
+    'Votre demande est transmise à la modération. Vous recevez une notification dès sa décision.',
 };
 
 /**
@@ -140,9 +140,8 @@ export default async function AvisDuMembre({
                     Pour {donne.ciblePrenom} · {donne.note}/5
                   </strong>
                   {donne.texte ? <span>{donne.texte}</span> : null}
-                  <span>
-                    {enJour(new Date(donne.ecritLe))}
-                    {' · '}
+                  <span className="date-et-etat">
+                    <span>{enJour(new Date(donne.ecritLe))}</span>
                     <span className={donne.publie ? 'status' : 'status status-attente'}>
                       {donne.publie
                         ? 'Publié'

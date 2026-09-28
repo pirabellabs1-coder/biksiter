@@ -75,6 +75,8 @@ export async function NouvelleDemande({
           envoyerAction={envoyerLaDemande.bind(null, reference)}
           verifierAction={verifierLaDemande.bind(null, reference)}
           bikeSitter={{
+            membreId: emplacement.bikeSitterId,
+            photo: emplacement.photoDuBikeSitter,
             prenom: emplacement.prenom,
             initiale: emplacement.initialeDuNom,
             verifie: emplacement.identiteVerifiee,

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Icone } from '@/components/app/icone';
@@ -66,16 +65,14 @@ export default async function PhotosDuLieu({
             remplacer: p('Remplacer'),
             envoyer: nouveau ? p('Étape suivante') : p('Enregistrer les photos'),
             envoi: p('Envoi…'),
+            sansPhoto: nouveau
+              ? {
+                  bouton: p('Continuer sans photo'),
+                  note: p('Les photos sont facultatives : vous pourrez les ajouter plus tard depuis votre espace.'),
+                }
+              : undefined,
           }}
         />
-
-        {/* Juste sous le bouton principal : c'est là qu'on cherche une autre
-            issue quand on n'a pas de photo sous la main. */}
-        {nouveau ? (
-          <Link href={`/mes-lieux/${reference}/disponibilites?nouveau=1`} className="bouton discret">
-            {p('Ajouter les photos plus tard')}
-          </Link>
-        ) : null}
 
         {photos.length > 0 ? (
           <div className="pile" style={{ marginTop: 12 }}>

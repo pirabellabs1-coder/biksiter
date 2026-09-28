@@ -112,7 +112,7 @@ export async function envoyerLaPiece(
   return {
     statut: 'envoyee',
     message: p(
-      'Envoyé. Un administrateur vérifie votre pièce sous 24 heures, et vous serez prévenu du résultat.',
+      'Envoyé. Une personne de l’association vérifie votre pièce sous 24 heures ; vous recevez une notification avec le résultat.',
     ),
   };
 }

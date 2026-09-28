@@ -216,13 +216,23 @@ export async function basculerLesNouvellesDemandes(
 }
 
 /**
+ * L'issue d'un geste sur la photo : une erreur, ou le moment où il a réussi
+ * (un nouveau moment relance la confirmation).
+ */
+export type EtatDeLaPhoto = {
+  erreur: string | null;
+  faitLe?: number;
+  geste?: 'enregistree' | 'retiree';
+};
+
+/**
  * La photo de profil : une image de téléphone, 8 Mo au plus. Elle est
  * recadrée en carré et ré-encodée sans métadonnées avant d'être gardée.
  */
 export async function changerMaPhoto(
-  _precedent: EtatSimple,
+  _precedent: EtatDeLaPhoto,
   donnees: FormData,
-): Promise<EtatSimple> {
+): Promise<EtatDeLaPhoto> {
   const membre = await exigerUnMembre();
   const fichier = donnees.get('photo');
   if (!(fichier instanceof File) || fichier.size === 0) {
@@ -252,14 +262,18 @@ export async function changerMaPhoto(
       ),
     };
   }
+  // Pas de redirection : la page se met à jour sur place, en-tête compris.
+  // Une redirection vidait l'écran le temps de recharger tout l'espace.
   revalidatePath('/', 'layout');
-  redirect('/profil?photo=enregistree');
+  return { erreur: null, faitLe: Date.now(), geste: 'enregistree' };
 }
 
-export async function retirerLaPhotoDeProfil(): Promise<void> {
+export async function retirerLaPhotoDeProfil(
+  _precedent: EtatDeLaPhoto,
+): Promise<EtatDeLaPhoto> {
   const membre = await exigerUnMembre();
   await retirerMaPhoto(membre.id);
   revalidatePath('/', 'layout');
-  redirect('/profil?photo=retiree');
+  return { erreur: null, faitLe: Date.now(), geste: 'retiree' };
 }
 

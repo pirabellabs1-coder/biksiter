@@ -132,17 +132,21 @@ export function FormulaireDeMessage({
       </p>
 
       {apercu ? (
-        <div className="compositeur-apercu">
+        <div className="compositeur-apercu" aria-busy={enCours || undefined}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={apercu} alt="" />
-          <button
-            type="button"
-            className="compositeur-retirer"
-            onClick={viderLaPhoto}
-            aria-label={textes.retirer}
-          >
-            <Icone nom="croix" taille={16} />
-          </button>
+          {/* Pendant l'envoi, la photo ne se retire plus : la croix
+              disparaît plutôt que de promettre un geste sans effet. */}
+          {enCours ? null : (
+            <button
+              type="button"
+              className="compositeur-retirer"
+              onClick={viderLaPhoto}
+              aria-label={textes.retirer}
+            >
+              <Icone nom="croix" taille={16} />
+            </button>
+          )}
         </div>
       ) : null}
 
@@ -155,6 +159,9 @@ export function FormulaireDeMessage({
           type="button"
           className="compositeur-joindre"
           onClick={() => fichier.current?.click()}
+          // Pendant l'envoi, joindre une photo l'effacerait sans rien dire :
+          // l'effet qui vide le compositeur après l'envoi la supprimerait.
+          disabled={enCours}
           aria-label={textes.joindre}
         >
           <Icone nom="photo" taille={22} />

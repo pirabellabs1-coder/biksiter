@@ -70,7 +70,7 @@ export function candidatureRecue(details: { prenom: string }): Message {
     '',
     'Votre emplacement est bien enregistré. Une personne de l’association va',
     'relire les informations et vérifier votre identité avant la publication.',
-    'Vous serez informé de la suite par e-mail.',
+    'La suite vous parvient par e-mail.',
     '',
     'Votre adresse reste confidentielle : la carte n’affiche qu’une zone',
     'approximative, et l’adresse exacte n’est transmise qu’au cycliste dont',

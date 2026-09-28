@@ -41,7 +41,7 @@ export async function creerUneAlerte(donnees: FormData): Promise<void> {
       );
       await notifier(client, membre.id, {
         texte:
-          "Alerte créée pour {lieu}. Vous serez prévenu dès qu'un emplacement ouvre.",
+          "Alerte créée pour {lieu}. Vous recevez une notification dès qu'un emplacement ouvre.",
         valeurs: { lieu: lieu.nom },
         lien: '/profil/alertes',
       });

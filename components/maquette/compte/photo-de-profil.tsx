@@ -12,16 +12,17 @@ import {
 import {
   changerMaPhoto,
   retirerLaPhotoDeProfil,
-  type EtatSimple,
+  type EtatDeLaPhoto,
 } from '@/app/(reseau)/(membre)/profil/actions';
 import { Icone } from '@/components/app/icone';
+import { Confirmation } from '@/components/maquette/confirmation';
 import {
   FORMATS_DEMANDES,
   POIDS_MAXIMAL_D_UN_ENVOI,
   reduireUnePhoto,
 } from '@/components/app/reduire-une-photo';
 
-const VIERGE: EtatSimple = { erreur: null };
+const VIERGE: EtatDeLaPhoto = { erreur: null };
 
 /**
  * La photo de profil, en tête du compte : le visage (ou l'initiale), un
@@ -40,10 +41,18 @@ export function PhotoDeProfil({
   version: number | null;
 }) {
   const [etat, envoyer, enCours] = useActionState(changerMaPhoto, VIERGE);
+  const [retrait, retirer, retraitEnCours] = useActionState(
+    retirerLaPhotoDeProfil,
+    VIERGE,
+  );
   const [apercu, setApercu] = useState<string | null>(null);
+  // L'aperçu envoyé : une fois enregistré, il cède la place à la photo
+  // servie, sans qu'on ait à le retirer à la main.
+  const [soumis, setSoumis] = useState<string | null>(null);
   const [refus, setRefus] = useState<string | null>(null);
   const [preparation, setPreparation] = useState(false);
   const fichier = useRef<HTMLInputElement>(null);
+  const visage = useRef<HTMLButtonElement>(null);
 
   useEffect(
     () => () => {
@@ -93,21 +102,55 @@ export function PhotoDeProfil({
   function soumettre(evenement: FormEvent<HTMLFormElement>) {
     evenement.preventDefault();
     const donnees = new FormData(evenement.currentTarget);
+    setSoumis(apercu);
     startTransition(() => envoyer(donnees));
   }
 
+  const enregistree =
+    !enCours && etat.faitLe !== undefined && soumis !== null && soumis === apercu;
+  const apercuAffiche = enregistree ? null : apercu;
   const image =
-    apercu ?? (version ? `/membres/${membreId}/photo?v=${version}` : null);
+    apercuAffiche ??
+    (version ? `/membres/${membreId}/photo?v=${version}` : null);
+  const dernierGeste = [etat, retrait]
+    .filter((geste) => geste.faitLe !== undefined)
+    .sort((a, b) => (b.faitLe ?? 0) - (a.faitLe ?? 0))[0];
+
+  // Après un enregistrement ou un retrait, la page ne navigue plus : on remet
+  // le champ à zéro (rechoisir la même photo doit redéclencher le change) et
+  // on rend le focus au visage, dont le bouton d'action vient de disparaître.
+  const reussiteLe = dernierGeste?.faitLe;
+  useEffect(() => {
+    if (reussiteLe === undefined) return;
+    if (fichier.current) fichier.current.value = '';
+    setApercu(null);
+    setSoumis(null);
+    visage.current?.focus();
+  }, [reussiteLe]);
+
+  const occupe = enCours || retraitEnCours;
 
   return (
     <section className="profil-tete" aria-labelledby="profil-nom">
+      {dernierGeste ? (
+        <Confirmation
+          key={dernierGeste.faitLe}
+          texte={
+            dernierGeste.geste === 'retiree'
+              ? 'Photo retirée.'
+              : 'Photo enregistrée.'
+          }
+        />
+      ) : null}
       <form action={envoyer} onSubmit={soumettre} className="profil-photo">
         <button
+          ref={visage}
           type="button"
           className="profil-visage"
           onClick={() => fichier.current?.click()}
+          disabled={occupe}
           aria-label={
-            version || apercu
+            version || apercuAffiche
               ? 'Changer ma photo de profil'
               : 'Ajouter une photo de profil'
           }
@@ -122,7 +165,9 @@ export function PhotoDeProfil({
               onError={() => {
                 // Un fichier qui se dit image mais ne se lit pas (un texte
                 // renommé en .jpg) : on le dit, et on revient à l'état initial.
-                if (apercu) {
+                // On ne réagit qu'à l'aperçu affiché : la photo déjà
+                // enregistrée n'est plus à corriger.
+                if (apercuAffiche) {
                   setRefus('Cette image n’a pas pu être lue. Essayez une autre photo.');
                   annuler();
                 }
@@ -150,7 +195,7 @@ export function PhotoDeProfil({
 
         <div className="profil-identite">
           <h1 id="profil-nom">{nomPublic}</h1>
-          {apercu ? (
+          {apercuAffiche ? (
             <div className="profil-actions">
               <button
                 type="submit"
@@ -183,9 +228,9 @@ export function PhotoDeProfil({
         </div>
       </form>
 
-      {version && !apercu ? (
+      {version && !apercuAffiche ? (
         <form
-          action={retirerLaPhotoDeProfil}
+          action={retirer}
           className="profil-retirer"
           onSubmit={(evenement) => {
             if (!window.confirm('Retirer votre photo de profil ?')) {
@@ -193,8 +238,8 @@ export function PhotoDeProfil({
             }
           }}
         >
-          <button type="submit" className="lien">
-            Retirer la photo
+          <button type="submit" className="lien" disabled={retraitEnCours}>
+            {retraitEnCours ? 'Un instant…' : 'Retirer la photo'}
           </button>
         </form>
       ) : null}

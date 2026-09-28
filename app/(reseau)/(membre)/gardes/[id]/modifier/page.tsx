@@ -87,6 +87,8 @@ export default async function ModifierLaDemande({
           verifierAction={verifierLaModification.bind(null, demande.id)}
           messageInitial={demande.message ?? ''}
           bikeSitter={{
+            membreId: emplacement.bikeSitterId,
+            photo: emplacement.photoDuBikeSitter,
             prenom: emplacement.prenom,
             initiale: emplacement.initialeDuNom,
             verifie: emplacement.identiteVerifiee,

@@ -58,7 +58,7 @@ export default async function SuiviDuSignalement({
       titre: p('Décision'),
       texte: decision
         ? decision.note ?? quand(new Date(decision.faitLe))
-        : p('Vous serez informé dès qu’une décision aura été prise.'),
+        : p('Vous recevez une notification dès qu’une décision est prise.'),
       etat: decision ? 'fait' : 'a-venir',
     },
   ];
@@ -67,7 +67,7 @@ export default async function SuiviDuSignalement({
     <main id="contenu">
       <div className="ecran-app ecran-parcours">
         <h1 className="titre-ecran">{p('Suivi du signalement')}</h1>
-        <p className="sous-titre">{p('Vous êtes informé à chaque étape d’une garde.')}</p>
+        <p className="sous-titre">{p('Vous recevez une notification à chaque étape d’une garde.')}</p>
 
         <div className="carte ligne ligne-info" style={{ alignItems: 'flex-start' }}>
           <span className="ligne-icone texte-rouge" aria-hidden="true">

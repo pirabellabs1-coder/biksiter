@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useActionState, useEffect, useState, useTransition } from 'react';
 
+import { Avatar } from '@/components/app/avatar';
 import { Icone } from '@/components/app/icone';
 import {
   creneauDansLesBornes,
@@ -75,6 +76,9 @@ export function FormulaireDeDemande({
   verifierAction: (champs: ChampsDeDemande) => Promise<VerificationDeDemande>;
   messageInitial?: string;
   bikeSitter: {
+    membreId: string;
+    /** La version de sa photo de profil, ou null. */
+    photo: string | null;
     prenom: string;
     initiale: string;
     verifie: boolean;
@@ -292,9 +296,12 @@ export function FormulaireDeDemande({
       <h2 className="titre-section">{textes.recapitulatif}</h2>
       <div className="liste recapitulatif">
         <div className="ligne">
-          <span className="avatar-app" aria-hidden="true">
-            {bikeSitter.prenom.charAt(0)}
-          </span>
+          <Avatar
+            membreId={bikeSitter.membreId}
+            prenom={bikeSitter.prenom}
+            version={bikeSitter.photo}
+            taille={44}
+          />
           <span className="ligne-texte">
             <span>{textes.votreBikeSitter}</span>
             <strong>

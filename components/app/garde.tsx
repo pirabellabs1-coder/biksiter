@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { libelleDEtat } from '@/components/membre/garde';
 import type { ProchaineGarde } from '@/lib/depot/accueil';
 import type { Textes } from '@/lib/i18n/langue';
+import { heureFrancaise } from '@/lib/regles/creneau';
 import { TON_DE_L_ETAT, type EtatDeGarde } from '@/lib/regles/garde';
 import { heureABruxelles, jourABruxelles } from '@/lib/temps';
 
@@ -52,7 +53,7 @@ const MOIS = [
   'déc.',
 ];
 
-/** « Sam. 20 sept. · 14:00 – 18:00 », à l'heure de Bruxelles. */
+/** « Sam. 20 sept. · 14h00 – 16h00 », à l'heure de Bruxelles. */
 export function dateDeGarde(p: Textes['p'], debut: Date, fin: Date): string {
   const jour = jourABruxelles(debut);
   const [annee, mois, date] = jour.split('-').map(Number) as [
@@ -63,9 +64,13 @@ export function dateDeGarde(p: Textes['p'], debut: Date, fin: Date): string {
   const semaine = new Date(Date.UTC(annee, mois - 1, date)).getUTCDay();
   const memeJour = jour === jourABruxelles(fin);
   const debutTexte = `${p(JOURS_COURTS[semaine]!)} ${date} ${p(MOIS[mois - 1]!)}`;
+  // Les heures au format des formulaires (10h00), et des espaces insécables
+  // autour du tiret : « 14h00 – 16h00 » ne se coupe jamais en deux lignes.
+  const de = heureFrancaise(heureABruxelles(debut));
+  const a = heureFrancaise(heureABruxelles(fin));
   return memeJour
-    ? `${debutTexte} · ${heureABruxelles(debut)} – ${heureABruxelles(fin)}`
-    : `${debutTexte} ${heureABruxelles(debut)} → ${jourABruxelles(fin).split('-').reverse().slice(0, 2).join('/')} ${heureABruxelles(fin)}`;
+    ? `${debutTexte} · ${de}\u00a0–\u00a0${a}`
+    : `${debutTexte} ${de}\u00a0→ ${jourABruxelles(fin).split('-').reverse().slice(0, 2).join('/')}\u00a0${a}`;
 }
 
 /** La garde telle que l'accueil et la liste des gardes la montrent. */

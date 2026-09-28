@@ -378,7 +378,10 @@ export default async function DetailDUneGarde({
           </div>
         </div>
         <p className="reference-de-garde">
-          {referenceDeGarde(garde.id)} · <PastilleDEtat t={t} etat={garde.etat} />
+          {/* L'écart suffit à séparer : un point médian restait seul au bout
+              de la ligne quand la pastille passait dessous. */}
+          <span>{referenceDeGarde(garde.id)}</span>
+          <PastilleDEtat t={t} etat={garde.etat} />
         </p>
 
         <div className="pile">
@@ -794,7 +797,7 @@ export default async function DetailDUneGarde({
                     </span>
                     <span className="ligne-texte">
                       <strong>{p('Rejoindre la liste d’attente')}</strong>
-                      <span>{p('Vous serez informé dès qu’un nouvel emplacement se libère à proximité.')}</span>
+                      <span>{p('Vous recevez une notification dès qu’un nouvel emplacement se libère à proximité.')}</span>
                     </span>
                     <Icone nom="chevron" taille={20} className="texte-leger" />
                   </button>

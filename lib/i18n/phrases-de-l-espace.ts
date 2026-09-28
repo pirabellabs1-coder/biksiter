@@ -11,6 +11,8 @@ export const PHRASES_DE_L_ESPACE: Record<
   Record<string, string>
 > = {
   nl: {
+    "Continuer sans photo": "Doorgaan zonder foto",
+    "Les photos sont facultatives : vous pourrez les ajouter plus tard depuis votre espace.": "Foto’s zijn optioneel: u kunt ze later toevoegen vanuit uw ruimte.",
     "L’adresse n’est plus affichée depuis l’annulation.": "Het adres wordt sinds de annulering niet meer getoond.",
     "Demande acceptée : {prenom} reçoit votre adresse et votre numéro pour le dépôt.": "Aanvraag aanvaard: {prenom} krijgt uw adres en uw nummer voor het afzetten.",
     "Modifier mon numéro": "Mijn nummer wijzigen",
@@ -57,7 +59,6 @@ export const PHRASES_DE_L_ESPACE: Record<
     "Jours et horaires": "Dagen en uren",
     "Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, ou videz le champ : l’inscription est ouverte sans code.": "Deze uitnodigingscode bestaat niet of is al gebruikt. Controleer of hij exact is overgenomen, of maak het veld leeg: inschrijven kan ook zonder code.",
     "Les photos de votre emplacement aident les cyclistes à voir où leur vélo sera accueilli.": "De foto’s van uw plek helpen fietsers te zien waar hun fiets wordt opgevangen.",
-    "Ajouter les photos plus tard": "Foto’s later toevoegen",
     "Protéger votre adresse": "Uw adres beschermen",
     "Cadrez l’emplacement lui-même : un numéro de rue, une plaque ou un visage n’apportent rien aux cyclistes. Les coordonnées GPS des photos sont retirées automatiquement.": "Fotografeer de plek zelf: een huisnummer, een nummerplaat of een gezicht voegen niets toe voor fietsers. De gps-gegevens van de foto’s worden automatisch verwijderd.",
     "À vérifier avant de repartir": "Te controleren voor u vertrekt",
@@ -148,6 +149,9 @@ export const PHRASES_DE_L_ESPACE: Record<
     "Ajoutez d'abord le vélo que vous souhaitez confier : le bike sitter saura ce qu'il accueille.":
       'Voeg eerst de fiets toe die u wilt toevertrouwen: zo weet de bike sitter wat hij mag verwachten.',
     'Alerte créée': 'Zoekmelding aangemaakt',
+    "Alerte créée pour {lieu}. Vous recevez une notification dès qu'un emplacement ouvre.":
+      'Zoekmelding aangemaakt voor {lieu}. U krijgt een bericht zodra er een plek vrijkomt.',
+    // Notifications déjà enregistrées en base avant la reformulation du texte.
     "Alerte créée pour {lieu}. Vous serez prévenu dès qu'un emplacement ouvre.":
       'Zoekmelding aangemaakt voor {lieu}. U krijgt een bericht zodra er een plek vrijkomt.',
     'Ancien membre': 'Voormalig lid',
@@ -791,7 +795,7 @@ export const PHRASES_DE_L_ESPACE: Record<
     'Gardes confiées': 'Toevertrouwde oppasbeurten',
     'Gardes engagées': 'Lopende oppasbeurten',
     'Gestion des litiges.': 'Beheer van de geschillen.',
-    'Identité vérifiée. La pièce a été supprimée et le membre est prévenu.':
+    'Identité vérifiée. La pièce a été supprimée et le membre reçoit une notification.':
       'Identiteit geverifieerd. Het document is verwijderd en het lid is verwittigd.',
     'Il est déjà visible dans le catalogue des membres.':
       'Het is al zichtbaar in de catalogus van de leden.',
@@ -887,6 +891,8 @@ export const PHRASES_DE_L_ESPACE: Record<
     '{n} à trancher': '{n} te beslechten',
   },
   en: {
+    "Continuer sans photo": "Continue without a photo",
+    "Les photos sont facultatives : vous pourrez les ajouter plus tard depuis votre espace.": "Photos are optional: you can add them later from your space.",
     "L’adresse n’est plus affichée depuis l’annulation.": "The address is no longer shown since the cancellation.",
     "Demande acceptée : {prenom} reçoit votre adresse et votre numéro pour le dépôt.": "Request accepted: {prenom} now receives your address and your number for the drop-off.",
     "Modifier mon numéro": "Change my number",
@@ -933,7 +939,6 @@ export const PHRASES_DE_L_ESPACE: Record<
     "Jours et horaires": "Days and hours",
     "Ce code d’invitation n’existe pas, ou il a déjà servi. Vérifiez qu’il est recopié tel quel, ou videz le champ : l’inscription est ouverte sans code.": "This invitation code doesn’t exist, or it has already been used. Check that it is copied exactly, or clear the field: you can sign up without a code.",
     "Les photos de votre emplacement aident les cyclistes à voir où leur vélo sera accueilli.": "Photos of your spot help cyclists see where their bike will be kept.",
-    "Ajouter les photos plus tard": "Add photos later",
     "Protéger votre adresse": "Protecting your address",
     "Cadrez l’emplacement lui-même : un numéro de rue, une plaque ou un visage n’apportent rien aux cyclistes. Les coordonnées GPS des photos sont retirées automatiquement.": "Frame the spot itself: a house number, a number plate or a face add nothing for cyclists. GPS data is removed from photos automatically.",
     "À vérifier avant de repartir": "To check before you leave",
@@ -1024,6 +1029,9 @@ export const PHRASES_DE_L_ESPACE: Record<
     "Ajoutez d'abord le vélo que vous souhaitez confier : le bike sitter saura ce qu'il accueille.":
       'First add the bike you’d like to leave: that way the bike sitter knows what to expect.',
     'Alerte créée': 'Alert created',
+    "Alerte créée pour {lieu}. Vous recevez une notification dès qu'un emplacement ouvre.":
+      'Alert created for {lieu}. We’ll let you know as soon as a place opens up.',
+    // Notifications déjà enregistrées en base avant la reformulation du texte.
     "Alerte créée pour {lieu}. Vous serez prévenu dès qu'un emplacement ouvre.":
       'Alert created for {lieu}. We’ll let you know as soon as a place opens up.',
     'Ancien membre': 'Former member',
@@ -1660,7 +1668,7 @@ export const PHRASES_DE_L_ESPACE: Record<
     'Gardes confiées': 'Stays entrusted',
     'Gardes engagées': 'Ongoing stays',
     'Gestion des litiges.': 'Dispute management.',
-    'Identité vérifiée. La pièce a été supprimée et le membre est prévenu.':
+    'Identité vérifiée. La pièce a été supprimée et le membre reçoit une notification.':
       'Identity verified. The document has been deleted and the member has been notified.',
     'Il est déjà visible dans le catalogue des membres.':
       'It is already visible in the members’ catalogue.',

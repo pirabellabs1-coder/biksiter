@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { creneauDansLesBornes } from '@/lib/regles/creneau';
+
 /**
  * Le volet « Demander une garde » de la fiche.
  *
@@ -28,10 +30,36 @@ export function DemandeDeGarde({
   tousLesVelos: readonly string[];
   monVelo: string | null;
 }) {
-  const [jour, setJour] = useState(creneau.jour);
-  const [debut, setDebut] = useState(creneau.de);
-  const [fin, setFin] = useState(creneau.a);
+  // La garde se reprend le jour même : le créneau venu de la recherche est
+  // ramené dans ce que les listes proposent, sinon l'écran afficherait une
+  // heure et le formulaire en enverrait une autre (dépôt à la dernière heure,
+  // reprise du lendemain — voir lib/regles/heures-proposees.ts).
+  const borne = creneauDansLesBornes(
+    {
+      jourDepot: creneau.jour,
+      heureDepot: creneau.de,
+      jourReprise: creneau.jour,
+      heureReprise: creneau.a,
+    },
+    { jours: jours.map((j) => j.valeur), heures, joursMaximum: 1 },
+  );
+  const [jour, setJour] = useState(borne.jourDepot);
+  const [debut, setDebut] = useState(borne.heureDepot);
+  const [fin, setFin] = useState(borne.heureReprise);
   const accepte = (velo: string) => velosAcceptes.includes(velo);
+  // Le vélo du membre d'abord, s'il est accepté ; sinon le premier accepté.
+  // Sans valeur choisie, la liste retombait sur « Ville », même pour un VTC.
+  const veloPropose =
+    monVelo !== null && accepte(monVelo)
+      ? monVelo
+      : (tousLesVelos.find(accepte) ?? tousLesVelos[0]);
+  // La garde se reprend le jour même : la reprise suit toujours le dépôt.
+  const heuresDeDepot = heures.slice(0, -1);
+  const heuresDeReprise = heures.filter((heure) => heure > debut);
+  const changerLeDepot = (valeur: string) => {
+    setDebut(valeur);
+    if (fin <= valeur) setFin(heures.find((heure) => heure > valeur) ?? fin);
+  };
 
   return (
     <div className="carte-cote">
@@ -63,9 +91,9 @@ export function DemandeDeGarde({
                 id="ccDebut"
                 name="de"
                 value={debut}
-                onChange={(e) => setDebut(e.target.value)}
+                onChange={(e) => changerLeDepot(e.target.value)}
               >
-                {heures.map((heure) => (
+                {heuresDeDepot.map((heure) => (
                   <option key={heure} value={heure}>
                     {heure.replace(':', 'h')}
                   </option>
@@ -80,7 +108,7 @@ export function DemandeDeGarde({
                 value={fin}
                 onChange={(e) => setFin(e.target.value)}
               >
-                {heures.map((heure) => (
+                {heuresDeReprise.map((heure) => (
                   <option key={heure} value={heure}>
                     {heure.replace(':', 'h')}
                   </option>
@@ -94,7 +122,12 @@ export function DemandeDeGarde({
         </p>
         <label className="champ">
           <span>Type de vélo</span>
-          <select id="requestBike" name="velo" aria-label="Vélo à confier">
+          <select
+            id="requestBike"
+            name="velo"
+            aria-label="Vélo à confier"
+            defaultValue={veloPropose}
+          >
             {tousLesVelos.map((velo) => {
               const ok = accepte(velo);
               const mien = monVelo !== null && monVelo === velo;

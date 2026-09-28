@@ -143,7 +143,7 @@ export default async function Invitation({
       <section className="bloc">
         <h2>Vous n’en avez pas</h2>
         <p>
-          Laissez votre adresse : vous serez prévenu à l’ouverture de votre
+          Laissez votre adresse : vous recevez un e-mail à l’ouverture de votre
           quartier, et pas avant. Aucune autre utilisation, aucun autre envoi.
         </p>
         <form className="deux-ligne" action="/liste-attente" method="get">

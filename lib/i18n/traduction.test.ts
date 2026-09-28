@@ -60,4 +60,18 @@ describe('la traduction de l’interface', () => {
       'Aïcha nodigt u uit',
     );
   });
+
+  test('une notification déjà enregistrée garde sa traduction après la reformulation du texte', () => {
+    // Le corps de la notification est stocké en français en base ; l'écran le
+    // traduit à l'affichage. L'ancienne formulation doit rester traduite pour
+    // les alertes créées avant la reformulation.
+    const ancienne =
+      "Alerte créée pour {lieu}. Vous serez prévenu dès qu'un emplacement ouvre.";
+    expect(phraseur('nl')(ancienne, { lieu: 'Ixelles' })).not.toContain(
+      'Vous serez prévenu',
+    );
+    expect(phraseur('en')(ancienne, { lieu: 'Ixelles' })).not.toContain(
+      'Vous serez prévenu',
+    );
+  });
 });
