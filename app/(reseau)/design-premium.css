@@ -4592,3 +4592,16 @@ button.photo-dossier.photo-piece {
     outline-offset: 2px;
   }
 }
+
+/* Le bloc date d'une garde active passe du quasi-noir au vert de marque — plus
+   de couleur, toujours dans la règle 6 (le vert = une garde en cours de
+   déroulement). L'attente (ambre) et le passé (gris) gardent leur sens. */
+.app-membre .guard-date {
+  background: linear-gradient(150deg, var(--v-8, #2f9c57), var(--v-10, #016623));
+  color: #fff;
+  border-radius: 14px;
+}
+.app-membre .gav-date {
+  background: linear-gradient(150deg, var(--v-8, #2f9c57), var(--v-10, #016623));
+  color: #fff;
+}
