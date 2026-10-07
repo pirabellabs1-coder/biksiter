@@ -4078,3 +4078,15 @@ button.photo-dossier.photo-piece {
   display: grid;
   gap: 16px;
 }
+
+/* Les favoris occupent la largeur sur grand écran, en grille de cartes. */
+@media (min-width: 900px) {
+  .app-membre > .site #favoris .page.page-etroite {
+    max-width: 1440px;
+  }
+  .app-membre .favoris {
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+}
