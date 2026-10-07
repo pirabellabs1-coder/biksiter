@@ -250,18 +250,27 @@ export default async function EspaceBikeSitter() {
             <h2 className="titre-section" id="titre-chiffres">
               Vos chiffres
             </h2>
-            <div className="prog-stats">
+            <div className="prog-stats prog-stats-illustre">
               <div>
+                <span className="stat-chip vert" aria-hidden="true">
+                  <Icone nom="etoile" taille={18} strokeWidth={2} />
+                </span>
                 <b data-solde>{accueil.points}</b>
                 <span>point{accueil.points > 1 ? 's' : ''}</span>
               </div>
               <div>
+                <span className="stat-chip ambre" aria-hidden="true">
+                  <Icone nom="horloge" taille={18} strokeWidth={2} />
+                </span>
                 <b>{accueil.demandesEnAttente}</b>
                 <span>
                   demande{accueil.demandesEnAttente > 1 ? 's' : ''} en attente
                 </span>
               </div>
               <div>
+                <span className="stat-chip vert" aria-hidden="true">
+                  <Icone nom="coche" taille={18} strokeWidth={2.2} />
+                </span>
                 <b>{accueil.gardesTerminees}</b>
                 <span>
                   garde{accueil.gardesTerminees > 1 ? 's' : ''} terminée

@@ -23,10 +23,11 @@
    1. Les fondations
    -------------------------------------------------------------------------- */
 :root {
-  --police-systeme-texte: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
-    'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
-  --police-systeme-titre: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+  --police-systeme-texte:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text',
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --police-systeme-titre:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display',
     'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
@@ -61,12 +62,12 @@
 
   /* Des ombres teintées, une seule source de lumière (le haut). Le premier
      niveau tient surtout au filet de 0,5 px : c'est lui qui dessine la carte. */
-  --ombre-1: 0 0 0 0.5px rgba(15, 31, 23, 0.08),
-    0 1px 2px rgba(15, 31, 23, 0.04);
-  --ombre-2: 0 0 0 0.5px rgba(15, 31, 23, 0.08),
-    0 10px 30px -12px rgba(15, 31, 23, 0.22);
-  --ombre-3: 0 0 0 0.5px rgba(15, 31, 23, 0.06),
-    0 24px 60px -18px rgba(15, 31, 23, 0.35);
+  --ombre-1:
+    0 0 0 0.5px rgba(15, 31, 23, 0.08), 0 1px 2px rgba(15, 31, 23, 0.04);
+  --ombre-2:
+    0 0 0 0.5px rgba(15, 31, 23, 0.08), 0 10px 30px -12px rgba(15, 31, 23, 0.22);
+  --ombre-3:
+    0 0 0 0.5px rgba(15, 31, 23, 0.06), 0 24px 60px -18px rgba(15, 31, 23, 0.35);
 
   /* La courbe des feuilles iOS : un départ vif, une arrivée très douce. */
   --courbe: cubic-bezier(0.32, 0.72, 0, 1);
@@ -100,8 +101,16 @@ body {
   text-wrap: pretty;
 }
 /* Les chiffres qui se comparent s'alignent. */
-:where(.prog-stats b, [data-solde], .compteur, .bulle-heure, .guard-date b,
-  .walk, .prog-points, time) {
+:where(
+  .prog-stats b,
+  [data-solde],
+  .compteur,
+  .bulle-heure,
+  .guard-date b,
+  .walk,
+  .prog-points,
+  time
+) {
   font-variant-numeric: tabular-nums;
 }
 
@@ -346,8 +355,17 @@ body[data-mode='sitter'] .app-membre .br[data-mode='sitter'] {
     background: var(--vert-appuye);
   }
 }
-:is(.primary, .rb-go, .rc-btn, .bouton.plein, .outline, .bouton.contour,
-  .rc-carte, .white, .danger):active {
+:is(
+  .primary,
+  .rb-go,
+  .rc-btn,
+  .bouton.plein,
+  .outline,
+  .bouton.contour,
+  .rc-carte,
+  .white,
+  .danger
+):active {
   transform: scale(0.97);
 }
 
@@ -400,8 +418,20 @@ body[data-mode='sitter'] .app-membre .br[data-mode='sitter'] {
 /* -----------------------------------------------------------------------------
    6. Les surfaces : des cartes dessinées par un filet, pas par une bordure
    -------------------------------------------------------------------------- */
-.app-membre :is(.bloc, .dem-carte, .fav, .notif, .mod-carte, .carte,
-  .fp2-bloc, .carte-cote, .reco, .etat-vide, .rech-liste .rc) {
+.app-membre
+  :is(
+    .bloc,
+    .dem-carte,
+    .fav,
+    .notif,
+    .mod-carte,
+    .carte,
+    .fp2-bloc,
+    .carte-cote,
+    .reco,
+    .etat-vide,
+    .rech-liste .rc
+  ) {
   background: var(--surface);
   border: 0;
   border-radius: var(--r-carte);
@@ -659,7 +689,10 @@ button.rangee:active {
   cursor: pointer;
   transition: background-color 0.25s var(--courbe);
 }
-:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch'])::before {
+:is(
+  .maintenant input[type='checkbox'],
+  input[type='checkbox'][role='switch']
+)::before {
   content: '';
   position: absolute;
   top: 2px;
@@ -673,17 +706,29 @@ button.rangee:active {
     0 3px 1px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s var(--courbe);
 }
-:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):checked {
+:is(
+  .maintenant input[type='checkbox'],
+  input[type='checkbox'][role='switch']
+):checked {
   background: var(--vert);
 }
-:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):checked::before {
+:is(
+    .maintenant input[type='checkbox'],
+    input[type='checkbox'][role='switch']
+  ):checked::before {
   transform: translateX(20px);
 }
-:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):focus-visible {
+:is(
+  .maintenant input[type='checkbox'],
+  input[type='checkbox'][role='switch']
+):focus-visible {
   outline: 3px solid var(--vert-trait);
   outline-offset: 2px;
 }
-:is(.maintenant input[type='checkbox'], input[type='checkbox'][role='switch']):disabled {
+:is(
+  .maintenant input[type='checkbox'],
+  input[type='checkbox'][role='switch']
+):disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -693,8 +738,17 @@ button.rangee:active {
    -------------------------------------------------------------------------- */
 /* Sur iPhone, un champ en dessous de 16 px fait zoomer la page à la saisie. */
 @media (max-width: 1023px) {
-  :is(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='hidden']),
-    select, textarea) {
+  :is(
+    input:not(
+      [type='checkbox'],
+      [type='radio'],
+      [type='range'],
+      [type='file'],
+      [type='hidden']
+    ),
+    select,
+    textarea
+  ) {
     font-size: 16px;
   }
 }
@@ -712,7 +766,9 @@ button.rangee:active {
   background: var(--surface-douce);
   box-shadow: inset 0 0 0 0.5px var(--trait-fort);
   color: var(--encre);
-  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 .app-membre .champ textarea {
   padding: 12px 14px;
@@ -1039,7 +1095,11 @@ button.rangee:active {
   padding: 22px 20px 20px;
   border-radius: var(--r-carte);
   background:
-    radial-gradient(120% 90% at 100% 0%, rgba(1, 118, 40, 0.14), transparent 60%),
+    radial-gradient(
+      120% 90% at 100% 0%,
+      rgba(1, 118, 40, 0.14),
+      transparent 60%
+    ),
     var(--surface);
   box-shadow: var(--ombre-1);
 }
@@ -1181,7 +1241,11 @@ body:has(.en-tete-moderation) {
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 calc(100% - 22px),
+    transparent
+  );
   mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent);
 }
 .app-membre .tabs.onglets-moderation::-webkit-scrollbar,
@@ -1376,7 +1440,9 @@ body:has(.en-tete-moderation) {
   height: 22px;
   border-radius: 50%;
   box-shadow: inset 0 0 0 1.5px var(--trait-fort);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .tuile-choix:has(input:checked) .tuile-coche {
   box-shadow: none;
@@ -1754,8 +1820,10 @@ body:has(.en-tete-moderation) {
   height: 12px;
   flex: none;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 
 /* -----------------------------------------------------------------------------
@@ -1864,7 +1932,9 @@ body:has(.en-tete-moderation) {
   color: var(--alert-ink, #8c2f1e);
 }
 @media (hover: hover) {
-  .app-membre .actions-de-garde :is(.bouton.contour, .bouton.danger-contour):hover {
+  .app-membre
+    .actions-de-garde
+    :is(.bouton.contour, .bouton.danger-contour):hover {
     background: var(--surface-douce);
   }
 }
@@ -2024,7 +2094,9 @@ body:has(.en-tete-moderation) {
     letter-spacing: -0.01em;
     color: var(--encre-2);
     text-decoration: none;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
   }
   body:has(.app-membre) .tabbar .tb .tb-i {
     display: grid;
@@ -2056,7 +2128,8 @@ body:has(.en-tete-moderation) {
   /* Les tableaux de bord et les listes occupent toute la largeur laissée par
      la barre : on la remplit avec des grilles et des panneaux, jamais une
      colonne centrée au milieu de l'écran. */
-  .app-membre > .site
+  .app-membre
+    > .site
     :is(.ecran, .dashboard-wrap, .ecran-membre, .ecran-app.ecran-large) {
     max-width: 1440px;
     margin-inline: 0;
@@ -2064,8 +2137,13 @@ body:has(.en-tete-moderation) {
   }
   /* Un formulaire ou une page de réglages garde une largeur de lecture, mais
      alignée au bord de la barre — pas flottante au centre. */
-  .app-membre > .site
-    :is(.page.page-etroite, .ecran-app.ecran-parcours, .ecran-app.centre-vertical) {
+  .app-membre
+    > .site
+    :is(
+      .page.page-etroite,
+      .ecran-app.ecran-parcours,
+      .ecran-app.centre-vertical
+    ) {
     max-width: 680px;
     margin-inline: 0;
     padding: 40px 48px 72px;
@@ -2435,7 +2513,9 @@ body:has(.en-tete-moderation) {
   background: var(--remplissage);
   color: var(--encre-2);
   cursor: pointer;
-  transition: transform 0.18s var(--courbe-appui, ease), color 0.2s ease;
+  transition:
+    transform 0.18s var(--courbe-appui, ease),
+    color 0.2s ease;
 }
 .bouton-coeur.actif {
   color: var(--vert);
@@ -2521,8 +2601,10 @@ body:has(.en-tete-moderation) {
   width: 12px;
   height: 12px;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 /* Le compteur de la cloche : le vert de la marque, pas le corail d'une
    erreur (règle 6). */
@@ -2634,7 +2716,10 @@ form > p.msg-erreur[role='alert'] {
 /* Sur ordinateur, la flèche retour se place au-dessus de la colonne de
    contenu : la marque ne bouge plus d'un écran à l'autre. */
 @media (min-width: 900px) {
-  body:has(.app-membre):not(:has(.en-tete-moderation)) .app-membre > .app-header .back {
+  body:has(.app-membre):not(:has(.en-tete-moderation))
+    .app-membre
+    > .app-header
+    .back {
     position: absolute;
     top: 50%;
     left: calc(var(--largeur-barre, 232px) + 36px);
@@ -3042,7 +3127,9 @@ button.bulle-photo {
   margin-top: 0;
   gap: 6px;
 }
-.invitation:not(.invitation-principale) .invitation-actions :is(.primary, .outline) {
+.invitation:not(.invitation-principale)
+  .invitation-actions
+  :is(.primary, .outline) {
   min-height: 36px;
   padding: 0 12px;
   font-size: 13.5px;
@@ -3075,7 +3162,9 @@ button.bulle-photo {
   height: 27px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.15),
+    0 1px 1px rgba(0, 0, 0, 0.16);
   transition: transform 0.25s var(--courbe, ease);
 }
 .interrupteur-envoi.actif {
@@ -4088,5 +4177,206 @@ button.photo-dossier.photo-piece {
     grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
     gap: 16px;
     align-items: start;
+  }
+}
+
+/* ============================================================================
+   RELIEF DESKTOP — donner de la matière à la version web
+   La version téléphone garde son allure iOS épurée ; sur grand écran, on
+   ajoute de la profondeur, une typographie d'affiche (serif), une carte de
+   niveau signature et des réactions au survol. Tout est sous @media 900px :
+   le mobile ne bouge pas. Couleurs : la marque (vert) et les quatre sens.
+   ========================================================================== */
+.app-membre {
+  --elev-1: 0 1px 2px rgba(10, 46, 22, 0.05), 0 1px 3px rgba(10, 46, 22, 0.04);
+  --elev-2:
+    0 2px 4px rgba(10, 46, 22, 0.04), 0 12px 28px -10px rgba(10, 46, 22, 0.14);
+  --elev-3:
+    0 6px 14px rgba(10, 46, 22, 0.06), 0 26px 56px -14px rgba(10, 46, 22, 0.2);
+  --trait-doux: rgba(10, 46, 22, 0.08);
+}
+
+@media (min-width: 900px) {
+  /* Les titres de l'application prennent la police d'affiche, comme le site
+     public : un rendu éditorial, pas un libellé d'application. */
+  .app-membre
+    :is(.ecran-tete h1, .dashboard-wrap h1, .titre-ecran, .page-tete h1) {
+    font-family: var(--serif);
+    font-weight: 600;
+    letter-spacing: -0.018em;
+  }
+
+  /* L'en-tête de l'accueil devient un bandeau de bienvenue avec un peu de
+     relief et un dégradé vert très doux. */
+  .ecran-tableau > .ecran-tete {
+    margin-bottom: 20px;
+    padding: 26px 30px 24px;
+    border: 1px solid var(--trait-doux);
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 150% at 100% 0%, var(--v-3) 0%, transparent 52%),
+      linear-gradient(180deg, var(--v-1), var(--fond));
+    box-shadow: var(--elev-1);
+  }
+  .ecran-tableau > .ecran-tete h1 {
+    font-size: clamp(30px, 2.6vw, 40px);
+    margin-top: 2px;
+  }
+
+  /* Les cartes gagnent une ombre à deux niveaux et un filet plus doux. */
+  .app-membre
+    > .site
+    :is(
+      .bloc,
+      .groupe,
+      .carte-de-garde,
+      .badge,
+      .prog-carte:not(:has(.jauge)),
+      .plan-carte,
+      .etat-vide,
+      .panneau-progression
+    ) {
+    border-color: var(--trait-doux);
+    box-shadow: var(--elev-1);
+  }
+
+  /* Ce qui se touche réagit : une légère montée et une ombre plus présente. */
+  .app-membre
+    :is(
+      .demande-a-traiter,
+      .garde-a-venir,
+      .carte-de-garde,
+      .carte-lieu,
+      .carte-ajout,
+      .fav,
+      .plan-carte,
+      .rangee,
+      .result-card
+    ) {
+    transition:
+      transform 0.18s var(--courbe),
+      box-shadow 0.18s ease,
+      border-color 0.18s ease;
+  }
+  .app-membre
+    a:is(
+      .demande-a-traiter,
+      .garde-a-venir,
+      .carte-de-garde,
+      .carte-lieu,
+      .carte-ajout,
+      .fav,
+      .plan-carte
+    ):hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elev-2);
+    border-color: var(--trait-doux);
+  }
+
+  /* Les grands nombres passent en serif : un chiffre qu'on « sent ». */
+  .app-membre
+    :is(.prog-stats b, [data-solde], .chiffres-de-page dd, .guard-date b) {
+    font-family: var(--serif);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .app-membre .prog-stats > div {
+    padding: 18px 18px 16px;
+    border: 1px solid var(--trait-doux);
+    border-radius: 16px;
+    box-shadow: var(--elev-1);
+  }
+  .app-membre .prog-stats b {
+    font-size: 32px;
+  }
+
+  /* La carte de niveau : le moment signature. Un dégradé vert de marque,
+     le solde en grand serif, la jauge en blanc translucide. */
+  .app-membre .prog-carte:has(.jauge) {
+    position: relative;
+    overflow: hidden;
+    border: 0;
+    color: #fff;
+    background: linear-gradient(
+      135deg,
+      var(--v-11) 0%,
+      var(--v-9) 55%,
+      var(--v-8) 100%
+    );
+    box-shadow: 0 14px 34px -12px rgba(1, 118, 40, 0.5);
+  }
+  .app-membre .prog-carte:has(.jauge)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      90% 130% at 100% 0%,
+      rgba(255, 255, 255, 0.18),
+      transparent 55%
+    );
+    pointer-events: none;
+  }
+  .app-membre .prog-carte:has(.jauge) .prog-solde span {
+    font-family: var(--serif);
+    font-size: 46px;
+    font-weight: 600;
+  }
+  .app-membre .prog-carte:has(.jauge) :is(.prog-sous, .prog-reste) {
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .app-membre .prog-carte:has(.jauge) .jauge {
+    background: rgba(255, 255, 255, 0.24);
+  }
+  .app-membre .prog-carte:has(.jauge) .jauge span {
+    background: #fff;
+  }
+}
+
+/* La pression d'un bouton se sent — partout, mobile compris, c'est discret. */
+.app-membre :is(.primary, .outline, .bouton, .rc-btn, .bleu, .white) {
+  transition:
+    transform 0.14s var(--courbe),
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    filter 0.2s ease;
+}
+.app-membre :is(.primary, .outline, .bouton, .rc-btn, .bleu, .white):active {
+  transform: scale(0.98);
+}
+@media (hover: hover) and (pointer: fine) {
+  .app-membre :is(.primary, .bleu):hover {
+    box-shadow: 0 8px 18px -8px rgba(1, 118, 40, 0.45);
+  }
+}
+
+/* Les cartes de chiffres illustrées (accueil) : une pastille d'icône colorée,
+   le nombre en grand serif. La pastille n'apparaît que sur grand écran — le
+   téléphone garde ses chiffres compacts. */
+/* Masquée sur téléphone — plus spécifique que « .prog-stats span », sinon
+   la pastille réapparaît. */
+.app-membre .prog-stats-illustre .stat-chip {
+  display: none;
+}
+@media (min-width: 900px) {
+  .app-membre .prog-stats-illustre > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 2px;
+  }
+  .app-membre .prog-stats-illustre .stat-chip {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: var(--trust-wash);
+    color: var(--trust);
+  }
+  .app-membre .prog-stats-illustre .stat-chip.ambre {
+    background: var(--lamp-wash);
+    color: var(--lamp-ink);
   }
 }
