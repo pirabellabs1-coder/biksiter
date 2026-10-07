@@ -77,125 +77,136 @@ export default async function MonCompte({
   return (
     <>
       {confirmation ? <Confirmation texte={confirmation} /> : null}
-      <main className="page page-etroite" id="contenu">
-        <PhotoDeProfil
-          membreId={membre.id}
-          prenom={profil.prenom}
-          nomPublic={`${profil.prenom} ${profil.initiale}.`}
-          version={versionDeLaPhoto}
-        />
+      <main className="page page-profil" id="contenu">
+        <div className="tableau-cols">
+          <div className="tableau-col">
+            <PhotoDeProfil
+              membreId={membre.id}
+              prenom={profil.prenom}
+              nomPublic={`${profil.prenom} ${profil.initiale}.`}
+              version={versionDeLaPhoto}
+            />
 
-        {membre.moderateur ? (
-          <ul className="groupe acces-moderation" role="list">
-            <li>
-              <Link href="/administration" className="rangee">
-                <span className="rangee-icone" aria-hidden="true">
-                  <Icone nom="bouclier" taille={18} strokeWidth={2} />
-                </span>
-                <span className="rangee-texte">
-                  <strong>Espace de modération</strong>
-                  <span>Vérifications d’identité, signalements, litiges</span>
-                </span>
-                <Icone nom="chevron" taille={18} className="rangee-chevron" />
-              </Link>
-            </li>
-          </ul>
-        ) : null}
+            {membre.moderateur ? (
+              <ul className="groupe acces-moderation" role="list">
+                <li>
+                  <Link href="/administration" className="rangee">
+                    <span className="rangee-icone" aria-hidden="true">
+                      <Icone nom="bouclier" taille={18} strokeWidth={2} />
+                    </span>
+                    <span className="rangee-texte">
+                      <strong>Espace de modération</strong>
+                      <span>
+                        Vérifications d’identité, signalements, litiges
+                      </span>
+                    </span>
+                    <Icone
+                      nom="chevron"
+                      taille={18}
+                      className="rangee-chevron"
+                    />
+                  </Link>
+                </li>
+              </ul>
+            ) : null}
 
-        <FormulaireDIdentite
-          prenom={profil.prenom}
-          initiale={profil.initiale}
-          email={membre.email}
-          telephone={
-            profil.telephoneConnu ? '+32 4·· ·· ·· ··' : 'Non renseigné'
-          }
-          modifiable={nomModifiable(profil.verification)}
-        />
+            <FormulaireDIdentite
+              prenom={profil.prenom}
+              initiale={profil.initiale}
+              email={membre.email}
+              telephone={
+                profil.telephoneConnu ? '+32 4·· ·· ·· ··' : 'Non renseigné'
+              }
+              modifiable={nomModifiable(profil.verification)}
+            />
 
-        <section className="bloc">
-          <h2>Vérifications</h2>
-          <p className="mention">
-            Une identité vérifiée est nécessaire pour publier un emplacement ou
-            envoyer une demande. Elle est vérifiée une fois, par une personne
-            de l’association.
-          </p>
-          <ul className="liste-nette">
-            {verifications.map((v) => (
-              <li key={v.titre} className="ligne-verif">
-                <span>{v.titre}</span>
-                {v.verifie ? (
-                  <span className="pastille bleu">
-                    <Icone nom="verifie" taille={14} />
-                    Vérifié
-                  </span>
-                ) : v.examen ? (
-                  <span className="pastille ambre">
-                    <Icone nom="horloge" taille={14} />
-                    En cours d’examen
-                  </span>
-                ) : v.enregistre ? (
-                  <span className="pastille gris">Enregistré</span>
-                ) : (
-                  <span className="pastille gris">À faire</span>
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className="actions-fin">
-            <Link className="outline" href="/profil/verifications">
-              Gérer mes vérifications
-            </Link>
+            <section className="bloc">
+              <h2>Vérifications</h2>
+              <p className="mention">
+                Une identité vérifiée est nécessaire pour publier un emplacement
+                ou envoyer une demande. Elle est vérifiée une fois, par une
+                personne de l’association.
+              </p>
+              <ul className="liste-nette">
+                {verifications.map((v) => (
+                  <li key={v.titre} className="ligne-verif">
+                    <span>{v.titre}</span>
+                    {v.verifie ? (
+                      <span className="pastille bleu">
+                        <Icone nom="verifie" taille={14} />
+                        Vérifié
+                      </span>
+                    ) : v.examen ? (
+                      <span className="pastille ambre">
+                        <Icone nom="horloge" taille={14} />
+                        En cours d’examen
+                      </span>
+                    ) : v.enregistre ? (
+                      <span className="pastille gris">Enregistré</span>
+                    ) : (
+                      <span className="pastille gris">À faire</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <div className="actions-fin">
+                <Link className="outline" href="/profil/verifications">
+                  Gérer mes vérifications
+                </Link>
+              </div>
+            </section>
           </div>
-        </section>
 
+          <div className="tableau-col">
+            <section className="bloc">
+              <h2>Notifications</h2>
+              <ReglagesDeNotification tranquillite={tranquillite} />
+            </section>
 
-        <section className="bloc">
-          <h2>Notifications</h2>
-          <ReglagesDeNotification tranquillite={tranquillite} />
-        </section>
+            <section className="bloc">
+              <h2>Vos données</h2>
+              <ul className="liste-nette">
+                <li>
+                  <b>Exporter.</b> Vous téléchargez tout ce que le service
+                  détient sur vous, en un fichier lisible.
+                </li>
+                <li>
+                  <b>Effacer.</b> Le compte et les données personnelles sont
+                  supprimés sous trente jours. Les avis que vous avez laissés
+                  restent, sans votre nom.
+                </li>
+                <li>
+                  <b>Une garde en cours</b> empêche l’effacement tant qu’elle
+                  n’est pas close : l’autre membre a droit à son constat.
+                </li>
+              </ul>
+              <div className="actions-fin">
+                <a className="outline" href="/profil/export" download>
+                  Exporter mes données
+                </a>
+                <Link className="danger" href="/profil/supprimer">
+                  Effacer mon compte
+                </Link>
+              </div>
+            </section>
 
-        <section className="bloc">
-          <h2>Vos données</h2>
-          <ul className="liste-nette">
-            <li>
-              <b>Exporter.</b> Vous téléchargez tout ce que le service détient
-              sur vous, en un fichier lisible.
-            </li>
-            <li>
-              <b>Effacer.</b> Le compte et les données personnelles sont
-              supprimés sous trente jours. Les avis que vous avez laissés
-              restent, sans votre nom.
-            </li>
-            <li>
-              <b>Une garde en cours</b> empêche l’effacement tant qu’elle n’est
-              pas close : l’autre membre a droit à son constat.
-            </li>
-          </ul>
-          <div className="actions-fin">
-            <a className="outline" href="/profil/export" download>
-              Exporter mes données
-            </a>
-            <Link className="danger" href="/profil/supprimer">
-              Effacer mon compte
-            </Link>
+            <section className="bloc">
+              <h2>Cet appareil</h2>
+              <p>
+                Vous restez connecté tant que vous ne vous déconnectez pas. Sur
+                un appareil partagé, déconnectez-vous : vos gardes et vos
+                messages sont visibles sans mot de passe.
+              </p>
+              <div className="actions-fin">
+                <form action={seDeconnecterDeLEspace}>
+                  <button type="submit" className="outline">
+                    Se déconnecter
+                  </button>
+                </form>
+              </div>
+            </section>
           </div>
-        </section>
-
-        <section className="bloc">
-          <h2>Cet appareil</h2>
-          <p>
-            Vous restez connecté tant que vous ne vous déconnectez pas. Sur un
-            appareil partagé, déconnectez-vous : vos gardes et vos messages
-            sont visibles sans mot de passe.
-          </p>
-          <div className="actions-fin">
-            <form action={seDeconnecterDeLEspace}>
-              <button type="submit" className="outline">
-                Se déconnecter
-              </button>
-            </form>
-          </div>
-        </section>
+        </div>
       </main>
     </>
   );

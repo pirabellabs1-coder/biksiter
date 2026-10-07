@@ -24,11 +24,31 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** Les écrans des points, reliés d'ici plutôt que perdus dans le site. */
 const LIENS_DES_POINTS: readonly (readonly [string, string, string])[] = [
-  ['/progression/badges', 'Tous les badges', 'Ceux que vous avez, et comment obtenir les autres'],
-  ['/progression/objectifs', 'Vos objectifs', 'Le prochain niveau et ce qui y mène'],
-  ['/progression/historique', 'Historique des points', 'Chaque garde terminée et ce qu’elle a rapporté'],
-  ['/classement', 'Top Bike Sitters', 'Le classement du jour, de la semaine et du mois'],
-  ['/progression/regles', 'Comment fonctionnent les points', 'Ce qui en rapporte, et quand'],
+  [
+    '/progression/badges',
+    'Tous les badges',
+    'Ceux que vous avez, et comment obtenir les autres',
+  ],
+  [
+    '/progression/objectifs',
+    'Vos objectifs',
+    'Le prochain niveau et ce qui y mène',
+  ],
+  [
+    '/progression/historique',
+    'Historique des points',
+    'Chaque garde terminée et ce qu’elle a rapporté',
+  ],
+  [
+    '/classement',
+    'Top Bike Sitters',
+    'Le classement du jour, de la semaine et du mois',
+  ],
+  [
+    '/progression/regles',
+    'Comment fonctionnent les points',
+    'Ce qui en rapporte, et quand',
+  ],
 ];
 
 const TITRE_DE_LA_PERIODE: Record<PeriodeDuClassement, string> = {
@@ -76,7 +96,9 @@ export default async function Progression({
             {progression.activite.gardesTerminees > 1 ? 's' : ''}
           </p>
           <div className="jauge">
-            <span style={{ width: `${Math.round(niveau.avancement * 100)}%` }} />
+            <span
+              style={{ width: `${Math.round(niveau.avancement * 100)}%` }}
+            />
           </div>
           <p className="prog-reste">
             {niveau.suivant
@@ -89,7 +111,8 @@ export default async function Progression({
           <div>
             <b>{progression.cyclistesAides}</b>
             <span>
-              cycliste{progression.cyclistesAides > 1 ? 's' : ''} aidé{progression.cyclistesAides > 1 ? 's' : ''}
+              cycliste{progression.cyclistesAides > 1 ? 's' : ''} aidé
+              {progression.cyclistesAides > 1 ? 's' : ''}
             </span>
           </div>
           {/* La maquette comptait les heures de garde ; le dépôt ne les tient
@@ -97,7 +120,8 @@ export default async function Progression({
           <div>
             <b>{stats.gardesMenees}</b>
             <span>
-              garde{stats.gardesMenees > 1 ? 's' : ''} accueillie{stats.gardesMenees > 1 ? 's' : ''}
+              garde{stats.gardesMenees > 1 ? 's' : ''} accueillie
+              {stats.gardesMenees > 1 ? 's' : ''}
             </span>
           </div>
           <div>
@@ -114,19 +138,43 @@ export default async function Progression({
 
         <h2 className="prog-titre">Vos badges</h2>
         <div className="badges">
-          {badges.map((badge) => (
-            <div className={badge.obtenu ? 'badge on' : 'badge'} key={badge.cle}>
-              <b>{badge.titre}</b>
-              <span>{badge.description}</span>
-              {badge.obtenu ? (
-                <em>Obtenu</em>
-              ) : (
-                <em className="att">
-                  {badge.avancement} / {badge.objectif}
-                </em>
-              )}
-            </div>
-          ))}
+          {badges.map((badge) => {
+            const part =
+              badge.objectif > 0
+                ? Math.min(
+                    100,
+                    Math.round((badge.avancement / badge.objectif) * 100),
+                  )
+                : 0;
+            return (
+              <div
+                className={badge.obtenu ? 'badge on' : 'badge'}
+                key={badge.cle}
+              >
+                <span className="badge-medaille" aria-hidden="true">
+                  <Icone
+                    nom={badge.obtenu ? 'coche' : 'trophee'}
+                    taille={20}
+                    strokeWidth={2.2}
+                  />
+                </span>
+                <b>{badge.titre}</b>
+                <span>{badge.description}</span>
+                {badge.obtenu ? (
+                  <em>Obtenu</em>
+                ) : (
+                  <span className="badge-avancement">
+                    <span className="badge-barre" aria-hidden="true">
+                      <i style={{ width: `${part}%` }} />
+                    </span>
+                    <em className="att">
+                      {badge.avancement} / {badge.objectif}
+                    </em>
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <h2 className="prog-titre">Le classement</h2>
@@ -161,7 +209,11 @@ export default async function Progression({
               {PERIODES_DU_CLASSEMENT.map(({ cle }) => (
                 <Link
                   key={cle}
-                  href={cle === 'jour' ? '/progression' : `/progression?periode=${cle}`}
+                  href={
+                    cle === 'jour'
+                      ? '/progression'
+                      : `/progression?periode=${cle}`
+                  }
                   aria-current={cle === periode ? 'page' : undefined}
                 >
                   {TITRE_DE_LA_PERIODE[cle]}

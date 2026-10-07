@@ -2053,31 +2053,22 @@ body:has(.en-tete-moderation) {
   body:has(.app-membre):not(:has(.en-tete-moderation)) .app-membre > .site {
     margin-left: var(--largeur-barre);
   }
+  /* Les tableaux de bord et les listes occupent toute la largeur laissée par
+     la barre : on la remplit avec des grilles et des panneaux, jamais une
+     colonne centrée au milieu de l'écran. */
   .app-membre > .site
-    :is(
-      .ecran,
-      .dashboard-wrap,
-      .page.page-etroite,
-      .ecran-app.ecran-parcours,
-      .ecran-app.centre-vertical,
-      .ecran-membre
-    ) {
-    /* Un écran d'un seul tenant se centre dans l'espace laissé par la barre,
-       à une largeur de lecture confortable, au lieu de se coller à gauche en
-       laissant un grand vide à droite. */
-    max-width: 760px;
-    margin-inline: auto;
-    padding-left: 32px;
-    padding-right: 32px;
-  }
-  .app-membre > .site :is(.ecran, .dashboard-wrap, .page.page-etroite) {
-    padding-top: 40px;
-  }
-  .app-membre > .site .ecran-app.ecran-large {
-    max-width: none;
+    :is(.ecran, .dashboard-wrap, .ecran-membre, .ecran-app.ecran-large) {
+    max-width: 1440px;
     margin-inline: 0;
-    padding-left: 48px;
-    padding-right: 48px;
+    padding: 40px 48px 72px;
+  }
+  /* Un formulaire ou une page de réglages garde une largeur de lecture, mais
+     alignée au bord de la barre — pas flottante au centre. */
+  .app-membre > .site
+    :is(.page.page-etroite, .ecran-app.ecran-parcours, .ecran-app.centre-vertical) {
+    max-width: 680px;
+    margin-inline: 0;
+    padding: 40px 48px 72px;
   }
 }
 
@@ -3851,16 +3842,19 @@ button.photo-dossier.photo-piece {
   display: contents;
 }
 @media (min-width: 1100px) {
-  .app-membre > .site .ecran.ecran-tableau {
-    max-width: 1120px;
-  }
   .ecran-tableau .tableau-cols {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
     gap: 16px 40px;
     align-items: start;
   }
-  .ecran-tableau .tableau-col {
+  .page-profil .tableau-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 40px;
+    align-items: start;
+  }
+  :is(.ecran-tableau, .page-profil) .tableau-col {
     display: block;
   }
   /* La première section de chaque colonne aligne son titre sur l'autre : pas
@@ -3868,4 +3862,212 @@ button.photo-dossier.photo-piece {
   .ecran-tableau .tableau-col > section:first-child > .titre-section {
     margin-top: 0;
   }
+  .page-profil .tableau-col > *:first-child {
+    margin-top: 0;
+  }
+}
+/* La page « Mon compte » occupe la largeur et se lit sur deux colonnes. */
+@media (min-width: 900px) {
+  .app-membre > .site .page.page-profil {
+    max-width: 1240px;
+    margin-inline: 0;
+    padding: 40px 48px 72px;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Mes emplacements : une grille de cartes (pas une colonne de rangées)
+   -------------------------------------------------------------------------- */
+.cartes-lieux {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 720px) {
+  .cartes-lieux {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+.carte-lieu,
+.carte-ajout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: var(--r-card);
+  box-shadow: var(--ombre-1);
+  overflow: hidden;
+  color: inherit;
+  transition:
+    transform 0.18s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.18s ease;
+}
+.carte-lieu:hover,
+.carte-ajout:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ombre-2);
+}
+.carte-lieu-media {
+  position: relative;
+  height: 128px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--trust-wash), var(--v-4, #cfebd8));
+  color: var(--trust-deep);
+}
+.carte-lieu-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.app-membre .carte-lieu-etat {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  left: auto;
+  width: max-content;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(10, 46, 22, 0.14);
+}
+.carte-lieu-corps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px 16px;
+}
+.carte-lieu-corps > strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+.carte-lieu-quartier {
+  color: var(--texte-doux);
+  font-size: 14px;
+}
+.carte-lieu-faits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  color: var(--texte-leger);
+  font-size: 13px;
+}
+.carte-lieu-faits .fait {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.carte-lieu-faits .fait svg {
+  color: var(--trust);
+}
+/* La carte « ajouter » : un cadre pointillé, le même gabarit que les autres. */
+.carte-ajout {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  border-style: dashed;
+  border-color: var(--bord-fort);
+  background: var(--trust-mist);
+  min-height: 220px;
+}
+.carte-ajout-rond {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--trust-wash);
+  color: var(--trust);
+}
+.carte-ajout strong {
+  font-size: 15px;
+  color: var(--trust-deep);
+}
+.carte-ajout > span:last-child {
+  font-size: 13px;
+  color: var(--texte-leger);
+}
+
+/* -----------------------------------------------------------------------------
+   Les gardes en grille sur grand écran, et des badges illustrés
+   -------------------------------------------------------------------------- */
+@media (min-width: 900px) {
+  .app-membre .vue-garde {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+  .app-membre .vue-garde > .vide-onglet {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Les badges : une médaille, une barre d'avancement, l'état acquis en vert
+   (règle 6 : le vert dit « obtenu », le gris « pas encore »). */
+.app-membre .badges {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 720px) {
+  .app-membre .badges {
+    grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  }
+}
+.app-membre .badge {
+  position: relative;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--trait);
+  background: var(--surface);
+  box-shadow: var(--ombre-1);
+}
+.app-membre .badge.on {
+  border-color: var(--trust);
+  background: var(--trust-mist);
+}
+.badge-medaille {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  background: var(--n-4);
+  color: var(--n-9);
+}
+.badge.on .badge-medaille {
+  background: var(--trust);
+  color: #fff;
+}
+.app-membre .badge b {
+  font-size: 15px;
+}
+.badge-avancement {
+  display: block;
+  margin-top: 12px;
+}
+.badge-barre {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--n-4);
+  overflow: hidden;
+}
+.badge-barre i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--trust);
+  min-width: 6px;
+}
+.badge-avancement .att {
+  display: block;
+  margin-top: 6px;
 }

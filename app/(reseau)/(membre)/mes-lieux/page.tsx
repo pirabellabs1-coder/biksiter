@@ -42,59 +42,76 @@ export default async function VotreEspace({
           </p>
         </header>
 
-        <ul className="groupe" role="list">
+        <ul className="cartes-lieux" role="list">
           {lieux.map((existant) => (
             <li key={existant.reference}>
               <Link
                 href={`/mes-lieux/${existant.reference}`}
-                className="rangee"
+                className="carte-lieu"
               >
-                {existant.premierePhoto !== null ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    className="vignette-lieu"
-                    src={`/emplacements/${existant.reference}/photo/${existant.premierePhoto}`}
-                    alt=""
-                    width={48}
-                    height={48}
-                  />
-                ) : (
-                  <span className="rangee-icone" aria-hidden="true">
-                    <Icone nom="maison" taille={18} strokeWidth={2} />
+                <span className="carte-lieu-media">
+                  {existant.premierePhoto !== null ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`/emplacements/${existant.reference}/photo/${existant.premierePhoto}`}
+                      alt=""
+                    />
+                  ) : (
+                    <Icone nom="maison" taille={30} strokeWidth={1.6} />
+                  )}
+                  <span
+                    className={`carte-lieu-etat pastille ${
+                      existant.publie ? 'vert' : 'ambre'
+                    }`}
+                  >
+                    {existant.publie
+                      ? 'En ligne'
+                      : existant.enPause
+                        ? 'En pause'
+                        : 'En préparation'}
                   </span>
-                )}
-                <span className="rangee-texte">
+                </span>
+                <span className="carte-lieu-corps">
                   <strong>{existant.type}</strong>
-                  <span>
-                    {existant.quartier} · {existant.capacite} place
-                    {existant.capacite > 1 ? 's' : ''} ·{' '}
-                    {existant.nombreDePhotos === 0
-                      ? 'sans photo'
-                      : `${existant.nombreDePhotos} photo${existant.nombreDePhotos > 1 ? 's' : ''}`}
+                  <span className="carte-lieu-quartier">
+                    {existant.quartier}
                   </span>
-                  <span>
-                    {existant.joursDAccueil === 7
-                      ? 'Tous les jours'
-                      : existant.joursDAccueil === 0
-                        ? 'Aucun jour d’accueil'
-                        : `${existant.joursDAccueil} jour${existant.joursDAccueil > 1 ? 's' : ''} d’accueil par semaine`}
+                  <span className="carte-lieu-faits">
+                    <span className="fait">
+                      <Icone nom="velo" taille={15} strokeWidth={2} />
+                      {existant.capacite} place
+                      {existant.capacite > 1 ? 's' : ''}
+                    </span>
+                    <span className="fait">
+                      <Icone nom="photo" taille={15} strokeWidth={2} />
+                      {existant.nombreDePhotos === 0
+                        ? 'sans photo'
+                        : `${existant.nombreDePhotos} photo${existant.nombreDePhotos > 1 ? 's' : ''}`}
+                    </span>
+                    <span className="fait">
+                      <Icone nom="calendrier" taille={15} strokeWidth={2} />
+                      {existant.joursDAccueil === 7
+                        ? 'Tous les jours'
+                        : existant.joursDAccueil === 0
+                          ? 'Aucun jour'
+                          : `${existant.joursDAccueil} j/semaine`}
+                    </span>
                   </span>
                 </span>
-                <span
-                  className={
-                    existant.publie ? 'status' : 'status status-attente'
-                  }
-                >
-                  {existant.publie
-                    ? 'En ligne'
-                    : existant.enPause
-                      ? 'En pause'
-                      : 'En préparation'}
-                </span>
-                <Icone nom="chevron" taille={18} className="rangee-chevron" />
               </Link>
             </li>
           ))}
+          {complet ? null : (
+            <li>
+              <Link className="carte-ajout" href="/mes-lieux?nouveau=1">
+                <span className="carte-ajout-rond" aria-hidden="true">
+                  <Icone nom="plus" taille={22} strokeWidth={2.2} />
+                </span>
+                <strong>Proposer un autre emplacement</strong>
+                <span>Un garage, une cave ou une cour fermée.</span>
+              </Link>
+            </li>
+          )}
         </ul>
 
         {complet ? (
@@ -102,12 +119,7 @@ export default async function VotreEspace({
             Vous proposez {EMPLACEMENTS_PAR_MEMBRE} emplacements, le maximum par
             membre. Vous pouvez les modifier à tout moment.
           </p>
-        ) : (
-          <Link className="outline bouton-ajout" href="/mes-lieux?nouveau=1">
-            <Icone nom="plus" taille={18} strokeWidth={2.2} />
-            Proposer un autre emplacement
-          </Link>
-        )}
+        ) : null}
       </main>
     );
   }
