@@ -3,6 +3,8 @@ import Link from 'next/link';
 
 import { textes } from '@/lib/i18n/langue';
 import { membreConnecte } from '@/lib/session';
+
+import { PagePublique } from '../page-publique';
 export async function generateMetadata(): Promise<Metadata> {
   const { p } = await textes();
   return { title: p('Plan du site') };
@@ -35,7 +37,11 @@ const GROUPES: { titre: string; classe?: string; cartes: Carte[] }[] = [
         detail: 'Les six règles non négociables',
         href: '/regles',
       },
-      { titre: 'Nous écrire', detail: 'Formulaire et adresses', href: '/contact' },
+      {
+        titre: 'Nous écrire',
+        detail: 'Formulaire et adresses',
+        href: '/contact',
+      },
       {
         titre: 'Mentions légales',
         detail: 'Conditions, données, cookies',
@@ -170,6 +176,7 @@ export default async function PlanDuSite() {
   // L'espace de modération ne s'affiche qu'aux personnes qui modèrent : pour
   // les autres, ce serait une porte fermée.
   const moderateur = (await membreConnecte())?.moderateur === true;
+  const t = await textes();
   const groupes = GROUPES.map((groupe) => ({
     ...groupe,
     cartes: groupe.cartes.filter(
@@ -178,38 +185,36 @@ export default async function PlanDuSite() {
   }));
 
   return (
-    <>
-      <div className="page" id="contenu">
-        <header className="page-tete">
-          <span className="kicker">PLAN DU SITE</span>
-          <h1>Toutes les pages du réseau.</h1>
-          <p>
-            Du premier clic sur la recherche jusqu’à la candidature d’un Bike
-            Sitter. Chaque carte ouvre la page correspondante.
-          </p>
-        </header>
-
-        <div className="page-grille">
-          {groupes.map((groupe) => (
-            <section
-              className={
-                groupe.classe ? `plan-groupe ${groupe.classe}` : 'plan-groupe'
-              }
-              key={groupe.titre}
-            >
-              <h2>{groupe.titre}</h2>
-              <div className="plan-liste">
-                {groupe.cartes.map((carte) => (
-                  <Link className="plan-carte" href={carte.href} key={carte.titre}>
-                    <b>{carte.titre}</b>
-                    <span>{carte.detail}</span>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
+    <PagePublique
+      textes={t}
+      surtitre="Plan du site"
+      titre="Toutes les pages du réseau."
+      introduction="Du premier clic sur la recherche jusqu’à la candidature d’un Bike Sitter. Chaque carte ouvre la page correspondante."
+    >
+      <div className="pile-sections">
+        {groupes.map((groupe) => (
+          <section
+            className={
+              groupe.classe ? `plan-groupe ${groupe.classe}` : 'plan-groupe'
+            }
+            key={groupe.titre}
+          >
+            <h2>{groupe.titre}</h2>
+            <div className="plan-liste">
+              {groupe.cartes.map((carte) => (
+                <Link
+                  className="plan-carte"
+                  href={carte.href}
+                  key={carte.titre}
+                >
+                  <b>{carte.titre}</b>
+                  <span>{carte.detail}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
-    </>
+    </PagePublique>
   );
 }

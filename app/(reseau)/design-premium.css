@@ -4071,3 +4071,10 @@ button.photo-dossier.photo-piece {
   display: block;
   margin-top: 6px;
 }
+
+/* Les sections empilées d'une page de texte publique (À propos…) : un rythme
+   régulier dans la colonne principale. */
+.pile-sections {
+  display: grid;
+  gap: 16px;
+}
