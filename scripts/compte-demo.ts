@@ -155,28 +155,87 @@ async function main(): Promise<void> {
     }
   }
 
-  // --- Des points gagnés mois par mois (pour la courbe de progression) ---
-  // On réécrit à chaque passage l'historique de démonstration, étalé sur les
-  // douze derniers mois, pour que le graphique raconte une progression.
+  // --- Un historique de gardes terminées, pour que tout soit cohérent ----
+  // On réécrit à chaque passage : de vraies gardes menées à terme, réparties
+  // sur douze mois, chacune rapportant ses points. Ainsi le solde, le nombre
+  // de gardes, la note moyenne et le graphique racontent la même histoire.
   await interroger(
     `delete from maillon
       where membre_id = $1 and nature = 'garde' and stationnement_id is null`,
     [moi],
   );
-  // Du plus ancien au mois en cours : un total de 80 points, en hausse.
-  const PARMOIS = [0, 0, 5, 0, 10, 5, 0, 15, 5, 10, 10, 20];
-  for (const [rang, gagnes] of PARMOIS.entries()) {
-    if (gagnes === 0) continue;
-    const moisAvant = PARMOIS.length - 1 - rang;
+  await interroger(
+    `delete from stationnement s using emplacement e
+      where e.id = s.emplacement_id and e.membre_id = $1 and s.etat = 'termine'`,
+    [moi],
+  );
+  const cyclistes = await interroger<{ id: string; prenom: string }>(
+    `select id, prenom from membre
+      where lower(email) in ('camille.renard@exemple.be', 'yanis.benali@exemple.be')
+      order by prenom`,
+  );
+  // Nombre de gardes par mois (du plus ancien au mois en cours) : 16 gardes
+  // de 5 points = 80 points, en hausse.
+  const GARDES_PAR_MOIS = [0, 0, 1, 0, 2, 1, 0, 3, 1, 2, 2, 4];
+  const gardesCreees: string[] = [];
+  let compteurCycliste = 0;
+  for (const [rang, nombre] of GARDES_PAR_MOIS.entries()) {
+    const moisAvant = GARDES_PAR_MOIS.length - 1 - rang;
+    for (let k = 0; k < nombre; k += 1) {
+      const cycliste = cyclistes[compteurCycliste % cyclistes.length];
+      compteurCycliste += 1;
+      if (!cycliste) continue;
+      const jour = 3 + k * 6;
+      const [garde] = await interroger<{ id: string }>(
+        `insert into stationnement (
+           emplacement_id, cycliste_id, etat, debut, fin, type_velo,
+           demande_le, repondu_le, depose_le, repris_le
+         )
+         values (
+           $1, $2, 'termine',
+           date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4, hours => 10),
+           date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4, hours => 13),
+           'Ville',
+           date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4 - 1, hours => 18),
+           date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4 - 1, hours => 19),
+           date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4, hours => 10),
+           date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4, hours => 13)
+         )
+         returning id`,
+        [lieu.id, cycliste.id, moisAvant, jour],
+      );
+      if (!garde) continue;
+      gardesCreees.push(garde.id);
+      await interroger(
+        `insert into maillon (membre_id, stationnement_id, nombre, etat, nature, motif, cree_le)
+         values ($1, $2, 5, 'acquis', 'garde', 'Garde de démonstration',
+                 date_trunc('month', now()) - make_interval(months => $3) + make_interval(days => $4, hours => 13))`,
+        [moi, garde.id, moisAvant, jour],
+      );
+    }
+  }
+  // Quelques avis publiés sur les gardes les plus récentes, pour une note.
+  const NOTES = [5, 5, 4, 5];
+  const recentes = gardesCreees.slice(-NOTES.length).reverse();
+  for (const [i, gardeId] of recentes.entries()) {
+    const [ligne] = await interroger<{ cyclisteId: string }>(
+      'select cycliste_id as "cyclisteId" from stationnement where id = $1',
+      [gardeId],
+    );
+    if (!ligne) continue;
     await interroger(
-      `insert into maillon (membre_id, nombre, etat, nature, motif, cree_le)
-       values ($1, $2, 'acquis', 'garde', 'Garde de démonstration',
-               date_trunc('month', now()) - make_interval(months => $3)
-                 + interval '12 days')`,
-      [moi, gagnes, moisAvant],
+      `insert into avis_sur_une_garde
+         (stationnement_id, auteur_id, cible_id, sens, note, texte, ecrit_le, publie_le)
+       values ($1, $2, $3, 'cycliste_vers_bike_sitter', $4,
+               'Accueil chaleureux, vélo en sécurité. Merci !',
+               now() - interval '10 days', now() - interval '10 days')
+       on conflict do nothing`,
+      [gardeId, ligne.cyclisteId, moi, NOTES[i] ?? 5],
     );
   }
-  process.stdout.write('· 80 points, répartis sur douze mois\n');
+  process.stdout.write(
+    `· ${gardesCreees.length} gardes terminées (80 points), ${recentes.length} avis\n`,
+  );
 
   // --- Des notifications -------------------------------------------------
   const [{ n: notifs }] = await interroger<{ n: string }>(
