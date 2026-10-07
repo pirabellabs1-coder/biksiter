@@ -129,7 +129,7 @@ export default async function EspaceBikeSitter() {
   ];
 
   return (
-    <main id="contenu" className="ecran">
+    <main id="contenu" className="ecran ecran-tableau">
       <header className="ecran-tete">
         <p className="kicker">Espace bike sitter</p>
         <h1>Bonjour {membre.prenom}</h1>
@@ -140,205 +140,227 @@ export default async function EspaceBikeSitter() {
         </p>
       </header>
 
-      <section aria-labelledby="titre-demandes">
-        <h2 className="titre-section" id="titre-demandes">
-          Demandes à traiter
-          {demandes.length > 0 ? (
-            <span className="titre-compteur attente">{demandes.length}</span>
-          ) : null}
-        </h2>
-        {demandes.length === 0 ? (
-          <p className="prog-note">
-            Aucune demande n’attend votre réponse. Vous recevez une notification
-            dès qu’un cycliste vous écrit.
-          </p>
-        ) : (
-          <ul className="pile-cartes" role="list">
-            {demandes.map((demande) => (
-              <li key={demande.id}>
+      {/* Deux colonnes sur grand écran, une seule sur téléphone : les
+          conteneurs disparaissent (display: contents) sous 1100 px, si bien
+          que l'ordre et l'espacement du mobile ne changent pas. */}
+      <div className="tableau-cols">
+        <div className="tableau-col">
+          <section aria-labelledby="titre-demandes">
+            <h2 className="titre-section" id="titre-demandes">
+              Demandes à traiter
+              {demandes.length > 0 ? (
+                <span className="titre-compteur attente">
+                  {demandes.length}
+                </span>
+              ) : null}
+            </h2>
+            {demandes.length === 0 ? (
+              <p className="prog-note">
+                Aucune demande n’attend votre réponse. Vous recevez une
+                notification dès qu’un cycliste vous écrit.
+              </p>
+            ) : (
+              <ul className="pile-cartes" role="list">
+                {demandes.map((demande) => (
+                  <li key={demande.id}>
+                    <Link
+                      href={`/demande/${demande.id}`}
+                      className="demande-a-traiter"
+                    >
+                      <Avatar
+                        membreId={demande.autreId}
+                        prenom={demande.autrePrenom}
+                        version={demande.autrePhoto}
+                        taille={46}
+                      />
+                      <span className="gav-texte">
+                        <strong>
+                          {demande.autrePrenom} {demande.autreInitiale}.
+                          {demande.autreVerifie ? (
+                            <span className="tag ver">Identité vérifiée</span>
+                          ) : null}
+                        </strong>
+                        <span>
+                          {demande.veloNom ?? demande.typeVelo} ·{' '}
+                          {creneauCourt(
+                            new Date(demande.debut),
+                            new Date(demande.fin),
+                          )}
+                        </span>
+                        <span className="delai">
+                          Réponse attendue dans{' '}
+                          {delaiEnFrancais(
+                            minutesPourRepondre(
+                              new Date(demande.demandeLe),
+                              new Date(demande.debut),
+                              maintenant,
+                            ),
+                          )}
+                        </span>
+                      </span>
+                      <Icone
+                        nom="chevron"
+                        taille={20}
+                        className="rangee-chevron"
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section aria-labelledby="titre-prochaine">
+            <h2 className="titre-section" id="titre-prochaine">
+              Prochaine garde
+            </h2>
+            {prochaine ? (
+              <Link href={`/demande/${prochaine.id}`} className="garde-a-venir">
+                <span className="gav-date" aria-hidden="true">
+                  <b>{jourDuMois(new Date(prochaine.debut))}</b>
+                  <span>{moisAbrege(new Date(prochaine.debut))}</span>
+                </span>
+                <span className="gav-texte">
+                  <span className={PASTILLE_DE_L_ETAT[prochaine.etat].pastille}>
+                    {PASTILLE_DE_L_ETAT[prochaine.etat].texte}
+                  </span>
+                  <strong>
+                    {prochaine.autrePrenom} {prochaine.autreInitiale}.
+                  </strong>
+                  <span>
+                    {prochaine.veloNom ?? prochaine.typeVelo} ·{' '}
+                    {creneauCourt(
+                      new Date(prochaine.debut),
+                      new Date(prochaine.fin),
+                    )}
+                  </span>
+                </span>
+                <Icone nom="chevron" taille={20} className="rangee-chevron" />
+              </Link>
+            ) : (
+              <p className="prog-note">
+                Aucune garde n’est prévue pour le moment.
+              </p>
+            )}
+          </section>
+        </div>
+
+        <div className="tableau-col">
+          <section aria-labelledby="titre-chiffres">
+            <h2 className="titre-section" id="titre-chiffres">
+              Vos chiffres
+            </h2>
+            <div className="prog-stats">
+              <div>
+                <b data-solde>{accueil.points}</b>
+                <span>point{accueil.points > 1 ? 's' : ''}</span>
+              </div>
+              <div>
+                <b>{accueil.demandesEnAttente}</b>
+                <span>
+                  demande{accueil.demandesEnAttente > 1 ? 's' : ''} en attente
+                </span>
+              </div>
+              <div>
+                <b>{accueil.gardesTerminees}</b>
+                <span>
+                  garde{accueil.gardesTerminees > 1 ? 's' : ''} terminée
+                  {accueil.gardesTerminees > 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="titre-accueil">
+            <h2 className="titre-section" id="titre-accueil">
+              Votre accueil
+            </h2>
+            <ul className="groupe" role="list">
+              <li>
                 <Link
-                  href={`/demande/${demande.id}`}
-                  className="demande-a-traiter"
+                  href={`/mes-lieux/${premierLieu.reference}/disponibilites`}
+                  className="rangee"
                 >
-                  <Avatar
-                    membreId={demande.autreId}
-                    prenom={demande.autrePrenom}
-                    version={demande.autrePhoto}
-                    taille={46}
-                  />
-                  <span className="gav-texte">
-                    <strong>
-                      {demande.autrePrenom} {demande.autreInitiale}.
-                      {demande.autreVerifie ? (
-                        <span className="tag ver">Identité vérifiée</span>
-                      ) : null}
-                    </strong>
+                  <span className="rangee-icone" aria-hidden="true">
+                    <Icone nom="horloge" taille={18} strokeWidth={2} />
+                  </span>
+                  <span className="rangee-texte">
+                    <strong>Jours et horaires</strong>
                     <span>
-                      {demande.veloNom ?? demande.typeVelo} ·{' '}
-                      {creneauCourt(
-                        new Date(demande.debut),
-                        new Date(demande.fin),
-                      )}
-                    </span>
-                    <span className="delai">
-                      Réponse attendue dans{' '}
-                      {delaiEnFrancais(
-                        minutesPourRepondre(
-                          new Date(demande.demandeLe),
-                          new Date(demande.debut),
-                          maintenant,
-                        ),
-                      )}
+                      {horaires} · jusqu’à {premierLieu.dureeMaxHeures} h
+                      d’affilée
                     </span>
                   </span>
-                  <Icone nom="chevron" taille={20} className="rangee-chevron" />
+                  <Icone nom="chevron" taille={18} className="rangee-chevron" />
                 </Link>
               </li>
-            ))}
-          </ul>
-        )}
-      </section>
+              <li>
+                <DisponibleMaintenant
+                  jusqua={jusqua ? jusqua.toISOString() : null}
+                  attente={
+                    // Un lieu en pause ou pas encore publié n'apparaît dans
+                    // aucune recherche : l'interrupteur attend sa publication.
+                    horairesPublies.length === 0
+                      ? 'Possible dès que votre emplacement est en ligne.'
+                      : ouverture.possible
+                        ? null
+                        : ouverture.des
+                          ? `Possible à partir de ${heureFrancaise(ouverture.des)}, pendant vos horaires d’accueil.`
+                          : 'Possible demain, pendant vos horaires d’accueil.'
+                  }
+                />
+              </li>
+              <li>
+                <Link
+                  href={`/mes-lieux/${premierLieu.reference}`}
+                  className="rangee"
+                >
+                  <span className="rangee-icone" aria-hidden="true">
+                    <Icone nom="maison" taille={18} strokeWidth={2} />
+                  </span>
+                  <span className="rangee-texte">
+                    <strong>Mon emplacement</strong>
+                    <span>
+                      {premierLieu.type} · {premierLieu.quartier} ·{' '}
+                      {premierLieu.capacite} place
+                      {premierLieu.capacite > 1 ? 's' : ''}
+                    </span>
+                  </span>
+                  <Icone nom="chevron" taille={18} className="rangee-chevron" />
+                </Link>
+              </li>
+            </ul>
+          </section>
 
-      <section aria-labelledby="titre-prochaine">
-        <h2 className="titre-section" id="titre-prochaine">
-          Prochaine garde
-        </h2>
-        {prochaine ? (
-          <Link href={`/demande/${prochaine.id}`} className="garde-a-venir">
-            <span className="gav-date" aria-hidden="true">
-              <b>{jourDuMois(new Date(prochaine.debut))}</b>
-              <span>{moisAbrege(new Date(prochaine.debut))}</span>
-            </span>
-            <span className="gav-texte">
-              <span className={PASTILLE_DE_L_ETAT[prochaine.etat].pastille}>
-                {PASTILLE_DE_L_ETAT[prochaine.etat].texte}
-              </span>
-              <strong>
-                {prochaine.autrePrenom} {prochaine.autreInitiale}.
-              </strong>
-              <span>
-                {prochaine.veloNom ?? prochaine.typeVelo} ·{' '}
-                {creneauCourt(
-                  new Date(prochaine.debut),
-                  new Date(prochaine.fin),
-                )}
-              </span>
-            </span>
-            <Icone nom="chevron" taille={20} className="rangee-chevron" />
-          </Link>
-        ) : (
-          <p className="prog-note">Aucune garde n’est prévue pour le moment.</p>
-        )}
-      </section>
-
-      <section aria-labelledby="titre-chiffres">
-        <h2 className="titre-section" id="titre-chiffres">
-          Vos chiffres
-        </h2>
-        <div className="prog-stats">
-          <div>
-            <b data-solde>{accueil.points}</b>
-            <span>point{accueil.points > 1 ? 's' : ''}</span>
-          </div>
-          <div>
-            <b>{accueil.demandesEnAttente}</b>
-            <span>
-              demande{accueil.demandesEnAttente > 1 ? 's' : ''} en attente
-            </span>
-          </div>
-          <div>
-            <b>{accueil.gardesTerminees}</b>
-            <span>
-              garde{accueil.gardesTerminees > 1 ? 's' : ''} terminée
-              {accueil.gardesTerminees > 1 ? 's' : ''}
-            </span>
-          </div>
+          <section aria-labelledby="titre-reconnaissance">
+            <h2 className="titre-section" id="titre-reconnaissance">
+              Reconnaissance
+            </h2>
+            <ul className="groupe" role="list">
+              {reconnaissance.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className="rangee">
+                    <span className="rangee-icone" aria-hidden="true">
+                      <Icone nom={r.icone} taille={18} strokeWidth={2} />
+                    </span>
+                    <span className="rangee-texte">
+                      <strong>{r.titre}</strong>
+                    </span>
+                    {r.valeur ? (
+                      <span className="rangee-valeur">{r.valeur}</span>
+                    ) : null}
+                    <Icone
+                      nom="chevron"
+                      taille={18}
+                      className="rangee-chevron"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
-      </section>
-
-      <section aria-labelledby="titre-accueil">
-        <h2 className="titre-section" id="titre-accueil">
-          Votre accueil
-        </h2>
-        <ul className="groupe" role="list">
-          <li>
-            <Link
-              href={`/mes-lieux/${premierLieu.reference}/disponibilites`}
-              className="rangee"
-            >
-              <span className="rangee-icone" aria-hidden="true">
-                <Icone nom="horloge" taille={18} strokeWidth={2} />
-              </span>
-              <span className="rangee-texte">
-                <strong>Jours et horaires</strong>
-                <span>
-                  {horaires} · jusqu’à {premierLieu.dureeMaxHeures} h d’affilée
-                </span>
-              </span>
-              <Icone nom="chevron" taille={18} className="rangee-chevron" />
-            </Link>
-          </li>
-          <li>
-            <DisponibleMaintenant
-              jusqua={jusqua ? jusqua.toISOString() : null}
-              attente={
-                // Un lieu en pause ou pas encore publié n'apparaît dans
-                // aucune recherche : l'interrupteur attend sa publication.
-                horairesPublies.length === 0
-                  ? 'Possible dès que votre emplacement est en ligne.'
-                  : ouverture.possible
-                    ? null
-                    : ouverture.des
-                      ? `Possible à partir de ${heureFrancaise(ouverture.des)}, pendant vos horaires d’accueil.`
-                      : 'Possible demain, pendant vos horaires d’accueil.'
-              }
-            />
-          </li>
-          <li>
-            <Link
-              href={`/mes-lieux/${premierLieu.reference}`}
-              className="rangee"
-            >
-              <span className="rangee-icone" aria-hidden="true">
-                <Icone nom="maison" taille={18} strokeWidth={2} />
-              </span>
-              <span className="rangee-texte">
-                <strong>Mon emplacement</strong>
-                <span>
-                  {premierLieu.type} · {premierLieu.quartier} ·{' '}
-                  {premierLieu.capacite} place
-                  {premierLieu.capacite > 1 ? 's' : ''}
-                </span>
-              </span>
-              <Icone nom="chevron" taille={18} className="rangee-chevron" />
-            </Link>
-          </li>
-        </ul>
-      </section>
-
-      <section aria-labelledby="titre-reconnaissance">
-        <h2 className="titre-section" id="titre-reconnaissance">
-          Reconnaissance
-        </h2>
-        <ul className="groupe" role="list">
-          {reconnaissance.map((r) => (
-            <li key={r.href}>
-              <Link href={r.href} className="rangee">
-                <span className="rangee-icone" aria-hidden="true">
-                  <Icone nom={r.icone} taille={18} strokeWidth={2} />
-                </span>
-                <span className="rangee-texte">
-                  <strong>{r.titre}</strong>
-                </span>
-                {r.valeur ? (
-                  <span className="rangee-valeur">{r.valeur}</span>
-                ) : null}
-                <Icone nom="chevron" taille={18} className="rangee-chevron" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      </div>
     </main>
   );
 }

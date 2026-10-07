@@ -2062,10 +2062,13 @@ body:has(.en-tete-moderation) {
       .ecran-app.centre-vertical,
       .ecran-membre
     ) {
-    max-width: 860px;
-    margin-inline: 0;
-    padding-left: 48px;
-    padding-right: 48px;
+    /* Un écran d'un seul tenant se centre dans l'espace laissé par la barre,
+       à une largeur de lecture confortable, au lieu de se coller à gauche en
+       laissant un grand vide à droite. */
+    max-width: 760px;
+    margin-inline: auto;
+    padding-left: 32px;
+    padding-right: 32px;
   }
   .app-membre > .site :is(.ecran, .dashboard-wrap, .page.page-etroite) {
     padding-top: 40px;
@@ -3835,4 +3838,34 @@ button.photo-dossier.photo-piece {
    (La date et son état, sur les avis donnés, sont déjà en flex plus haut.) */
 .reference-de-garde {
   flex-wrap: wrap;
+}
+
+/* -----------------------------------------------------------------------------
+   L'accueil en deux colonnes sur grand écran
+   Les conteneurs sont transparents (display: contents) sous 1100 px : l'ordre
+   et l'espacement de la pile du téléphone ne changent pas. Au-delà, l'accueil
+   s'étale sur deux colonnes et occupe la largeur au lieu de laisser un vide.
+   -------------------------------------------------------------------------- */
+.tableau-cols,
+.tableau-col {
+  display: contents;
+}
+@media (min-width: 1100px) {
+  .app-membre > .site .ecran.ecran-tableau {
+    max-width: 1120px;
+  }
+  .ecran-tableau .tableau-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 16px 40px;
+    align-items: start;
+  }
+  .ecran-tableau .tableau-col {
+    display: block;
+  }
+  /* La première section de chaque colonne aligne son titre sur l'autre : pas
+     de marge haute qui décalerait une colonne par rapport à l'autre. */
+  .ecran-tableau .tableau-col > section:first-child > .titre-section {
+    margin-top: 0;
+  }
 }
