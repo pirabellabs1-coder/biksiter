@@ -281,3 +281,55 @@ export async function apparaitAuClassement(membreId: string): Promise<boolean> {
   );
   return ligne?.apparait ?? false;
 }
+
+/** Un mois du graphique des points : son libellé court et les points gagnés. */
+export type PointsDUnMois = { cle: string; libelle: string; points: number };
+
+/**
+ * Les points gagnés mois par mois, sur les douze derniers mois (mois vides
+ * compris) : de quoi dessiner la courbe de progression sur la page Points.
+ */
+export async function pointsParMois(
+  membreId: string,
+  nombreDeMois = 12,
+): Promise<PointsDUnMois[]> {
+  const lignes = await interroger<{ mois: Date; points: number }>(
+    `select m.mois,
+            coalesce(sum(x.nombre) filter (where x.nombre > 0), 0)::int as points
+       from generate_series(
+              date_trunc('month', now()) - make_interval(months => $2 - 1),
+              date_trunc('month', now()),
+              interval '1 month'
+            ) as m(mois)
+       left join maillon x
+         on date_trunc('month', x.cree_le) = m.mois
+        and x.membre_id = $1
+        and x.nature = 'garde'
+        and x.etat = 'acquis'
+      group by m.mois
+      order by m.mois`,
+    [membreId, nombreDeMois],
+  );
+  const mois = [
+    'janv.',
+    'févr.',
+    'mars',
+    'avr.',
+    'mai',
+    'juin',
+    'juil.',
+    'août',
+    'sept.',
+    'oct.',
+    'nov.',
+    'déc.',
+  ];
+  return lignes.map((ligne) => {
+    const date = new Date(ligne.mois);
+    return {
+      cle: `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`,
+      libelle: mois[date.getUTCMonth()] ?? '',
+      points: ligne.points,
+    };
+  });
+}

@@ -155,21 +155,28 @@ async function main(): Promise<void> {
     }
   }
 
-  // --- Des points, pour que le catalogue s'ouvre -------------------------
-  const [{ n: points }] = await interroger<{ n: string }>(
-    'select count(*) as n from maillon where membre_id = $1',
+  // --- Des points gagnés mois par mois (pour la courbe de progression) ---
+  // On réécrit à chaque passage l'historique de démonstration, étalé sur les
+  // douze derniers mois, pour que le graphique raconte une progression.
+  await interroger(
+    `delete from maillon
+      where membre_id = $1 and nature = 'garde' and stationnement_id is null`,
     [moi],
   );
-  if (Number(points) === 0) {
-    for (let i = 0; i < 4; i += 1) {
-      await interroger(
-        `insert into maillon (membre_id, nombre, etat, motif)
-         values ($1, 20, 'acquis', 'Garde de démonstration')`,
-        [moi],
-      );
-    }
-    process.stdout.write('· 80 points crédités\n');
+  // Du plus ancien au mois en cours : un total de 80 points, en hausse.
+  const PARMOIS = [0, 0, 5, 0, 10, 5, 0, 15, 5, 10, 10, 20];
+  for (const [rang, gagnes] of PARMOIS.entries()) {
+    if (gagnes === 0) continue;
+    const moisAvant = PARMOIS.length - 1 - rang;
+    await interroger(
+      `insert into maillon (membre_id, nombre, etat, nature, motif, cree_le)
+       values ($1, $2, 'acquis', 'garde', 'Garde de démonstration',
+               date_trunc('month', now()) - make_interval(months => $3)
+                 + interval '12 days')`,
+      [moi, gagnes, moisAvant],
+    );
   }
+  process.stdout.write('· 80 points, répartis sur douze mois\n');
 
   // --- Des notifications -------------------------------------------------
   const [{ n: notifs }] = await interroger<{ n: string }>(

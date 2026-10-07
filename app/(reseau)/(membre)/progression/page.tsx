@@ -2,9 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Icone } from '@/components/app/icone';
+import { GraphiqueDesPoints } from '@/components/app/graphique-points';
 import { statistiquesDuBikeSitter } from '@/lib/depot/lieux';
 import { nombreDeNotificationsNonLues } from '@/lib/depot/notifications';
-import { classement, progressionDuMembre } from '@/lib/depot/progression';
+import {
+  classement,
+  pointsParMois,
+  progressionDuMembre,
+} from '@/lib/depot/progression';
 import { textes } from '@/lib/i18n/langue';
 import { modeCourant } from '@/lib/mode';
 import {
@@ -68,10 +73,11 @@ export default async function Progression({
   const periode: PeriodeDuClassement =
     PERIODES_DU_CLASSEMENT.find((p) => p.cle === demandee)?.cle ?? 'jour';
 
-  const [progression, _nonLues, stats] = await Promise.all([
+  const [progression, _nonLues, stats, courbeDesPoints] = await Promise.all([
     progressionDuMembre(membre.id),
     nombreDeNotificationsNonLues(membre.id),
     statistiquesDuBikeSitter(membre.id),
+    pointsParMois(membre.id),
   ]);
   const niveau = niveauPour(progression.pointsGagnes);
   const badges = etatDesBadges(progression.activite);
@@ -107,8 +113,11 @@ export default async function Progression({
           </p>
         </div>
 
-        <div className="prog-stats">
+        <div className="prog-stats prog-stats-illustre">
           <div>
+            <span className="stat-chip vert" aria-hidden="true">
+              <Icone nom="utilisateurs" taille={18} strokeWidth={2} />
+            </span>
             <b>{progression.cyclistesAides}</b>
             <span>
               cycliste{progression.cyclistesAides > 1 ? 's' : ''} aidé
@@ -118,6 +127,9 @@ export default async function Progression({
           {/* La maquette comptait les heures de garde ; le dépôt ne les tient
               pas encore, il tient les gardes accueillies. */}
           <div>
+            <span className="stat-chip vert" aria-hidden="true">
+              <Icone nom="velo" taille={18} strokeWidth={2} />
+            </span>
             <b>{stats.gardesMenees}</b>
             <span>
               garde{stats.gardesMenees > 1 ? 's' : ''} accueillie
@@ -125,6 +137,9 @@ export default async function Progression({
             </span>
           </div>
           <div>
+            <span className="stat-chip ambre" aria-hidden="true">
+              <Icone nom="etoile" taille={18} strokeWidth={2} />
+            </span>
             <b>
               {progression.noteMoyenne !== null
                 ? progression.noteMoyenne.toLocaleString('fr-BE', {
@@ -135,6 +150,19 @@ export default async function Progression({
             <span>note moyenne</span>
           </div>
         </div>
+
+        <section className="prog-carte prog-graphique">
+          <div className="prog-graphique-tete">
+            <h2 className="prog-titre" style={{ margin: 0 }}>
+              Vos points au fil des mois
+            </h2>
+            <span className="prog-graphique-total">
+              {courbeDesPoints.reduce((somme, m) => somme + m.points, 0)} points
+              sur douze mois
+            </span>
+          </div>
+          <GraphiqueDesPoints mois={courbeDesPoints} />
+        </section>
 
         <h2 className="prog-titre">Vos badges</h2>
         <div className="badges">

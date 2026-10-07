@@ -4380,3 +4380,67 @@ button.photo-dossier.photo-piece {
     color: var(--lamp-ink);
   }
 }
+
+/* -----------------------------------------------------------------------------
+   Le graphique des points (page Progression)
+   -------------------------------------------------------------------------- */
+.prog-graphique {
+  padding: 22px 22px 10px;
+}
+.prog-graphique-tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 6px;
+}
+.prog-graphique-total {
+  font-size: 13.5px;
+  color: var(--texte-leger);
+}
+.graphique-points {
+  margin: 0;
+}
+.graphique-points svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.gp-grille {
+  stroke: var(--trait);
+  stroke-width: 1;
+}
+.gp-ligne {
+  stroke: var(--trust);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.gp-point {
+  fill: var(--trust);
+}
+.gp-point-actuel {
+  fill: var(--trust);
+  stroke: var(--fond);
+  stroke-width: 3;
+}
+.gp-valeur {
+  fill: var(--trust-deep);
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+}
+.gp-mois {
+  fill: var(--texte-leger);
+  font-size: 12.5px;
+}
+
+/* Un liseré ambre sur les demandes à traiter : elles attendent votre réponse
+   (règle 6 : l'ambre dit « en cours / en attente »). Desktop seulement. */
+@media (min-width: 900px) {
+  .app-membre a.demande-a-traiter {
+    border-left: 3px solid var(--lamp);
+  }
+}
