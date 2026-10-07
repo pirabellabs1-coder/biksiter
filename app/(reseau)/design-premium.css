@@ -4551,3 +4551,44 @@ button.photo-dossier.photo-piece {
     animation-delay: 0.16s;
   }
 }
+
+/* -----------------------------------------------------------------------------
+   La barre latérale en couleur (desktop) — un vert de marque profond
+   Le mobile garde sa barre d'onglets claire en bas ; seule la barre verticale
+   de l'ordinateur passe en vert. L'élément actif devient une pastille blanche,
+   nette sur le fond vert.
+   -------------------------------------------------------------------------- */
+@media (min-width: 900px) {
+  body:has(.app-membre) .tabbar {
+    background: linear-gradient(
+      185deg,
+      var(--v-11, #0a5a25) 0%,
+      var(--v-12, #0a2e16) 100%
+    );
+    border-right: 0;
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.04);
+  }
+  body:has(.app-membre) .tabbar .tb {
+    color: rgba(255, 255, 255, 0.76);
+  }
+  body:has(.app-membre) .tabbar .tb .tb-i svg {
+    color: rgba(255, 255, 255, 0.88);
+  }
+  body:has(.app-membre) .tabbar .tb:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  body:has(.app-membre) .tabbar .tb.actif {
+    background: #fff;
+    color: var(--trust-deep, #005b20);
+    font-weight: 600;
+    box-shadow: 0 4px 12px -5px rgba(0, 0, 0, 0.3);
+  }
+  body:has(.app-membre) .tabbar .tb.actif .tb-i svg {
+    color: var(--trust, #017628);
+  }
+  body:has(.app-membre) .tabbar .tb:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
