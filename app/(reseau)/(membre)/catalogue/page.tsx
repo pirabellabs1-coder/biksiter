@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { Icone } from '@/components/app/icone';
 import { mesBons, offresDuCatalogue } from '@/lib/depot/catalogue';
 import { nombreDEmplacements } from '@/lib/depot/emplacements';
 import { comptesDuMembre, soldeDuMembre } from '@/lib/depot/maillons';
@@ -149,13 +150,16 @@ export default async function Catalogue({
                     key={offre.id}
                   >
                     <div className="reco-tete">
-                      <span className="reco-cat">
-                        {offre.categorie === 'autre' ? '' : titreDeLaCategorie}
+                      <span className="reco-icone" aria-hidden="true">
+                        <Icone nom="cadeau" taille={20} strokeWidth={1.8} />
                       </span>
                       <span className="reco-cout">
                         <b>{offre.coutEnMaillons}</b> pts
                       </span>
                     </div>
+                    {offre.categorie === 'autre' ? null : (
+                      <span className="reco-cat">{titreDeLaCategorie}</span>
+                    )}
                     <h3>{offre.titre}</h3>
                     <p>
                       {offre.partenaire}

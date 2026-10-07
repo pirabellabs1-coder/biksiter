@@ -4444,3 +4444,110 @@ button.photo-dossier.photo-piece {
     border-left: 3px solid var(--lamp);
   }
 }
+
+/* -----------------------------------------------------------------------------
+   Catalogue des récompenses : des cartes vivantes
+   Le vert porte la monnaie du réseau (les points) et l'action ; une pastille
+   cadeau donne de la couleur sans sortir de la règle 6.
+   -------------------------------------------------------------------------- */
+@media (min-width: 900px) {
+  #catalogue .page {
+    max-width: 1440px;
+  }
+}
+.app-membre .reco {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border: 1px solid var(--trait-doux, rgba(10, 46, 22, 0.08));
+  border-radius: 18px;
+  background: var(--fond);
+  box-shadow: var(--ombre-1);
+  transition:
+    transform 0.18s var(--courbe),
+    box-shadow 0.18s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .app-membre .reco:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elev-2, var(--ombre-2));
+  }
+}
+.app-membre .reco-bloquee {
+  opacity: 0.74;
+}
+.app-membre .reco-icone {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--trust-wash);
+  color: var(--trust);
+}
+.app-membre .reco-cout {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--trust);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.app-membre .reco-cout b {
+  font-weight: 700;
+}
+.app-membre .reco-cat {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--texte-leger);
+}
+.app-membre .reco h3 {
+  margin: 6px 0 2px;
+  font-size: 16px;
+}
+.app-membre .reco-actions {
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+/* -----------------------------------------------------------------------------
+   Micro-animation d'apparition — les cartes « se posent » à l'ouverture.
+   Desktop seulement, courte et discrète ; neutralisée pour qui a désactivé
+   les animations (règle globale prefers-reduced-motion).
+   -------------------------------------------------------------------------- */
+@keyframes bs-apparition {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (min-width: 900px) {
+  .ecran-tableau > .ecran-tete,
+  .ecran-tableau .tableau-col > section,
+  .dashboard-wrap
+    > :is(.prog-carte, .prog-stats, .prog-graphique, .badges, h2),
+  .vue-garde > *,
+  .cartes-lieux > li,
+  .recos > .reco,
+  .badges > .badge {
+    animation: bs-apparition 0.34s var(--courbe) both;
+  }
+  /* Une cascade courte dans les grilles et les colonnes. */
+  :is(.recos, .cartes-lieux, .badges, .vue-garde) > :nth-child(2),
+  .ecran-tableau .tableau-col:last-child > section:nth-child(1) {
+    animation-delay: 0.04s;
+  }
+  :is(.recos, .cartes-lieux, .badges, .vue-garde) > :nth-child(3) {
+    animation-delay: 0.08s;
+  }
+  :is(.recos, .cartes-lieux, .badges, .vue-garde) > :nth-child(4) {
+    animation-delay: 0.12s;
+  }
+  :is(.recos, .cartes-lieux, .badges, .vue-garde) > :nth-child(n + 5) {
+    animation-delay: 0.16s;
+  }
+}
